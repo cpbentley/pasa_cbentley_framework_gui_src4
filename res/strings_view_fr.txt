@@ -1,0 +1,13 @@
+Sortie
+Aide
+Menu
+Selection
+En Arrière
+Défaire
+Annuler
+Ok
+Rotation écran
+Refaire
+Toggle Debug
+Position du Menu
+Historique des Commandes

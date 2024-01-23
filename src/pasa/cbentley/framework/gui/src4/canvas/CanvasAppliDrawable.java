@@ -17,9 +17,9 @@ import pasa.cbentley.framework.coreui.src4.exec.ExecEntry;
 import pasa.cbentley.framework.coreui.src4.exec.ExecutionContext;
 import pasa.cbentley.framework.coreui.src4.interfaces.ICanvasHost;
 import pasa.cbentley.framework.coreui.src4.interfaces.ITechEventHost;
-import pasa.cbentley.framework.coreui.src4.tech.IBCodes;
+import pasa.cbentley.framework.coreui.src4.tech.ITechCodes;
 import pasa.cbentley.framework.coreui.src4.tech.IInput;
-import pasa.cbentley.framework.coreui.src4.tech.ITechCanvasHost;
+import pasa.cbentley.framework.coreui.src4.tech.IBOCanvasHost;
 import pasa.cbentley.framework.drawx.src4.engine.GraphicsX;
 import pasa.cbentley.framework.drawx.src4.engine.RgbImage;
 import pasa.cbentley.framework.gui.src4.anim.AnimCreator;
@@ -45,7 +45,7 @@ import pasa.cbentley.framework.input.src4.CanvasResult;
 import pasa.cbentley.framework.input.src4.InputState;
 import pasa.cbentley.framework.input.src4.RepaintCtrl;
 import pasa.cbentley.framework.input.src4.ScreenOrientationCtrl;
-import pasa.cbentley.framework.input.src4.interfaces.ITechInput;
+import pasa.cbentley.framework.input.src4.interfaces.ITechPaintThread;
 import pasa.cbentley.framework.input.src4.interfaces.ITechInputCycle;
 import pasa.cbentley.layouter.src4.engine.LayouterDebugBreaker;
 import pasa.cbentley.layouter.src4.engine.PozerFactory;
@@ -105,7 +105,7 @@ public class CanvasAppliDrawable extends CanvasAppliInput implements IDrawableLi
     * <li> {@link ITechCanvasDrawable#SCREEN_3_RIGHT_ROTATED}
     * 
     */
-   protected int                     screenConfig = ITechCanvasHost.SCREEN_0_TOP_NORMAL;
+   protected int                     screenConfig = IBOCanvasHost.SCREEN_0_TOP_NORMAL;
 
    private CanvasTechHelper          settingsHelper;
 
@@ -148,7 +148,7 @@ public class CanvasAppliDrawable extends CanvasAppliInput implements IDrawableLi
     * 
     * @param gc
     * @param techCanvasAppli {@link ITechCanvasAppliDrawable}
-    * @param techCanvasHost {@link ITechCanvasHost}
+    * @param techCanvasHost {@link IBOCanvasHost}
     */
    public CanvasAppliDrawable(GuiCtx gc, ByteObject techCanvasAppli, ByteObject techCanvasHost) {
       super(gc.getIC(), techCanvasAppli, techCanvasHost);
@@ -393,10 +393,10 @@ public class CanvasAppliDrawable extends CanvasAppliInput implements IDrawableLi
     * 
     * An event 
     * <li>wait for previous execution context to finish
-    * <li>queries the state of the GUI with focus state changes , Lock on {@link ITechInput#THREAD_2_RENDER} 
+    * <li>queries the state of the GUI with focus state changes , Lock on {@link ITechPaintThread#THREAD_2_RENDER} 
     * <li>identify a command,
     * <li>execute the command and sub commands, 
-    * <li>push the changes to the GUI. Lock on {@link ITechInput#THREAD_2_RENDER}
+    * <li>push the changes to the GUI. Lock on {@link ITechPaintThread#THREAD_2_RENDER}
     * <br>
     * <br>
     * An execution context can be parceled in several paint jobs. 
@@ -420,7 +420,7 @@ public class CanvasAppliDrawable extends CanvasAppliInput implements IDrawableLi
     * the event to the 
     * {@link CanvasAppliInput#ctrlKeyPressed}
     * <br>
-    * Called in the update thread {@link ITechInput#THREAD_1_UPDATE}
+    * Called in the update thread {@link ITechPaintThread#THREAD_1_UPDATE}
     * <br>
     * <br>
     * At the begining of the Appli life cycle, the CMD start is processed.
@@ -444,14 +444,14 @@ public class CanvasAppliDrawable extends CanvasAppliInput implements IDrawableLi
          return;
       }
 
-      if (ic.isKeyTyped(IBCodes.KEY_F2)) {
+      if (ic.isKeyTyped(ITechCodes.KEY_F2)) {
          toDLog().pAlways("F2 Debug CanvasView", this, CanvasAppliDrawable.class, "ctrlUIEvent");
          return;
       }
-      if (ic.isKeyPressed(IBCodes.KEY_F3)) {
+      if (ic.isKeyPressed(ITechCodes.KEY_F3)) {
          toDLog().pAlways("F3 Debug InputState", ic, CanvasAppliDrawable.class, "ctrlUIEvent");
       }
-      if (ic.isKeyPressed(IBCodes.KEY_F4)) {
+      if (ic.isKeyPressed(ITechCodes.KEY_F4)) {
          toDLog().pAlways("F4 Debug Coordinator", gc.getCFC().getCoordinator(), CanvasAppliDrawable.class, "ctrlUIEvent");
       }
       InputStateDrawable id = (InputStateDrawable) ic;
@@ -461,7 +461,7 @@ public class CanvasAppliDrawable extends CanvasAppliInput implements IDrawableLi
 
       //wait until previous context has finished rendering. why?
       //because we will getDrawable at x,y and we need the latest state
-      if (getThreadingMode() == ITechInput.THREADING_3_THREE_SEPARATE) {
+      if (getThreadingMode() == ITechPaintThread.THREADING_3_THREE_SEPARATE) {
          //in single thread.. that's automatic
          if (previous != null) {
             if (!previous.finished) {
@@ -823,7 +823,7 @@ public class CanvasAppliDrawable extends CanvasAppliInput implements IDrawableLi
       //size for the image layer
       int w = 0;
       int h = 0;
-      if (screenConfig == ITechCanvasHost.SCREEN_1_BOT_UPSIDEDOWN || screenConfig == ITechCanvasHost.SCREEN_0_TOP_NORMAL) {
+      if (screenConfig == IBOCanvasHost.SCREEN_1_BOT_UPSIDEDOWN || screenConfig == IBOCanvasHost.SCREEN_0_TOP_NORMAL) {
          w = getWidth();
          h = getHeight();
       } else {
@@ -841,7 +841,7 @@ public class CanvasAppliDrawable extends CanvasAppliInput implements IDrawableLi
     * Main Render method to draw {@link CanvasAppliDrawable} content. 
     * 
     * <b>Threading Mode</b>
-    * <li>Called in the render thread {@link ITechInput#THREAD_2_RENDER}
+    * <li>Called in the render thread {@link ITechPaintThread#THREAD_2_RENDER}
     * in Active Rendering mode 
     * <li> the GUI Event Thread in Passive Mode.
     * <li> It can also be called in a Business Thread when painting ? Not a good idea.

@@ -16,7 +16,7 @@ import pasa.cbentley.framework.cmd.src4.ctx.CmdCtx;
 import pasa.cbentley.framework.cmd.src4.ctx.IStaticIDsCmd;
 import pasa.cbentley.framework.core.src4.app.IAppli;
 import pasa.cbentley.framework.core.src4.ctx.CoreFrameworkCtx;
-import pasa.cbentley.framework.core.src4.interfaces.ITechFeaturesHost;
+import pasa.cbentley.framework.core.src4.interfaces.ITechHostCore;
 import pasa.cbentley.framework.coredata.src4.ctx.CoreDataCtx;
 import pasa.cbentley.framework.coredraw.src4.ctx.CoreDrawCtx;
 import pasa.cbentley.framework.coreui.src4.ctx.CoreUiCtx;
@@ -705,8 +705,8 @@ public class GuiCtx extends ABOCtx implements ITechCtxSettingsAppGui {
    }
 
    public void showIndependant(InputConfig ic, IDrawable drawable) {
-      if (getCFC().getHost().hasFeatureSupport(ITechFeaturesHost.SUP_ID_24_MULTIPLE_WINDOWS)) {
-         ByteObject techCanvasHost = getCUC().createTechCanvasHostDefault();
+      if (getCFC().getHostCore().hasFeatureSupport(ITechHostCore.SUP_ID_24_MULTIPLE_WINDOWS)) {
+         ByteObject techCanvasHost = getCUC().createBOCanvasHostDefault();
          ByteObject techCanvasAppli = createTechCanvasAppliDrawableDefault();
 
          CanvasAppliDrawable canvas = new CanvasAppliDrawable(this, techCanvasAppli, techCanvasHost);

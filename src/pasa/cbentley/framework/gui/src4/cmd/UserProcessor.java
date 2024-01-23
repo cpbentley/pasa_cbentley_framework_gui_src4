@@ -30,7 +30,7 @@ import pasa.cbentley.framework.coreui.src4.event.GesturePointer;
 import pasa.cbentley.framework.coreui.src4.event.RepeatEvent;
 import pasa.cbentley.framework.coreui.src4.event.SenseEvent;
 import pasa.cbentley.framework.coreui.src4.exec.ExecutionContext;
-import pasa.cbentley.framework.coreui.src4.interfaces.ISenses;
+import pasa.cbentley.framework.coreui.src4.interfaces.ITechSenses;
 import pasa.cbentley.framework.coreui.src4.tech.IInput;
 import pasa.cbentley.framework.coreui.src4.tech.ITechGestures;
 import pasa.cbentley.framework.input.src4.InputState;
@@ -227,8 +227,8 @@ public class UserProcessor implements ITriggers, IStringable {
       } else if (is.isTypeDeviceSensor()) {
          SenseEvent se = is.getSensor();
          int type = se.getSensorType();
-         if (type == ISenses.GESTURE_TYPE_05_SHAKE) {
-            ct.addDevice(0, ISenses.GESTURE_TYPE_05_SHAKE, IInput.DEVICE_7_SENSOR);
+         if (type == ITechSenses.GESTURE_TYPE_05_SHAKE) {
+            ct.addDevice(0, ITechSenses.GESTURE_TYPE_05_SHAKE, IInput.DEVICE_7_SENSOR);
          }
       }
       //create a link trigger.. TODO i.e what is the relation between this one

@@ -6,7 +6,7 @@ import pasa.cbentley.core.src4.interfaces.C;
 import pasa.cbentley.core.src4.logging.Dctx;
 import pasa.cbentley.core.src4.logging.IStringable;
 import pasa.cbentley.framework.coredraw.src4.interfaces.IMFont;
-import pasa.cbentley.framework.drawx.src4.style.ITechStyle;
+import pasa.cbentley.framework.drawx.src4.style.IBOStyle;
 import pasa.cbentley.framework.drawx.src4.style.StyleCache;
 import pasa.cbentley.framework.gui.src4.canvas.ViewContext;
 import pasa.cbentley.framework.gui.src4.ctx.GuiCtx;
@@ -37,7 +37,7 @@ import pasa.cbentley.layouter.src4.tech.ITechSizer;
  * @author Charles-Philip Bentley
  *
  */
-public class LayEngineDrawable extends LayEngineRead implements ITechLayout, IStringable, ITechStyle, IByteObject, ITechDrawable {
+public class LayEngineDrawable extends LayEngineRead implements ITechLayout, IStringable, IBOStyle, IByteObject, ITechDrawable {
 
    private Drawable       drawable;
 

@@ -3,7 +3,7 @@ package pasa.cbentley.framework.gui.src4.ctx;
 import pasa.cbentley.byteobjects.src4.ctx.ABOCtx;
 import pasa.cbentley.framework.coredraw.src4.ctx.CoreDrawCtx;
 import pasa.cbentley.framework.coreui.src4.ctx.CoreUiCtx;
-import pasa.cbentley.framework.coreui.src4.tech.ITechCanvasHost;
+import pasa.cbentley.framework.coreui.src4.tech.IBOCanvasHost;
 import pasa.cbentley.framework.gui.src4.canvas.CanvasAppliDrawable;
 import pasa.cbentley.framework.gui.src4.ctx.config.IConfigCanvasGui;
 import pasa.cbentley.framework.gui.src4.interfaces.IDrawable;
@@ -22,7 +22,7 @@ import pasa.cbentley.framework.input.src4.ctx.InputCtx;
  * Singletons that belong to a Canvas, are located in this class.
  * 
  * THe configuration of the {@link InputCtx} decides what is the default canvas settings
- * {@link ITechCanvasHost}
+ * {@link IBOCanvasHost}
  * 
  * @author Charles Bentley
  *

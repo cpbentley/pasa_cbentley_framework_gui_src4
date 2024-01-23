@@ -15,7 +15,7 @@ import pasa.cbentley.framework.cmd.src4.trigger.CmdTrigger;
 import pasa.cbentley.framework.coreui.src4.event.DeviceEvent;
 import pasa.cbentley.framework.coreui.src4.event.GestureArea;
 import pasa.cbentley.framework.coreui.src4.exec.ExecutionContext;
-import pasa.cbentley.framework.coreui.src4.tech.IBCodes;
+import pasa.cbentley.framework.coreui.src4.tech.ITechCodes;
 import pasa.cbentley.framework.coreui.src4.tech.IInput;
 import pasa.cbentley.framework.coreui.src4.tech.ITechInputFeedback;
 import pasa.cbentley.framework.coreui.src4.utils.ViewState;
@@ -212,9 +212,9 @@ public class ViewCommandListener extends ObjectGui implements ICmdsView, IComman
    public CmdNode getModalCtx() {
       if (modalCtx == null) {
          modalCtx = cc.getNodeRoot().createChildCtx("Modal");
-         CmdTrigger ctFire = cc.getFacTrig().createKeyP(IBCodes.KEY_FIRE);
+         CmdTrigger ctFire = cc.getFacTrig().createKeyP(ITechCodes.KEY_FIRE);
          modalCtx.addCmdLink(ctFire, ICmdsCmd.CMD_04_OK);
-         CmdTrigger ctEscape = cc.getFacTrig().createKeyP(IBCodes.KEY_ESCAPE);
+         CmdTrigger ctEscape = cc.getFacTrig().createKeyP(ITechCodes.KEY_ESCAPE);
          modalCtx.addCmdLink(ctEscape, ICmdsCmd.CMD_05_CANCEL);
       }
       return modalCtx;

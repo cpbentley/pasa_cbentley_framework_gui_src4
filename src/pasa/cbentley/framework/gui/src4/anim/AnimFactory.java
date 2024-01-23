@@ -7,7 +7,7 @@ import pasa.cbentley.byteobjects.src4.ctx.IBOTypesDrw;
 import pasa.cbentley.byteobjects.src4.objects.function.Function;
 import pasa.cbentley.byteobjects.src4.objects.function.ITechFunction;
 import pasa.cbentley.core.src4.interfaces.C;
-import pasa.cbentley.framework.drawx.src4.tech.ITechFigure;
+import pasa.cbentley.framework.drawx.src4.factories.interfaces.IBOFigure;
 import pasa.cbentley.framework.gui.src4.anim.definitions.AlphaChangeRgb;
 import pasa.cbentley.framework.gui.src4.anim.definitions.ByteObjectAnim;
 import pasa.cbentley.framework.gui.src4.anim.definitions.ITechShiftLine;
@@ -50,10 +50,10 @@ public class AnimFactory extends BOAbstractFactory implements IBOAnim, ITechShif
    public void setFigAnimation(ByteObject fig, ByteObject anim) {
       fig.checkType(IBOTypesDrw.TYPE_050_FIGURE);
       anim.checkType(IBOTypesGui.TYPE_130_ANIMATION);
-      if (fig.hasFlag(ITechFigure.FIG__OFFSET_02_FLAG, ITechFigure.FIG_FLAG_6_ANIMATED)) {
+      if (fig.hasFlag(IBOFigure.FIG__OFFSET_02_FLAG, IBOFigure.FIG_FLAG_6_ANIMATED)) {
          //check the animations in the array remove
       } else {
-         fig.setFlag(ITechFigure.FIG__OFFSET_02_FLAG, ITechFigure.FIG_FLAG_6_ANIMATED, true);
+         fig.setFlag(IBOFigure.FIG__OFFSET_02_FLAG, IBOFigure.FIG_FLAG_6_ANIMATED, true);
       }
       fig.addByteObject(anim);
    }

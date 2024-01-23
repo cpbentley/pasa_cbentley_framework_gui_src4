@@ -8,7 +8,7 @@ import pasa.cbentley.core.src4.logging.Dctx;
 import pasa.cbentley.framework.cmd.src4.ctx.CmdCtx;
 import pasa.cbentley.framework.core.src4.app.AppCtx;
 import pasa.cbentley.framework.core.src4.app.IConfigApp;
-import pasa.cbentley.framework.core.src4.app.ITechCtxSettingsAppli;
+import pasa.cbentley.framework.core.src4.app.IBOCtxSettingsAppli;
 import pasa.cbentley.framework.datamodel.src4.ctx.DataModelCtx;
 import pasa.cbentley.framework.drawx.src4.ctx.DrwCtx;
 import pasa.cbentley.framework.gui.src4.ctx.GuiCtx;

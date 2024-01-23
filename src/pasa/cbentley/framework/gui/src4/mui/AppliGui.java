@@ -9,9 +9,9 @@ import pasa.cbentley.core.src4.structs.IntToObjects;
 import pasa.cbentley.framework.cmd.src4.ctx.CmdCtx;
 import pasa.cbentley.framework.core.src4.app.AppCtx;
 import pasa.cbentley.framework.core.src4.app.AppliAbstract;
-import pasa.cbentley.framework.core.src4.app.ITechCtxSettingsAppli;
+import pasa.cbentley.framework.core.src4.app.IBOCtxSettingsAppli;
 import pasa.cbentley.framework.coreui.src4.interfaces.ICanvasAppli;
-import pasa.cbentley.framework.coreui.src4.tech.ITechCanvasHost;
+import pasa.cbentley.framework.coreui.src4.tech.IBOCanvasHost;
 import pasa.cbentley.framework.coreui.src4.utils.ViewState;
 import pasa.cbentley.framework.gui.src4.canvas.CanvasAppliDrawable;
 import pasa.cbentley.framework.gui.src4.canvas.CanvasResultDrawable;
@@ -130,12 +130,12 @@ public abstract class AppliGui extends AppliAbstract {
    private ICanvasAppli getCanvasDefault() {
       if (root0 == null) {
          //do we create it here? we load it from save state. the AppManager will look up the Canvas ID in the current screen config
-         ByteObject techCanvas = gc.getCUC().createTechCanvasHostDefault();
-         techCanvas.set2(ITechCanvasHost.TCANVAS_OFFSET_03_ID2, ITechCanvasHost.TCANVAS_ID_1_ROOT);
+         ByteObject techCanvas = gc.getCUC().createBOCanvasHostDefault();
+         techCanvas.set2(IBOCanvasHost.TCANVAS_OFFSET_03_ID2, IBOCanvasHost.TCANVAS_ID_1_ROOT);
          //title and icon are taken from the LaunchValues no.
          //they are localized
-         techCanvas.set2(ITechCanvasHost.TCANVAS_OFFSET_07_ICON_ID2, 0);
-         techCanvas.set2(ITechCanvasHost.TCANVAS_OFFSET_08_TITLE_ID_ID2, 0);
+         techCanvas.set2(IBOCanvasHost.TCANVAS_OFFSET_07_ICON_ID2, 0);
+         techCanvas.set2(IBOCanvasHost.TCANVAS_OFFSET_08_TITLE_ID_ID2, 0);
          //TODO problem when root. root MUST always be shown on start up ?
          root0 = (CanvasAppliDrawable) getCanvas(1, techCanvas);
       }
@@ -290,13 +290,7 @@ public abstract class AppliGui extends AppliAbstract {
 
    }
 
-   public void stateReadFrom(StatorReader state) {
-      super.stateReadFrom(state);
-   }
 
-   public void stateWriteTo(StatorWriter state) {
-      super.stateWriteTo(state);
-   }
 
    //#mdebug
    public void toString(Dctx dc) {

@@ -33,7 +33,10 @@ public class ScenarioNode extends ScenarioItemAbstract {
    public void addLink(ScenarioNodeLink link) {
       
    }
-   
+   public int getStatorableClassID() {
+      throw new RuntimeException("Must be implemented by subclass");
+   }
+
    public void stateWriteTo(StatorWriter state) {
       // TODO Auto-generated method stub
       

@@ -9,7 +9,7 @@ import pasa.cbentley.core.src4.utils.ColorUtils;
 import pasa.cbentley.core.src4.utils.interfaces.IColors;
 import pasa.cbentley.framework.cmd.src4.ctx.CmdCtx;
 import pasa.cbentley.framework.cmd.src4.interfaces.ICmdsCmd;
-import pasa.cbentley.framework.coreui.src4.tech.IBCodes;
+import pasa.cbentley.framework.coreui.src4.tech.ITechCodes;
 import pasa.cbentley.framework.drawx.src4.ctx.DrwCtx;
 import pasa.cbentley.framework.drawx.src4.engine.GraphicsX;
 import pasa.cbentley.framework.drawx.src4.factories.FigureFactory;
@@ -1012,7 +1012,7 @@ public class ScrollBar extends Drawable implements IBOScrollBar, IDrawableListen
     */
    public void managePointerInput(InputConfig ic) {
       if (ic.isWheeled()) {
-         if (ic.getIdKeyBut() == IBCodes.PBUTTON_3_WHEEL_UP) {
+         if (ic.getIdKeyBut() == ITechCodes.PBUTTON_3_WHEEL_UP) {
             navigateGeneric(ic, 0, true, true);
          } else {
             navigateGeneric(ic, 0, false, true);

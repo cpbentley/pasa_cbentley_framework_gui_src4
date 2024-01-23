@@ -2,6 +2,7 @@ package pasa.cbentley.framework.gui.src4.core;
 
 import pasa.cbentley.byteobjects.src4.core.ByteObject;
 import pasa.cbentley.byteobjects.src4.ctx.IBOTypesDrw;
+import pasa.cbentley.core.src4.ctx.ICtx;
 import pasa.cbentley.core.src4.ctx.UCtx;
 import pasa.cbentley.core.src4.event.BusEvent;
 import pasa.cbentley.core.src4.helpers.StringBBuilder;
@@ -25,11 +26,11 @@ import pasa.cbentley.framework.datamodel.src4.table.ObjectTableModel;
 import pasa.cbentley.framework.drawx.src4.engine.GraphicsX;
 import pasa.cbentley.framework.drawx.src4.engine.RgbCache;
 import pasa.cbentley.framework.drawx.src4.engine.RgbImage;
+import pasa.cbentley.framework.drawx.src4.factories.interfaces.IBOFigure;
 import pasa.cbentley.framework.drawx.src4.string.FxStringOperator;
-import pasa.cbentley.framework.drawx.src4.style.ITechStyle;
+import pasa.cbentley.framework.drawx.src4.style.IBOStyle;
 import pasa.cbentley.framework.drawx.src4.style.StyleCache;
 import pasa.cbentley.framework.drawx.src4.style.StyleOperator;
-import pasa.cbentley.framework.drawx.src4.tech.ITechFigure;
 import pasa.cbentley.framework.gui.src4.anim.AnimCreator;
 import pasa.cbentley.framework.gui.src4.anim.IBOAnim;
 import pasa.cbentley.framework.gui.src4.anim.ITechAnim;
@@ -166,7 +167,7 @@ import pasa.cbentley.layouter.src4.tech.ITechSizer;
  * @author Charles-Philip Bentley
  *
  */
-public class Drawable implements IDrawable, ITechStyle, IStringable, ILayoutable, ICommandDrawable {
+public class Drawable implements IDrawable, IBOStyle, IStringable, ILayoutable, ICommandDrawable {
 
    public static final int     VER_DRAWABLE_01 = 1;
 
@@ -543,6 +544,10 @@ public class Drawable implements IDrawable, ITechStyle, IStringable, ILayoutable
          default:
             break;
       }
+   }
+
+   public int getStatorableClassID() {
+      throw new RuntimeException("Must be implemented by subclass");
    }
 
    /**
@@ -1944,6 +1949,10 @@ public class Drawable implements IDrawable, ITechStyle, IStringable, ILayoutable
       return (statesVolatile & flag) == flag;
    }
 
+   public ICtx getCtxOwner() {
+      return gc;
+   }
+
    /**
     * Request to hide this drawable inside the execution of {@link CmdInstance}
     * @param cmd
@@ -2716,7 +2725,7 @@ public class Drawable implements IDrawable, ITechStyle, IStringable, ILayoutable
     * <br>
     * Different from style layer based animation
     * @param type
-    * @param flag {@link ITechStyle#STYLE_FLAGC_6_ANIM_ENTRY} or {@link ITechStyle#STYLE_FLAGC_7_ANIM_MAIN}
+    * @param flag {@link IBOStyle#STYLE_FLAGC_6_ANIM_ENTRY} or {@link IBOStyle#STYLE_FLAGC_7_ANIM_MAIN}
     * @param style
     */
    protected void processAnim(int type, int flag, ByteObject style) {
@@ -2753,12 +2762,12 @@ public class Drawable implements IDrawable, ITechStyle, IStringable, ILayoutable
       }
 
       //may define an animation on the content only.
-      ByteObject contentFig = getStyleOp().getStyleDrw(style, ITechStyle.STYLE_OFFSET_1_FLAGA, ITechStyle.STYLE_FLAGA_1_CONTENT);
+      ByteObject contentFig = getStyleOp().getStyleDrw(style, IBOStyle.STYLE_OFFSET_1_FLAGA, IBOStyle.STYLE_FLAGA_1_CONTENT);
       //go over each style elements and inspect animated figures.
       for (int i = 0; i < styleElements.length; i++) {
          ByteObject styleSub = styleElements[i];
          if (styleSub != null && styleSub.getType() == IBOTypesDrw.TYPE_050_FIGURE) {
-            if (styleSub.hasFlag(ITechFigure.FIG__OFFSET_02_FLAG, ITechFigure.FIG_FLAG_6_ANIMATED)) {
+            if (styleSub.hasFlag(IBOFigure.FIG__OFFSET_02_FLAG, IBOFigure.FIG_FLAG_6_ANIMATED)) {
                if (styleSub == contentFig) {
                   //animate only the content? How?
 

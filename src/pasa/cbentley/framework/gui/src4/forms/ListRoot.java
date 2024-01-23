@@ -4,7 +4,7 @@ import pasa.cbentley.core.src4.event.BusEvent;
 import pasa.cbentley.framework.coredraw.src4.interfaces.IGraphics;
 import pasa.cbentley.framework.coredraw.src4.interfaces.IMFont;
 import pasa.cbentley.framework.coredraw.src4.interfaces.ITechGraphics;
-import pasa.cbentley.framework.coreui.src4.tech.IBCodes;
+import pasa.cbentley.framework.coreui.src4.tech.ITechCodes;
 import pasa.cbentley.framework.gui.src4.canvas.InputConfig;
 import pasa.cbentley.framework.gui.src4.core.StyleClass;
 import pasa.cbentley.framework.gui.src4.ctx.GuiCtx;
@@ -169,45 +169,45 @@ public class ListRoot extends StringDrawable {
 
    protected void keyReleased(int keyCode) {
       switch (keyCode) {
-         case IBCodes.KEY_STAR: {
+         case ITechCodes.KEY_STAR: {
             decrement();
             break;
          }
-         case IBCodes.KEY_POUND:
+         case ITechCodes.KEY_POUND:
             increment();
             break;
          case -8:
             //remove one letter of the T9
             minusT9();
             break;
-         case IBCodes.KEY_NUM0:
+         case ITechCodes.KEY_NUM0:
             selectX(0);
             break;
-         case IBCodes.KEY_NUM1:
+         case ITechCodes.KEY_NUM1:
             selectX(1);
             break;
-         case IBCodes.KEY_NUM2:
+         case ITechCodes.KEY_NUM2:
             selectX(2);
             break;
-         case IBCodes.KEY_NUM3:
+         case ITechCodes.KEY_NUM3:
             selectX(3);
             break;
-         case IBCodes.KEY_NUM4:
+         case ITechCodes.KEY_NUM4:
             selectX(4);
             break;
-         case IBCodes.KEY_NUM5:
+         case ITechCodes.KEY_NUM5:
             selectX(5);
             break;
-         case IBCodes.KEY_NUM6:
+         case ITechCodes.KEY_NUM6:
             selectX(6);
             break;
-         case IBCodes.KEY_NUM7:
+         case ITechCodes.KEY_NUM7:
             selectX(7);
             break;
-         case IBCodes.KEY_NUM8:
+         case ITechCodes.KEY_NUM8:
             selectX(8);
             break;
-         case IBCodes.KEY_NUM9:
+         case ITechCodes.KEY_NUM9:
             selectX(9);
             break;
 

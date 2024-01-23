@@ -7,7 +7,7 @@ import pasa.cbentley.core.src4.logging.IDLog;
 import pasa.cbentley.core.src4.utils.interfaces.IColors;
 import pasa.cbentley.framework.coredraw.src4.interfaces.IMFont;
 import pasa.cbentley.framework.drawx.src4.ctx.DrwCtx;
-import pasa.cbentley.framework.drawx.src4.style.ITechStyle;
+import pasa.cbentley.framework.drawx.src4.style.IBOStyle;
 import pasa.cbentley.framework.drawx.src4.tech.ITechMergeMaskFigure;
 import pasa.cbentley.framework.drawx.src4.tech.ITechMergeMaskFigureString;
 import pasa.cbentley.framework.gui.src4.ctx.GuiCtx;
@@ -25,7 +25,7 @@ import pasa.cbentley.framework.gui.src4.interfaces.ITechDrawable;
  * @author Charles Bentley
  *
  */
-public class StyleManager extends ObjectGui implements ITechStyle {
+public class StyleManager extends ObjectGui implements IBOStyle {
 
    private ByteObject     defContentStyle = null;
 

@@ -11,13 +11,14 @@ import pasa.cbentley.framework.drawx.src4.factories.AnchorFactory;
 import pasa.cbentley.framework.drawx.src4.factories.BoxFactory;
 import pasa.cbentley.framework.drawx.src4.factories.FigureFactory;
 import pasa.cbentley.framework.drawx.src4.factories.TblrFactory;
-import pasa.cbentley.framework.drawx.src4.style.ITechStyle;
+import pasa.cbentley.framework.drawx.src4.factories.interfaces.IBOFigure;
+import pasa.cbentley.framework.drawx.src4.style.IBOStyle;
 import pasa.cbentley.framework.drawx.src4.style.StyleFactory;
 import pasa.cbentley.framework.drawx.src4.style.StyleOperator;
 import pasa.cbentley.framework.drawx.src4.tech.ITechFigure;
 import pasa.cbentley.framework.gui.src4.ctx.GuiCtx;
 
-public class DefaultStyles extends BOAbstractFactory implements ITechStyle, ITechFigure, IBOTypesDrw {
+public class DefaultStyles extends BOAbstractFactory implements IBOStyle, ITechFigure, IBOTypesDrw {
 
    protected final GuiCtx gc;
 
@@ -178,7 +179,7 @@ public class DefaultStyles extends BOAbstractFactory implements ITechStyle, ITec
    public ByteObject getStyleSelectedBgRed() {
       ByteObject bg = figureFactory.getFigRect(ColorUtils.getRGBInt(255, 255, 255, 255), true);
       ByteObject fg2 = figureFactory.getFigBorder(2, ColorUtils.getRGBInt(255, 255, 0, 0), true);
-      fg2.setFlag(FIG__OFFSET_03_FLAGP, FIG_FLAGP_8POSTPONE, true);
+      fg2.setFlag(IBOFigure.FIG__OFFSET_03_FLAGP, IBOFigure.FIG_FLAGP_8POSTPONE, true);
       ByteObject style = styleFactory.getStyle(bg, STYLE_OFFSET_2_FLAGB, STYLE_FLAGB_4_BG);
       styleOp.setGAnchors(style, STYLE_FLAGB_4_BG, STYLE_ANC_3_PADDING);
 

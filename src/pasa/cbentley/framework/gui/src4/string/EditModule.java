@@ -7,7 +7,7 @@ import pasa.cbentley.core.src4.logging.IDLog;
 import pasa.cbentley.core.src4.logging.IStringable;
 import pasa.cbentley.core.src4.utils.StringUtils;
 import pasa.cbentley.framework.cmd.src4.engine.MCmd;
-import pasa.cbentley.framework.coreui.src4.tech.IBCodes;
+import pasa.cbentley.framework.coreui.src4.tech.ITechCodes;
 import pasa.cbentley.framework.drawx.src4.engine.GraphicsX;
 import pasa.cbentley.framework.drawx.src4.string.StringMetrics;
 import pasa.cbentley.framework.drawx.src4.string.Stringer;
@@ -547,7 +547,7 @@ public class EditModule implements IDrawListener, IBOStringDrawable, IStringable
                caretAtDeleteChar();
                isGoToNextChar = true;
                ic.srActionDoneRepaint();
-            } else if (key >= IBCodes.KEY_NUM0 && key <= IBCodes.KEY_NUM9) {
+            } else if (key >= ITechCodes.KEY_NUM0 && key <= ITechCodes.KEY_NUM9) {
                manageKey09PressedWrite(ic, key);
                ic.srActionDoneRepaint();
             } else if (ic.isFireP()) {

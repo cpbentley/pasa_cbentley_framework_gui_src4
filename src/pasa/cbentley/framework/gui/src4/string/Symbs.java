@@ -1,7 +1,7 @@
 package pasa.cbentley.framework.gui.src4.string;
 
 import pasa.cbentley.framework.coreui.src4.interfaces.BCodes;
-import pasa.cbentley.framework.coreui.src4.tech.IBCodes;
+import pasa.cbentley.framework.coreui.src4.tech.ITechCodes;
 
 public class Symbs {
 
@@ -124,7 +124,7 @@ public class Symbs {
    /**
     * Returns the charset associated with the [0 1 2 3 4 5 6 7 8 9] key.
     * @param set
-    * @param key {@link IBCodes#KEY_NUM0} to {@link IBCodes#KEY_NUM9}
+    * @param key {@link ITechCodes#KEY_NUM0} to {@link ITechCodes#KEY_NUM9}
     * @return
     */
    public static char[] getKeyCharSet(char[][] set, int key) {

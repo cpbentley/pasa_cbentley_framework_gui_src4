@@ -9,8 +9,8 @@ import pasa.cbentley.core.src4.utils.interfaces.IColors;
 import pasa.cbentley.framework.cmd.src4.engine.CmdNode;
 import pasa.cbentley.framework.coredraw.src4.interfaces.IMFont;
 import pasa.cbentley.framework.drawx.src4.engine.GraphicsX;
+import pasa.cbentley.framework.drawx.src4.factories.interfaces.IBOBox;
 import pasa.cbentley.framework.drawx.src4.tech.ITechAnchor;
-import pasa.cbentley.framework.drawx.src4.tech.ITechBox;
 import pasa.cbentley.framework.drawx.src4.utils.AnchorUtils;
 import pasa.cbentley.framework.gui.src4.canvas.InputConfig;
 import pasa.cbentley.framework.gui.src4.core.Drawable;
@@ -194,7 +194,7 @@ public class SymbolTable extends TableView {
       int charWidth = f.charWidth(myChars[index]);
       int dx = AnchorUtils.getXAlign(ITechAnchor.ALIGN_6_CENTER, x, w, charWidth);
       int dy = AnchorUtils.getYAlign(ITechAnchor.ALIGN_6_CENTER, y, h, f.getHeight());
-      g.drawChar(myChars[index], dx, dy, ITechBox.ANCHOR);
+      g.drawChar(myChars[index], dx, dy, IBOBox.ANCHOR);
       if (index == selectedIndex) {
          //#debug
          toDLog().pDraw(x + " " + y + " w=" + w + " charWidth=" + charWidth, this, SymbolTable.class, "drawModelIndex", LVL_05_FINE, true);

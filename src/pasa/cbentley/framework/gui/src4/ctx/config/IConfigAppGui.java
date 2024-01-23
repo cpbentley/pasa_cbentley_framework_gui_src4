@@ -8,7 +8,7 @@ import pasa.cbentley.framework.gui.src4.core.StyleClass;
 import pasa.cbentley.framework.gui.src4.ctx.IFlagsToStringGui;
 import pasa.cbentley.framework.gui.src4.ctx.app.AppGuiCtx;
 import pasa.cbentley.framework.gui.src4.interfaces.ITechCanvasDrawable;
-import pasa.cbentley.framework.input.src4.interfaces.ITechCanvasAppli;
+import pasa.cbentley.framework.input.src4.interfaces.IBOCanvasAppli;
 
 /**
  * Configuration for {@link AppGuiCtx}
@@ -36,7 +36,7 @@ public interface IConfigAppGui extends IConfigApp {
    /**
     * Position of the menu bar.
     * <br>
-    * Relevant for Canvas without a specific {@link ITechCanvasAppli}.
+    * Relevant for Canvas without a specific {@link IBOCanvasAppli}.
     * 
     * <li>{@link C#POS_0_TOP}
     * <li>{@link C#POS_1_BOT}
@@ -85,7 +85,7 @@ public interface IConfigAppGui extends IConfigApp {
    /**
     * True when a menu bar is wanted.
     * <br>
-    * Relevant for Canvas without a specific {@link ITechCanvasAppli}.
+    * Relevant for Canvas without a specific {@link IBOCanvasAppli}.
     * @return
     */
    public boolean isUsingMenuBar();

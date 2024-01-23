@@ -1,7 +1,7 @@
 package pasa.cbentley.framework.gui.src4.utils;
 
 import pasa.cbentley.byteobjects.src4.core.ByteObject;
-import pasa.cbentley.framework.drawx.src4.style.ITechStyle;
+import pasa.cbentley.framework.drawx.src4.style.IBOStyle;
 import pasa.cbentley.framework.drawx.src4.style.StyleOperator;
 import pasa.cbentley.framework.gui.src4.canvas.InputConfig;
 import pasa.cbentley.framework.gui.src4.core.Drawable;

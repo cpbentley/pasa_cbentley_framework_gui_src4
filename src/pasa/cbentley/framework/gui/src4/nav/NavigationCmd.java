@@ -8,7 +8,7 @@ import pasa.cbentley.framework.cmd.src4.interfaces.ICmdsCmd;
 import pasa.cbentley.framework.cmd.src4.interfaces.INavTech;
 import pasa.cbentley.framework.cmd.src4.interfaces.IStringsCmd;
 import pasa.cbentley.framework.cmd.src4.trigger.CmdTrigger;
-import pasa.cbentley.framework.coreui.src4.tech.IBCodes;
+import pasa.cbentley.framework.coreui.src4.tech.ITechCodes;
 import pasa.cbentley.framework.coreui.src4.tech.IInput;
 import pasa.cbentley.framework.gui.src4.canvas.FocusCtrl;
 import pasa.cbentley.framework.gui.src4.canvas.InputConfig;
@@ -236,32 +236,32 @@ public class NavigationCmd extends CmdAbstract implements INavTech {
          InputConfig ic = cd.getIC();
          InputState is = ic.is;
          if (is.isTypeDevicePointer()) {
-            if (is.getKeyCode() == IBCodes.PBUTTON_0_DEFAULT) {
+            if (is.getKeyCode() == ITechCodes.PBUTTON_0_DEFAULT) {
                direction = NAV_5_SELECT;
-            } else if (is.getKeyCode() == IBCodes.PBUTTON_3_WHEEL_UP) {
+            } else if (is.getKeyCode() == ITechCodes.PBUTTON_3_WHEEL_UP) {
                direction = NAV_1_UP;
-            } else if (is.getKeyCode() == IBCodes.PBUTTON_4_WHEEL_DOWN) {
+            } else if (is.getKeyCode() == ITechCodes.PBUTTON_4_WHEEL_DOWN) {
                direction = NAV_2_DOWN;
             }
          } else if (is.isTypeDeviceKeyboard()) {
             int key = is.getKeyCode();
             switch (key) {
-               case IBCodes.KEY_DOWN:
+               case ITechCodes.KEY_DOWN:
                   direction = NAV_2_DOWN;
                   break;
-               case IBCodes.KEY_UP:
+               case ITechCodes.KEY_UP:
                   direction = NAV_1_UP;
                   break;
-               case IBCodes.KEY_LEFT:
+               case ITechCodes.KEY_LEFT:
                   direction = NAV_3_LEFT;
                   break;
-               case IBCodes.KEY_RIGHT:
+               case ITechCodes.KEY_RIGHT:
                   direction = NAV_4_RIGHT;
                   break;
-               case IBCodes.KEY_ESCAPE:
+               case ITechCodes.KEY_ESCAPE:
                   direction = NAV_6_UNSELECT;
                   break;
-               case IBCodes.KEY_FIRE: {
+               case ITechCodes.KEY_FIRE: {
                   //TODO unselect?
                   direction = NAV_5_SELECT;
                   break;

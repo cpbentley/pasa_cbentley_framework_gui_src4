@@ -10,7 +10,7 @@ import pasa.cbentley.framework.input.src4.CanvasAppliInput;
 import pasa.cbentley.framework.input.src4.RepaintCtrl;
 import pasa.cbentley.framework.input.src4.CanvasResult;
 import pasa.cbentley.framework.input.src4.ctx.IFlagsToStringInput;
-import pasa.cbentley.framework.input.src4.interfaces.ITechInput;
+import pasa.cbentley.framework.input.src4.interfaces.ITechPaintThread;
 
 public class RepaintCtrlDrawable extends RepaintCtrl {
 
@@ -134,7 +134,7 @@ public class RepaintCtrlDrawable extends RepaintCtrl {
    /**
     * The {@link Runnable} is the code that updates the render state.
     * <br>
-    * It will be run in the {@link ITechInput#THREAD_1_UPDATE} that writes to 
+    * It will be run in the {@link ITechPaintThread#THREAD_1_UPDATE} that writes to 
     * the render state.
     * <br>
     * It is added to the queue

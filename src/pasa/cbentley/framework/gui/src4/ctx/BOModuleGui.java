@@ -9,7 +9,7 @@ import pasa.cbentley.core.src4.logging.ToStringStaticC;
 import pasa.cbentley.framework.gui.src4.canvas.ITechCanvasAppliDrawable;
 import pasa.cbentley.framework.gui.src4.interfaces.ITechCanvasDrawable;
 import pasa.cbentley.framework.gui.src4.table.interfaces.IBOCellPolicy;
-import pasa.cbentley.framework.input.src4.interfaces.ITechCanvasAppli;
+import pasa.cbentley.framework.input.src4.interfaces.IBOCanvasAppli;
 
 /**
  * When initialized, its statically loads an print to the {@link ByteObject}
@@ -39,7 +39,7 @@ public class BOModuleGui extends BOModuleAbstract implements IBOTypesGui, ITechC
 
    public boolean toStringSubType(Dctx dc, ByteObject bo, int subType) {
       int type = bo.getType();
-      if (type == ITechCanvasAppli.CANVAS_APP_TYPE) {
+      if (type == IBOCanvasAppli.CANVAS_APP_TYPE) {
          if (subType == CANVAS_APP_DRW_1_TYPE_DRAWABLE) {
             //deal with wrong size
             dc.rootN(bo, "ITechCanvasAppliDrawable");

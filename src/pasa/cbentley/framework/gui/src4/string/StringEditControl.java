@@ -12,19 +12,19 @@ import pasa.cbentley.core.src4.structs.IntToStrings;
 import pasa.cbentley.core.src4.thread.IBRunnable;
 import pasa.cbentley.core.src4.thread.PulseThread;
 import pasa.cbentley.framework.cmd.src4.interfaces.INavTech;
-import pasa.cbentley.framework.core.src4.interfaces.ITechDataHost;
-import pasa.cbentley.framework.core.src4.interfaces.ITechHost;
+import pasa.cbentley.framework.core.src4.interfaces.IBOHost;
 import pasa.cbentley.framework.coredraw.src4.interfaces.IMFont;
 import pasa.cbentley.framework.coreui.src4.ctx.CoreUiCtx;
 import pasa.cbentley.framework.coreui.src4.ctx.IEventsCoreUI;
-import pasa.cbentley.framework.coreui.src4.tech.IBCodes;
+import pasa.cbentley.framework.coreui.src4.tech.ITechCodes;
+import pasa.cbentley.framework.coreui.src4.tech.ITechHostUI;
 import pasa.cbentley.framework.datamodel.src4.table.ObjectTableModel;
 import pasa.cbentley.framework.drawx.src4.engine.GraphicsX;
+import pasa.cbentley.framework.drawx.src4.factories.interfaces.IBOBox;
 import pasa.cbentley.framework.drawx.src4.string.Stringer;
-import pasa.cbentley.framework.drawx.src4.style.ITechStyle;
-import pasa.cbentley.framework.drawx.src4.tech.ITechBox;
-import pasa.cbentley.framework.gui.src4.canvas.CanvasResultDrawable;
+import pasa.cbentley.framework.drawx.src4.style.IBOStyle;
 import pasa.cbentley.framework.gui.src4.canvas.CanvasAppliDrawable;
+import pasa.cbentley.framework.gui.src4.canvas.CanvasResultDrawable;
 import pasa.cbentley.framework.gui.src4.canvas.InputConfig;
 import pasa.cbentley.framework.gui.src4.canvas.InputStateDrawable;
 import pasa.cbentley.framework.gui.src4.canvas.MEventDrawable;
@@ -37,14 +37,15 @@ import pasa.cbentley.framework.gui.src4.ctx.GuiCtx;
 import pasa.cbentley.framework.gui.src4.ctx.IBOTypesGui;
 import pasa.cbentley.framework.gui.src4.factories.interfaces.IBOStringDrawable;
 import pasa.cbentley.framework.gui.src4.factories.interfaces.IBOStringEdit;
-import pasa.cbentley.framework.gui.src4.interfaces.ITechCanvasDrawable;
 import pasa.cbentley.framework.gui.src4.interfaces.IDrawListener;
 import pasa.cbentley.framework.gui.src4.interfaces.IDrawable;
+import pasa.cbentley.framework.gui.src4.interfaces.ITechCanvasDrawable;
 import pasa.cbentley.framework.gui.src4.interfaces.ITechDrawable;
+import pasa.cbentley.framework.gui.src4.menu.MenuBar;
 import pasa.cbentley.framework.gui.src4.table.TableView;
 import pasa.cbentley.framework.gui.src4.tech.ITechStringDrawable;
 import pasa.cbentley.framework.gui.src4.utils.DrawableUtilz;
-import pasa.cbentley.framework.input.src4.interfaces.ITechInput;
+import pasa.cbentley.framework.input.src4.interfaces.ITechPaintThread;
 import pasa.cbentley.powerdata.spec.src4.guicontrols.T9PrefixTrieSearch;
 import pasa.cbentley.powerdata.spec.src4.power.trie.IPowerCharTrie;
 import pasa.cbentley.powerdata.spec.src4.spec.CharTrieUtilz;
@@ -176,7 +177,7 @@ public class StringEditControl extends TableView implements IDrawListener, IBOSt
 
    private StringDrawable     controlledSD;
 
-   private int                currentKey             = IBCodes.KEY_NUM1;
+   private int                currentKey             = ITechCodes.KEY_NUM1;
 
    private int                currentLanguageID;
 
@@ -387,7 +388,7 @@ public class StringEditControl extends TableView implements IDrawListener, IBOSt
       //setParentLink(predictionTable);
       //setParentLink(punctuationTable);
 
-      boolean isFullKB = getKeyboardType() == ITechHost.KB_TYPE_1_FULL;
+      boolean isFullKB = getKeyboardType() == IBOHost.KB_TYPE_1_FULL;
 
       if (isFullKB) {
          //sort out what is shown
@@ -480,17 +481,17 @@ public class StringEditControl extends TableView implements IDrawListener, IBOSt
          ByteObject style = d.getStyle();
          int key = editModule.currentKey;
          char[] chars = new char[0];
-         if (key > IBCodes.KEY_NUM0 && key < IBCodes.KEY_NUM9) {
+         if (key > ITechCodes.KEY_NUM0 && key < ITechCodes.KEY_NUM9) {
             chars = Symbs.getKeyCharSet(charSets, editModule.currentKey);
 
          } else {
-            if (key == IBCodes.KB_069_E) {
+            if (key == ITechCodes.KB_069_E) {
                chars = new char[] { 'E', 'É', 'È' };
             }
          }
          ByteObject txt = getStyleOp().getContentStyle(style);
          //the background figure to draw below the selected
-         ByteObject bgFigure = getStyleOp().getStyleDrw(style, ITechStyle.STYLE_OFFSET_2_FLAGB, ITechStyle.STYLE_FLAGB_1_BG);
+         ByteObject bgFigure = getStyleOp().getStyleDrw(style, IBOStyle.STYLE_OFFSET_2_FLAGB, IBOStyle.STYLE_FLAGB_1_BG);
          int color = getOpStringFx().getStringColor(txt);
          IMFont f = getOpStringFx().getStringFont(txt);
          g.setFont(f);
@@ -505,7 +506,7 @@ public class StringEditControl extends TableView implements IDrawListener, IBOSt
                g.setColor(color);
             }
             //int dx = Anchor.getXAlign(IDrw.ALIGN_CENTER, x, cw, ow);
-            g.drawChar(c, dx, y, ITechBox.ANCHOR);
+            g.drawChar(c, dx, y, IBOBox.ANCHOR);
             dx += ow;
          }
       }
@@ -585,7 +586,7 @@ public class StringEditControl extends TableView implements IDrawListener, IBOSt
    }
 
    public int getKeyboardType() {
-      return gc.getCFC().getHost().getHostInt(ITechDataHost.DATA_ID_23_KEYBOARD_TYPE);
+      return gc.getCFC().getHostCore().getHostInt(ITechHostUI.DATA_ID_23_KEYBOARD_TYPE);
    }
 
    /**
@@ -708,7 +709,7 @@ public class StringEditControl extends TableView implements IDrawListener, IBOSt
             if (!predictionTable.hasStateVolatile(ITechDrawable.STATE_03_HIDDEN)) {
                //commands for quick selection of
                int num = -1;
-               if (ic.isPressedKeyboard0(IBCodes.KEY_FIRE)) {
+               if (ic.isPressedKeyboard0(ITechCodes.KEY_FIRE)) {
                   if (ic.is1()) {
                      num = 0;
                   } else if (ic.is2()) {
@@ -884,7 +885,7 @@ public class StringEditControl extends TableView implements IDrawListener, IBOSt
     * called by {@link Controller#removeControlEdit(StringDrawable)}
     */
    public void removeControl() {
-      if (getKeyboardType() == ITechHost.KB_TYPE_2_FULL_VIRTUAL) {
+      if (getKeyboardType() == IBOHost.KB_TYPE_2_FULL_VIRTUAL) {
          produceCoreUIEvent(IEventsCoreUI.DEVICE_VIRT_KEYB_OFF);
       }
       if (pulseThread.isPulseRunning()) {
@@ -905,7 +906,7 @@ public class StringEditControl extends TableView implements IDrawListener, IBOSt
    /**
     * This method is called either in worker thread or gui thread.
     * <br>
-    * If called in the {@link ITechInput#THREAD_0_HOST_HUI}, the Runnable is called.
+    * If called in the {@link ITechPaintThread#THREAD_0_HOST_HUI}, the Runnable is called.
     * Otherwise, the code is queued
     * <br>
     * @param prefix
@@ -1108,7 +1109,7 @@ public class StringEditControl extends TableView implements IDrawListener, IBOSt
       this.setParent(controlledSD);
 
       //asks the device virtual keyboard to appear
-      if (getKeyboardType() == ITechHost.KB_TYPE_2_FULL_VIRTUAL) {
+      if (getKeyboardType() == IBOHost.KB_TYPE_2_FULL_VIRTUAL) {
          produceCoreUIEvent(IEventsCoreUI.DEVICE_VIRT_KEYB_REQUEST);
       }
       //Controller.getMe().getTopologyNav().positionToplogy(this, C.POS_0_TOP, sd);

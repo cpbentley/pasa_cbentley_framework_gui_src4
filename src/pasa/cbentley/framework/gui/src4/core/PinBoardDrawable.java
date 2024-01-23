@@ -4,7 +4,7 @@ import pasa.cbentley.core.src4.event.BusEvent;
 import pasa.cbentley.core.src4.logging.Dctx;
 import pasa.cbentley.core.src4.utils.ArrayUtils;
 import pasa.cbentley.core.src4.utils.IntUtils;
-import pasa.cbentley.framework.coreui.src4.tech.IBCodes;
+import pasa.cbentley.framework.coreui.src4.tech.ITechCodes;
 import pasa.cbentley.framework.drawx.src4.engine.GraphicsX;
 import pasa.cbentley.framework.gui.src4.canvas.InputConfig;
 import pasa.cbentley.framework.gui.src4.canvas.PointerGestureDrawable;
@@ -283,13 +283,13 @@ public class PinBoardDrawable extends ViewDrawable {
     */
    public void manageKeyInput(InputConfig ic) {
 
-      if (ic.isSequencedPressed(IBCodes.KEY_STAR, IBCodes.KEY_UP)) {
+      if (ic.isSequencedPressed(ITechCodes.KEY_STAR, ITechCodes.KEY_UP)) {
          //cycle front to back most
          ArrayUtils.rotateRight(ds, 0, nextempty);
          ic.srActionDoneRepaint(this);
          return;
       }
-      if (ic.isSequencedPressed(IBCodes.KEY_STAR, IBCodes.KEY_DOWN)) {
+      if (ic.isSequencedPressed(ITechCodes.KEY_STAR, ITechCodes.KEY_DOWN)) {
          //cycle front to -1
          ArrayUtils.rotateLeft(ds, 0, nextempty);
          ic.srActionDoneRepaint(this);

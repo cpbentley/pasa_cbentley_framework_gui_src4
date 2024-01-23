@@ -11,7 +11,7 @@ import pasa.cbentley.byteobjects.src4.objects.function.ITechAction;
 import pasa.cbentley.byteobjects.src4.objects.function.ITechFunction;
 import pasa.cbentley.byteobjects.src4.objects.pointer.PointerOperator;
 import pasa.cbentley.core.src4.logging.Dctx;
-import pasa.cbentley.framework.drawx.src4.style.ITechStyle;
+import pasa.cbentley.framework.drawx.src4.style.IBOStyle;
 import pasa.cbentley.framework.gui.src4.anim.IBOAnim;
 import pasa.cbentley.framework.gui.src4.anim.ITechAnim;
 import pasa.cbentley.framework.gui.src4.anim.base.DrawableAnim;
@@ -120,7 +120,7 @@ public class ByteObjectAnim extends DrawableAnim {
          target = ((FigDrawable) d).getFigure();
       } else {
          ByteObject style = d.getStyle();
-         int offset = ITechStyle.STYLE_OFFSET_2_FLAGB;
+         int offset = IBOStyle.STYLE_OFFSET_2_FLAGB;
          int flag = 1;
          for (int i = 0; i < targetType; i++) {
             flag <<= 1;

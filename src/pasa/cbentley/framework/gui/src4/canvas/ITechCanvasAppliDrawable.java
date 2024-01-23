@@ -3,13 +3,13 @@ package pasa.cbentley.framework.gui.src4.canvas;
 import pasa.cbentley.core.src4.interfaces.C;
 import pasa.cbentley.framework.drawx.src4.engine.GraphicsX;
 import pasa.cbentley.framework.gui.src4.interfaces.ITechCanvasDrawable;
-import pasa.cbentley.framework.input.src4.interfaces.ITechCanvasAppli;
+import pasa.cbentley.framework.input.src4.interfaces.IBOCanvasAppli;
 
 /**
- * Extends {@link ITechCanvasAppli} for drawable application
+ * Extends {@link IBOCanvasAppli} for drawable application
  * 
  */
-public interface ITechCanvasAppliDrawable extends ITechCanvasAppli {
+public interface ITechCanvasAppliDrawable extends IBOCanvasAppli {
 
    public static final int CANVAS_APP_DRW_1_TYPE_DRAWABLE                = 1;
 

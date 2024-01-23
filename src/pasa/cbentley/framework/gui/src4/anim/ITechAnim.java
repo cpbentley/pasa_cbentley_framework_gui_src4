@@ -2,7 +2,7 @@ package pasa.cbentley.framework.gui.src4.anim;
 
 import pasa.cbentley.byteobjects.src4.core.ByteObject;
 import pasa.cbentley.core.src4.interfaces.ITech;
-import pasa.cbentley.framework.drawx.src4.style.ITechStyle;
+import pasa.cbentley.framework.drawx.src4.style.IBOStyle;
 import pasa.cbentley.framework.gui.src4.anim.move.FunctionMove;
 import pasa.cbentley.framework.gui.src4.core.Drawable;
 import pasa.cbentley.framework.gui.src4.interfaces.IAnimable;
@@ -36,42 +36,42 @@ public interface ITechAnim extends ITech {
    public static final int ANIM_TARGET_0_FULL       = 0;
 
    /**
-    * {@link ITechStyle#STYLE_FLAGB_1_BG}
+    * {@link IBOStyle#STYLE_FLAGB_1_BG}
     */
    public static final int ANIM_TARGET_1_DLAYER1    = 1;
 
    /**
-    * {@link ITechStyle#STYLE_FLAGB_2_BG}
+    * {@link IBOStyle#STYLE_FLAGB_2_BG}
     */
    public static final int ANIM_TARGET_2_DLAYER1    = 2;
 
    /**
-    * {@link ITechStyle#STYLE_FLAGB_3_BG}
+    * {@link IBOStyle#STYLE_FLAGB_3_BG}
     */
    public static final int ANIM_TARGET_3_DLAYER1    = 3;
 
    /**
-    * {@link ITechStyle#STYLE_FLAGB_4_BG}
+    * {@link IBOStyle#STYLE_FLAGB_4_BG}
     */
    public static final int ANIM_TARGET_4_DLAYER1    = 4;
 
    /**
-    * {@link ITechStyle#STYLE_FLAGB_5_FG}
+    * {@link IBOStyle#STYLE_FLAGB_5_FG}
     */
    public static final int ANIM_TARGET_5_DLAYER1    = 5;
 
    /**
-    * {@link ITechStyle#STYLE_FLAGB_6_FG}
+    * {@link IBOStyle#STYLE_FLAGB_6_FG}
     */
    public static final int ANIM_TARGET_6_DLAYER1    = 6;
 
    /**
-    * {@link ITechStyle#STYLE_FLAGB_7_FG}
+    * {@link IBOStyle#STYLE_FLAGB_7_FG}
     */
    public static final int ANIM_TARGET_7_DLAYER1    = 7;
 
    /**
-    * {@link ITechStyle#STYLE_FLAGB_8_FG}
+    * {@link IBOStyle#STYLE_FLAGB_8_FG}
     */
    public static final int ANIM_TARGET_8_DLAYER1    = 8;
 

@@ -8,10 +8,10 @@ import pasa.cbentley.framework.cmd.src4.engine.CmdNode;
 import pasa.cbentley.framework.cmd.src4.engine.CommanderAbstract;
 import pasa.cbentley.framework.cmd.src4.engine.MCmd;
 import pasa.cbentley.framework.cmd.src4.interfaces.ITechCmdViewLog;
-import pasa.cbentley.framework.core.src4.interfaces.IHostUITools;
-import pasa.cbentley.framework.core.src4.interfaces.ITechFeaturesHost;
+import pasa.cbentley.framework.core.src4.interfaces.IHostCoreTools;
+import pasa.cbentley.framework.core.src4.interfaces.ITechHostCore;
 import pasa.cbentley.framework.coredraw.src4.engine.VisualState;
-import pasa.cbentley.framework.coreui.src4.tech.ITechCanvasHost;
+import pasa.cbentley.framework.coreui.src4.tech.IBOCanvasHost;
 import pasa.cbentley.framework.coreui.src4.tech.ITechInputFeedback;
 import pasa.cbentley.framework.coreui.src4.utils.ViewState;
 import pasa.cbentley.framework.drawx.src4.engine.RgbImage;
@@ -191,7 +191,7 @@ public class CommanderGui extends CommanderAbstract implements ICmdsView, ITechI
 
    private void cmdLightToggle(CmdInstance cmd) {
       //get the API to the light
-      IHostUITools l = gc.getCFC().getHostTools();
+      IHostCoreTools l = gc.getCFC().getHostTools();
       //gc.getEC().produceEvent(gc.getDeviceDriver().getProducerIDCamera(), IEvents.DEVICE_VIRT_FLASH_LIGHT, this);
    }
 
@@ -313,14 +313,14 @@ public class CommanderGui extends CommanderAbstract implements ICmdsView, ITechI
          log.setViewContext(gc.getCanvasCtxRoot().getCanvas().getVCAppli());
          gc.setCtxLogViewer(log);
 
-         boolean hasMultiWindows = gc.getCFC().getHost().hasFeatureSupport(ITechFeaturesHost.SUP_ID_24_MULTIPLE_WINDOWS);
+         boolean hasMultiWindows = gc.getCFC().getHostCore().hasFeatureSupport(ITechHostCore.SUP_ID_24_MULTIPLE_WINDOWS);
          //
          if (hasMultiWindows && cd.param == ITechCmdViewLog.PARAM_1_OUTSIDE) {
             //check if params already have data for this canvas
-            ByteObject bo = gc.getCUC().createTechCanvasHostDefault();
-            bo.setFlag(ITechCanvasHost.TCANVAS_OFFSET_01_FLAG, ITechCanvasHost.TCANVAS_FLAG_2_WINDOW, true);
+            ByteObject bo = gc.getCUC().createBOCanvasHostDefault();
+            bo.setFlag(IBOCanvasHost.TCANVAS_OFFSET_01_FLAG, IBOCanvasHost.TCANVAS_FLAG_2_WINDOW, true);
             //sets the IDs
-            bo.set2(ITechCanvasHost.TCANVAS_OFFSET_03_ID2, ITechCtxSettingsAppGui.CANVAS_ID_LOGVIEWER);
+            bo.set2(IBOCanvasHost.TCANVAS_OFFSET_03_ID2, ITechCtxSettingsAppGui.CANVAS_ID_LOGVIEWER);
 
             //creation of a canvas goes through the 
             CanvasAppliDrawable canvas = new CanvasAppliDrawable(gc, bo);

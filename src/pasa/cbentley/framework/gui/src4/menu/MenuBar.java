@@ -3,7 +3,7 @@ package pasa.cbentley.framework.gui.src4.menu;
 import pasa.cbentley.byteobjects.src4.core.ByteObject;
 import pasa.cbentley.core.src4.logging.Dctx;
 import pasa.cbentley.framework.cmd.src4.engine.MCmd;
-import pasa.cbentley.framework.coreui.src4.tech.IBCodes;
+import pasa.cbentley.framework.coreui.src4.tech.ITechCodes;
 import pasa.cbentley.framework.coreui.src4.tech.IInput;
 import pasa.cbentley.framework.datamodel.src4.table.ObjectTableModel;
 import pasa.cbentley.framework.drawx.src4.engine.GraphicsX;
@@ -242,15 +242,15 @@ public class MenuBar extends Drawable {
    }
 
    private void icRelease(InputConfig ic) {
-      if (ic.getIdKeyBut() == IBCodes.KEY_MENU_LEFT) {
+      if (ic.getIdKeyBut() == ITechCodes.KEY_MENU_LEFT) {
          mLeft.setStateStyle(ITechDrawable.STYLE_05_SELECTED, false);
          //send a menu repaint
          ic.srActionDoneRepaint(mLeft);
-      } else if (ic.getIdKeyBut() == IBCodes.KEY_MENU_RIGHT) {
+      } else if (ic.getIdKeyBut() == ITechCodes.KEY_MENU_RIGHT) {
          mRight.setStateStyle(ITechDrawable.STYLE_05_SELECTED, false);
          //send a menu repaint
          ic.srActionDoneRepaint(mRight);
-      } else if (ic.getIdKeyBut() == IBCodes.KEY_FIRE) {
+      } else if (ic.getIdKeyBut() == ITechCodes.KEY_FIRE) {
          mMiddle.setStateStyle(ITechDrawable.STYLE_05_SELECTED, false);
          //send a menu repaint
          ic.srActionDoneRepaint(mMiddle);

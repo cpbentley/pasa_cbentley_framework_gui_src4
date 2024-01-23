@@ -5,7 +5,7 @@ import pasa.cbentley.framework.cmd.src4.engine.CmdNode;
 import pasa.cbentley.framework.cmd.src4.engine.MCmd;
 import pasa.cbentley.framework.cmd.src4.trigger.CmdTrigger;
 import pasa.cbentley.framework.cmd.src4.trigger.FacTrig;
-import pasa.cbentley.framework.coreui.src4.tech.IBCodes;
+import pasa.cbentley.framework.coreui.src4.tech.ITechCodes;
 import pasa.cbentley.framework.gui.src4.canvas.InputConfig;
 import pasa.cbentley.framework.gui.src4.cmd.ViewCommandListener;
 import pasa.cbentley.framework.gui.src4.core.Drawable;
@@ -70,42 +70,42 @@ public class Navigator extends ObjectGui implements ICmdsView {
       //navigate command that requires a parameter
       NavigationCmd navCmd = new NavigationCmd(gc, 0);
 
-      CmdTrigger ctT = triggerFactory.createKeyP(IBCodes.KEY_DOWN);
+      CmdTrigger ctT = triggerFactory.createKeyP(ITechCodes.KEY_DOWN);
       navCtx.addCmdLinkRepeated(ctT, navCmd);
       //#debug
       toDLog().pCmd("", ctT, ViewCommandListener.class, "initDefNav");
 
-      CmdTrigger ctB = triggerFactory.createKeyP(IBCodes.KEY_UP);
+      CmdTrigger ctB = triggerFactory.createKeyP(ITechCodes.KEY_UP);
       navCtx.addCmdLinkRepeated(ctB, navCmd);
-      CmdTrigger ctL = triggerFactory.createKeyP(IBCodes.KEY_LEFT);
+      CmdTrigger ctL = triggerFactory.createKeyP(ITechCodes.KEY_LEFT);
       navCtx.addCmdLinkRepeated(ctL, navCmd);
-      CmdTrigger ctR = triggerFactory.createKeyP(IBCodes.KEY_RIGHT);
+      CmdTrigger ctR = triggerFactory.createKeyP(ITechCodes.KEY_RIGHT);
       navCtx.addCmdLinkRepeated(ctR, navCmd);
 
-      CmdTrigger ctF = triggerFactory.createKeyP(IBCodes.KEY_FIRE);
+      CmdTrigger ctF = triggerFactory.createKeyP(ITechCodes.KEY_FIRE);
       navCtx.addCmdLink(ctF, navCmd);
-      CmdTrigger ctES = triggerFactory.createKeyP(IBCodes.KEY_ESCAPE);
+      CmdTrigger ctES = triggerFactory.createKeyP(ITechCodes.KEY_ESCAPE);
       navCtx.addCmdLink(ctES, navCmd);
 
-      CmdTrigger ctWheelUp = triggerFactory.createPointerPressed(IBCodes.PBUTTON_3_WHEEL_UP);
+      CmdTrigger ctWheelUp = triggerFactory.createPointerPressed(ITechCodes.PBUTTON_3_WHEEL_UP);
       navCtx.addCmdLink(ctWheelUp, navCmd);
-      CmdTrigger ctWheelDown = triggerFactory.createPointerPressed(IBCodes.PBUTTON_4_WHEEL_DOWN);
+      CmdTrigger ctWheelDown = triggerFactory.createPointerPressed(ITechCodes.PBUTTON_4_WHEEL_DOWN);
       navCtx.addCmdLink(ctWheelDown, navCmd);
       //first press is a CUE_SELECT
-      CmdTrigger ctPointer1 = triggerFactory.createPointerPressed(IBCodes.PBUTTON_0_DEFAULT);
+      CmdTrigger ctPointer1 = triggerFactory.createPointerPressed(ITechCodes.PBUTTON_0_DEFAULT);
       navCtx.addCmdLink(ctPointer1, CMD_18_NAV_PRE_SELECT);
 
-      CmdTrigger ctPointerDrag = triggerFactory.create1stPointerDrag(IBCodes.PBUTTON_0_DEFAULT);
+      CmdTrigger ctPointerDrag = triggerFactory.create1stPointerDrag(ITechCodes.PBUTTON_0_DEFAULT);
       navCtx.addCmdLink(ctPointerDrag, CMD_18_NAV_PRE_SELECT);
 
       //first press is a CUE_SELECT. some nav context will want a pointer press selection
       //while others want 
-      CmdTrigger ctPointerType = triggerFactory.createPointer(IBCodes.PBUTTON_0_DEFAULT);
+      CmdTrigger ctPointerType = triggerFactory.createPointer(ITechCodes.PBUTTON_0_DEFAULT);
       navCtx.addCmdLink(ctPointerType, navCmd);
 
-      CmdTrigger ctEx = triggerFactory.createTypedRepeat(IBCodes.KEY_ESCAPE, 5, IBCodes.TIMING_3_FAST);
+      CmdTrigger ctEx = triggerFactory.createTypedRepeat(ITechCodes.KEY_ESCAPE, 5, ITechCodes.TIMING_3_FAST);
       cc.getNodeRoot().addCmdLink(ctEx, CMD_03_EXIT);
-      CmdTrigger ctF1 = triggerFactory.createKeyP(IBCodes.KEY_F1);
+      CmdTrigger ctF1 = triggerFactory.createKeyP(ITechCodes.KEY_F1);
       cc.getNodeRoot().addCmdLink(ctF1, CMD_19_HELP);
 
       //#debug

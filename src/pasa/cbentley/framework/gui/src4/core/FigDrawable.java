@@ -6,6 +6,7 @@ import pasa.cbentley.core.src4.interfaces.C;
 import pasa.cbentley.core.src4.logging.Dctx;
 import pasa.cbentley.framework.drawx.src4.engine.GraphicsX;
 import pasa.cbentley.framework.drawx.src4.engine.RgbImage;
+import pasa.cbentley.framework.drawx.src4.factories.interfaces.IBOFigure;
 import pasa.cbentley.framework.drawx.src4.tech.ITechFigure;
 import pasa.cbentley.framework.gui.src4.anim.IBOAnim;
 import pasa.cbentley.framework.gui.src4.anim.ITechAnim;
@@ -171,14 +172,14 @@ public class FigDrawable extends Drawable implements ITechFigure {
          this.figure = p;
       }
       //based on Figure Flag, enables caching
-      if (figure.hasFlag(ITechFigure.FIG__OFFSET_03_FLAGP, FIG_FLAGP_1RGB) || figure.hasFlag(FIG__OFFSET_02_FLAG, FIG_FLAG_5_FILTER)) {
+      if (figure.hasFlag(IBOFigure.FIG__OFFSET_03_FLAGP, IBOFigure.FIG_FLAGP_1RGB) || figure.hasFlag(IBOFigure.FIG__OFFSET_02_FLAG, IBOFigure.FIG_FLAG_5_FILTER)) {
          //the figure is using rgb pixel manipulation, so it is wise to cache content. tip the mother class.
          setBehaviorFlag(ITechDrawable.BEHAVIOR_22_TIP_HEAVY_CONTENT, true);
       } else {
          this.setBehaviorFlag(ITechDrawable.BEHAVIOR_22_TIP_HEAVY_CONTENT, false);
       }
       //deals with animations on the figure
-      if (figure.hasFlag(FIG__OFFSET_02_FLAG, FIG_FLAG_6_ANIMATED)) {
+      if (figure.hasFlag(IBOFigure.FIG__OFFSET_02_FLAG, IBOFigure.FIG_FLAG_6_ANIMATED)) {
          ByteObject[] anims = figure.getSubs(IBOTypesGui.TYPE_130_ANIMATION);
          for (int i = 0; i < anims.length; i++) {
             ByteObject anim = anims[i];

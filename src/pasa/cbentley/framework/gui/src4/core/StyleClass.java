@@ -3,6 +3,7 @@ package pasa.cbentley.framework.gui.src4.core;
 import pasa.cbentley.byteobjects.src4.core.ByteObject;
 import pasa.cbentley.byteobjects.src4.core.interfaces.IByteObject;
 import pasa.cbentley.byteobjects.src4.ctx.IBOTypesDrw;
+import pasa.cbentley.core.src4.ctx.ICtx;
 import pasa.cbentley.core.src4.ctx.IToStringFlags;
 import pasa.cbentley.core.src4.ctx.UCtx;
 import pasa.cbentley.core.src4.io.BAByteOS;
@@ -18,7 +19,7 @@ import pasa.cbentley.core.src4.structs.IntToObjects;
 import pasa.cbentley.core.src4.utils.ArrayUtils;
 import pasa.cbentley.core.src4.utils.BitUtils;
 import pasa.cbentley.core.src4.utils.IntUtils;
-import pasa.cbentley.framework.drawx.src4.style.ITechStyle;
+import pasa.cbentley.framework.drawx.src4.style.IBOStyle;
 import pasa.cbentley.framework.gui.src4.ctx.GuiCtx;
 import pasa.cbentley.framework.gui.src4.ctx.ToStringStaticGui;
 import pasa.cbentley.framework.gui.src4.interfaces.IDrawable;
@@ -41,7 +42,7 @@ import pasa.cbentley.framework.gui.src4.table.interfaces.IBOTableView;
  * 
  * From these, {@link StyleClass} create variations of the root style. 
  * <br>
- * Root style is usually opaque and sub styles are semi transparent i.e. flagged with {@link ITechStyle#STYLE_FLAG_PERF_7_INCOMPLETE}
+ * Root style is usually opaque and sub styles are semi transparent i.e. flagged with {@link IBOStyle#STYLE_FLAG_PERF_7_INCOMPLETE}
  * <br>
  * <br>
  * <b>Style Variations </b>:
@@ -223,7 +224,9 @@ public class StyleClass implements IStringable, IStatorable {
       this.gc = gc;
       this.uc = gc.getUCtx();
    }
-
+   public ICtx getCtxOwner() {
+      return gc;
+   }
    /**
     * 
     * @param id
@@ -238,6 +241,9 @@ public class StyleClass implements IStringable, IStatorable {
       rootMODs = new ByteObject[] { rootStyle };
       cacheStyleInit();
       FLAG_CACHE_STYLE = gc.getSettingsWrapper().hasStyleClassCache();
+   }
+   public int getStatorableClassID() {
+      throw new RuntimeException("Must be implemented by subclass");
    }
 
    /**
@@ -1076,12 +1082,12 @@ public class StyleClass implements IStringable, IStatorable {
    public void stateReadFrom(StatorReader state) {
       IntToObjects ito = new IntToObjects(uc);
       StyleClass sc = new StyleClass(gc);
-      BADataIS dataReader = state.getDataReader();
+      BADataIS dataReader = state.getReader();
       sc.serializeFrom(ito, dataReader);
    }
 
    public void stateWriteTo(StatorWriter state) {
-      BADataOS dataWriter = state.getDataWriter();
+      BADataOS dataWriter = state.getWriter();
       IntToObjects ito = new IntToObjects(uc);
       serializeTo(ito, dataWriter);
    }

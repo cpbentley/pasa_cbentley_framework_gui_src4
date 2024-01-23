@@ -11,7 +11,7 @@ import pasa.cbentley.framework.cmd.src4.engine.MCmd;
 import pasa.cbentley.framework.cmd.src4.interfaces.ICommandable;
 import pasa.cbentley.framework.cmd.src4.interfaces.IEventCmds;
 import pasa.cbentley.framework.coreui.src4.interfaces.IActionFeedback;
-import pasa.cbentley.framework.coreui.src4.tech.IBCodes;
+import pasa.cbentley.framework.coreui.src4.tech.ITechCodes;
 import pasa.cbentley.framework.coreui.src4.tech.IInput;
 import pasa.cbentley.framework.datamodel.src4.table.ObjectTableModel;
 import pasa.cbentley.framework.gui.src4.canvas.FocusCtrl;
@@ -450,15 +450,15 @@ public class CmdMenuBar extends TableView implements IEventConsumer, ICmdsView {
    }
 
    private void icRelease(InputConfig ic) {
-      if (ic.is.getKeyCode() == IBCodes.KEY_MENU_LEFT) {
+      if (ic.is.getKeyCode() == ITechCodes.KEY_MENU_LEFT) {
          mLeft.setStateStyle(ITechDrawable.STYLE_08_PRESSED, false);
          //send a menu repaint
          ic.srActionDoneRepaint(mLeft);
-      } else if (ic.is.getKeyCode() == IBCodes.KEY_MENU_RIGHT) {
+      } else if (ic.is.getKeyCode() == ITechCodes.KEY_MENU_RIGHT) {
          mRight.setStateStyle(ITechDrawable.STYLE_08_PRESSED, false);
          //send a menu repaint
          ic.srActionDoneRepaint(mRight);
-      } else if (ic.is.getKeyCode() == IBCodes.KEY_FIRE) {
+      } else if (ic.is.getKeyCode() == ITechCodes.KEY_FIRE) {
          if (mMiddle.hasStateStyle(ITechDrawable.STYLE_08_PRESSED)) {
             mMiddle.setStateStyle(ITechDrawable.STYLE_08_PRESSED, false);
             //send a menu repaint
@@ -658,7 +658,7 @@ public class CmdMenuBar extends TableView implements IEventConsumer, ICmdsView {
          }
 
          //when modifiers key are kept pressed, modifies the base Model content. with ctx specifics
-         if (ic.isKeyTypedAlone(IBCodes.KEY_STAR)) {
+         if (ic.isKeyTypedAlone(ITechCodes.KEY_STAR)) {
             //modifies 3 to show 3 starred menu cmds. modifies active model
             if (modeMenu == MODE_MENU_1_STAR) {
                changeMenuModel(ic, cmdModelDefault);
@@ -666,7 +666,7 @@ public class CmdMenuBar extends TableView implements IEventConsumer, ICmdsView {
                changeMenuModel(ic, cmdModelStar);
             }
          }
-         if (ic.isKeyTypedAlone(IBCodes.KEY_POUND)) {
+         if (ic.isKeyTypedAlone(ITechCodes.KEY_POUND)) {
             //modifies 3 to show 3 starred menu cmds. modifies active model
             if (modeMenu == MODE_MENU_2_POUND) {
                changeMenuModel(ic, cmdModelDefault);

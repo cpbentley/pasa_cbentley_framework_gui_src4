@@ -18,7 +18,7 @@ import pasa.cbentley.framework.cmd.src4.interfaces.ICommandable;
 import pasa.cbentley.framework.cmd.src4.interfaces.INavTech;
 import pasa.cbentley.framework.coreui.src4.ctx.ToStringStaticCoreUi;
 import pasa.cbentley.framework.coreui.src4.exec.ExecutionContext;
-import pasa.cbentley.framework.coreui.src4.tech.IBCodes;
+import pasa.cbentley.framework.coreui.src4.tech.ITechCodes;
 import pasa.cbentley.framework.coreui.src4.utils.ViewState;
 import pasa.cbentley.framework.datamodel.src4.table.ITableModel;
 import pasa.cbentley.framework.datamodel.src4.table.ModelAux;
@@ -3215,7 +3215,7 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
 
          //#debug
          toDLog().pFlow("Wheeled " + ToStringStaticCoreUi.getStringMouseButton(ic.getIdKeyBut()), this, TableView.class, "managePointerInputViewPort", LVL_05_FINE, true);
-         if (ic.getIdKeyBut() == IBCodes.PBUTTON_3_WHEEL_UP) {
+         if (ic.getIdKeyBut() == ITechCodes.PBUTTON_3_WHEEL_UP) {
             if (modelRow.numCells == 1) {
                navigateLeft(ic);
             } else {

@@ -42,20 +42,23 @@ public class Scenario extends ScenarioItemAbstract implements IStatorable {
    public Scenario(GuiCtx gc) {
       super(gc);
    }
+   public int getStatorableClassID() {
+      throw new RuntimeException("Must be implemented by subclass");
+   }
 
    public void stateWriteTo(StatorWriter state) {
-      BADataOS dataWriter = state.getDataWriter();
+      BADataOS dataWriter = state.getWriter();
       dataWriter.writeInt(scenarioID);
       dataWriter.writeString(name);
-      state.stateWriteOf(startingNode);
-      state.stateWriteOf(factory);
+      state.writerToStatorable(startingNode);
+      state.writerToStatorable(factory);
    }
 
    public void stateReadFrom(StatorReader state) {
-      BADataIS dataReader = state.getDataReader();
+      BADataIS dataReader = state.getReader();
       scenarioID = dataReader.readInt();
       name = dataReader.readString();
-      startingNode = (ScenarioNode) state.createObject(ScenarioNode.class, startingNode);
-      factory = (IScenarioDrawableFactory) state.createObject(IScenarioDrawableFactory.class, factory);
+      startingNode = (ScenarioNode) state.readObject(gc, startingNode);
+      factory = (IScenarioDrawableFactory) state.readObject(gc, factory);
    }
 }

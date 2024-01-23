@@ -30,7 +30,7 @@ public class RgbImageSaveTask extends GuiBackgroundTask implements IStringable {
    }
 
    public String getFileNameAuto() {
-      String name = gc.getCFC().getConfigApp().getAppName();
+      String name = gc.getAppli().getAppCtx().getConfigApp().getAppName();
       name = name + "_" + System.currentTimeMillis() + ".png";
       return name;
    }

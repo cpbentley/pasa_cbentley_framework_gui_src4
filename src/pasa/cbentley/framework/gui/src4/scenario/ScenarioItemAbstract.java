@@ -1,5 +1,6 @@
 package pasa.cbentley.framework.gui.src4.scenario;
 
+import pasa.cbentley.core.src4.ctx.ICtx;
 import pasa.cbentley.core.src4.ctx.UCtx;
 import pasa.cbentley.core.src4.logging.Dctx;
 import pasa.cbentley.core.src4.logging.IDLog;
@@ -13,6 +14,10 @@ public abstract class ScenarioItemAbstract implements IStatorable {
       this.gc = gc;
    }
    
+   public ICtx getCtxOwner() {
+      return gc;
+   }
+
    //#mdebug
    public IDLog toDLog() {
       return toStringGetUCtx().toDLog();

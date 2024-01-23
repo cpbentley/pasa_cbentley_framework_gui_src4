@@ -2,7 +2,7 @@ package pasa.cbentley.framework.gui.src4.ctx.config;
 
 import pasa.cbentley.core.src4.ctx.UCtx;
 import pasa.cbentley.framework.core.src4.app.ConfigAppAbstract;
-import pasa.cbentley.framework.coreui.src4.tech.IInputConstants;
+import pasa.cbentley.framework.coreui.src4.tech.ITechInputConstants;
 import pasa.cbentley.framework.gui.src4.interfaces.ITechCanvasDrawable;
 
 public abstract class ConfigAppGuiAbstractFlat extends ConfigAppAbstract {
@@ -32,7 +32,7 @@ public abstract class ConfigAppGuiAbstractFlat extends ConfigAppAbstract {
    }
 
    public int getAllerRetourMinAmplitudePixel() {
-      return IInputConstants.BF_ALLER_RETOUR_MIN_AMPLITUDE;
+      return ITechInputConstants.BF_ALLER_RETOUR_MIN_AMPLITUDE;
    }
 
 }

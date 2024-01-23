@@ -9,7 +9,7 @@ import pasa.cbentley.framework.coreui.src4.ctx.ToStringStaticCoreUi;
 import pasa.cbentley.framework.coreui.src4.event.RepeatEvent;
 import pasa.cbentley.framework.coreui.src4.exec.ExecutionContext;
 import pasa.cbentley.framework.coreui.src4.interfaces.IActionFeedback;
-import pasa.cbentley.framework.coreui.src4.tech.IBCodes;
+import pasa.cbentley.framework.coreui.src4.tech.ITechCodes;
 import pasa.cbentley.framework.coreui.src4.tech.IInput;
 import pasa.cbentley.framework.coreui.src4.tech.ITechInputFeedback;
 import pasa.cbentley.framework.drawx.src4.engine.GraphicsX;
@@ -168,15 +168,15 @@ public class InputConfig implements IStringable, IInput, IActionFeedback {
    }
 
    public boolean is0() {
-      return getIdKeyBut() == IBCodes.KEY_NUM0;
+      return getIdKeyBut() == ITechCodes.KEY_NUM0;
    }
 
    public boolean is0P() {
-      return isPressedKeyboard0(IBCodes.KEY_NUM0);
+      return isPressedKeyboard0(ITechCodes.KEY_NUM0);
    }
 
    public boolean is1() {
-      return getIdKeyBut() == IBCodes.KEY_NUM1;
+      return getIdKeyBut() == ITechCodes.KEY_NUM1;
    }
 
    public void debugSrActionDoneRepaint(String actionStr) {
@@ -184,71 +184,71 @@ public class InputConfig implements IStringable, IInput, IActionFeedback {
    }
 
    public boolean is1P() {
-      return isPressedKeyboard0(IBCodes.KEY_NUM1);
+      return isPressedKeyboard0(ITechCodes.KEY_NUM1);
    }
 
    public boolean is2() {
-      return getIdKeyBut() == IBCodes.KEY_NUM2;
+      return getIdKeyBut() == ITechCodes.KEY_NUM2;
    }
 
    public boolean is2P() {
-      return isPressedKeyboard0(IBCodes.KEY_NUM2);
+      return isPressedKeyboard0(ITechCodes.KEY_NUM2);
    }
 
    public boolean is3() {
-      return getIdKeyBut() == IBCodes.KEY_NUM3;
+      return getIdKeyBut() == ITechCodes.KEY_NUM3;
    }
 
    public boolean is3P() {
-      return isPressedKeyboard0(IBCodes.KEY_NUM3);
+      return isPressedKeyboard0(ITechCodes.KEY_NUM3);
    }
 
    public boolean is4() {
-      return getIdKeyBut() == IBCodes.KEY_NUM4;
+      return getIdKeyBut() == ITechCodes.KEY_NUM4;
    }
 
    public boolean is4P() {
-      return isPressedKeyboard0(IBCodes.KEY_NUM4);
+      return isPressedKeyboard0(ITechCodes.KEY_NUM4);
    }
 
    public boolean is5() {
-      return getIdKeyBut() == IBCodes.KEY_NUM5;
+      return getIdKeyBut() == ITechCodes.KEY_NUM5;
    }
 
    public boolean is5P() {
-      return isPressedKeyboard0(IBCodes.KEY_NUM5);
+      return isPressedKeyboard0(ITechCodes.KEY_NUM5);
    }
 
    public boolean is6() {
-      return getIdKeyBut() == IBCodes.KEY_NUM6;
+      return getIdKeyBut() == ITechCodes.KEY_NUM6;
    }
 
    public boolean is6P() {
-      return isPressedKeyboard0(IBCodes.KEY_NUM6);
+      return isPressedKeyboard0(ITechCodes.KEY_NUM6);
    }
 
    public boolean is7() {
-      return getIdKeyBut() == IBCodes.KEY_NUM7;
+      return getIdKeyBut() == ITechCodes.KEY_NUM7;
    }
 
    public boolean is7P() {
-      return isPressedKeyboard0(IBCodes.KEY_NUM7);
+      return isPressedKeyboard0(ITechCodes.KEY_NUM7);
    }
 
    public boolean is8() {
-      return getIdKeyBut() == IBCodes.KEY_NUM8;
+      return getIdKeyBut() == ITechCodes.KEY_NUM8;
    }
 
    public boolean is8P() {
-      return isPressedKeyboard0(IBCodes.KEY_NUM8);
+      return isPressedKeyboard0(ITechCodes.KEY_NUM8);
    }
 
    public boolean is9() {
-      return getIdKeyBut() == IBCodes.KEY_NUM9;
+      return getIdKeyBut() == ITechCodes.KEY_NUM9;
    }
 
    public boolean is9P() {
-      return isPressedKeyboard0(IBCodes.KEY_NUM9);
+      return isPressedKeyboard0(ITechCodes.KEY_NUM9);
    }
 
    public boolean isActionDone() {
@@ -441,7 +441,7 @@ public class InputConfig implements IStringable, IInput, IActionFeedback {
     * Is the key pressed, among all the keys currently pressed
     * <br>
     * <br>
-    * @param key value from {@link IBCodes#KEY_BACK}, {@link IBCodes#KEY_NUM3}
+    * @param key value from {@link ITechCodes#KEY_BACK}, {@link ITechCodes#KEY_NUM3}
     * @return
     */
    public boolean isPressedKeyboard0(int key) {
@@ -484,7 +484,7 @@ public class InputConfig implements IStringable, IInput, IActionFeedback {
    }
 
    public boolean isRightP() {
-      return isPressedKeyboard0(IBCodes.KEY_RIGHT);
+      return isPressedKeyboard0(ITechCodes.KEY_RIGHT);
    }
 
    public boolean isSequencedPressed(int key1, int key2) {

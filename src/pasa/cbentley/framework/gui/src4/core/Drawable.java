@@ -1707,14 +1707,6 @@ public class Drawable implements IDrawable, IBOStyle, IStringable, ILayoutable, 
       return layEngine.getW();
    }
 
-   /**
-    * Returns the sizing value based on the styling
-    * <li> {@link ISizerDrawable#ET_DRW_0_DRAWN}
-    * <li> {@link ISizerDrawable#ET_DRW_1_CONTENT} drawn without the sty;e
-    * <br>
-    * 
-    * Sub class must implement other sizes.
-    */
    public int getSizeW(int sizeType) {
       if (sizeType == ITechSizer.SIZER_PROP_05_CONTENT) {
          return layEngine.getContentW();
@@ -1726,9 +1718,6 @@ public class Drawable implements IDrawable, IBOStyle, IStringable, ILayoutable, 
       return getSizeDrawnWidth();
    }
 
-   /**
-    * Compute different X based sizes
-    */
    public int getSizeX(int sizeType) {
       int x = getPozeXComputed();
       if (sizeType == ITechSizer.SIZER_PROP_05_CONTENT) {

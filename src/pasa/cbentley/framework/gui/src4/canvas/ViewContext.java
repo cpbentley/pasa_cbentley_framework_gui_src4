@@ -5,7 +5,7 @@ import pasa.cbentley.core.src4.logging.Dctx;
 import pasa.cbentley.core.src4.logging.IDLog;
 import pasa.cbentley.core.src4.logging.IStringable;
 import pasa.cbentley.framework.drawx.src4.engine.GraphicsX;
-import pasa.cbentley.framework.gui.src4.ctx.CanvasGuiContext;
+import pasa.cbentley.framework.gui.src4.ctx.CanvasGuiCtx;
 import pasa.cbentley.framework.gui.src4.ctx.GuiCtx;
 import pasa.cbentley.framework.gui.src4.interfaces.IDrawable;
 import pasa.cbentley.layouter.src4.engine.LayoutableAbstract;
@@ -66,7 +66,7 @@ public class ViewContext extends LayoutableAbstract implements IStringable, ILay
    }
 
    /**
-    * The {@link CanvasGuiContext} to which belongs this view
+    * The {@link CanvasGuiCtx} to which belongs this view
     * @return
     */
    public CanvasAppliDrawable getCanvasCtx() {

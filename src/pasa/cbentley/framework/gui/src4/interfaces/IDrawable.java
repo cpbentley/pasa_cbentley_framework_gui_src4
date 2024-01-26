@@ -25,6 +25,7 @@ import pasa.cbentley.framework.gui.src4.core.LayEngineDrawable;
 import pasa.cbentley.framework.gui.src4.core.StyleClass;
 import pasa.cbentley.layouter.src4.engine.LayEngine;
 import pasa.cbentley.layouter.src4.interfaces.ILayoutable;
+import pasa.cbentley.layouter.src4.tech.ITechSizer;
 
 /**
  * Main Interface to any drawable components which supports the {@link IAnimable} framework.
@@ -339,12 +340,46 @@ public interface IDrawable extends IStringable, ITechDrawable, IStatorable, IBen
     */
    public RgbImage getRgbImage(int type);
 
+   /**
+    * @see IDrawable#getSizeW(int)
+    * @param sizeType
+    * @return
+    */
    public int getSizeH(int sizeType);
 
+   /**
+    * Returns the sizing value based on the styling
+    * 
+    * <li> {@link ITechSizer#SIZER_PROP_05_CONTENT} Width without pad/border/margin values
+    * <li> {@link ITechSizer#SIZER_PROP_06_CONTENT_PAD}
+    * <li> {@link ITechSizer#SIZER_PROP_07_CONTENT_PAD_BORDER}
+    * <li> {@link ITechSizer#SIZER_PROP_10_PAD}
+    * <li> {@link ITechSizer#SIZER_PROP_11_PAD_BORDER}
+    * <li> {@link ITechSizer#SIZER_PROP_12_PAD_BORDER_MARGIN}
+    * <li> {@link ITechSizer#SIZER_PROP_13_BORDER}
+    * <li> {@link ITechSizer#SIZER_PROP_14_BORDER_MARGIN}
+    * <li> {@link ITechSizer#SIZER_PROP_15_MARGIN}
+    * 
+    * Sub class must implement other sizes.
+    * 
+    * @param sizeType
+    * @return
+    */
    public int getSizeW(int sizeType);
 
+   /**
+    * Similar to {@link IDrawable#getSizeW(int)} but for the X coordinate.
+    * <li> {@link ITechSizer#SIZER_PROP_07_CONTENT_PAD_BORDER} would compute the X coord with padding and border
+    * @param sizeType
+    * @return
+    */
    public int getSizeX(int sizeType);
 
+   /**
+    * @see IDrawable#getSizeW(int)
+    * @param sizeType
+    * @return
+    */
    public int getSizeY(int sizeType);
 
    /**
@@ -586,12 +621,7 @@ public interface IDrawable extends IStringable, ITechDrawable, IStatorable, IBen
    //   public void navigateUp(InputConfig ic);
 
    /**
-    * Method for showNotify and hideNotify kind of methods
-    * <br>
-    * <br>
-    * Contract is method is called before the state associated with the event has been changed.
-    * <br>
-    * <br>
+    * Same as {@link IDrawable#notifyEvent(int, Object)} but with a null Object
     * @param event
     */
    public void notifyEvent(int event);
@@ -605,7 +635,7 @@ public interface IDrawable extends IStringable, ITechDrawable, IStatorable, IBen
     * <li> {@link ITechDrawable#EVENT_05_ANIM_FINISHED}
     * <li> {@link ITechDrawable#EVENT_06_ANIM_STARTED}
     * <br>
-    * <br>
+    * Contract is method is called before the state associated with the event has been changed.
     * @param event
     * @param o
     */

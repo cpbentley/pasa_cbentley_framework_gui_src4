@@ -27,7 +27,7 @@ import pasa.cbentley.framework.gui.src4.canvas.InputStateDrawable;
 import pasa.cbentley.framework.gui.src4.core.Drawable;
 import pasa.cbentley.framework.gui.src4.core.UserInteraction;
 import pasa.cbentley.framework.gui.src4.ctx.GuiCtx;
-import pasa.cbentley.framework.gui.src4.ctx.ObjectGui;
+import pasa.cbentley.framework.gui.src4.ctx.ObjectGC;
 import pasa.cbentley.framework.gui.src4.interfaces.IBOUserInterAction;
 import pasa.cbentley.framework.gui.src4.interfaces.ICmdsView;
 import pasa.cbentley.framework.gui.src4.menu.CmdMenuBar;
@@ -55,7 +55,7 @@ import pasa.cbentley.framework.input.src4.InputState;
  * @author Charles-Philip Bentley
  *
  */
-public class ViewCommandListener extends ObjectGui implements ICmdsView, ICommandable, ITechInputFeedback {
+public class ViewCommandListener extends ObjectGC implements ICmdsView, ICommandable, ITechInputFeedback {
 
    private CmdNode       ctx;
 

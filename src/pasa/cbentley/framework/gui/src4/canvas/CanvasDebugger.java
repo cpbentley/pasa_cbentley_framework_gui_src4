@@ -15,6 +15,7 @@ import pasa.cbentley.framework.gui.src4.ctx.ITechCtxSettingsAppGui;
 import pasa.cbentley.framework.gui.src4.ctx.ToStringStaticGui;
 import pasa.cbentley.framework.gui.src4.interfaces.ITechCanvasDrawable;
 import pasa.cbentley.framework.gui.src4.string.StringDrawable;
+import pasa.cbentley.framework.gui.src4.utils.RenderMetrics;
 
 /**
  * Drawable to paint debug info.
@@ -29,7 +30,6 @@ import pasa.cbentley.framework.gui.src4.string.StringDrawable;
  */
 public class CanvasDebugger extends Drawable {
 
-   private CanvasAppliDrawable canvas;
 
    protected int               countAnimRepaints;
 
@@ -55,9 +55,8 @@ public class CanvasDebugger extends Drawable {
 
    protected int               totalPaintTime = 0;
 
-   public CanvasDebugger(GuiCtx gc, CanvasAppliDrawable canvas) {
+   public CanvasDebugger(GuiCtx gc) {
       super(gc, gc.getClass(0));
-      this.canvas = canvas;
       sb = new StringBBuilder(gc.getUCtx());
       setDebugName("CanvasDebugger");
    }
@@ -71,9 +70,9 @@ public class CanvasDebugger extends Drawable {
       sb.append("(" + Thread.currentThread().getName() + ")");
    }
 
-   public void debugRender1End(GraphicsX g) {
+   public void debugRender1End(GraphicsX g, RenderMetrics renderMetrics) {
 
-      paintDebugLight(g, canvas.getRenderMetrics().getLastDuration());
+      paintDebugLight(g, renderMetrics.getLastDuration());
 
       //#mdebug
       if (gc.toStringHasToStringFlag(IFlagsToStringGui.D_FLAG_28_MASTER_CANVAS)) {

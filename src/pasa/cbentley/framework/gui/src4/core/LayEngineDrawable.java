@@ -16,7 +16,7 @@ import pasa.cbentley.layouter.src4.engine.LayEngineRead;
 import pasa.cbentley.layouter.src4.engine.LayoutOperator;
 import pasa.cbentley.layouter.src4.engine.Zer2DRect;
 import pasa.cbentley.layouter.src4.tech.ITechLayout;
-import pasa.cbentley.layouter.src4.tech.ITechSizer;
+import pasa.cbentley.layouter.src4.tech.IBOSizer;
 
 /**
  * A 2D draw sizer defines the size of a rectangle relative to another one.
@@ -225,7 +225,7 @@ public class LayEngineDrawable extends LayEngineRead implements ITechLayout, ISt
 
    private boolean hasFlagSizer(ByteObject sizer, int flag) {
       if (sizer != null) {
-         return sizer.hasFlag(ITechSizer.SIZER_OFFSET_01_FLAG, ITechSizer.SIZER_FLAG_2_ALLOW_SHRINK);
+         return sizer.hasFlag(IBOSizer.SIZER_OFFSET_01_FLAG, IBOSizer.SIZER_FLAG_2_ALLOW_SHRINK);
       }
       return false;
    }

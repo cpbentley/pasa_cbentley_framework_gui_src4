@@ -20,7 +20,7 @@ import pasa.cbentley.framework.gui.src4.canvas.InputConfig;
 import pasa.cbentley.framework.gui.src4.canvas.RgbImageSaveTask;
 import pasa.cbentley.framework.gui.src4.canvas.ViewContext;
 import pasa.cbentley.framework.gui.src4.core.StyleClass;
-import pasa.cbentley.framework.gui.src4.ctx.CanvasGuiContext;
+import pasa.cbentley.framework.gui.src4.ctx.CanvasGuiCtx;
 import pasa.cbentley.framework.gui.src4.ctx.GuiCtx;
 import pasa.cbentley.framework.gui.src4.ctx.ITechCtxSettingsAppGui;
 import pasa.cbentley.framework.gui.src4.interfaces.ICmdsView;
@@ -78,7 +78,7 @@ public class CommanderGui extends CommanderAbstract implements ICmdsView, ITechI
    }
 
    protected void cmdDebugCanvasToggle(CmdInstanceDrawable cmd) {
-      CanvasGuiContext cac = (CanvasGuiContext) cmd.paramO;
+      CanvasGuiCtx cac = (CanvasGuiCtx) cmd.paramO;
       CanvasAppliDrawable canvas = cac.getCanvas();
       if (cmd.hasFlag(CmdInstance.STATE_FLAG_4_UNDO)) {
          int oldMode = cmd.getParamInt(0);
@@ -203,7 +203,7 @@ public class CommanderGui extends CommanderAbstract implements ICmdsView, ITechI
     * @param cmd
     */
    public void cmdMenuCanvasToggle(CmdInstance cmd) {
-      CanvasGuiContext cv = (CanvasGuiContext) cmd.paramO;
+      CanvasGuiCtx cv = (CanvasGuiCtx) cmd.paramO;
       CmdMenuBar cm = cv.getMenuBar();
       int mode = cm.getMenuBarTech().get1(IMenus.MENUS_OFFSET_03_SHOW_MODE1);
       if (mode == IMenus.SHOW_MODE_0_ALWAYS_ON) {

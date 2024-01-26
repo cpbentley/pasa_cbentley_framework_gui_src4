@@ -6,13 +6,13 @@ import pasa.cbentley.core.src4.logging.IDLog;
 import pasa.cbentley.core.src4.logging.IStringable;
 import pasa.cbentley.framework.cmd.src4.ctx.CmdCtx;
 
-public class ObjectGui implements IStringable {
+public class ObjectGC implements IStringable {
 
    protected final GuiCtx gc;
 
    protected final CmdCtx cc;
 
-   public ObjectGui(GuiCtx gc) {
+   public ObjectGC(GuiCtx gc) {
       this.gc = gc;
       this.cc = gc.getCC();
    }
@@ -31,7 +31,7 @@ public class ObjectGui implements IStringable {
    }
 
    public void toString(Dctx dc) {
-      dc.root(this, ObjectGui.class, "@line5");
+      dc.root(this, ObjectGC.class, "@line5");
       toStringPrivate(dc);
    }
 
@@ -44,7 +44,7 @@ public class ObjectGui implements IStringable {
    }
 
    public void toString1Line(Dctx dc) {
-      dc.root1Line(this, ObjectGui.class);
+      dc.root1Line(this, ObjectGC.class);
       toStringPrivate(dc);
    }
 

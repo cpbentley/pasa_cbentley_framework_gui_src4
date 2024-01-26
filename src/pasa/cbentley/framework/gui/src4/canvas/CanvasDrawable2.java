@@ -6,6 +6,7 @@ import pasa.cbentley.framework.cmd.src4.engine.CmdNode;
 import pasa.cbentley.framework.cmd.src4.engine.MCmd;
 import pasa.cbentley.framework.cmd.src4.interfaces.ICmdListener;
 import pasa.cbentley.framework.coredraw.src4.interfaces.IGraphics;
+import pasa.cbentley.framework.coreui.src4.event.BEvent;
 import pasa.cbentley.framework.coreui.src4.utils.ViewState;
 import pasa.cbentley.framework.drawx.src4.engine.GraphicsX;
 import pasa.cbentley.framework.drawx.src4.engine.RgbImage;
@@ -14,8 +15,10 @@ import pasa.cbentley.framework.gui.src4.core.Drawable;
 import pasa.cbentley.framework.gui.src4.core.StyleClass;
 import pasa.cbentley.framework.gui.src4.ctx.CanvasGuiCtx;
 import pasa.cbentley.framework.gui.src4.ctx.GuiCtx;
+import pasa.cbentley.framework.gui.src4.ctx.ObjectGC;
 import pasa.cbentley.framework.gui.src4.interfaces.IAnimable;
 import pasa.cbentley.framework.gui.src4.interfaces.IDrawable;
+import pasa.cbentley.framework.gui.src4.interfaces.ITechDrawable;
 import pasa.cbentley.framework.input.src4.CanvasAppliInput;
 import pasa.cbentley.framework.input.src4.InputState;
 import pasa.cbentley.framework.input.src4.CanvasResult;
@@ -31,29 +34,34 @@ import pasa.cbentley.framework.input.src4.CanvasResult;
  * @author Charles Bentley
  *
  */
-public abstract class CanvasDrawable extends CanvasAppliInput implements IDrawable {
+public abstract class CanvasDrawable2 extends ObjectGC implements IDrawable {
 
-   private CanvasGuiCtx cac;
+   protected final CanvasGuiCtx  cgc;
 
-   protected GraphicsXD destGraphicsX;
+   private IDrawable             parent;
 
-   protected GuiCtx     gc;
+   private Drawable              root;
 
-   private IDrawable    parent;
+   private int                   uiid;
 
-   private Drawable     root;
+   protected CanvasAppliDrawable canvas;
 
-   private int          uiid;
 
    /**
     * 
-    * @param gc
-    * @param mi
+    * @param cgc the canvas on which its being drawn.
+    * @param canvas
     */
-   public CanvasDrawable(GuiCtx gc, ByteObject mi) {
-      super(gc.getIC(), mi);
-      this.gc = gc;
+   public CanvasDrawable2(CanvasGuiCtx cgc, CanvasAppliDrawable canvas, StyleClass sc) {
+      super(cgc.getGC());
+      this.cgc = cgc;
+      this.canvas = canvas;
+      root = new Drawable(gc, sc, this);
       uiid = gc.getRepo().nextUIID();
+   }
+
+   public CanvasGuiCtx getCGC() {
+      return cgc;
    }
 
    public void addFullAnimation(IAnimable anim) {
@@ -75,12 +83,16 @@ public abstract class CanvasDrawable extends CanvasAppliInput implements IDrawab
     * Sub class 
     */
    public void draw(GraphicsX g) {
+      //#debug
+      toDLog().pDraw("Clip " + "[" + g.getClipX() + "," + g.getClipY() + " " + g.getClipWidth() + "," + g.getClipHeight() + "]", null, CanvasAppliInput.class, "render");
 
+      root.drawDrawable(g);
+      canvas.paint(g.getGraphics());
    }
 
    public void drawDrawable(GraphicsX g) {
-      // TODO Auto-generated method stub
-
+      root.drawDrawable(g);
+      canvas.paint(g.getGraphics());
    }
 
    public IDrawable[] getChildren() {
@@ -94,13 +106,11 @@ public abstract class CanvasDrawable extends CanvasAppliInput implements IDrawab
    }
 
    public CmdNode getCmdNode() {
-      // TODO Auto-generated method stub
-      return null;
+      return root.getCmdNode();
    }
 
    public int getCType() {
-      // TODO Auto-generated method stub
-      return 0;
+      return root.getCType();
    }
 
    public int getDrawnHeight() {
@@ -112,17 +122,14 @@ public abstract class CanvasDrawable extends CanvasAppliInput implements IDrawab
    }
 
    public int[] getHoles() {
-      // TODO Auto-generated method stub
-      return null;
+      return root.getHoles();
    }
 
    public String getName() {
-      // TODO Auto-generated method stub
-      return null;
+      return "" + hashCode();
    }
 
    public IDrawable getNavigate(int navEvent) {
-      // TODO Auto-generated method stub
       return null;
    }
 
@@ -236,13 +243,21 @@ public abstract class CanvasDrawable extends CanvasAppliInput implements IDrawab
    }
 
    public void manageInput(InputConfig ic) {
+      generateEvent(ic);
+   }
+   
+   protected void generateEvent(InputConfig ic) {
+      BEvent eventCurrent = ic.getInputState().getEventCurrent();
+      canvas.event(eventCurrent);
    }
 
    public void manageKeyInput(InputConfig ic) {
+      generateEvent(ic);
 
    }
 
    public void managePointerInput(InputConfig ic) {
+      generateEvent(ic);
    }
 
    public void managePointerStateStyle(InputConfig ic) {
@@ -251,43 +266,23 @@ public abstract class CanvasDrawable extends CanvasAppliInput implements IDrawab
    }
 
    public void notifyEvent(int event) {
-      // TODO Auto-generated method stub
-
+      this.notifyEvent(event, null);
    }
 
    public void notifyEvent(int event, Object o) {
-      // TODO Auto-generated method stub
+      switch (event) {
+         case ITechDrawable.EVENT_01_NOTIFY_SHOW:
+            break;
+         case ITechDrawable.EVENT_02_NOTIFY_HIDE:
+            break;
+         case ITechDrawable.EVENT_07_POINTER_FOCUS_LOSS:
+            break;
 
+         default:
+            break;
+      }
    }
 
-   /**
-    * 
-    */
-   protected void render(IGraphics g, InputState is, CanvasResult sr) {
-      //#debug
-      toDLog().pDraw("Clip " + "[" + g.getClipX() + "," + g.getClipY() + " " + g.getClipWidth() + "," + g.getClipHeight() + "]", null, CanvasAppliInput.class, "render");
-
-      CanvasResultDrawable renderCause = (CanvasResultDrawable) sr;
-      //clean clip sequence since this is a new paint job
-      super.paintStart();
-      //create new GraphicsXDrawable context
-      if (destGraphicsX == null) {
-         //init the 
-         destGraphicsX = new GraphicsXD(gc);
-         // int paintMode = settingsHelper.getPaintMode();
-         //destGraphicsX.setPaintMode(paintMode, getWidth(), getHeight());
-         destGraphicsX.toStringSetName("RootGraphics");
-         //destGraphicsX = new GraphicsX(GraphicsX.MODE_IMAGE, getWidth(), getHeight());
-      }
-      if (destGraphicsX.getPaintMode() == GraphicsX.MODE_0_SCREEN) {
-         //when paint mode is not screen, we have to draw
-         destGraphicsX.reset(g);
-      }
-      destGraphicsX.screenResultCause = renderCause;
-      destGraphicsX.isd = (InputStateDrawable) is;
-
-      draw(destGraphicsX);
-   }
 
    public int sendEvent(int evType, Object param) {
       return ICmdListener.PRO_STATE_0;

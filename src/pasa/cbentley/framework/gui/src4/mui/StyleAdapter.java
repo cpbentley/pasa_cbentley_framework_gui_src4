@@ -4,14 +4,14 @@ import pasa.cbentley.core.src4.ctx.UCtx;
 import pasa.cbentley.core.src4.logging.Dctx;
 import pasa.cbentley.core.src4.logging.IDLog;
 import pasa.cbentley.framework.coredraw.src4.interfaces.IMFont;
-import pasa.cbentley.framework.gui.src4.ctx.CanvasGuiContext;
+import pasa.cbentley.framework.gui.src4.ctx.CanvasGuiCtx;
 import pasa.cbentley.framework.gui.src4.ctx.GuiCtx;
 import pasa.cbentley.layouter.src4.interfaces.IStyler;
 
 /**
  * Adapt the style based on screen densities and screen size.
  * 
- * It associated with a Canvas {@link CanvasGuiContext}
+ * It associated with a Canvas {@link CanvasGuiCtx}
  * <br>
  * A {@link GuiCtx} will have a default styleadapter though.
  * But a canvas may use its own

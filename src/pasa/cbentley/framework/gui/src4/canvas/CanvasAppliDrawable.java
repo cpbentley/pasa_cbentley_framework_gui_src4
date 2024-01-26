@@ -5,6 +5,8 @@ import pasa.cbentley.core.src4.event.BusEvent;
 import pasa.cbentley.core.src4.interfaces.C;
 import pasa.cbentley.core.src4.interfaces.IAInitable;
 import pasa.cbentley.core.src4.logging.Dctx;
+import pasa.cbentley.core.src4.stator.StatorReader;
+import pasa.cbentley.core.src4.stator.StatorWriter;
 import pasa.cbentley.core.src4.utils.ColorUtils;
 import pasa.cbentley.framework.cmd.src4.ctx.CmdCtx;
 import pasa.cbentley.framework.cmd.src4.engine.MCmd;
@@ -18,6 +20,7 @@ import pasa.cbentley.framework.coreui.src4.exec.ExecutionContext;
 import pasa.cbentley.framework.coreui.src4.interfaces.ICanvasHost;
 import pasa.cbentley.framework.coreui.src4.interfaces.ITechEventHost;
 import pasa.cbentley.framework.coreui.src4.tech.ITechCodes;
+import pasa.cbentley.framework.coreui.src4.tech.ITechHostUI;
 import pasa.cbentley.framework.coreui.src4.tech.IInput;
 import pasa.cbentley.framework.coreui.src4.tech.IBOCanvasHost;
 import pasa.cbentley.framework.drawx.src4.engine.GraphicsX;
@@ -26,6 +29,7 @@ import pasa.cbentley.framework.gui.src4.anim.AnimCreator;
 import pasa.cbentley.framework.gui.src4.cmd.CmdInstanceDrawable;
 import pasa.cbentley.framework.gui.src4.core.FigDrawable;
 import pasa.cbentley.framework.gui.src4.core.TopoViewDrawable;
+import pasa.cbentley.framework.gui.src4.ctx.CanvasGuiCtx;
 import pasa.cbentley.framework.gui.src4.ctx.GuiCtx;
 import pasa.cbentley.framework.gui.src4.ctx.ITechCtxSettingsAppGui;
 import pasa.cbentley.framework.gui.src4.interfaces.ICmdsView;
@@ -68,6 +72,14 @@ import pasa.cbentley.layouter.src4.engine.SizerFactory;
  */
 public class CanvasAppliDrawable extends CanvasAppliInput implements IDrawableListener, IAInitable {
 
+   public void stateReadFrom(StatorReader state) {
+      super.stateReadFrom(state);
+   }
+
+   public void stateWriteTo(StatorWriter state) {
+      super.stateWriteTo(state);
+   }
+
    private AnimCreator               animCreator;
 
    /**
@@ -105,7 +117,7 @@ public class CanvasAppliDrawable extends CanvasAppliInput implements IDrawableLi
     * <li> {@link ITechCanvasDrawable#SCREEN_3_RIGHT_ROTATED}
     * 
     */
-   protected int                     screenConfig = IBOCanvasHost.SCREEN_0_TOP_NORMAL;
+   protected int                     screenConfig = ITechHostUI.SCREEN_0_TOP_NORMAL;
 
    private CanvasTechHelper          settingsHelper;
 
@@ -131,9 +143,11 @@ public class CanvasAppliDrawable extends CanvasAppliInput implements IDrawableLi
     */
    protected TopoViewDrawable        topoViewDrawableRoot;
 
-   private ViewContext               vcAppli;
+   private ViewContext               vcContent;
 
    private ViewContext               vcRoot;
+
+   private CanvasGuiCtx canvasGC;
 
    public CanvasAppliDrawable(GuiCtx gc, ByteObject canvasTechHost) {
       this(gc, gc.createTechCanvasAppliDrawableDefault(), canvasTechHost);
@@ -154,6 +168,7 @@ public class CanvasAppliDrawable extends CanvasAppliInput implements IDrawableLi
       super(gc.getIC(), techCanvasAppli, techCanvasHost);
       this.gc = gc;
       this.cc = gc.getCC();
+      this.canvasGC = new CanvasGuiCtx(gc, this);
       gc.addCanvas(this);
 
       //only call this if we are leaf
@@ -165,6 +180,9 @@ public class CanvasAppliDrawable extends CanvasAppliInput implements IDrawableLi
       toDLog().pInit("Size inside constructor w=" + getWidth() + " h=" + getHeight(), null, CanvasAppliDrawable.class, "CanvasAppliDrawable", LVL_05_FINE, true);
    }
 
+   public CanvasGuiCtx getCanvasGC() {
+      return canvasGC;
+   }
    /**
     * Because those helpers are designed to be extended
     */
@@ -329,12 +347,12 @@ public class CanvasAppliDrawable extends CanvasAppliInput implements IDrawableLi
 
       vcRoot.setTopo(topologyRoot);
 
-      vcAppli = new ViewContext(gc, this);
-      vcAppli.toStringSetDebugName("Appli");
-      vcAppli.setParent(vcRoot);
+      vcContent = new ViewContext(gc, this);
+      vcContent.toStringSetDebugName("Appli");
+      vcContent.setParent(vcRoot);
 
       //set the no style style
-      topoViewDrawableRoot = new TopoViewDrawable(gc, gc.getClass(IUIView.SC_6_EMPTY), vcRoot, vcAppli);
+      topoViewDrawableRoot = new TopoViewDrawable(gc, gc.getClass(IUIView.SC_6_EMPTY), vcRoot, vcContent);
 
       //#debug
       topoViewDrawableRoot.setDebugName("RootDrawable");
@@ -710,7 +728,7 @@ public class CanvasAppliDrawable extends CanvasAppliInput implements IDrawableLi
     * @return
     */
    public ViewContext getVCAppli() {
-      return vcAppli;
+      return vcContent;
    }
 
    /**
@@ -719,6 +737,10 @@ public class CanvasAppliDrawable extends CanvasAppliInput implements IDrawableLi
     */
    public ViewContext getVCRoot() {
       return vcRoot;
+   }
+   
+   public GuiCtx getGC() {
+      return gc;
    }
 
    public void layoutInvalidate() {
@@ -823,7 +845,7 @@ public class CanvasAppliDrawable extends CanvasAppliInput implements IDrawableLi
       //size for the image layer
       int w = 0;
       int h = 0;
-      if (screenConfig == IBOCanvasHost.SCREEN_1_BOT_UPSIDEDOWN || screenConfig == IBOCanvasHost.SCREEN_0_TOP_NORMAL) {
+      if (screenConfig == ITechHostUI.SCREEN_1_BOT_UPSIDEDOWN || screenConfig == ITechHostUI.SCREEN_0_TOP_NORMAL) {
          w = getWidth();
          h = getHeight();
       } else {
@@ -994,7 +1016,7 @@ public class CanvasAppliDrawable extends CanvasAppliInput implements IDrawableLi
       renderMetrics.addFrame(time, duration);
 
       if (canvasDebug != null) {
-         canvasDebug.debugRender1End(g);
+         canvasDebug.debugRender1End(g, this.getRenderMetrics());
       }
    }
 
@@ -1017,7 +1039,7 @@ public class CanvasAppliDrawable extends CanvasAppliInput implements IDrawableLi
    public void setDebugMode(int mode) {
       if (mode != ITechCanvasDrawable.DEBUG_0_NONE) {
          if (canvasDebug == null) {
-            canvasDebug = new CanvasDebugger(gc, this);
+            canvasDebug = new CanvasDebugger(gc);
             canvasDebug.setViewContext(vcRoot);
          }
          canvasDebug.setDebugMode(mode);
@@ -1114,7 +1136,7 @@ public class CanvasAppliDrawable extends CanvasAppliInput implements IDrawableLi
       dc.appendVarWithSpace("cmdProcessingMode", cmdProcessingMode);
       super.toString(dc.sup());
       dc.nlLvl(vcRoot, "viewContextRoot");
-      dc.nlLvl(vcAppli, "viewContextAppli");
+      dc.nlLvl(vcContent, "viewContextAppli");
       dc.nlLvl(canvasDebug, "canvasDebug");
       dc.nlLvl(cmdMenuBar, "cmdMenuBar");
       dc.nlLvl(topoViewDrawableRoot, "topoViewDrawableRoot");

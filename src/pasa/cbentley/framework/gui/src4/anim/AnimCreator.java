@@ -5,7 +5,7 @@ import pasa.cbentley.core.src4.logging.Dctx;
 import pasa.cbentley.core.src4.logging.IDLog;
 import pasa.cbentley.framework.gui.src4.canvas.CanvasAppliDrawable;
 import pasa.cbentley.framework.gui.src4.ctx.GuiCtx;
-import pasa.cbentley.framework.gui.src4.ctx.ObjectGui;
+import pasa.cbentley.framework.gui.src4.ctx.ObjectGC;
 import pasa.cbentley.framework.gui.src4.interfaces.IAnimable;
 
 /**
@@ -23,7 +23,7 @@ import pasa.cbentley.framework.gui.src4.interfaces.IAnimable;
  * @author Charles-Philip Bentley
  *
  */
-public class AnimCreator extends ObjectGui implements IBOAnim {
+public class AnimCreator extends ObjectGC implements IBOAnim {
 
 
    private Realisator         realisator;

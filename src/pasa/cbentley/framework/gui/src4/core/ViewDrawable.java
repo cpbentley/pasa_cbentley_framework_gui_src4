@@ -33,6 +33,7 @@ import pasa.cbentley.framework.gui.src4.tech.ITechViewPane;
 import pasa.cbentley.framework.gui.src4.utils.DrawableUtilz;
 import pasa.cbentley.framework.input.src4.gesture.GestureDetector;
 import pasa.cbentley.layouter.src4.interfaces.ILayoutable;
+import pasa.cbentley.layouter.src4.tech.IBOSizer;
 import pasa.cbentley.layouter.src4.tech.ITechSizer;
 
 /**
@@ -200,7 +201,7 @@ public class ViewDrawable extends Drawable implements ITechViewDrawable {
     */
    protected void activateShrinkExpandFlags() {
       if (pw < getDw()) {
-         if (layEngine.hasFlagSizerW(ITechSizer.SIZER_FLAG_2_ALLOW_SHRINK)) {
+         if (layEngine.hasFlagSizerW(IBOSizer.SIZER_FLAG_2_ALLOW_SHRINK)) {
             setDw(pw);
          }
          if (hasViewFlag(VIEW_GENE_29_SHRINKABLE_W)) {
@@ -208,7 +209,7 @@ public class ViewDrawable extends Drawable implements ITechViewDrawable {
          }
       }
       if (ph < getDh()) {
-         if (layEngine.hasFlagSizerH(ITechSizer.SIZER_FLAG_2_ALLOW_SHRINK)) {
+         if (layEngine.hasFlagSizerH(IBOSizer.SIZER_FLAG_2_ALLOW_SHRINK)) {
             setDw(pw);
          }
          if (hasViewFlag(VIEW_GENE_30_SHRINKABLE_H)) {

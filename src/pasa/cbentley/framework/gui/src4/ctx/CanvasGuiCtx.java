@@ -1,6 +1,7 @@
 package pasa.cbentley.framework.gui.src4.ctx;
 
 import pasa.cbentley.byteobjects.src4.ctx.ABOCtx;
+import pasa.cbentley.core.src4.logging.Dctx;
 import pasa.cbentley.framework.coredraw.src4.ctx.CoreDrawCtx;
 import pasa.cbentley.framework.coreui.src4.ctx.CoreUiCtx;
 import pasa.cbentley.framework.coreui.src4.tech.IBOCanvasHost;
@@ -27,22 +28,18 @@ import pasa.cbentley.framework.input.src4.ctx.InputCtx;
  * @author Charles Bentley
  *
  */
-public class CanvasGuiContext  {
+public class CanvasGuiCtx extends ObjectGC {
 
    protected final CanvasAppliDrawable canvas;
 
-   protected final GuiCtx     gc;
-
-  
-   public CanvasGuiContext(IConfigCanvasGui config, GuiCtx gc, CanvasAppliDrawable canvas) {
-      this.gc = gc;
+   public CanvasGuiCtx(GuiCtx gc, CanvasAppliDrawable canvas) {
+      super(gc);
       this.canvas = canvas;
    }
 
    public void exitInputContext() {
       canvas.getIC().exitInputContext();
    }
-
 
    public CanvasAppliDrawable getCanvas() {
       return canvas;
@@ -60,7 +57,6 @@ public class CanvasGuiContext  {
       return null;
    }
 
-
    public GuiCtx getGC() {
       return gc;
    }
@@ -73,5 +69,25 @@ public class CanvasGuiContext  {
       return canvas.getRoot();
    }
    
+   //#mdebug
+   public void toString(Dctx dc) {
+      dc.root(this, CanvasGuiCtx.class, 90);
+      toStringPrivate(dc);
+      super.toString(dc.sup());
+   }
+
+   private void toStringPrivate(Dctx dc) {
+      
+   }
+
+   public void toString1Line(Dctx dc) {
+      dc.root1Line(this, CanvasGuiCtx.class);
+      toStringPrivate(dc);
+      super.toString1Line(dc.sup1Line());
+   }
+
+   //#enddebug
+   
+
 
 }

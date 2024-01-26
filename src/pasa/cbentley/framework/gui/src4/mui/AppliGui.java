@@ -23,7 +23,7 @@ import pasa.cbentley.framework.gui.src4.cmd.MCmdGuiNewStart;
 import pasa.cbentley.framework.gui.src4.cmd.ViewCommandListener;
 import pasa.cbentley.framework.gui.src4.core.IDToDrawable;
 import pasa.cbentley.framework.gui.src4.core.StyleClass;
-import pasa.cbentley.framework.gui.src4.ctx.CanvasGuiContext;
+import pasa.cbentley.framework.gui.src4.ctx.CanvasGuiCtx;
 import pasa.cbentley.framework.gui.src4.ctx.GuiCtx;
 import pasa.cbentley.framework.gui.src4.ctx.config.IConfigAppGui;
 import pasa.cbentley.framework.gui.src4.interfaces.ICmdsView;
@@ -84,13 +84,7 @@ public abstract class AppliGui extends AppliAbstract {
       return new IDToDrawable(gc);
    }
 
-   /**
-    * Recreates Canvas based on the serialized state
-    * @param id
-    * @param tech
-    * @return
-    */
-   public ICanvasAppli getCanvas(int id, ByteObject tech) {
+   public ICanvasAppli createCanvas(int id, ByteObject tech, Object params) {
       if (tech == null) {
          return getCanvasDefault();
       } else {
@@ -137,7 +131,7 @@ public abstract class AppliGui extends AppliAbstract {
          techCanvas.set2(IBOCanvasHost.TCANVAS_OFFSET_07_ICON_ID2, 0);
          techCanvas.set2(IBOCanvasHost.TCANVAS_OFFSET_08_TITLE_ID_ID2, 0);
          //TODO problem when root. root MUST always be shown on start up ?
-         root0 = (CanvasAppliDrawable) getCanvas(1, techCanvas);
+         root0 = (CanvasAppliDrawable) createCanvas(1, techCanvas, null);
       }
       return root0;
    }

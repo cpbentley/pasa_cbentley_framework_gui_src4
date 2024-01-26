@@ -12,6 +12,7 @@ import pasa.cbentley.core.src4.event.EventBusArray;
 import pasa.cbentley.core.src4.event.IEventBus;
 import pasa.cbentley.core.src4.i8n.IStringProducer;
 import pasa.cbentley.core.src4.logging.Dctx;
+import pasa.cbentley.core.src4.stator.IStatorFactory;
 import pasa.cbentley.framework.cmd.src4.ctx.CmdCtx;
 import pasa.cbentley.framework.cmd.src4.ctx.IStaticIDsCmd;
 import pasa.cbentley.framework.core.src4.app.IAppli;
@@ -22,13 +23,14 @@ import pasa.cbentley.framework.coredraw.src4.ctx.CoreDrawCtx;
 import pasa.cbentley.framework.coreui.src4.ctx.CoreUiCtx;
 import pasa.cbentley.framework.datamodel.src4.ctx.DataModelCtx;
 import pasa.cbentley.framework.drawx.src4.ctx.DrwCtx;
-import pasa.cbentley.framework.gui.src4.anim.AnimOperator;
 import pasa.cbentley.framework.gui.src4.anim.AnimFactory;
+import pasa.cbentley.framework.gui.src4.anim.AnimOperator;
 import pasa.cbentley.framework.gui.src4.canvas.CanvasAppliDrawable;
 import pasa.cbentley.framework.gui.src4.canvas.CanvasDrawControl;
 import pasa.cbentley.framework.gui.src4.canvas.FocusCtrl;
 import pasa.cbentley.framework.gui.src4.canvas.ITechCanvasAppliDrawable;
 import pasa.cbentley.framework.gui.src4.canvas.InputConfig;
+import pasa.cbentley.framework.gui.src4.canvas.StatorFactoryDrawable;
 import pasa.cbentley.framework.gui.src4.canvas.TopLevelCtrl;
 import pasa.cbentley.framework.gui.src4.canvas.ViewContext;
 import pasa.cbentley.framework.gui.src4.cmd.CmdMapperGui;
@@ -98,7 +100,7 @@ public class GuiCtx extends ABOCtx implements ITechCtxSettingsAppGui {
 
    public static final int          MODULE_ID = 13;
 
-   private AnimFactory                   animFactory;
+   private AnimFactory              animFactory;
 
    private AnimOperator             animOp;
 
@@ -106,9 +108,9 @@ public class GuiCtx extends ABOCtx implements ITechCtxSettingsAppGui {
 
    private int                      canvasCount;
 
-   private CanvasGuiContext         canvasCtxRoot;
+   private CanvasGuiCtx             canvasCtxRoot;
 
-   private CanvasGuiContext[]       canvasCtxs;
+   private CanvasGuiCtx[]           canvasCtxs;
 
    private CanvasAppliDrawable[]    canvases;
 
@@ -178,11 +180,11 @@ public class GuiCtx extends ABOCtx implements ITechCtxSettingsAppGui {
 
    private StyleManager             styleManager;
 
-   private TableGeneticsFactory           tableGenes;
+   private TableGeneticsFactory     tableGenes;
 
    private TableOperator            tableOperator;
 
-   private TablePolicyFactory             tablePolicyFactory;
+   private TablePolicyFactory       tablePolicyFactory;
 
    private TopLevelCtrl             topLevelCtrl;
 
@@ -193,6 +195,8 @@ public class GuiCtx extends ABOCtx implements ITechCtxSettingsAppGui {
    private ViewCommandListener      viewCommandListener;
 
    private SettingsWrapperGui       wrapper;
+
+   private StatorFactoryDrawable    statorFactory;
 
    public GuiCtx(IConfigAppGui config, CoreFrameworkCtx cfc, InputCtx ic, CmdCtx cc, BOCtx boc, DrwCtx dc, DataModelCtx dmc, IStringProducer strings) {
       super(config, boc);
@@ -208,12 +212,13 @@ public class GuiCtx extends ABOCtx implements ITechCtxSettingsAppGui {
       repo = new DrawableRepo(this);
       styleFactory = new DefaultStyles(this);
 
+      statorFactory = new StatorFactoryDrawable(this);
       animFactory = new AnimFactory(this);
 
       CtxManager c = uc.getCtxManager();
 
       c.registerStaticRange(this, IStaticIDsBO.SID_BYTEOBJECT_TYPES, IBOTypesGui.SID_VIEWTYPE_A, IBOTypesGui.SID_VIEWTYPE_Z);
-      
+
       c.registerStaticRange(this, IStaticIDs.SID_DIDS, IToStringsDIDGui.A_DID_OFFSET_A_GUI, IToStringsDIDGui.A_DID_OFFSET_Z_GUI);
       c.registerStaticRange(this, IStaticIDsCmd.SID_COMMANDS, ICmdsView.A_SID_VCMD_A, ICmdsView.A_SID_VCMD_Z);
       c.registerStaticRange(this, IStaticIDs.SID_STRINGS, IStringsGui.AZ_STR_VIEW_A, IStringsGui.AZ_STR_VIEW_Z);
@@ -233,6 +238,12 @@ public class GuiCtx extends ABOCtx implements ITechCtxSettingsAppGui {
       }
    }
 
+   
+   public IStatorFactory getStatorFactory() {
+      return statorFactory;
+   }
+
+
    public void a_Init() {
       super.a_Init();
    }
@@ -246,7 +257,7 @@ public class GuiCtx extends ABOCtx implements ITechCtxSettingsAppGui {
       canvasCount++;
    }
 
-   public void addCanvas(CanvasGuiContext canvas) {
+   public void addCanvas(CanvasGuiCtx canvas) {
       if (canvasCtxRoot == null) {
          canvasCtxRoot = canvas;
       }
@@ -325,7 +336,7 @@ public class GuiCtx extends ABOCtx implements ITechCtxSettingsAppGui {
     * The first canvas created
     * @return
     */
-   public CanvasGuiContext getCanvasCtxRoot() {
+   public CanvasGuiCtx getCanvasCtxRoot() {
       return canvasCtxRoot;
    }
 
@@ -658,7 +669,7 @@ public class GuiCtx extends ABOCtx implements ITechCtxSettingsAppGui {
       uc.getWorkerThread().addToQueue(runnable);
    }
 
-   public void setCanvasCtxRoot(CanvasGuiContext cac) {
+   public void setCanvasCtxRoot(CanvasGuiCtx cac) {
       this.canvasCtxRoot = cac;
    }
 

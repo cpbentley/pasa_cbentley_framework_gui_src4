@@ -10,11 +10,11 @@ import pasa.cbentley.framework.gui.src4.canvas.InputConfig;
 import pasa.cbentley.framework.gui.src4.cmd.ViewCommandListener;
 import pasa.cbentley.framework.gui.src4.core.Drawable;
 import pasa.cbentley.framework.gui.src4.ctx.GuiCtx;
-import pasa.cbentley.framework.gui.src4.ctx.ObjectGui;
+import pasa.cbentley.framework.gui.src4.ctx.ObjectGC;
 import pasa.cbentley.framework.gui.src4.interfaces.ICmdsView;
 import pasa.cbentley.framework.gui.src4.interfaces.IDrawable;
 
-public class Navigator extends ObjectGui implements ICmdsView {
+public class Navigator extends ObjectGC implements ICmdsView {
 
    protected CmdNode navCtx;
 

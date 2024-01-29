@@ -6,7 +6,7 @@ import pasa.cbentley.core.src4.ctx.UCtx;
 import pasa.cbentley.core.src4.logging.Dctx;
 import pasa.cbentley.core.src4.logging.IDebugStringable;
 import pasa.cbentley.core.src4.logging.ToStringStaticC;
-import pasa.cbentley.framework.gui.src4.canvas.ITechCanvasAppliDrawable;
+import pasa.cbentley.framework.gui.src4.canvas.IBOCanvasAppliGui;
 import pasa.cbentley.framework.gui.src4.interfaces.ITechCanvasDrawable;
 import pasa.cbentley.framework.gui.src4.table.interfaces.IBOCellPolicy;
 import pasa.cbentley.framework.input.src4.interfaces.IBOCanvasAppli;
@@ -22,7 +22,7 @@ import pasa.cbentley.framework.input.src4.interfaces.IBOCanvasAppli;
  * @author Charles-Philip Bentley
  *
  */
-public class BOModuleGui extends BOModuleAbstract implements IBOTypesGui, ITechCanvasAppliDrawable, IDebugStringable, IToStringsDIDGui, ITechCanvasDrawable, ITechCtxSettingsAppGui {
+public class BOModuleGui extends BOModuleAbstract implements IBOTypesGui, IBOCanvasAppliGui, IDebugStringable, IToStringsDIDGui, ITechCanvasDrawable, ITechCtxSettingsAppGui {
 
    public static final int BIP_CLASS_SC  = 3;
 
@@ -39,10 +39,10 @@ public class BOModuleGui extends BOModuleAbstract implements IBOTypesGui, ITechC
 
    public boolean toStringSubType(Dctx dc, ByteObject bo, int subType) {
       int type = bo.getType();
-      if (type == IBOCanvasAppli.CANVAS_APP_TYPE) {
-         if (subType == CANVAS_APP_DRW_1_TYPE_DRAWABLE) {
+      if (type == IBOCanvasAppli.CANVAS_APP_BASE_TYPE) {
+         if (subType == CANVAS_APP_TYPE_SUB_GUI) {
             //deal with wrong size
-            dc.rootN(bo, "ITechCanvasAppliDrawable");
+            dc.rootN(bo, "IBOCanvasAppliGui");
             dc.appendVarWithSpace("subType", subType);
             if (bo.getLength() < CANVAS_APP_DRW_BASIC_SIZE) {
                dc.append("Error: Size of ByteObject ");

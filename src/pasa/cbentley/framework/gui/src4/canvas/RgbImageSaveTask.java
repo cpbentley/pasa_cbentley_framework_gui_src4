@@ -19,13 +19,13 @@ public class RgbImageSaveTask extends GuiBackgroundTask implements IStringable {
 
    private String   fileName;
 
-   public RgbImageSaveTask(GuiCtx gc, RepaintCtrlDrawable ctrl, RgbImage img) {
+   public RgbImageSaveTask(GuiCtx gc, RepaintCtrlGui ctrl, RgbImage img) {
       super(gc, ctrl);
 
       this.img = img;
    }
 
-   public RgbImageSaveTask(GuiCtx gc, RepaintCtrlDrawable ctrl) {
+   public RgbImageSaveTask(GuiCtx gc, RepaintCtrlGui ctrl) {
       super(gc, ctrl);
    }
 
@@ -35,13 +35,13 @@ public class RgbImageSaveTask extends GuiBackgroundTask implements IStringable {
       return name;
    }
 
-   public void saveImage(RgbImage img, RepaintCtrlDrawable ctrl) {
+   public void saveImage(RgbImage img, RepaintCtrlGui ctrl) {
       PngEncoder pngEncoder = gc.getDC().getPngEncoder();
       byte[] pngdata = pngEncoder.encodePNG(img);
       saveByteData(pngdata, ctrl);
    }
 
-   public void saveByteData(byte[] pngdata, int offset, int len, RepaintCtrlDrawable ctrl) {
+   public void saveByteData(byte[] pngdata, int offset, int len, RepaintCtrlGui ctrl) {
       try {
          String name = getFileName();
          if (name == null) {
@@ -68,7 +68,7 @@ public class RgbImageSaveTask extends GuiBackgroundTask implements IStringable {
       ctrl.repaintDrawableCycleBusiness();
    }
 
-   public void saveByteData(byte[] pngdata, RepaintCtrlDrawable ctrl) {
+   public void saveByteData(byte[] pngdata, RepaintCtrlGui ctrl) {
       saveByteData(pngdata, 0, pngdata.length, ctrl);
    }
 

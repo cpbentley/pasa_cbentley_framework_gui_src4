@@ -25,7 +25,7 @@ import pasa.cbentley.framework.datamodel.src4.table.ModelAux;
 import pasa.cbentley.framework.datamodel.src4.table.ObjectTableModel;
 import pasa.cbentley.framework.drawx.src4.engine.GraphicsX;
 import pasa.cbentley.framework.drawx.src4.factories.FigureOperator;
-import pasa.cbentley.framework.gui.src4.canvas.ExecutionCtxDraw;
+import pasa.cbentley.framework.gui.src4.canvas.ExecutionContextGui;
 import pasa.cbentley.framework.gui.src4.canvas.InputConfig;
 import pasa.cbentley.framework.gui.src4.cmd.CmdInstanceDrawable;
 import pasa.cbentley.framework.gui.src4.core.Drawable;
@@ -50,12 +50,13 @@ import pasa.cbentley.framework.gui.src4.interfaces.ITechDrawable;
 import pasa.cbentley.framework.gui.src4.interfaces.ITechViewDrawable;
 import pasa.cbentley.framework.gui.src4.menu.MenuBar;
 import pasa.cbentley.framework.gui.src4.mui.MLogViewer;
-import pasa.cbentley.framework.gui.src4.string.InputRequestStr;
+import pasa.cbentley.framework.gui.src4.string.RequestStringInput;
 import pasa.cbentley.framework.gui.src4.string.StringDrawable;
 import pasa.cbentley.framework.gui.src4.table.interfaces.IBOCellPolicy;
 import pasa.cbentley.framework.gui.src4.table.interfaces.IBOGenetics;
 import pasa.cbentley.framework.gui.src4.table.interfaces.IBOTablePolicy;
 import pasa.cbentley.framework.gui.src4.table.interfaces.IBOTableView;
+import pasa.cbentley.framework.gui.src4.table.interfaces.ITechTable;
 import pasa.cbentley.framework.gui.src4.tech.ITechStringDrawable;
 import pasa.cbentley.framework.gui.src4.tech.ITechViewPane;
 import pasa.cbentley.framework.gui.src4.utils.DrawableMapper;
@@ -96,7 +97,7 @@ import pasa.cbentley.framework.input.src4.gesture.GestureDetector;
  * <b>Cell Edition</b> <br>
  * Decided at String Model?<br>
  * When Edition is made, event is made
- * {@link IBOTableView#EVENT_ID_03_SELECTION_EDITION_START}. <br>
+ * {@link ITechTable#EVENT_ID_03_SELECTION_EDITION_START}. <br>
  * <br>
  * <b> How to use it ?</b> 2 relationships are possible for the User <br>
  * <li><b>isA</b> TableView. A sub class is created to override TableView's
@@ -105,7 +106,7 @@ import pasa.cbentley.framework.input.src4.gesture.GestureDetector;
  * a class field. If user is a Drawable, it will be forward InputConfig. <br>
  * <br>
  * <b>Event Handling</b> <br>
- * {@link TableView} is often used in the same purpose as {@link InputRequestStr}.
+ * {@link TableView} is often used in the same purpose as {@link RequestStringInput}.
  * <br>
  * <li>a {@link MCmd} requires input. Model create a {@link TableView} with its data model to choose data from.
  * <li>Registers as an {@link ICmdListener} to the {@link ICmdsCmd#CMD_ID_SELECT} {@link MCmd}
@@ -586,7 +587,7 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
 
    public void addEventListener(IEventConsumer listener, int eid) {
       if (producerID == -1) {
-         producerID = gc.getEventsBusGui().createNewProducerID(EVENT_ID_MAX);
+         producerID = gc.getEventsBusGui().createNewProducerID(ITechTable.EVENT_ID_MAX);
       }
       gc.getEventsBusGui().addConsumer(listener, producerID, eid);
    }
@@ -596,9 +597,10 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
     */
    private void aHelpersInitialization() {
       mapperObjectDrawable = new DrawableMapper(gc, 5);
-      emptyBluePrint = new Drawable(gc, gc.getEmptySC(), this);
+      emptyBluePrint = new Drawable(gc, gc.getEmptySC());
+      emptyBluePrint.setParent(this);
       //#debug
-      emptyBluePrint.setDebugName("Empty Table Cell");
+      emptyBluePrint.toStringSetName("Empty Table Cell");
       updateStyleClass();
 
    }
@@ -653,13 +655,13 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
 
          modelGenetics = modelAux.getModelGenetics();
          if (modelGenetics != null) {
-            setHelperFlag(HELPER_FLAG_21_MODEL_STYLE, modelGenetics.hasFlag(IBOGenetics.GENE_OFFSET_02_FLAGX, IBOGenetics.GENE_FLAGX_7_MODEL_STYLE));
+            setHelperFlag(ITechTable.HELPER_FLAG_21_MODEL_STYLE, modelGenetics.hasFlag(IBOGenetics.GENE_OFFSET_02_FLAGX, IBOGenetics.GENE_FLAGX_7_MODEL_STYLE));
             if (modelGenetics.hasFlag(IBOGenetics.GENE_OFFSET_01_FLAG, IBOGenetics.GENE_FLAG_5_MAPPERINT_TYPE)) {
                //modifies String Tech
                //mapperObjectDrawable.setType(modelGenetics.get2(IGenetics.GENE_OFFSET_5INT_MAPPER_TYPE2));
             }
             if (modelGenetics.hasFlag(IBOGenetics.GENE_OFFSET_01_FLAG, IBOGenetics.GENE_FLAG_6_SELECTABILITY_DRAWABLE)) {
-               setHelperFlag(HELPER_FLAG_29_UNSELECTABLE_STUFF, true);
+               setHelperFlag(ITechTable.HELPER_FLAG_29_UNSELECTABLE_STUFF, true);
             }
             if (modelGenetics.hasFlag(IBOGenetics.GENE_OFFSET_02_FLAGX, IBOGenetics.GENE_FLAGX_8_DRAWABLES)) {
                //NO MAPPER IS NEEDED
@@ -671,7 +673,7 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
             }
 
             boolean hasCtypes = modelGenetics.hasFlag(IBOGenetics.GENE_OFFSET_02_FLAGX, IBOGenetics.GENE_FLAGX_6_MODEL_CTYPES);
-            setHelperFlag(HELPER_FLAG_30_DO_CTYPES, hasCtypes);
+            setHelperFlag(ITechTable.HELPER_FLAG_30_DO_CTYPES, hasCtypes);
          }
          //check for policy titles,styles etc.
 
@@ -1093,7 +1095,7 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
       } else {
          //style the cell with TableView structural style and cell style.
          //check if override drawable root style key
-         if (!hasHelperFlag(HELPER_FLAG_21_MODEL_STYLE)) {
+         if (!hasHelperFlag(ITechTable.HELPER_FLAG_21_MODEL_STYLE)) {
             // System.out.println(Presentation.debugStyleKey(drawableStyleKey));
             d.setStyleClass(tableCellStyleClass);
          }
@@ -1200,7 +1202,7 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
             rows[j] = new StringDrawable(gc, titleRowStyleClass, title, ITechStringDrawable.TYPE_1_TITLE);
             rows[j].setParent(this);
             //we don't want the default shrinking title behavior
-            rows[j].setViewFlag(VIEW_GENE_30_SHRINKABLE_H, false);
+            rows[j].setFlagGene(FLAG_GENE_30_SHRINKABLE_H, false);
             rows[j].setBehaviorFlag(ITechDrawable.BEHAVIOR_23_PARENT_EVENT_CONTROL, true);
          }
          rows[j].init(width, modelRow.workCellSizes[j]);
@@ -1333,7 +1335,7 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
     * @param y
     */
    protected void drawViewDrawableContentProcessed(GraphicsX g, int x, int y, CellModel modelCol, CellModel modelRow) {
-      if (hasViewFlag(VIEWSTATE_01_CLIP)) {
+      if (hasFlagView(FLAG_VSTATE_01_CLIP)) {
          g.clipSet(x, y, getContentW(), getContentH());
       }
 
@@ -1361,7 +1363,7 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
          // draw an overlay of selected row
          figop.paintFigure(g, dx, dy, w, h, figureOverlay);
       }
-      if (hasViewFlag(VIEWSTATE_01_CLIP)) {
+      if (hasFlagView(FLAG_VSTATE_01_CLIP)) {
          g.clipReset();
       }
    }
@@ -1429,9 +1431,9 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
    }
 
    /**
-    * In All cases generates a {@link IBOTableView#EVENT_ID_00_SELECT} .
+    * In All cases generates a {@link ITechTable#EVENT_ID_00_SELECT} .
     * <br>
-    * May also generate a {@link IBOTableView#EVENT_ID_01_SELECTION_CHANGE} before it if it was not already so
+    * May also generate a {@link ITechTable#EVENT_ID_01_SELECTION_CHANGE} before it if it was not already so
     * <br>
     * @param ic
     * @param d
@@ -1458,7 +1460,7 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
          int i = pointed[0];
          int j = pointed[1];
          //check if the element at this index is 'selected'. In case of drawable less
-         if (hasHelperFlag(HELPER_FLAG_20_SPECIAL_REPAINT)) {
+         if (hasHelperFlag(ITechTable.HELPER_FLAG_20_SPECIAL_REPAINT)) {
             if (hasPointState(getGridIndexFromAbs(i, j), ITechDrawable.STYLE_05_SELECTED)) {
                selectionSelectEvent(ic);
             } else {
@@ -1724,7 +1726,7 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
     */
    public IDrawable getModelDrawable(int index) {
       if (model != null) {
-         if (hasHelperFlag(HELPER_FLAG_06_MODEL_MASK)) {
+         if (hasHelperFlag(ITechTable.HELPER_FLAG_06_MODEL_MASK)) {
             index += modelOffset;
          }
          Object o = model.getObject(index);
@@ -1801,7 +1803,7 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
    public IDrawable getModelDrawableStyled(int index) {
       IDrawable d = getModelDrawable(index);
       if (d != null) {
-         if (!hasHelperFlag(HELPER_FLAG_21_MODEL_STYLE)) {
+         if (!hasHelperFlag(ITechTable.HELPER_FLAG_21_MODEL_STYLE)) {
             // System.out.println(Presentation.debugStyleKey(drawableStyleKey));
             d.setStyleClass(tableCellStyleClass);
          }
@@ -1810,7 +1812,7 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
             int ctype = model.getPropertyInt(ITableModel.PROPERTY_0_CTYPE, index);
             d.setCType(ctype);
          }
-         if (hasHelperFlag(HELPER_FLAG_25_STRUCT_STYLES)) {
+         if (hasHelperFlag(ITechTable.HELPER_FLAG_25_STRUCT_STYLES)) {
             setStructuralStyleKey(d, index);
          }
          //
@@ -1845,7 +1847,7 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
     * Throws an exception if call is made while TableView is not initialized
     * 
     */
-   public IDrawable getDrawableViewPort(int x, int y, ExecutionCtxDraw ex) {
+   public IDrawable getDrawableViewPort(int x, int y, ExecutionContextGui ex) {
       checkInit();
       int firstRowAbs = modelRow.firstCellAbs;
       int lastRowAbs = modelRow.lastCellAbs;
@@ -1884,7 +1886,7 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
       int selIndex = getSelectedIndex();
       int numTotalCols = modelCol.numCells;
       int numTotalRows = modelRow.numCells;
-      if (hasHelperFlag(HELPER_FLAG_29_UNSELECTABLE_STUFF)) {
+      if (hasHelperFlag(ITechTable.HELPER_FLAG_29_UNSELECTABLE_STUFF)) {
          for (int i = selIndex + 1; i < model.getSizeModel(); i++) {
             int col = getAbsColFromIndex(i);
             int row = getAbsRowFromIndex(i);
@@ -1914,7 +1916,7 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
    public int getNextSelectableDown() {
       int row = modelRow.selectedCellAbs;
       int numTotalRows = modelRow.numCells;
-      if (hasHelperFlag(HELPER_FLAG_29_UNSELECTABLE_STUFF)) {
+      if (hasHelperFlag(ITechTable.HELPER_FLAG_29_UNSELECTABLE_STUFF)) {
          int count = 1;
          //is it defined on column or cell wise?
          int col = modelCol.selectedCellAbs;
@@ -1959,7 +1961,7 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
       int col = modelCol.selectedCellAbs;
       int numTotalCols = modelCol.numCells;
       int numTotalRows = modelRow.numCells;
-      if (hasHelperFlag(HELPER_FLAG_29_UNSELECTABLE_STUFF)) {
+      if (hasHelperFlag(ITechTable.HELPER_FLAG_29_UNSELECTABLE_STUFF)) {
          int count = 1;
          //is it defined on column or cell wise?
          int row = modelRow.selectedCellAbs;
@@ -2004,7 +2006,7 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
       int numTotalCols = modelCol.numCells;
       int numTotalRows = modelRow.numCells;
 
-      if (hasHelperFlag(HELPER_FLAG_29_UNSELECTABLE_STUFF)) {
+      if (hasHelperFlag(ITechTable.HELPER_FLAG_29_UNSELECTABLE_STUFF)) {
          int count = 1;
          //is it defined on column or cell wise?
          int row = modelRow.selectedCellAbs;
@@ -2053,7 +2055,7 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
       int row = modelRow.selectedCellAbs;
       int numTotalCols = modelCol.numCells;
       int numTotalRows = modelRow.numCells;
-      if (hasHelperFlag(HELPER_FLAG_29_UNSELECTABLE_STUFF)) {
+      if (hasHelperFlag(ITechTable.HELPER_FLAG_29_UNSELECTABLE_STUFF)) {
          int count = 1;
          //is it defined on column or cell wise?
          int col = modelCol.selectedCellAbs;
@@ -2348,7 +2350,7 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
       if (model != null) {
          val = model.getSizeModel();
       }
-      if (hasHelperFlag(HELPER_FLAG_06_MODEL_MASK) && modelLen != 0) {
+      if (hasHelperFlag(ITechTable.HELPER_FLAG_06_MODEL_MASK) && modelLen != 0) {
          val = Math.min(val, modelLen);
       }
       return val;
@@ -2451,7 +2453,7 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
     * @return
     */
    private boolean hasCTypes() {
-      return hasHelperFlag(HELPER_FLAG_30_DO_CTYPES);
+      return hasHelperFlag(ITechTable.HELPER_FLAG_30_DO_CTYPES);
    }
 
    public boolean hasHelperFlag(int flag) {
@@ -2555,19 +2557,19 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
     */
    public boolean initListen(ByteObject sizerW, ByteObject sizerH, Drawable d) {
       //#debug
-      toLog().pInit("w=" + sizerW.toString1Line() + " h=" + sizerH.toString1Line() + " " + d.toString1Line(), this, TableView.class, "initInject", LVL_05_FINE, true);
+      toDLog().pInit("w=" + sizerW.toString1Line() + " h=" + sizerH.toString1Line() + " " + d.toString1Line(), this, TableView.class, "initInject", LVL_05_FINE, true);
       //init column titles drawable. Height is style dependent. Width is decided by?
       //TODO Depending on Table settings. Columns may influence preferred size of cells?
       //Yes
       if (d == modelCol.titlesView) {
          //#debug
-         toLog().pInit("Column Titles Width", sizerW, TableView.class, "initInject");
+         toDLog().pInit("Column Titles Width", sizerW, TableView.class, "initInject");
          //init all title drawable. take the biggest size
          return true;
       } else if (d == modelRow.titlesView) {
          //#debug
-         toLog().pInit("Row Titles Height", sizerH, TableView.class, "initInject");
-         modelCol.titlesView.initH(sizerH);
+         toDLog().pInit("Row Titles Height", sizerH, TableView.class, "initInject");
+         modelCol.titlesView.initSizerH(sizerH);
          return true;
       }
       return false;
@@ -2610,7 +2612,7 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
             //implicit init width gives 0 or negative contentWidth.
             int c = getContentW();
             if (max > c) {
-               setHelperFlag(HELPER_FLAG_03_CAP_OVERSIZE, true);
+               setHelperFlag(ITechTable.HELPER_FLAG_03_CAP_OVERSIZE, true);
                max = c;
             }
          }
@@ -2688,7 +2690,7 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
          if (!layEngine.isContextualH()) {
             int ch = getContentH();
             if (max > ch) {
-               setHelperFlag(HELPER_FLAG_03_CAP_OVERSIZE, true);
+               setHelperFlag(ITechTable.HELPER_FLAG_03_CAP_OVERSIZE, true);
                max = ch;
             }
          }
@@ -2848,13 +2850,15 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
       }
 
       // computes the preferred sizes based on the configuration
-      pw = IntUtils.sum(modelCol.workCellSizes);
+      int pw = IntUtils.sum(modelCol.workCellSizes);
       pw += getSizeGridV() * (modelCol.numCells - 1);
 
       //fix pw
 
-      ph = IntUtils.sum(modelRow.workCellSizes);
+      int ph = IntUtils.sum(modelRow.workCellSizes);
       ph += getSizeGridH() * (modelRow.numCells - 1);
+      layEngine.setPh(ph);
+      layEngine.setPw(pw);
    }
 
    /**
@@ -2937,7 +2941,7 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
       //now compute the style size. how when sizing of padding/border/margin is contextual?
       //contextual on what? proportional to draw size or preferred size?
 
-      if (ph == 0 || pw == 0) {
+      if (layEngine.isPwOrPhEqualsZero()) {
          // at this stage if pw or ph is zero we have an empty table.
          // the ViewDrawable will deal with it according to the tech params
       }
@@ -3067,13 +3071,13 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
     * @return
     */
    public boolean isCellDrawableSelectable(IDrawable d, int colAbs, int rowAbs) {
-      if (hasHelperFlag(HELPER_FLAG_29_UNSELECTABLE_STUFF)) {
+      if (hasHelperFlag(ITechTable.HELPER_FLAG_29_UNSELECTABLE_STUFF)) {
          if (d != null) {
             if (d.hasBehavior(ITechDrawable.BEHAVIOR_01_NOT_SELECTABLE)) {
                return false;
             }
          }
-         if (hasHelperFlag(HELPER_FLAG_26_UNSELECTABLE_CELLS)) {
+         if (hasHelperFlag(ITechTable.HELPER_FLAG_26_UNSELECTABLE_CELLS)) {
             return model.getPropertyInt(ITableModel.PROPERTY_1_SELECTABLE, getGridIndexFromAbs(colAbs, rowAbs)) == 1;
          }
          if (modelCol.hasHelperFlag(CellModel.HELPER_FLAG_27_UNSELECTABLE)) {
@@ -3214,7 +3218,7 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
       if (ic.isWheeled()) {
 
          //#debug
-         toDLog().pFlow("Wheeled " + ToStringStaticCoreUi.getStringMouseButton(ic.getIdKeyBut()), this, TableView.class, "managePointerInputViewPort", LVL_05_FINE, true);
+         toDLog().pFlow("Wheeled " + ToStringStaticCoreUi.toStringMouseButton(ic.getIdKeyBut()), this, TableView.class, "managePointerInputViewPort", LVL_05_FINE, true);
          if (ic.getIdKeyBut() == ITechCodes.PBUTTON_3_WHEEL_UP) {
             if (modelRow.numCells == 1) {
                navigateLeft(ic);
@@ -3301,7 +3305,7 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
    }
 
    /**
-    * Selection routine to decide to forward {@link IBOTableView#EVENT_ID_00_SELECT} event.
+    * Selection routine to decide to forward {@link ITechTable#EVENT_ID_00_SELECT} event.
     * <br>
     * <br>
     * In all cases, we need the Pressed Drawable in order to forward the state updates.
@@ -3316,21 +3320,21 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
       toDLog().pFlow("", techTable, TableView.class, "managePointerViewPressed", LVL_05_FINE, true);
 
       int type = techTable.get1(T_OFFSET_12_PSELECTION_MODE1);
-      if (type == PSELECT_0_NONE) {
+      if (type == ITechTable.PSELECT_0_NONE) {
          forwardPointerEvent(ic);
-      } else if (type == PSELECT_1_PRESS) {
+      } else if (type == ITechTable.PSELECT_1_PRESS) {
          forwardPointerSelectEvent(ic);
-      } else if (type == PSELECT_2_PRESS_RELEASE) {
+      } else if (type == ITechTable.PSELECT_2_PRESS_RELEASE) {
          forwardPointerEvent(ic);
-      } else if (type == PSELECT_3_SELECTED_PRESS) {
+      } else if (type == ITechTable.PSELECT_3_SELECTED_PRESS) {
          forwardPointerSelectPress(ic);
-      } else if (type == PSELECT_4_PRESS_DOUBLE) {
+      } else if (type == ITechTable.PSELECT_4_PRESS_DOUBLE) {
          if (ic.isPressedDouble()) {
             forwardPointerSelectEvent(ic);
          } else {
             forwardPointerEvent(ic);
          }
-      } else if (type == PSELECT_5_PRESS_RELEASE_DOUBLE) {
+      } else if (type == ITechTable.PSELECT_5_PRESS_RELEASE_DOUBLE) {
          if (ic.isPressedReleasedDouble()) {
             forwardPointerSelectEvent(ic);
          } else {
@@ -3342,11 +3346,11 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
    public void managePointerViewReleased(InputConfig ic) {
 
       int type = techTable.get1(T_OFFSET_12_PSELECTION_MODE1);
-      if (type == PSELECT_0_NONE) {
+      if (type == ITechTable.PSELECT_0_NONE) {
          forwardPointerEvent(ic);
-      } else if (type == PSELECT_1_PRESS) {
+      } else if (type == ITechTable.PSELECT_1_PRESS) {
          //dealt with in the other method
-      } else if (type == PSELECT_2_PRESS_RELEASE) {
+      } else if (type == ITechTable.PSELECT_2_PRESS_RELEASE) {
          //finds which drawable is located under the release event
          int[] pointed = getPointerDrawableCoordinates(ic);
          if (pointed != null) {
@@ -3366,9 +3370,9 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
             // pointer event as slave. manage the internal drawable states.
             d.managePointerInput(ic);
          }
-      } else if (type == PSELECT_3_SELECTED_PRESS) {
-      } else if (type == PSELECT_4_PRESS_DOUBLE) {
-      } else if (type == PSELECT_5_PRESS_RELEASE_DOUBLE) {
+      } else if (type == ITechTable.PSELECT_3_SELECTED_PRESS) {
+      } else if (type == ITechTable.PSELECT_4_PRESS_DOUBLE) {
+      } else if (type == ITechTable.PSELECT_5_PRESS_RELEASE_DOUBLE) {
          if (ic.isPressedReleasedDouble()) {
             forwardPointerSelectEvent(ic);
          }
@@ -3700,7 +3704,7 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
 
       //tabledrawindex set full repaint, but not stupid. 
       //helper flag to do a index based repaint.
-      if (hasHelperFlag(HELPER_FLAG_20_SPECIAL_REPAINT)) {
+      if (hasHelperFlag(ITechTable.HELPER_FLAG_20_SPECIAL_REPAINT)) {
          if (isFullInsideTransition()) {
             int visualIndex1 = getVisualIndex(modelCol.oldSelectedCellAbs, modelRow.oldSelectedCellAbs);
             int visualIndex2 = getVisualIndex(modelCol.selectedCellAbs, modelRow.selectedCellAbs);
@@ -3735,7 +3739,7 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
             if (od.hasState(ITechDrawable.STATE_04_DRAWN_OUTSIDE) || nd.hasState(ITechDrawable.STATE_04_DRAWN_OUTSIDE)) {
                // repaint the whole thing or just the inside?
                //TODO must be able to compute extra size of style layers because you may have to repaint a scrollbar/headers as well.
-               setViewFlag(ITechViewDrawable.VIEWSTATE_02_REPAINTING_CONTENT, true);
+               setFlagView(ITechViewDrawable.FLAG_VSTATE_02_REPAINTING_CONTENT, true);
                ic.srActionDoneRepaint(this);
             } else {
                // if it is not opaque. it will have to repaint bg layers and fg layers of parent drawable.
@@ -3743,7 +3747,7 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
                ic.srActionDoneRepaint(nd);
             }
          } else {
-            setViewFlag(ITechViewDrawable.VIEWSTATE_02_REPAINTING_CONTENT, true);
+            setFlagView(ITechViewDrawable.FLAG_VSTATE_02_REPAINTING_CONTENT, true);
             ic.srActionDoneRepaint(this);
          }
       }
@@ -3783,7 +3787,7 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
    }
 
    protected void selectionMoveEvent(InputConfig ic) {
-      gc.getEventsBusGui().sendNewEvent(producerID, EVENT_ID_01_SELECTION_CHANGE, this);
+      gc.getEventsBusGui().sendNewEvent(producerID, ITechTable.EVENT_ID_01_SELECTION_CHANGE, this);
    }
 
    /**
@@ -3798,7 +3802,7 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
    protected void selectionSelectEvent(InputConfig ic) {
       //#debug
       toDLog().pEvent("SelectedCell=[" + getSelectedCol() + "," + getSelectedRow() + "] =" + toStringSelectedDrawable(), this, TableView.class, "selectionSelectEvent");
-      BusEvent be = gc.getEventsBusGui().createEvent(producerID, EVENT_ID_00_SELECT, this);
+      BusEvent be = gc.getEventsBusGui().createEvent(producerID, ITechTable.EVENT_ID_00_SELECT, this);
       be.setParamO1(eventParamO);
       be.putOnBus();
    }
@@ -3827,6 +3831,16 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
       cm.policies = new int[] { CELL_1_EXPLICIT_SET };
    }
 
+   /**
+    * <li> {@link ITechTable#HELPER_FLAG_01_STRONG_ROWS}
+    * <li> {@link ITechTable#HELPER_FLAG_02_SINGLE_CONFIG}
+    * <li> {@link ITechTable#HELPER_FLAG_03_CAP_OVERSIZE}
+    * <li> {@link ITechTable#HELPER_FLAG_04_TOTAL_SET}
+    * <li> {@link ITechTable#HELPER_FLAG_05_YCOORDS_ONLY}
+    * <li> {@link ITechTable#HELPER_FLAG_06_MODEL_MASK}
+    * @param flag
+    * @param v
+    */
    public void setHelperFlag(int flag, boolean v) {
       helpers = BitUtils.setFlag(helpers, flag, v);
    }
@@ -3871,9 +3885,9 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
    public void setModelLength(int modelLength) {
       modelLen = modelLength;
       if (modelLen != 0 || modelOffset != 0) {
-         setHelperFlag(HELPER_FLAG_06_MODEL_MASK, true);
+         setHelperFlag(ITechTable.HELPER_FLAG_06_MODEL_MASK, true);
       } else {
-         setHelperFlag(HELPER_FLAG_06_MODEL_MASK, false);
+         setHelperFlag(ITechTable.HELPER_FLAG_06_MODEL_MASK, false);
       }
 
    }
@@ -3887,9 +3901,9 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
    public void setModelOffset(int i) {
       modelOffset = i;
       if (modelLen != 0 || modelOffset != 0) {
-         setHelperFlag(HELPER_FLAG_06_MODEL_MASK, true);
+         setHelperFlag(ITechTable.HELPER_FLAG_06_MODEL_MASK, true);
       } else {
-         setHelperFlag(HELPER_FLAG_06_MODEL_MASK, false);
+         setHelperFlag(ITechTable.HELPER_FLAG_06_MODEL_MASK, false);
       }
    }
 
@@ -4208,7 +4222,7 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
          // check policyCol to know which is the strongest.
          if (modelRow.policy.hasFlag(OFFSET_02_FLAG, FLAG_5_STRONG_FLOW)) {
             tableType = IBOTablePolicy.TABLE_TYPE_4FLOW_ROW; //strong rows
-            setHelperFlag(HELPER_FLAG_01_STRONG_ROWS, true);
+            setHelperFlag(ITechTable.HELPER_FLAG_01_STRONG_ROWS, true);
          } else {
             tableType = IBOTablePolicy.TABLE_TYPE_3FLOW_COL; //strong columns
          }
@@ -4219,7 +4233,7 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
          tableType = IBOTablePolicy.TABLE_TYPE_1GENERIC_COL; // strong columns
          numTotalRows = updateTotalColRows(numTotalCols);
       } else if (numTotalRows != 0 && numTotalCols == 0) {
-         setHelperFlag(HELPER_FLAG_01_STRONG_ROWS, true);
+         setHelperFlag(ITechTable.HELPER_FLAG_01_STRONG_ROWS, true);
          tableType = IBOTablePolicy.TABLE_TYPE_2GENERIC_ROW; // strong row
          numTotalCols = updateTotalColRows(numTotalRows);
       } else {
@@ -4310,6 +4324,7 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
    public void stateWriteTo(StatorWriter state) {
       super.stateWriteTo(state);
    }
+
    /**
     * Finalize setup by computing implicit setup size to implict. <br>
     * <br>
@@ -4368,7 +4383,7 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
             //ViewPane will automatically set as parent this one
             DrawableInjected titlesView = new DrawableInjected(gc, titleColStyleClass, this, this);
             //debug
-            titlesView.setDebugName("TitleColsContainer");
+            titlesView.toStringSetName("TitleColsContainer");
             titlesView.setBehaviorFlag(ITechDrawable.BEHAVIOR_23_PARENT_EVENT_CONTROL, true);
             setHeaderClose(titlesView, C.POS_0_TOP);
             modelCol.titlesView = titlesView;
@@ -4385,7 +4400,7 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
          if (modelRow.titlesView == null) {
             StyleClass titleRowStyleClass = styleClass.getStyleClass(IBOTypesGui.LINK_83_STYLE_TABLE_ROW_TITLE);
             DrawableInjected titlesView = new DrawableInjected(gc, titleRowStyleClass, this, this);
-            titlesView.setDebugName("TitleRowsContainer");
+            titlesView.toStringSetName("TitleRowsContainer");
             titlesView.setBehaviorFlag(ITechDrawable.BEHAVIOR_23_PARENT_EVENT_CONTROL, true);
             setHeader(titlesView, C.POS_2_LEFT, ITechViewPane.PLANET_MODE_0_EAT);
             modelRow.titlesView = titlesView;
@@ -4415,11 +4430,11 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
       }
       cm.setHelperFlag(CellModel.HELPER_FLAG_08_ALL_CELLS_SAME_SIZE, true);
       if (isRow) {
-         setViewFlag(ITechViewDrawable.VIEWSTATE_11_CONTENT_PH_VIEWPORT_DH, true);
-         setViewFlag(ITechViewDrawable.VIEWSTATE_13_CONTENT_H_DEPENDS_VIEWPORT, true);
+         setFlagView(ITechViewDrawable.FLAG_VSTATE_11_CONTENT_PH_VIEWPORT_DH, true);
+         setFlagView(ITechViewDrawable.FLAG_VSTATE_13_CONTENT_H_DEPENDS_VIEWPORT, true);
       } else {
-         setViewFlag(ITechViewDrawable.VIEWSTATE_10_CONTENT_PW_VIEWPORT_DW, true);
-         setViewFlag(ITechViewDrawable.VIEWSTATE_12_CONTENT_W_DEPENDS_VIEWPORT, true);
+         setFlagView(ITechViewDrawable.FLAG_VSTATE_10_CONTENT_PW_VIEWPORT_DW, true);
+         setFlagView(ITechViewDrawable.FLAG_VSTATE_12_CONTENT_W_DEPENDS_VIEWPORT, true);
       }
    }
 
@@ -4474,10 +4489,10 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
                //will be computed in variable
                size = SETUP_WEAK;
                if (isRow) {
-                  setViewFlag(ITechViewDrawable.VIEWSTATE_13_CONTENT_H_DEPENDS_VIEWPORT, true);
+                  setFlagView(ITechViewDrawable.FLAG_VSTATE_13_CONTENT_H_DEPENDS_VIEWPORT, true);
                   cm.setHelperFlag(CellModel.HELPER_FLAG_14_VARIABLE_SETUP_SIZE, true);
                } else {
-                  setViewFlag(ITechViewDrawable.VIEWSTATE_12_CONTENT_W_DEPENDS_VIEWPORT, true);
+                  setFlagView(ITechViewDrawable.FLAG_VSTATE_12_CONTENT_W_DEPENDS_VIEWPORT, true);
                   cm.setHelperFlag(CellModel.HELPER_FLAG_14_VARIABLE_SETUP_SIZE, true);
                }
                //
@@ -4524,9 +4539,9 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
 
    protected void setViewPortFlag(boolean isRow) {
       if (isRow) {
-         setViewFlag(ITechViewDrawable.VIEWSTATE_13_CONTENT_H_DEPENDS_VIEWPORT, true);
+         setFlagView(ITechViewDrawable.FLAG_VSTATE_13_CONTENT_H_DEPENDS_VIEWPORT, true);
       } else {
-         setViewFlag(ITechViewDrawable.VIEWSTATE_12_CONTENT_W_DEPENDS_VIEWPORT, true);
+         setFlagView(ITechViewDrawable.FLAG_VSTATE_12_CONTENT_W_DEPENDS_VIEWPORT, true);
       }
    }
 
@@ -4601,8 +4616,8 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
    }
 
    public void toString(Dctx sb) {
-      sb.root(this, "TableView");
-      sb.append(ToStringStaticGui.toStringTableType(tableType) + " modelSize=" + getSize() + " spanCount=" + spannedCount);
+      sb.root(this, TableView.class, 4600);
+      toStringPrivate(sb);
       super.toString(sb.sup());
 
       //helper flags
@@ -4690,11 +4705,18 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
       }
    }
 
+   private void toStringPrivate(Dctx sb) {
+      sb.append(ToStringStaticGui.toStringTableType(tableType) + " modelSize=" + getSize() + " spanCount=" + spannedCount);
+   }
+
    //#enddebug
 
    public void toString1Line(Dctx dc) {
-      dc.root(this, "TableView");
-      dc.appendWithSpace(" " + getDebugName());
+      dc.root1Line(this, TableView.class);
+      toStringPrivate(dc);
+      super.toString1Line(dc.sup1Line());
+
+      dc.appendWithSpace(" " + toStringGetName());
       dc.append(" [" + modelCol.numCells + ":" + modelRow.numCells + "]");
       if (styleStates != 0) {
          ToStringStaticGui.toStringBehavior(this, dc);
@@ -4710,15 +4732,15 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
 
    public void toStringHelperFlags(Dctx sb) {
       sb.append("HelperFlags =");
-      toStringHelperFlag(sb, HELPER_FLAG_01_STRONG_ROWS, "StrongRows");
-      toStringHelperFlag(sb, HELPER_FLAG_02_SINGLE_CONFIG, "SingleConfig");
-      toStringHelperFlag(sb, HELPER_FLAG_03_CAP_OVERSIZE, "CapOverSize");
-      toStringHelperFlag(sb, HELPER_FLAG_04_TOTAL_SET, "TotalSet");
-      toStringHelperFlag(sb, HELPER_FLAG_05_YCOORDS_ONLY, "YCoordOnly");
-      toStringHelperFlag(sb, HELPER_FLAG_16_SPANNING, "Spanning");
-      toStringHelperFlag(sb, HELPER_FLAG_17_OVERSIZE_WIDTH, "OversizeW");
-      toStringHelperFlag(sb, HELPER_FLAG_18_OVERSIZE_HEIGHT, "OversizeH");
-      toStringHelperFlag(sb, HELPER_FLAG_19_SPECIAL_FILL, "SpecialFill");
+      toStringHelperFlag(sb, ITechTable.HELPER_FLAG_01_STRONG_ROWS, "StrongRows");
+      toStringHelperFlag(sb, ITechTable.HELPER_FLAG_02_SINGLE_CONFIG, "SingleConfig");
+      toStringHelperFlag(sb, ITechTable.HELPER_FLAG_03_CAP_OVERSIZE, "CapOverSize");
+      toStringHelperFlag(sb, ITechTable.HELPER_FLAG_04_TOTAL_SET, "TotalSet");
+      toStringHelperFlag(sb, ITechTable.HELPER_FLAG_05_YCOORDS_ONLY, "YCoordOnly");
+      toStringHelperFlag(sb, ITechTable.HELPER_FLAG_16_SPANNING, "Spanning");
+      toStringHelperFlag(sb, ITechTable.HELPER_FLAG_17_OVERSIZE_WIDTH, "OversizeW");
+      toStringHelperFlag(sb, ITechTable.HELPER_FLAG_18_OVERSIZE_HEIGHT, "OversizeH");
+      toStringHelperFlag(sb, ITechTable.HELPER_FLAG_19_SPECIAL_FILL, "SpecialFill");
 
    }
 
@@ -4827,7 +4849,7 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
    public void layoutInvalidate(boolean topDown) {
       super.layoutInvalidate(topDown);
    }
-   
+
    protected void updateTablePolicy(ByteObject policyTable) {
       invalidateLayout();
       initPolicy(policyTable);

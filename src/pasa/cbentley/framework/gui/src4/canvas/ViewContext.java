@@ -1,8 +1,6 @@
 package pasa.cbentley.framework.gui.src4.canvas;
 
-import pasa.cbentley.core.src4.ctx.UCtx;
 import pasa.cbentley.core.src4.logging.Dctx;
-import pasa.cbentley.core.src4.logging.IDLog;
 import pasa.cbentley.core.src4.logging.IStringable;
 import pasa.cbentley.framework.drawx.src4.engine.GraphicsX;
 import pasa.cbentley.framework.gui.src4.ctx.CanvasGuiCtx;
@@ -16,15 +14,17 @@ import pasa.cbentley.layouter.src4.interfaces.ILayoutable;
  * {@link ViewContext} defines an rectangular area controlled by a {@link TopologyDLayer} populated
  * by {@link IDrawable}.
  * 
- * isa {@link LayoutableAbstract}
+ * <li> ViewContext is a {@link LayoutableAbstract}
+ * 
+ * It has a {@link CanvasGuiCtx}
  * 
  * A Container that does not enforce clipping. Animations ?
  * 
- * {@link ILayoutable} whose x,y,w,h is not computed but set externally by the class using it.
+ * <li>{@link ILayoutable} whose x,y,w,h is not computed but set externally by the class using it.
  * 
  * It is used as a concept
  * 
- * It can be used as a ruler to control the alignement of other {@link ILayoutable}
+ * <li>It can be used as a ruler to control the alignement of other {@link ILayoutable}
  * 
  * As such it can be layouted as well!
  * 
@@ -33,28 +33,39 @@ import pasa.cbentley.layouter.src4.interfaces.ILayoutable;
  */
 public class ViewContext extends LayoutableAbstract implements IStringable, ILayoutable {
 
-   protected final GuiCtx      gc;
+   private CanvasGuiCtx   canvasGC;
 
-   private ViewContext         parent;
+   protected final GuiCtx gc;
 
-   private TopologyDLayer      topo;
+   private ViewContext    parentVC;
 
-   private CanvasAppliDrawable cac;
+   private TopologyDLayer topo;
 
-   public ViewContext(GuiCtx gc, CanvasAppliDrawable cac) {
+   public ViewContext(GuiCtx gc) {
       super(gc.getLAC());
       this.gc = gc;
-      this.cac = cac;
       engine.setManualOverride(true);
       topo = new TopologyDLayer(gc, this);
    }
 
-   public void draw(GraphicsX g) {
-      topo.drawLayers(g);
+   public ViewContext(GuiCtx gc, CanvasGuiCtx canvasGC) {
+      super(gc.getLAC());
+      this.gc = gc;
+      this.canvasGC = canvasGC;
+      engine.setManualOverride(true);
+      topo = new TopologyDLayer(gc, this);
+   }
+
+   /**
+    * The {@link CanvasGuiCtx} to which belongs this view
+    * @return
+    */
+   public CanvasAppliInputGui getCanvasDrawable() {
+      return canvasGC.getCanvas();
    }
 
    public CanvasDrawControl getDrawCtrlAppli() {
-      return cac.getDrwCtrl();
+      return canvasGC.getCanvas().getDrwCtrl();
    }
 
    public int getHeight() {
@@ -62,15 +73,7 @@ public class ViewContext extends LayoutableAbstract implements IStringable, ILay
    }
 
    public ILayoutable getLayoutableParent() {
-      return parent;
-   }
-
-   /**
-    * The {@link CanvasGuiCtx} to which belongs this view
-    * @return
-    */
-   public CanvasAppliDrawable getCanvasCtx() {
-      return cac;
+      return parentVC;
    }
 
    /**
@@ -78,27 +81,29 @@ public class ViewContext extends LayoutableAbstract implements IStringable, ILay
     * @return
     */
    public ViewContext getParentVC() {
-      return parent;
+      return parentVC;
    }
 
-   public RepaintCtrlDrawable getRepaintCtrlDraw() {
-      return cac.getRepaintCtrlDraw();
+   public RepaintCtrlGui getRepaintCtrlDraw() {
+      return getCanvasDrawable().getRepaintCtrlDraw();
    }
 
+   /**
+    * The total X value based on the chain of {@link ViewContext} Parents.
+    * @return
+    */
    public int getScreenX() {
-      if (parent == null) {
+      if (parentVC == null) {
          return getX();
       }
-      return getX() + parent.getScreenX();
+      return getX() + parentVC.getScreenX();
    }
 
    public int getScreenY() {
-      int y = getY();
-      if (parent == null) {
-         //TODO assume it is
-         return y;
+      if (parentVC == null) {
+         return getY();
       }
-      return y + parent.getScreenY();
+      return getY() + parentVC.getScreenY();
    }
 
    public TopologyDLayer getTopo() {
@@ -123,7 +128,7 @@ public class ViewContext extends LayoutableAbstract implements IStringable, ILay
       return getPozeY();
    }
 
-   public void newSize(int nw, int nh) {
+   public void setNewSize(int nw, int nh) {
       engine.setOverrideW(nw);
       engine.setOverrideH(nh);
    }
@@ -132,11 +137,14 @@ public class ViewContext extends LayoutableAbstract implements IStringable, ILay
       engine.setOverrideH(h);
    }
 
-   public void setParent(ViewContext vc) {
-      parent = vc;
+   public void setParentVC(ViewContext vc) {
+      parentVC = vc;
    }
 
    public void setTopo(TopologyDLayer topo) {
+      if (topo == null) {
+         throw new NullPointerException();
+      }
       this.topo = topo;
    }
 
@@ -157,16 +165,12 @@ public class ViewContext extends LayoutableAbstract implements IStringable, ILay
       dc.root(this, ViewContext.class);
       toStringPrivate(dc);
       super.toString(dc.sup());
-      dc.nlLvl("Parent", parent);
-      
+      dc.nlLvl("Parent", parentVC);
+
       dc.appendVarWithNewLine("getX()", getX());
       dc.appendVarWithSpace("getY()", getY());
       dc.appendVarWithNewLine("getScreenX()", getScreenX());
       dc.appendVarWithSpace("getScreenY()", getScreenY());
-   }
-
-   private void toStringPrivate(Dctx dc) {
-      dc.appendVarWithSpace("Name", toStringName());
    }
 
    public void toString1Line(Dctx dc) {
@@ -175,7 +179,10 @@ public class ViewContext extends LayoutableAbstract implements IStringable, ILay
       super.toString1Line(dc.sup1Line());
    }
 
+   private void toStringPrivate(Dctx dc) {
+      dc.appendVarWithSpace("Name", toStringName());
+   }
+
    //#enddebug
-   
 
 }

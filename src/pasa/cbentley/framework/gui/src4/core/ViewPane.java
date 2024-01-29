@@ -12,7 +12,7 @@ import pasa.cbentley.framework.gui.src4.anim.move.Move;
 import pasa.cbentley.framework.gui.src4.anim.move.FunctionMove;
 import pasa.cbentley.framework.gui.src4.anim.move.ITechMoveFunction;
 import pasa.cbentley.framework.gui.src4.anim.move.MoveGhost;
-import pasa.cbentley.framework.gui.src4.canvas.ExecutionCtxDraw;
+import pasa.cbentley.framework.gui.src4.canvas.ExecutionContextGui;
 import pasa.cbentley.framework.gui.src4.canvas.InputConfig;
 import pasa.cbentley.framework.gui.src4.canvas.PointerGestureDrawable;
 import pasa.cbentley.framework.gui.src4.canvas.ViewContext;
@@ -83,7 +83,7 @@ import pasa.cbentley.layouter.src4.engine.Zer2DArea;
  * <li> width or height are negative, the drawable size is computed.
  * <li> they are positiv
  * <br>
- * shrink flags are applied. {@link ITechViewDrawable#VIEW_GENE_29_SHRINKABLE_W}
+ * shrink flags are applied. {@link ITechViewDrawable#FLAG_GENE_29_SHRINKABLE_W}
  * When shrinking gain is computed and given to the ViewPane. This value is the slack for non expandable headers and scrollbars.
  * <br>
  * <b>Visual Left Over</b> : <br>
@@ -184,15 +184,15 @@ import pasa.cbentley.layouter.src4.engine.Zer2DArea;
  * @see ScrollBar
  * @see ScrollConfig
  */
-public class ViewPane extends Drawable implements ITechViewPane, ITechDrawable, ITechViewDrawable {
+public class ViewPane extends Drawable implements ITechViewPane, ITechDrawable, ITechViewDrawable, IBOViewPane {
 
-   private static final int HOLE_0TOP_LEFT  = 0;
+   private static final int HOLE_0_TOP_LEFT  = 0;
 
-   private static final int HOLE_1TOP_RIGHT = 1;
+   private static final int HOLE_1_TOP_RIGHT = 1;
 
-   private static final int HOLE_2BOT_RIGHT = 2;
+   private static final int HOLE_2_BOT_RIGHT = 2;
 
-   private static final int HOLE_3BOT_LEFT  = 3;
+   private static final int HOLE_3_BOT_LEFT  = 3;
 
    public static int getAdd(Object param) {
       int add = 1;
@@ -341,9 +341,9 @@ public class ViewPane extends Drawable implements ITechViewPane, ITechDrawable, 
    protected ByteObject styleViewPort;
 
    /**
-    * {@link ITechViewPane}
+    * {@link IBOViewPane}
     */
-   private ByteObject   tech;
+   private ByteObject   boViewPane;
 
    /**
     * Tracks startInc and number of increment doubles currently managed by MoveGhost
@@ -385,7 +385,7 @@ public class ViewPane extends Drawable implements ITechViewPane, ITechDrawable, 
       trailScope = new IntBuffer(gc.getUCtx());
 
       //#debug
-      this.setDebugName("ViewPane");
+      this.toStringSetName("ViewPane");
 
    }
 
@@ -407,8 +407,8 @@ public class ViewPane extends Drawable implements ITechViewPane, ITechDrawable, 
     * <br>
     * <br>
     * 
-    * <li> {@link ITechViewDrawable#VIEW_GENE_29_SHRINKABLE_W}
-    * <li> {@link ITechViewDrawable#VIEW_GENE_30_SHRINKABLE_H}
+    * <li> {@link ITechViewDrawable#FLAG_GENE_29_SHRINKABLE_W}
+    * <li> {@link ITechViewDrawable#FLAG_GENE_30_SHRINKABLE_H}
     * <br>
     * <br>
     * Shrinking only applies when {@link ViewDrawable} is shrinkable
@@ -418,12 +418,12 @@ public class ViewPane extends Drawable implements ITechViewPane, ITechDrawable, 
     */
    private boolean applyBehaviorShrinking() {
       boolean isShrinkVP = false;
-      if (tech.get4Bits1(IBOViewPane.VP_OFFSET_06_VISUAL_LEFT_OVER1) == VISUAL_2_SHRINK) {
+      if (boViewPane.get4Bits1(VP_OFFSET_06_VISUAL_LEFT_OVER1) == VISUAL_2_SHRINK) {
          //check the ph of the current visible increments.
          viewedDrawable.getViewPortDecoW();
       }
       //
-      if (viewedDrawable.hasViewFlag(VIEW_GENE_29_SHRINKABLE_W)) {
+      if (viewedDrawable.hasFlagView(FLAG_GENE_29_SHRINKABLE_W)) {
          int dw = viewedDrawable.getDrawnWidth();
          int decoW = getViewPaneHorizSpaceConsumed();
          int pw = viewedDrawable.getPreferredWidth();
@@ -437,7 +437,7 @@ public class ViewPane extends Drawable implements ITechViewPane, ITechDrawable, 
             shrinkViewPortW = 0;
          }
       }
-      if (viewedDrawable.hasViewFlag(VIEW_GENE_30_SHRINKABLE_H)) {
+      if (viewedDrawable.hasFlagView(FLAG_GENE_30_SHRINKABLE_H)) {
          int dh = viewedDrawable.getDrawnHeight();
          int decoH = getViewPaneVerticalSpaceConsumed();
          int ph = viewedDrawable.getPreferredHeight();
@@ -455,7 +455,7 @@ public class ViewPane extends Drawable implements ITechViewPane, ITechDrawable, 
    }
 
    private int botHeadersMod(int y) {
-      if (tech.get2Bits1(IBOViewPane.VP_OFFSET_04_HEADER_PLANET_MODE1) != PLANET_MODE_2_OVERLAY) {
+      if (boViewPane.get2Bits1(VP_OFFSET_04_HEADER_PLANET_MODE1) != PLANET_MODE_2_OVERLAY) {
          if (headerBottom != null) {
             y += headerTop.getDrawnHeight();
          }
@@ -491,7 +491,7 @@ public class ViewPane extends Drawable implements ITechViewPane, ITechDrawable, 
     * TODO make sure no bug when style set with {@link ITechViewPane#DRW_STYLE_1_VIEWPANE}
     */
    protected void doUpdateStyleClass() {
-      tech = styleClass.getByteObjectNotNull(IBOTypesGui.LINK_66_TECH_VIEWPANE);
+      boViewPane = styleClass.getByteObjectNotNull(IBOTypesGui.LINK_66_TECH_VIEWPANE);
       //how do you hijack the style?
       styleValidateViewPort();
       styleValidateViewPane();
@@ -499,10 +499,10 @@ public class ViewPane extends Drawable implements ITechViewPane, ITechDrawable, 
 
    public void doUpdateTechScrollbar() {
       if (hScrollBar != null) {
-         hScrollBar.techUpdateViewPane(tech);
+         hScrollBar.techUpdateViewPane(boViewPane);
       }
       if (vScrollBar != null) {
-         vScrollBar.techUpdateViewPane(tech);
+         vScrollBar.techUpdateViewPane(boViewPane);
       }
    }
 
@@ -580,7 +580,7 @@ public class ViewPane extends Drawable implements ITechViewPane, ITechDrawable, 
 
       //check if we only have to repaint the content inside.
       //in that case repaint style bg and fg
-      if (!g.hasPaintCtx(ITechCanvasDrawable.REPAINT_01_FULL) && viewedDrawable.hasViewFlag(VIEWSTATE_02_REPAINTING_CONTENT)) {
+      if (!g.hasPaintCtx(ITechCanvasDrawable.REPAINT_01_FULL) && viewedDrawable.hasFlagView(FLAG_VSTATE_02_REPAINTING_CONTENT)) {
          //we also have to draw ViewPane background or clear the area.
          g.clipSet(cx, cy, cw, ch);
 
@@ -609,7 +609,7 @@ public class ViewPane extends Drawable implements ITechViewPane, ITechDrawable, 
 
       drawContent(g, cx, cy, cw, ch);
 
-      if (hasTech(IBOViewPane.VP_FLAG_3_SCROLLBAR_MASTER)) {
+      if (hasTech(VP_FLAG_3_SCROLLBAR_MASTER)) {
          drawHeaders(g);
          drawScrollBars(g);
       } else {
@@ -720,11 +720,11 @@ public class ViewPane extends Drawable implements ITechViewPane, ITechDrawable, 
    }
 
    public int getCompetTypeHeader() {
-      return tech.get1(IBOViewPane.VP_OFFSET_11_COMPETITION_HEADER_TYPE1);
+      return boViewPane.get1(VP_OFFSET_11_COMPETITION_HEADER_TYPE1);
    }
 
    public int getCompetTypeSb() {
-      return tech.get1(IBOViewPane.VP_OFFSET_10_COMPETITION_SB_TYPE1);
+      return boViewPane.get1(VP_OFFSET_10_COMPETITION_SB_TYPE1);
    }
 
    /**
@@ -803,7 +803,7 @@ public class ViewPane extends Drawable implements ITechViewPane, ITechDrawable, 
       if (isViewPaneStyleApplied()) {
          val -= getStyleHBotConsumed();
       }
-      if (hasTech(IBOViewPane.VP_FLAG_3_SCROLLBAR_MASTER)) {
+      if (hasTech(VP_FLAG_3_SCROLLBAR_MASTER)) {
          if (vScrollBar != null) {
             val -= vScrollBar.getYShiftTop();
          }
@@ -848,7 +848,7 @@ public class ViewPane extends Drawable implements ITechViewPane, ITechDrawable, 
       //         y += MStyle.getStyleTopHConsumed(style);
       //      }
       y = topHeadersMod(y);
-      if (!hasTech(IBOViewPane.VP_FLAG_3_SCROLLBAR_MASTER) && isScrollBarVertNotOverlay()) {
+      if (!hasTech(VP_FLAG_3_SCROLLBAR_MASTER) && isScrollBarVertNotOverlay()) {
          y += getSbVertSpaceConsumed();
       }
       if (isBotHOverlay()) {
@@ -868,7 +868,7 @@ public class ViewPane extends Drawable implements ITechViewPane, ITechDrawable, 
       //         x += getStyleWLeftConsumed();
       //      }
       x = leftHeadersMod(x);
-      if (!hasTech(IBOViewPane.VP_FLAG_3_SCROLLBAR_MASTER) && isScrollBarHorizNotOverlay()) {
+      if (!hasTech(VP_FLAG_3_SCROLLBAR_MASTER) && isScrollBarHorizNotOverlay()) {
          x += getSbHorizSpaceConsumed();
       }
       if (isRightHOverlay()) {
@@ -905,7 +905,7 @@ public class ViewPane extends Drawable implements ITechViewPane, ITechDrawable, 
       if (isViewPaneStyleApplied()) {
          val += getStyleHTopConsumed();
       }
-      if (hasTech(IBOViewPane.VP_FLAG_3_SCROLLBAR_MASTER)) {
+      if (hasTech(VP_FLAG_3_SCROLLBAR_MASTER)) {
          if (vScrollBar != null) {
             val += vScrollBar.getYShiftTop();
          }
@@ -947,7 +947,7 @@ public class ViewPane extends Drawable implements ITechViewPane, ITechDrawable, 
       if (isViewPaneStyleApplied()) {
          val += getStyleWLeftConsumed();
       }
-      if (hasTech(IBOViewPane.VP_FLAG_3_SCROLLBAR_MASTER)) {
+      if (hasTech(VP_FLAG_3_SCROLLBAR_MASTER)) {
          //when scrollbar is overlay. we don't have a shift.
          if (vScrollBar != null) {
             val += vScrollBar.getXShiftLeft();
@@ -964,7 +964,7 @@ public class ViewPane extends Drawable implements ITechViewPane, ITechDrawable, 
       if (isViewPaneStyleApplied()) {
          val -= getStyleWRightConsumed();
       }
-      if (hasTech(IBOViewPane.VP_FLAG_3_SCROLLBAR_MASTER)) {
+      if (hasTech(VP_FLAG_3_SCROLLBAR_MASTER)) {
          //when scrollbar is overlay. we don't have a shift.
          if (vScrollBar != null) {
             val -= vScrollBar.getXShiftRight();
@@ -977,7 +977,7 @@ public class ViewPane extends Drawable implements ITechViewPane, ITechDrawable, 
       return val;
    }
 
-   public IDrawable getDrawable(int x, int y, ExecutionCtxDraw ex) {
+   public IDrawable getDrawable(int x, int y, ExecutionContextGui ex) {
       if (isInsideViewPort(x, y)) {
          return viewedDrawable.getDrawableViewPort(x, y, ex);
       } else {
@@ -993,7 +993,7 @@ public class ViewPane extends Drawable implements ITechViewPane, ITechDrawable, 
 
    private IDrawable[] satellites = new IDrawable[SAT_MAX_NUM];
 
-   public IDrawable getDrawableFromSattelites(int x, int y, ExecutionCtxDraw ex) {
+   public IDrawable getDrawableFromSattelites(int x, int y, ExecutionContextGui ex) {
       IDrawable d = null;
       for (int i = 0; i < satellites.length; i++) {
          //to avoid array access check flag
@@ -1034,7 +1034,7 @@ public class ViewPane extends Drawable implements ITechViewPane, ITechDrawable, 
     * @return -1 when no max size
     */
    public int getMaxHorizHeaderSize() {
-      int maxWidth = getViewed().getDS().getSizePotentialW();
+      int maxWidth = getViewDrawable().getLayEngine().getSizePotentialW();
       if (maxWidth != -1) {
          int headerCompet = getCompetTypeHeader();
          boolean isSBMaster = isHeaderMaster();
@@ -1199,7 +1199,7 @@ public class ViewPane extends Drawable implements ITechViewPane, ITechDrawable, 
    }
 
    public ByteObject getTech() {
-      return tech;
+      return boViewPane;
    }
 
    private int getTopHoleH() {
@@ -1213,7 +1213,7 @@ public class ViewPane extends Drawable implements ITechViewPane, ITechDrawable, 
       return val;
    }
 
-   public ViewDrawable getViewed() {
+   public ViewDrawable getViewDrawable() {
       return viewedDrawable;
    }
 
@@ -1284,8 +1284,8 @@ public class ViewPane extends Drawable implements ITechViewPane, ITechDrawable, 
     */
    public int getViewPortHeight() {
       int val = getViewPortHeightWithoutStyle();
-      val = minusStyleValuesH(val, IBOViewPane.VP_FLAGX_1_STYLE_VIEWPANE, IBOViewPane.VP_OFFSET_13_STYLE_VIEWPANE_MODE1);
-      val = minusStyleValuesH(val, IBOViewPane.VP_FLAGX_2_STYLE_VIEWPORT, IBOViewPane.VP_OFFSET_14_STYLE_VIEWPORT_MODE1);
+      val = minusStyleValuesH(val, VP_FLAGX_1_STYLE_VIEWPANE, VP_OFFSET_13_STYLE_VIEWPANE_MODE1);
+      val = minusStyleValuesH(val, VP_FLAGX_2_STYLE_VIEWPORT, VP_OFFSET_14_STYLE_VIEWPORT_MODE1);
       if (val < 0) {
          val = 0;
       }
@@ -1333,8 +1333,8 @@ public class ViewPane extends Drawable implements ITechViewPane, ITechDrawable, 
     */
    public int getViewPortWidth() {
       int val = getViewPortWidthWithoutStyle();
-      val = minusStyleValuesW(val, IBOViewPane.VP_FLAGX_1_STYLE_VIEWPANE, IBOViewPane.VP_OFFSET_13_STYLE_VIEWPANE_MODE1);
-      val = minusStyleValuesW(val, IBOViewPane.VP_FLAGX_2_STYLE_VIEWPORT, IBOViewPane.VP_OFFSET_14_STYLE_VIEWPORT_MODE1);
+      val = minusStyleValuesW(val, VP_FLAGX_1_STYLE_VIEWPANE, VP_OFFSET_13_STYLE_VIEWPANE_MODE1);
+      val = minusStyleValuesW(val, VP_FLAGX_2_STYLE_VIEWPORT, VP_OFFSET_14_STYLE_VIEWPORT_MODE1);
       if (val < 0) {
          val = 0;
       }
@@ -1400,7 +1400,7 @@ public class ViewPane extends Drawable implements ITechViewPane, ITechDrawable, 
    public int getViewPortXOffset() {
       int viewPortXOffset = 0;
       viewPortXOffset = leftHeadersMod(viewPortXOffset);
-      if (tech.get2Bits1(IBOViewPane.VP_OFFSET_05_SCROLLBAR_MODE1) != PLANET_MODE_2_OVERLAY) {
+      if (boViewPane.get2Bits1(VP_OFFSET_05_SCROLLBAR_MODE1) != PLANET_MODE_2_OVERLAY) {
          viewPortXOffset += getSbXShift();
       }
       if (isViewPaneStyleApplied()) {
@@ -1432,7 +1432,7 @@ public class ViewPane extends Drawable implements ITechViewPane, ITechDrawable, 
    public int getViewPortYOffset() {
       int viewPortYOffset = 0;
       viewPortYOffset = topHeadersMod(viewPortYOffset);
-      if (tech.get2Bits2(IBOViewPane.VP_OFFSET_05_SCROLLBAR_MODE1) != PLANET_MODE_2_OVERLAY) {
+      if (boViewPane.get2Bits2(VP_OFFSET_05_SCROLLBAR_MODE1) != PLANET_MODE_2_OVERLAY) {
          viewPortYOffset += getSbYShift();
       }
       if (isViewPaneStyleApplied()) {
@@ -1444,39 +1444,24 @@ public class ViewPane extends Drawable implements ITechViewPane, ITechDrawable, 
       return viewPortYOffset;
    }
 
-   public ViewState getViewState() {
-      ViewState vs = super.getViewState();
-      vs.addViewState(vScrollBar);
-      vs.addViewState(hScrollBar);
-      vs.addViewState(headerTop);
-      vs.addViewState(headerTopClose);
-      vs.addViewState(headerBottom);
-      vs.addViewState(headerBottomClose);
-      vs.addViewState(headerLeft);
-      vs.addViewState(headerLeftClose);
-      vs.addViewState(headerRight);
-      vs.addViewState(headerRightClose);
-      return vs;
-   }
-
    public ScrollBar getVScrollBar() {
       return vScrollBar;
    }
 
    private boolean hasAtLeastOneSizedDrawable() {
-      return tech.get1(IBOViewPane.VP_OFFSET_12_INTERNAL_SIZING1) != 0;
+      return boViewPane.get1(VP_OFFSET_12_INTERNAL_SIZING1) != 0;
    }
 
    public boolean hasTech(int flag) {
-      return tech.hasFlag(IBOViewPane.VP_OFFSET_01_FLAG, flag);
+      return boViewPane.hasFlag(VP_OFFSET_01_FLAG, flag);
    }
 
    public boolean hasTechX(int flag) {
-      return tech.hasFlag(IBOViewPane.VP_OFFSET_02_FLAGX, flag);
+      return boViewPane.hasFlag(VP_OFFSET_02_FLAGX, flag);
    }
 
    public boolean hasTechY(int flag) {
-      return tech.hasFlag(IBOViewPane.VP_OFFSET_03_FLAGY, flag);
+      return boViewPane.hasFlag(VP_OFFSET_03_FLAGY, flag);
    }
 
    /**
@@ -1485,15 +1470,15 @@ public class ViewPane extends Drawable implements ITechViewPane, ITechDrawable, 
     * @return
     */
    public boolean hasViewDrwStyle() {
-      return hasTechX(IBOViewPane.VP_FLAGX_3_STYLE_CONTENT);
+      return hasTechX(VP_FLAGX_3_STYLE_CONTENT);
    }
 
    public boolean hasVisualPartialH() {
-      return tech.get4Bits2(IBOViewPane.VP_OFFSET_06_VISUAL_LEFT_OVER1) == VISUAL_1_PARTIAL;
+      return boViewPane.get4Bits2(VP_OFFSET_06_VISUAL_LEFT_OVER1) == VISUAL_1_PARTIAL;
    }
 
    public boolean hasVisualPartialW() {
-      return tech.get4Bits1(IBOViewPane.VP_OFFSET_06_VISUAL_LEFT_OVER1) == VISUAL_1_PARTIAL;
+      return boViewPane.get4Bits1(VP_OFFSET_06_VISUAL_LEFT_OVER1) == VISUAL_1_PARTIAL;
    }
 
    /**
@@ -1517,10 +1502,10 @@ public class ViewPane extends Drawable implements ITechViewPane, ITechDrawable, 
     */
    private void initFullHBar() {
       initHBar();
-      if (tech.get2Bits1(IBOViewPane.VP_OFFSET_05_SCROLLBAR_MODE1) == PLANET_MODE_3_IMMATERIAL) {
+      if (boViewPane.get2Bits1(VP_OFFSET_05_SCROLLBAR_MODE1) == PLANET_MODE_3_IMMATERIAL) {
          hScrollBar.setBehaviorFlag(ITechDrawable.BEHAVIOR_16_IMMATERIAL, true);
       }
-      if (tech.hasFlag(IBOViewPane.VP_OFFSET_03_FLAGY, IBOViewPane.VP_FLAGY_5_SB_INVISIBLE_HORIZ)) {
+      if (boViewPane.hasFlag(VP_OFFSET_03_FLAGY, VP_FLAGY_5_SB_INVISIBLE_HORIZ)) {
          hScrollBar.setBehaviorFlag(ITechDrawable.BEHAVIOR_16_IMMATERIAL, true);
       }
       if (isScrollBarHorizExpand()) {
@@ -1545,10 +1530,10 @@ public class ViewPane extends Drawable implements ITechViewPane, ITechDrawable, 
     */
    private void initFullVBar() {
       initVBar();
-      if (tech.get2Bits2(IBOViewPane.VP_OFFSET_05_SCROLLBAR_MODE1) == PLANET_MODE_3_IMMATERIAL) {
+      if (boViewPane.get2Bits2(VP_OFFSET_05_SCROLLBAR_MODE1) == PLANET_MODE_3_IMMATERIAL) {
          vScrollBar.setBehaviorFlag(ITechDrawable.BEHAVIOR_16_IMMATERIAL, true);
       }
-      if (tech.hasFlag(IBOViewPane.VP_OFFSET_03_FLAGY, IBOViewPane.VP_FLAGY_6_SB_INVISIBLE_VERT)) {
+      if (boViewPane.hasFlag(VP_OFFSET_03_FLAGY, VP_FLAGY_6_SB_INVISIBLE_VERT)) {
          vScrollBar.setBehaviorFlag(ITechDrawable.BEHAVIOR_16_IMMATERIAL, true);
       }
       //over which area is the vertical scrollbar be dimensioned?
@@ -1585,7 +1570,7 @@ public class ViewPane extends Drawable implements ITechViewPane, ITechDrawable, 
          hScrollBar = new ScrollBar(gc, sc, true, this);
          //override around the clock behavior
          hScrollBar.getLayEngine().setManualOverride(true);
-         hScrollBar.techUpdateViewPane(tech);
+         hScrollBar.techUpdateViewPane(boViewPane);
 
       }
    }
@@ -1615,11 +1600,12 @@ public class ViewPane extends Drawable implements ITechViewPane, ITechDrawable, 
       if (hScrollBar != null) {
          scx = hScrollBar.getConfig();
       }
-      //SystemLog.printState("#ViewPane#initScrollingConfigs1 " + viewedDrawable.getDebugName() + " " + ((scx == null) ? "null" : scx.toString1Line()) + " "
-      //      + ((scy == null) ? "null" : scy.toString1Line()));
+      //#debug
+      toDLog().pFlow("ScrollConfig X", scx, ViewPane.class, "initScrollingConfigs", LVL_05_FINE, false);
+      //#debug
+      toDLog().pFlow("ScrollConfig Y", scy, ViewPane.class, "initScrollingConfigs", LVL_05_FINE, false);
       viewedDrawable.initScrollingConfig(scx, scy);
-      //SystemLog.printState("#ViewPane#initScrollingConfigs2 " + viewedDrawable.getDebugName() + " " + ((scx == null) ? "null" : scx.toString1Line()) + " "
-      //      + ((scy == null) ? "null" : scy.toString1Line()));
+      
       doUpdateScrollbarStructures();
    }
 
@@ -1636,14 +1622,17 @@ public class ViewPane extends Drawable implements ITechViewPane, ITechDrawable, 
    private void initSizedDrawables(int width, int height) {
       if (hasAtLeastOneSizedDrawable()) {
          //compute max width of ViewDrawable
-         int maxWidth = getViewed().getDS().getSizeMaxW();
+         ViewDrawable vd = getViewDrawable();
+         LayEngineDrawable layEngineViewDrawable = vd.getLayEngine();
+         
+         int maxWidth = layEngineViewDrawable.getSizeMaxW();
          //at least one Header has a size. update viewPortWidth
          maxViewPortW(headerTop, maxWidth, VP_SIZER_1_TOP);
          maxViewPortW(headerBottom, maxWidth, VP_SIZER_2_BOT);
          maxViewPortW(headerTopClose, maxWidth, VP_SIZER_5_TOP_CLOSE);
          maxViewPortW(headerBottomClose, maxWidth, VP_SIZER_6_BOT_CLOSE);
 
-         int maxHeight = getViewed().getDS().getSizeMaxH();
+         int maxHeight = layEngineViewDrawable.getSizeMaxH();
 
          maxViewPortH(headerLeft, maxHeight, VP_SIZER_3_LEFT);
          maxViewPortH(headerRight, maxHeight, VP_SIZER_4_RIGHT);
@@ -1683,7 +1672,7 @@ public class ViewPane extends Drawable implements ITechViewPane, ITechDrawable, 
          StyleClass sc = styleClass.getStyleClass(IBOTypesGui.LINK_72_STYLE_VIEWPANE_V_SCROLLBAR);
          vScrollBar = new ScrollBar(gc, sc, false, this);
          vScrollBar.getLayEngine().setManualOverride(true); //everything is decided
-         vScrollBar.techUpdateViewPane(tech);
+         vScrollBar.techUpdateViewPane(boViewPane);
       }
    }
 
@@ -1797,17 +1786,17 @@ public class ViewPane extends Drawable implements ITechViewPane, ITechDrawable, 
 
       //after the up
       if (vScrollBar != null) {
-         viewedDrawable.setViewFlag(VIEWSTATE_24_SCROLLED_V, true);
-         viewedDrawable.setViewFlag(VIEWSTATE_22_SCROLLED, true);
+         viewedDrawable.setFlagView(FLAG_VSTATE_24_SCROLLED_V, true);
+         viewedDrawable.setFlagView(FLAG_VSTATE_22_SCROLLED, true);
          setBehaviorFlag(ITechDrawable.BEHAVIOR_26_NAV_VERTICAL, true);
       }
       if (hScrollBar != null) {
-         viewedDrawable.setViewFlag(VIEWSTATE_23_SCROLLED_H, true);
-         viewedDrawable.setViewFlag(VIEWSTATE_22_SCROLLED, true);
+         viewedDrawable.setFlagView(FLAG_VSTATE_23_SCROLLED_H, true);
+         viewedDrawable.setFlagView(FLAG_VSTATE_22_SCROLLED, true);
          setBehaviorFlag(ITechDrawable.BEHAVIOR_27_NAV_HORIZONTAL, true);
       }
 
-      gc.getNavigator().setNavCtx(viewedDrawable, viewedDrawable.hasViewFlag(VIEWSTATE_22_SCROLLED));
+      gc.getNavigator().setNavCtx(viewedDrawable, viewedDrawable.hasFlagView(FLAG_VSTATE_22_SCROLLED));
    }
 
    /**
@@ -1819,7 +1808,7 @@ public class ViewPane extends Drawable implements ITechViewPane, ITechDrawable, 
       initScrollingConfigs();
 
       //position scrollbars and headers
-      if (hasTech(IBOViewPane.VP_FLAG_3_SCROLLBAR_MASTER)) {
+      if (hasTech(VP_FLAG_3_SCROLLBAR_MASTER)) {
          layPositionHeaders();
          layPositionScrollBars();
       } else {
@@ -1853,9 +1842,10 @@ public class ViewPane extends Drawable implements ITechViewPane, ITechDrawable, 
    private void initViewPort() {
       viewPortStyleCache = new StyleCache(gc.getDC(), viewedDrawable, styleViewPort);
 
+      LayEngineDrawable layEngineDrawable = viewedDrawable.getLayEngine();
       //keep a copy to see if ViewPort changes modified the preferred size
-      int lastPw = viewedDrawable.pw;
-      int lastPh = viewedDrawable.ph;
+      int lastPw = layEngineDrawable.getPw();
+      int lastPh = layEngineDrawable.getPh();
       int lastViewPortW = getViewPortWidth();
       int lastViewPortH = getViewPortHeight();
 
@@ -1865,7 +1855,7 @@ public class ViewPane extends Drawable implements ITechViewPane, ITechDrawable, 
       //
       if (viewedDrawable.isMalleable()) {
          //only do that if malleable. otherwise preferred size does not change relative to 
-         if (lastPw != viewedDrawable.pw || lastPh != viewedDrawable.ph) {
+         if (lastPw != layEngineDrawable.getPw() || lastPh != layEngineDrawable.getPh()) {
             //preferred size was changed therefore we need to update the ViewPane
             //changes in preferred sizes can create a new scrollbar which modifies the configuration
             //the change in preferred size influence the scrollbars which in turn may change headers.
@@ -1878,8 +1868,8 @@ public class ViewPane extends Drawable implements ITechViewPane, ITechDrawable, 
             if (lastViewPortW != nextViewPortW || lastViewPortH != nextViewPortH) {
                //viewport dimension changed, probably because of a new scrollbar.
                //we have to update the ViewPort again.
-               lastPw = viewedDrawable.pw;
-               lastPh = viewedDrawable.ph;
+               lastPw = layEngineDrawable.getPw();
+               lastPh = layEngineDrawable.getPh();
                lastViewPortW = nextViewPortW;
                lastViewPortH = nextViewPortH;
 
@@ -1888,7 +1878,7 @@ public class ViewPane extends Drawable implements ITechViewPane, ITechDrawable, 
 
                //check if the ViewPort changed the preferred size
 
-               if (lastPw != viewedDrawable.pw || lastPh != viewedDrawable.ph) {
+               if (lastPw != layEngineDrawable.getPw() || lastPh != layEngineDrawable.getPh()) {
                   //preferred size were changed again we need to update the ViewPane
                   initViewPaneSattelites();
 
@@ -1943,28 +1933,28 @@ public class ViewPane extends Drawable implements ITechViewPane, ITechDrawable, 
    }
 
    private boolean isBotEat() {
-      return headerBottom != null && (tech.get2Bits2(IBOViewPane.VP_OFFSET_04_HEADER_PLANET_MODE1) == PLANET_MODE_0_EAT && !viewedDrawable.hasViewFlag(VIEWSTATE_07_NO_EAT_H_MUST_EXPAND));
+      return headerBottom != null && (boViewPane.get2Bits2(VP_OFFSET_04_HEADER_PLANET_MODE1) == PLANET_MODE_0_EAT && !viewedDrawable.hasFlagView(FLAG_VSTATE_07_NO_EAT_H_MUST_EXPAND));
    }
 
    /**
-    * True even when PLANET_STRUCT_0EAT but {@link ViewDrawable} has state {@link ITechViewDrawable#VIEWSTATE_07_NO_EAT_H_MUST_EXPAND}.
+    * True even when PLANET_STRUCT_0EAT but {@link ViewDrawable} has state {@link ITechViewDrawable#FLAG_VSTATE_07_NO_EAT_H_MUST_EXPAND}.
     * @return
     */
    private boolean isBotHExpand() {
-      int val = tech.get2Bits2(IBOViewPane.VP_OFFSET_04_HEADER_PLANET_MODE1);
-      return headerBottom != null && (val == PLANET_MODE_1_EXPAND || (val == PLANET_MODE_0_EAT && viewedDrawable.hasViewFlag(VIEWSTATE_07_NO_EAT_H_MUST_EXPAND)));
+      int val = boViewPane.get2Bits2(VP_OFFSET_04_HEADER_PLANET_MODE1);
+      return headerBottom != null && (val == PLANET_MODE_1_EXPAND || (val == PLANET_MODE_0_EAT && viewedDrawable.hasFlagView(FLAG_VSTATE_07_NO_EAT_H_MUST_EXPAND)));
    }
 
    private boolean isBotHNotOverlay() {
-      return headerBottom != null && tech.get2Bits2(IBOViewPane.VP_OFFSET_04_HEADER_PLANET_MODE1) != PLANET_MODE_2_OVERLAY;
+      return headerBottom != null && boViewPane.get2Bits2(VP_OFFSET_04_HEADER_PLANET_MODE1) != PLANET_MODE_2_OVERLAY;
    }
 
    private boolean isBotHOverlay() {
-      return headerBottom != null && tech.get2Bits2(IBOViewPane.VP_OFFSET_04_HEADER_PLANET_MODE1) == PLANET_MODE_2_OVERLAY;
+      return headerBottom != null && boViewPane.get2Bits2(VP_OFFSET_04_HEADER_PLANET_MODE1) == PLANET_MODE_2_OVERLAY;
    }
 
    /**
-    * Should {@link ITechViewDrawable#VIEWSTATE_01_CLIP} be set to true.
+    * Should {@link ITechViewDrawable#FLAG_VSTATE_01_CLIP} be set to true.
     * <br>
     * <br>
     * @return
@@ -1974,7 +1964,7 @@ public class ViewPane extends Drawable implements ITechViewPane, ITechDrawable, 
    }
 
    private boolean isHeaderMaster() {
-      return !hasTech(IBOViewPane.VP_FLAG_3_SCROLLBAR_MASTER);
+      return !hasTech(VP_FLAG_3_SCROLLBAR_MASTER);
    }
 
    public boolean isInsideViewPort(InputConfig ic) {
@@ -1986,20 +1976,20 @@ public class ViewPane extends Drawable implements ITechViewPane, ITechDrawable, 
    }
 
    private boolean isLeftHEat() {
-      return headerLeft != null && tech.get2Bits3(IBOViewPane.VP_OFFSET_04_HEADER_PLANET_MODE1) == PLANET_MODE_0_EAT && !viewedDrawable.hasViewFlag(VIEWSTATE_06_NO_EAT_W_MUST_EXPAND);
+      return headerLeft != null && boViewPane.get2Bits3(VP_OFFSET_04_HEADER_PLANET_MODE1) == PLANET_MODE_0_EAT && !viewedDrawable.hasFlagView(FLAG_VSTATE_06_NO_EAT_W_MUST_EXPAND);
    }
 
    private boolean isLeftHExpand() {
-      int val = tech.get2Bits3(IBOViewPane.VP_OFFSET_04_HEADER_PLANET_MODE1);
-      return headerLeft != null && (val == PLANET_MODE_1_EXPAND || (val == PLANET_MODE_0_EAT && viewedDrawable.hasViewFlag(VIEWSTATE_06_NO_EAT_W_MUST_EXPAND)));
+      int val = boViewPane.get2Bits3(VP_OFFSET_04_HEADER_PLANET_MODE1);
+      return headerLeft != null && (val == PLANET_MODE_1_EXPAND || (val == PLANET_MODE_0_EAT && viewedDrawable.hasFlagView(FLAG_VSTATE_06_NO_EAT_W_MUST_EXPAND)));
    }
 
    private boolean isLeftHNotOverlay() {
-      return headerLeft != null && tech.get2Bits3(IBOViewPane.VP_OFFSET_04_HEADER_PLANET_MODE1) != PLANET_MODE_2_OVERLAY;
+      return headerLeft != null && boViewPane.get2Bits3(VP_OFFSET_04_HEADER_PLANET_MODE1) != PLANET_MODE_2_OVERLAY;
    }
 
    private boolean isLeftHOverlay() {
-      return headerLeft != null && tech.get2Bits3(IBOViewPane.VP_OFFSET_04_HEADER_PLANET_MODE1) == PLANET_MODE_2_OVERLAY;
+      return headerLeft != null && boViewPane.get2Bits3(VP_OFFSET_04_HEADER_PLANET_MODE1) == PLANET_MODE_2_OVERLAY;
    }
 
    /**
@@ -2037,7 +2027,7 @@ public class ViewPane extends Drawable implements ITechViewPane, ITechDrawable, 
     * @return
     */
    private boolean isRightHEat() {
-      return headerRight != null && tech.get2Bits4(IBOViewPane.VP_OFFSET_04_HEADER_PLANET_MODE1) == PLANET_MODE_0_EAT && !viewedDrawable.hasViewFlag(VIEWSTATE_06_NO_EAT_W_MUST_EXPAND);
+      return headerRight != null && boViewPane.get2Bits4(VP_OFFSET_04_HEADER_PLANET_MODE1) == PLANET_MODE_0_EAT && !viewedDrawable.hasFlagView(FLAG_VSTATE_06_NO_EAT_W_MUST_EXPAND);
    }
 
    /**
@@ -2045,20 +2035,20 @@ public class ViewPane extends Drawable implements ITechViewPane, ITechDrawable, 
     * @return
     */
    private boolean isRightHExpand() {
-      int val = tech.get2Bits4(IBOViewPane.VP_OFFSET_04_HEADER_PLANET_MODE1);
-      return headerRight != null && (val == PLANET_MODE_1_EXPAND || (val == PLANET_MODE_0_EAT && viewedDrawable.hasViewFlag(VIEWSTATE_06_NO_EAT_W_MUST_EXPAND)));
+      int val = boViewPane.get2Bits4(VP_OFFSET_04_HEADER_PLANET_MODE1);
+      return headerRight != null && (val == PLANET_MODE_1_EXPAND || (val == PLANET_MODE_0_EAT && viewedDrawable.hasFlagView(FLAG_VSTATE_06_NO_EAT_W_MUST_EXPAND)));
    }
 
    private boolean isRightHNotOverlay() {
-      return headerRight != null && tech.get2Bits4(IBOViewPane.VP_OFFSET_04_HEADER_PLANET_MODE1) != PLANET_MODE_2_OVERLAY;
+      return headerRight != null && boViewPane.get2Bits4(VP_OFFSET_04_HEADER_PLANET_MODE1) != PLANET_MODE_2_OVERLAY;
    }
 
    private boolean isRightHOverlay() {
-      return headerRight != null && tech.get2Bits4(IBOViewPane.VP_OFFSET_04_HEADER_PLANET_MODE1) == PLANET_MODE_2_OVERLAY;
+      return headerRight != null && boViewPane.get2Bits4(VP_OFFSET_04_HEADER_PLANET_MODE1) == PLANET_MODE_2_OVERLAY;
    }
 
    private boolean isScrollBarHorizEat() {
-      return tech.get2Bits1(IBOViewPane.VP_OFFSET_05_SCROLLBAR_MODE1) == PLANET_MODE_0_EAT && !viewedDrawable.hasViewFlag(VIEWSTATE_06_NO_EAT_W_MUST_EXPAND);
+      return boViewPane.get2Bits1(VP_OFFSET_05_SCROLLBAR_MODE1) == PLANET_MODE_0_EAT && !viewedDrawable.hasFlagView(FLAG_VSTATE_06_NO_EAT_W_MUST_EXPAND);
    }
 
    /**
@@ -2066,24 +2056,24 @@ public class ViewPane extends Drawable implements ITechViewPane, ITechDrawable, 
     * @return
     */
    private boolean isScrollBarHorizExpand() {
-      int val = tech.get2Bits1(IBOViewPane.VP_OFFSET_05_SCROLLBAR_MODE1);
-      return (val == PLANET_MODE_1_EXPAND || (val == PLANET_MODE_0_EAT && viewedDrawable.hasViewFlag(VIEWSTATE_06_NO_EAT_W_MUST_EXPAND)));
+      int val = boViewPane.get2Bits1(VP_OFFSET_05_SCROLLBAR_MODE1);
+      return (val == PLANET_MODE_1_EXPAND || (val == PLANET_MODE_0_EAT && viewedDrawable.hasFlagView(FLAG_VSTATE_06_NO_EAT_W_MUST_EXPAND)));
    }
 
    private boolean isScrollBarHorizImmaterial() {
-      return tech.get2Bits1(IBOViewPane.VP_OFFSET_05_SCROLLBAR_MODE1) == PLANET_MODE_3_IMMATERIAL;
+      return boViewPane.get2Bits1(VP_OFFSET_05_SCROLLBAR_MODE1) == PLANET_MODE_3_IMMATERIAL;
    }
 
    private boolean isScrollBarHorizNotOverlay() {
-      return tech.get2Bits1(IBOViewPane.VP_OFFSET_05_SCROLLBAR_MODE1) != PLANET_MODE_2_OVERLAY;
+      return boViewPane.get2Bits1(VP_OFFSET_05_SCROLLBAR_MODE1) != PLANET_MODE_2_OVERLAY;
    }
 
    private boolean isScrollBarHorizOverlay() {
-      return tech.get2Bits1(IBOViewPane.VP_OFFSET_05_SCROLLBAR_MODE1) == PLANET_MODE_2_OVERLAY;
+      return boViewPane.get2Bits1(VP_OFFSET_05_SCROLLBAR_MODE1) == PLANET_MODE_2_OVERLAY;
    }
 
    private boolean isScrollBarVertEat() {
-      return tech.get2Bits2(IBOViewPane.VP_OFFSET_05_SCROLLBAR_MODE1) == PLANET_MODE_0_EAT && !viewedDrawable.hasViewFlag(VIEWSTATE_07_NO_EAT_H_MUST_EXPAND);
+      return boViewPane.get2Bits2(VP_OFFSET_05_SCROLLBAR_MODE1) == PLANET_MODE_0_EAT && !viewedDrawable.hasFlagView(FLAG_VSTATE_07_NO_EAT_H_MUST_EXPAND);
 
    }
 
@@ -2092,12 +2082,12 @@ public class ViewPane extends Drawable implements ITechViewPane, ITechDrawable, 
     * @return
     */
    private boolean isScrollBarVertExpand() {
-      int val = tech.get2Bits2(IBOViewPane.VP_OFFSET_05_SCROLLBAR_MODE1);
-      return (val == PLANET_MODE_1_EXPAND || (val == PLANET_MODE_0_EAT && viewedDrawable.hasViewFlag(VIEWSTATE_07_NO_EAT_H_MUST_EXPAND)));
+      int val = boViewPane.get2Bits2(VP_OFFSET_05_SCROLLBAR_MODE1);
+      return (val == PLANET_MODE_1_EXPAND || (val == PLANET_MODE_0_EAT && viewedDrawable.hasFlagView(FLAG_VSTATE_07_NO_EAT_H_MUST_EXPAND)));
    }
 
    private boolean isScrollBarVertImmaterial() {
-      int val = tech.get2Bits2(IBOViewPane.VP_OFFSET_05_SCROLLBAR_MODE1);
+      int val = boViewPane.get2Bits2(VP_OFFSET_05_SCROLLBAR_MODE1);
       return (val == PLANET_MODE_3_IMMATERIAL);
    }
 
@@ -2106,11 +2096,11 @@ public class ViewPane extends Drawable implements ITechViewPane, ITechDrawable, 
     * @return
     */
    private boolean isScrollBarVertNotOverlay() {
-      return tech.get2Bits2(IBOViewPane.VP_OFFSET_05_SCROLLBAR_MODE1) != PLANET_MODE_2_OVERLAY;
+      return boViewPane.get2Bits2(VP_OFFSET_05_SCROLLBAR_MODE1) != PLANET_MODE_2_OVERLAY;
    }
 
    private boolean isScrollBarVertOverlay() {
-      return tech.get2Bits2(IBOViewPane.VP_OFFSET_05_SCROLLBAR_MODE1) == PLANET_MODE_2_OVERLAY;
+      return boViewPane.get2Bits2(VP_OFFSET_05_SCROLLBAR_MODE1) == PLANET_MODE_2_OVERLAY;
    }
 
    /**
@@ -2118,7 +2108,7 @@ public class ViewPane extends Drawable implements ITechViewPane, ITechDrawable, 
     * @return
     */
    private boolean isScrollHNeeded() {
-      if (viewedDrawable.hasViewFlag(VIEWSTATE_10_CONTENT_PW_VIEWPORT_DW)) {
+      if (viewedDrawable.hasFlagView(FLAG_VSTATE_10_CONTENT_PW_VIEWPORT_DW)) {
          return false;
       }
       //System.out.println("#ViewPane#isScrollHNeeded viewportWidth="+ getViewPortWidth() + " < "+ viewedDrawable.getPreferredContentWidth());
@@ -2126,7 +2116,7 @@ public class ViewPane extends Drawable implements ITechViewPane, ITechDrawable, 
    }
 
    public boolean isScrollHPixels() {
-      return tech.get2Bits3(IBOViewPane.VP_OFFSET_05_SCROLLBAR_MODE1) == SCROLL_TYPE_0_PIXEL_UNIT;
+      return boViewPane.get2Bits3(VP_OFFSET_05_SCROLLBAR_MODE1) == SCROLL_TYPE_0_PIXEL_UNIT;
    }
 
    /**
@@ -2134,7 +2124,7 @@ public class ViewPane extends Drawable implements ITechViewPane, ITechDrawable, 
     * @return
     */
    private boolean isScrollVNeeded() {
-      if (viewedDrawable.hasViewFlag(VIEWSTATE_11_CONTENT_PH_VIEWPORT_DH)) {
+      if (viewedDrawable.hasFlagView(FLAG_VSTATE_11_CONTENT_PH_VIEWPORT_DH)) {
          return false;
       }
       //System.out.println("#ViewPane#isScrollNeededV viewportHeigh="+ getViewPortHeight() + " < "+ viewedDrawable.getPreferredContentHeight());
@@ -2142,24 +2132,24 @@ public class ViewPane extends Drawable implements ITechViewPane, ITechDrawable, 
    }
 
    public boolean isScrollVPixels() {
-      return tech.get2Bits4(IBOViewPane.VP_OFFSET_05_SCROLLBAR_MODE1) == SCROLL_TYPE_0_PIXEL_UNIT;
+      return boViewPane.get2Bits4(VP_OFFSET_05_SCROLLBAR_MODE1) == SCROLL_TYPE_0_PIXEL_UNIT;
    }
 
    private boolean isTopCloseHEat() {
-      return headerTopClose != null && tech.get2Bits1(IBOViewPane.VP_OFFSET_04_HEADER_PLANET_MODE1) == PLANET_MODE_0_EAT;
+      return headerTopClose != null && boViewPane.get2Bits1(VP_OFFSET_04_HEADER_PLANET_MODE1) == PLANET_MODE_0_EAT;
    }
 
    private boolean isTopCloseHExpand() {
-      int val = tech.get2Bits1(IBOViewPane.VP_OFFSET_04_HEADER_PLANET_MODE1);
-      return headerTopClose != null && (val == PLANET_MODE_1_EXPAND || (val == PLANET_MODE_0_EAT && viewedDrawable.hasViewFlag(VIEWSTATE_07_NO_EAT_H_MUST_EXPAND)));
+      int val = boViewPane.get2Bits1(VP_OFFSET_04_HEADER_PLANET_MODE1);
+      return headerTopClose != null && (val == PLANET_MODE_1_EXPAND || (val == PLANET_MODE_0_EAT && viewedDrawable.hasFlagView(FLAG_VSTATE_07_NO_EAT_H_MUST_EXPAND)));
    }
 
    private boolean isTopCloseHOverlay() {
-      return headerTopClose != null && tech.get2Bits1(IBOViewPane.VP_OFFSET_04_HEADER_PLANET_MODE1) == PLANET_MODE_2_OVERLAY;
+      return headerTopClose != null && boViewPane.get2Bits1(VP_OFFSET_04_HEADER_PLANET_MODE1) == PLANET_MODE_2_OVERLAY;
    }
 
    private boolean isTopHEat() {
-      return headerTop != null && (tech.get2Bits1(IBOViewPane.VP_OFFSET_04_HEADER_PLANET_MODE1) == PLANET_MODE_0_EAT && !viewedDrawable.hasViewFlag(VIEWSTATE_07_NO_EAT_H_MUST_EXPAND));
+      return headerTop != null && (boViewPane.get2Bits1(VP_OFFSET_04_HEADER_PLANET_MODE1) == PLANET_MODE_0_EAT && !viewedDrawable.hasFlagView(FLAG_VSTATE_07_NO_EAT_H_MUST_EXPAND));
    }
 
    /**
@@ -2167,16 +2157,16 @@ public class ViewPane extends Drawable implements ITechViewPane, ITechDrawable, 
     * @return
     */
    private boolean isTopHExpand() {
-      int val = tech.get2Bits1(IBOViewPane.VP_OFFSET_04_HEADER_PLANET_MODE1);
-      return headerTop != null && (val == PLANET_MODE_1_EXPAND || (val == PLANET_MODE_0_EAT && viewedDrawable.hasViewFlag(VIEWSTATE_07_NO_EAT_H_MUST_EXPAND)));
+      int val = boViewPane.get2Bits1(VP_OFFSET_04_HEADER_PLANET_MODE1);
+      return headerTop != null && (val == PLANET_MODE_1_EXPAND || (val == PLANET_MODE_0_EAT && viewedDrawable.hasFlagView(FLAG_VSTATE_07_NO_EAT_H_MUST_EXPAND)));
    }
 
    private boolean isTopHNotOverlay() {
-      return headerTop != null && tech.get2Bits1(IBOViewPane.VP_OFFSET_04_HEADER_PLANET_MODE1) != PLANET_MODE_2_OVERLAY;
+      return headerTop != null && boViewPane.get2Bits1(VP_OFFSET_04_HEADER_PLANET_MODE1) != PLANET_MODE_2_OVERLAY;
    }
 
    private boolean isTopHOverlay() {
-      return headerTop != null && tech.get2Bits1(IBOViewPane.VP_OFFSET_04_HEADER_PLANET_MODE1) == PLANET_MODE_2_OVERLAY;
+      return headerTop != null && boViewPane.get2Bits1(VP_OFFSET_04_HEADER_PLANET_MODE1) == PLANET_MODE_2_OVERLAY;
    }
 
    /**
@@ -2188,26 +2178,26 @@ public class ViewPane extends Drawable implements ITechViewPane, ITechDrawable, 
     * @return
     */
    public boolean isViewPaneStyleApplied() {
-      return hasTechX(IBOViewPane.VP_FLAGX_1_STYLE_VIEWPANE);
+      return hasTechX(VP_FLAGX_1_STYLE_VIEWPANE);
    }
 
    public boolean isViewPortStyleApplied() {
-      return hasTechX(IBOViewPane.VP_FLAGX_2_STYLE_VIEWPORT);
+      return hasTechX(VP_FLAGX_2_STYLE_VIEWPORT);
    }
 
    private boolean isVisualShrinkH() {
-      return tech.get4Bits2(IBOViewPane.VP_OFFSET_06_VISUAL_LEFT_OVER1) == VISUAL_2_SHRINK;
+      return boViewPane.get4Bits2(VP_OFFSET_06_VISUAL_LEFT_OVER1) == VISUAL_2_SHRINK;
    }
 
    private boolean isVisualShrinkW() {
-      return tech.get4Bits1(IBOViewPane.VP_OFFSET_06_VISUAL_LEFT_OVER1) == VISUAL_2_SHRINK;
+      return boViewPane.get4Bits1(VP_OFFSET_06_VISUAL_LEFT_OVER1) == VISUAL_2_SHRINK;
    }
 
    /**
     * Computes the dimension of headers and scrollbars.
     * <br>
     * This method does not change {@link ViewPane} state, except
-    * <li> setting {@link ITechViewDrawable#VIEWSTATE_03_VIEWPANE_OVERLAY} to {@link ViewDrawable}
+    * <li> setting {@link ITechViewDrawable#FLAG_VSTATE_03_VIEWPANE_OVERLAY} to {@link ViewDrawable}
     * <li> settings scrollbar to null or creating them
     * <li> {@link ViewPane#scrollBarHPaneH}
     * <li> {@link ViewPane#scrollBarHPaneW}
@@ -2216,7 +2206,7 @@ public class ViewPane extends Drawable implements ITechViewPane, ITechDrawable, 
     * 
     */
    private void layDimensionArtifacts() {
-      if (hasTech(IBOViewPane.VP_FLAG_3_SCROLLBAR_MASTER)) {
+      if (hasTech(VP_FLAG_3_SCROLLBAR_MASTER)) {
          layDimensionHeaders();
          layDimensionScrollbars();
          //boolean hs = hScrollBar != null && tech.get2Bits1(TECH_VP_OFFSET_4SCROLLBAR_MODE1) == PLANET_STRUCT_1EXPAND;
@@ -2255,29 +2245,29 @@ public class ViewPane extends Drawable implements ITechViewPane, ITechDrawable, 
             holeY = headerTop.getY();
          }
          if (headerLeft != null) {
-            headerHoles[HOLE_0TOP_LEFT] = new Drawable(gc, styleClass.getStyleClass(IBOTypesGui.LINK_67_STYLE_VIEWPANE_HOLE));
-            IDrawable h = headerHoles[HOLE_0TOP_LEFT];
+            headerHoles[HOLE_0_TOP_LEFT] = new Drawable(gc, styleClass.getStyleClass(IBOTypesGui.LINK_67_STYLE_VIEWPANE_HOLE));
+            IDrawable h = headerHoles[HOLE_0_TOP_LEFT];
             h.init(headerLeft.getDrawnWidth(), holeH);
             h.setXY(headerLeft.getX(), holeY);
          }
          if (headerRight != null) {
-            headerHoles[HOLE_1TOP_RIGHT] = new Drawable(gc, styleClass.getStyleClass(IBOTypesGui.LINK_67_STYLE_VIEWPANE_HOLE));
-            IDrawable h = headerHoles[HOLE_1TOP_RIGHT];
+            headerHoles[HOLE_1_TOP_RIGHT] = new Drawable(gc, styleClass.getStyleClass(IBOTypesGui.LINK_67_STYLE_VIEWPANE_HOLE));
+            IDrawable h = headerHoles[HOLE_1_TOP_RIGHT];
             h.init(headerRight.getDrawnWidth(), holeH);
             h.setXY(headerRight.getX(), holeY);
          }
       }
       if (headerBottom != null) {
          if (headerLeft != null) {
-            headerHoles[HOLE_3BOT_LEFT] = new Drawable(gc, styleClass.getStyleClass(IBOTypesGui.LINK_67_STYLE_VIEWPANE_HOLE));
-            IDrawable h = headerHoles[HOLE_3BOT_LEFT];
+            headerHoles[HOLE_3_BOT_LEFT] = new Drawable(gc, styleClass.getStyleClass(IBOTypesGui.LINK_67_STYLE_VIEWPANE_HOLE));
+            IDrawable h = headerHoles[HOLE_3_BOT_LEFT];
             h.init(headerLeft.getDrawnWidth(), headerBottom.getDrawnHeight());
             h.setXY(headerLeft.getX(), headerBottom.getY());
             //System.out.println("x=" + headerLeft.getX() + " y=" + headerBottom.getY());
          }
          if (headerRight != null) {
-            headerHoles[HOLE_2BOT_RIGHT] = new Drawable(gc, styleClass.getStyleClass(IBOTypesGui.LINK_67_STYLE_VIEWPANE_HOLE));
-            IDrawable h = headerHoles[HOLE_2BOT_RIGHT];
+            headerHoles[HOLE_2_BOT_RIGHT] = new Drawable(gc, styleClass.getStyleClass(IBOTypesGui.LINK_67_STYLE_VIEWPANE_HOLE));
+            IDrawable h = headerHoles[HOLE_2_BOT_RIGHT];
             h.init(headerRight.getDrawnWidth(), headerBottom.getDrawnHeight());
             h.setXY(headerRight.getX(), headerBottom.getY());
          }
@@ -2326,9 +2316,9 @@ public class ViewPane extends Drawable implements ITechViewPane, ITechDrawable, 
          width += headerLeft.getDrawnWidth();
       }
       if (headerTop != null) {
-         if (tech.hasFlag(IBOViewPane.VP_OFFSET_12_INTERNAL_SIZING1, VP_SIZER_1_TOP)) {
+         if (boViewPane.hasFlag(VP_OFFSET_12_INTERNAL_SIZING1, VP_SIZER_1_TOP)) {
             //our header top wants a word in the init width 
-            headerTop.init();
+            headerTop.initSize();
             int wTop = headerTop.getDrawnWidth();
             if (wTop > width) {
 
@@ -2344,7 +2334,7 @@ public class ViewPane extends Drawable implements ITechViewPane, ITechDrawable, 
       setUpHeaderSize(headerBottom, width, 0);
 
       //overlay Top or Bottom take the place if the shorten overlay flag is set.
-      if (hasTechY(IBOViewPane.VP_FLAGY_2_SHORTEN_HEADER_HEIGHT)) {
+      if (hasTechY(VP_FLAGY_2_SHORTEN_HEADER_HEIGHT)) {
          if (isTopHOverlay()) {
             height -= headerTop.getDrawnHeight();
          }
@@ -2441,7 +2431,7 @@ public class ViewPane extends Drawable implements ITechViewPane, ITechDrawable, 
       setUpHeaderSize(headerLeft, 0, height);
       setUpHeaderSize(headerRight, 0, height);
 
-      if (hasTechY(IBOViewPane.VP_FLAGY_1_SHORTEN_HEADER_WIDTH)) {
+      if (hasTechY(VP_FLAGY_1_SHORTEN_HEADER_WIDTH)) {
          if (isLeftHOverlay()) {
             width -= headerLeft.getDrawnWidth();
          }
@@ -2530,7 +2520,7 @@ public class ViewPane extends Drawable implements ITechViewPane, ITechDrawable, 
          scrollBarPaneW -= getStyleWConsumed();
          scrollBarPaneH -= getStyleHConsumed();
       }
-      if (hasTech(IBOViewPane.VP_FLAG_3_SCROLLBAR_MASTER)) {
+      if (hasTech(VP_FLAG_3_SCROLLBAR_MASTER)) {
          //take space for expanding headers
          if (isTopHExpand()) {
             scrollBarPaneH += headerTop.getDrawnHeight();
@@ -2705,7 +2695,7 @@ public class ViewPane extends Drawable implements ITechViewPane, ITechDrawable, 
             xSCBox += getStyleWLeftConsumed();
             ySCBox += getStyleHTopConsumed();
          }
-         if (!hasTech(IBOViewPane.VP_FLAG_3_SCROLLBAR_MASTER)) {
+         if (!hasTech(VP_FLAG_3_SCROLLBAR_MASTER)) {
             ySCBox = topHeadersMod(ySCBox);
             if (isLeftHNotOverlay()) {
                xSCBox += headerLeft.getDrawnWidth();
@@ -2726,7 +2716,7 @@ public class ViewPane extends Drawable implements ITechViewPane, ITechDrawable, 
             xSCBox += getStyleWLeftConsumed();
             ySCBox += getStyleHTopConsumed();
          }
-         if (!hasTech(IBOViewPane.VP_FLAG_3_SCROLLBAR_MASTER)) {
+         if (!hasTech(VP_FLAG_3_SCROLLBAR_MASTER)) {
             ySCBox = topHeadersMod(ySCBox);
             if (isLeftHNotOverlay()) {
                xSCBox += headerLeft.getDrawnWidth();
@@ -2818,7 +2808,7 @@ public class ViewPane extends Drawable implements ITechViewPane, ITechDrawable, 
          draggingViewPane(ic);
       }
       //check the overlayed headers and scollbars
-      if (viewedDrawable.hasViewFlag(ViewDrawable.VIEWSTATE_03_VIEWPANE_OVERLAY)) {
+      if (viewedDrawable.hasFlagView(ViewDrawable.FLAG_VSTATE_03_VIEWPANE_OVERLAY)) {
          managePointerSattelite(ic);
          if (ic.isActionDone()) {
             //cancel what was done in slaved?
@@ -2852,7 +2842,7 @@ public class ViewPane extends Drawable implements ITechViewPane, ITechDrawable, 
       }
    }
 
-   private IDrawable managePointerInputHelper(int x, int y, IDrawable d, ExecutionCtxDraw ex) {
+   private IDrawable managePointerInputHelper(int x, int y, IDrawable d, ExecutionContextGui ex) {
       if (d != null && DrawableUtilz.isInside(x, y, d)) {
          return d.getDrawable(x, y, ex);
       }
@@ -2908,9 +2898,9 @@ public class ViewPane extends Drawable implements ITechViewPane, ITechDrawable, 
 
    private void maxViewPortH(IDrawable d, int maxHeight, int flag) {
       if (d != null) {
-         if (tech.hasFlag(IBOViewPane.VP_OFFSET_12_INTERNAL_SIZING1, flag)) {
+         if (boViewPane.hasFlag(VP_OFFSET_12_INTERNAL_SIZING1, flag)) {
             //our header top wants a word in the init width 
-            d.init();
+            d.initSize();
             int h = d.getDrawnHeight();
             if (h > viewPortHeight) {
                //we force the maximum size
@@ -2939,9 +2929,9 @@ public class ViewPane extends Drawable implements ITechViewPane, ITechDrawable, 
     */
    private void maxViewPortW(IDrawable d, int maxWidth, int flag) {
       if (d != null) {
-         if (tech.hasFlag(IBOViewPane.VP_OFFSET_12_INTERNAL_SIZING1, flag)) {
+         if (boViewPane.hasFlag(VP_OFFSET_12_INTERNAL_SIZING1, flag)) {
             //our header top wants a word in the init width 
-            d.init();
+            d.initSize();
             int wTop = d.getDrawnWidth();
             if (wTop > viewPortWidth) {
                viewPortWidth = getNewValue(wTop, maxWidth);
@@ -3070,7 +3060,7 @@ public class ViewPane extends Drawable implements ITechViewPane, ITechDrawable, 
          //how do we check visual state change? we can't. we are talking increments here. not aware of Drawables.
          // so ViewDrawable must externally invalidate a given increment in the trailScope.
 
-         if (viewedDrawable.hasViewFlag(VIEWSTATE_04_NO_CONTENT_STATE)) {
+         if (viewedDrawable.hasFlagView(FLAG_VSTATE_04_NO_CONTENT_STATE)) {
 
          } else {
             move.resetTrail();
@@ -3144,7 +3134,7 @@ public class ViewPane extends Drawable implements ITechViewPane, ITechDrawable, 
          //how do we check visual state change? we can't. we are talking increments here. not aware of Drawables.
          // so ViewDrawable must externally invalidate a given increment in the trailScope.
 
-         if (viewedDrawable.hasViewFlag(VIEWSTATE_04_NO_CONTENT_STATE)) {
+         if (viewedDrawable.hasFlagView(FLAG_VSTATE_04_NO_CONTENT_STATE)) {
 
          } else {
             move.resetTrail();
@@ -3279,7 +3269,7 @@ public class ViewPane extends Drawable implements ITechViewPane, ITechDrawable, 
          hScrollBar.updateStructure();
          boolean isLeft = vx < 0;
          //need pixel
-         if (hasTechX(IBOViewPane.VP_FLAGX_7_ANIMATED)) {
+         if (hasTechX(VP_FLAGX_7_ANIMATED)) {
             //we must compute the vx to pixel new config
             manageAnimHoriz(ic, scX, isLeft);
          }
@@ -3300,7 +3290,7 @@ public class ViewPane extends Drawable implements ITechViewPane, ITechDrawable, 
          scY.move(vy);
          vScrollBar.updateStructure();
          boolean isUp = vy < 0;
-         if (hasTechX(IBOViewPane.VP_FLAGX_7_ANIMATED)) {
+         if (hasTechX(VP_FLAGX_7_ANIMATED)) {
             //we must compute the vx to pixel new config
             manageAnimVert(ic, scY, isUp);
          }
@@ -3374,8 +3364,14 @@ public class ViewPane extends Drawable implements ITechViewPane, ITechDrawable, 
    }
 
    public boolean removeDrawable(IDrawable d) {
-      // TODO Auto-generated method stub
-      return false;
+      boolean isFound = false;
+      if(d==headerLeft) {
+         isFound = true;
+      }
+      if(isFound) {
+         d.setParent(null);
+      }
+      return isFound;
    }
 
    private int rightHeadersMod(int x) {
@@ -3386,16 +3382,9 @@ public class ViewPane extends Drawable implements ITechViewPane, ITechDrawable, 
    }
 
    /**
-    * Sets {@link IDrawable} as outer header (not a close header).
     * 
-    * Drawable uses his sizers. In effect a Top width, become a minimum size for the Drawable
     * 
-    * do we modify the sizer directly? Or clone it?
     * 
-    * <br>
-    * <br>
-    * Cue Sizers will be decided by the {@link ViewPane},
-    * <br>
     * @param d can be null to remove a header
     * @param pos {@link C#POS_1_BOT}
     * @param posType  {@link ITechViewPane#PLANET_MODE_0_EAT}
@@ -3415,16 +3404,16 @@ public class ViewPane extends Drawable implements ITechViewPane, ITechDrawable, 
       //we want pref height as in the drawable can take what it wants, fixed sizeW
       switch (pos) {
          case C.POS_0_TOP:
-            tech.setFlag(IBOViewPane.VP_OFFSET_12_INTERNAL_SIZING1, VP_SIZER_1_TOP, val);
+            boViewPane.setFlag(VP_OFFSET_12_INTERNAL_SIZING1, VP_SIZER_1_TOP, val);
             break;
          case C.POS_1_BOT:
-            tech.setFlag(IBOViewPane.VP_OFFSET_12_INTERNAL_SIZING1, VP_SIZER_2_BOT, val);
+            boViewPane.setFlag(VP_OFFSET_12_INTERNAL_SIZING1, VP_SIZER_2_BOT, val);
             break;
          case C.POS_2_LEFT:
-            tech.setFlag(IBOViewPane.VP_OFFSET_12_INTERNAL_SIZING1, VP_SIZER_3_LEFT, val);
+            boViewPane.setFlag(VP_OFFSET_12_INTERNAL_SIZING1, VP_SIZER_3_LEFT, val);
             break;
          case C.POS_3_RIGHT:
-            tech.setFlag(IBOViewPane.VP_OFFSET_12_INTERNAL_SIZING1, VP_SIZER_4_RIGHT, val);
+            boViewPane.setFlag(VP_OFFSET_12_INTERNAL_SIZING1, VP_SIZER_4_RIGHT, val);
             break;
          default:
             throw new IllegalArgumentException("Unknown Position" + pos);
@@ -3499,8 +3488,9 @@ public class ViewPane extends Drawable implements ITechViewPane, ITechDrawable, 
     * In all cases, ViewPane sets absolute sizers for Width in case
     * <br>
     * Cue Sizers are decided by the caller. However the {@link ViewPane} ...
+    * 
     * @param d when null, removes any header at the specified position
-    * @param pos
+    * @param pos {@link C#POS_0_TOP}
     * @param posType
     */
    public void setHeader(IDrawable d, int pos, int posType) {
@@ -3514,19 +3504,19 @@ public class ViewPane extends Drawable implements ITechViewPane, ITechDrawable, 
       switch (pos) {
          case C.POS_0_TOP:
             headerTop = d;
-            tech.setValue2Bits1(IBOViewPane.VP_OFFSET_04_HEADER_PLANET_MODE1, posType);
+            boViewPane.setValue2Bits1(VP_OFFSET_04_HEADER_PLANET_MODE1, posType);
             break;
          case C.POS_1_BOT:
             headerBottom = d;
-            tech.setValue2Bits2(IBOViewPane.VP_OFFSET_04_HEADER_PLANET_MODE1, posType);
+            boViewPane.setValue2Bits2(VP_OFFSET_04_HEADER_PLANET_MODE1, posType);
             break;
          case C.POS_2_LEFT:
             headerLeft = d;
-            tech.setValue2Bits3(IBOViewPane.VP_OFFSET_04_HEADER_PLANET_MODE1, posType);
+            boViewPane.setValue2Bits3(VP_OFFSET_04_HEADER_PLANET_MODE1, posType);
             break;
          case C.POS_3_RIGHT:
             headerRight = d;
-            tech.setValue2Bits4(IBOViewPane.VP_OFFSET_04_HEADER_PLANET_MODE1, posType);
+            boViewPane.setValue2Bits4(VP_OFFSET_04_HEADER_PLANET_MODE1, posType);
             break;
          default:
             throw new IllegalArgumentException("Unknown Position" + pos);
@@ -3558,22 +3548,22 @@ public class ViewPane extends Drawable implements ITechViewPane, ITechDrawable, 
 
    private void setImmaterialHeaders() {
       if (headerRight != null) {
-         if (tech.get2Bits4(IBOViewPane.VP_OFFSET_04_HEADER_PLANET_MODE1) == PLANET_MODE_3_IMMATERIAL) {
+         if (boViewPane.get2Bits4(VP_OFFSET_04_HEADER_PLANET_MODE1) == PLANET_MODE_3_IMMATERIAL) {
             headerRight.setBehaviorFlag(ITechDrawable.BEHAVIOR_16_IMMATERIAL, true);
          }
       }
       if (headerLeft != null) {
-         if (tech.get2Bits3(IBOViewPane.VP_OFFSET_04_HEADER_PLANET_MODE1) == PLANET_MODE_3_IMMATERIAL) {
+         if (boViewPane.get2Bits3(VP_OFFSET_04_HEADER_PLANET_MODE1) == PLANET_MODE_3_IMMATERIAL) {
             headerRight.setBehaviorFlag(ITechDrawable.BEHAVIOR_16_IMMATERIAL, true);
          }
       }
       if (headerTop != null) {
-         if (tech.get2Bits1(IBOViewPane.VP_OFFSET_04_HEADER_PLANET_MODE1) == PLANET_MODE_3_IMMATERIAL) {
+         if (boViewPane.get2Bits1(VP_OFFSET_04_HEADER_PLANET_MODE1) == PLANET_MODE_3_IMMATERIAL) {
             headerRight.setBehaviorFlag(ITechDrawable.BEHAVIOR_16_IMMATERIAL, true);
          }
       }
       if (headerBottom != null) {
-         if (tech.get2Bits2(IBOViewPane.VP_OFFSET_04_HEADER_PLANET_MODE1) == PLANET_MODE_3_IMMATERIAL) {
+         if (boViewPane.get2Bits2(VP_OFFSET_04_HEADER_PLANET_MODE1) == PLANET_MODE_3_IMMATERIAL) {
             headerRight.setBehaviorFlag(ITechDrawable.BEHAVIOR_16_IMMATERIAL, true);
          }
       }
@@ -3642,7 +3632,7 @@ public class ViewPane extends Drawable implements ITechViewPane, ITechDrawable, 
    }
 
    public void setTechFlagX(int flag, boolean v) {
-      tech.setFlag(IBOViewPane.VP_OFFSET_02_FLAGX, flag, v);
+      boViewPane.setFlag(VP_OFFSET_02_FLAGX, flag, v);
    }
 
    /**
@@ -3696,7 +3686,7 @@ public class ViewPane extends Drawable implements ITechViewPane, ITechDrawable, 
    }
 
    /**
-    * Sets {@link ITechViewDrawable#VIEWSTATE_03_VIEWPANE_OVERLAY} to indicate at least one viewpane satellite is drawn in overlay
+    * Sets {@link ITechViewDrawable#FLAG_VSTATE_03_VIEWPANE_OVERLAY} to indicate at least one viewpane satellite is drawn in overlay
     * <br>
     * Called by {@link ViewPane#layDimensionArtifacts()}
     */
@@ -3705,7 +3695,7 @@ public class ViewPane extends Drawable implements ITechViewPane, ITechDrawable, 
       if (isScrollBarHorizOverlay() || isScrollBarVertOverlay()) {
          isOverlayed = true;
       }
-      viewedDrawable.setViewFlag(VIEWSTATE_03_VIEWPANE_OVERLAY, isOverlayed);
+      viewedDrawable.setFlagView(FLAG_VSTATE_03_VIEWPANE_OVERLAY, isOverlayed);
    }
 
    public void setViewState(ViewState vs) {
@@ -3751,7 +3741,7 @@ public class ViewPane extends Drawable implements ITechViewPane, ITechDrawable, 
    //#enddebug
 
    protected void styleValidateViewPane() {
-      int styleType = getTech().get1(IBOViewPane.VP_OFFSET_13_STYLE_VIEWPANE_MODE1);
+      int styleType = getTech().get1(VP_OFFSET_13_STYLE_VIEWPANE_MODE1);
       if (styleType == DRW_STYLE_0_VIEWDRAWABLE) {
          styleViewPane = viewedDrawable.style;
       } else if (styleType == DRW_STYLE_1_VIEWPANE) {
@@ -3768,7 +3758,7 @@ public class ViewPane extends Drawable implements ITechViewPane, ITechDrawable, 
     * Set our styles
     */
    protected void styleValidateViewPort() {
-      int styleType = getTech().get1(IBOViewPane.VP_OFFSET_14_STYLE_VIEWPORT_MODE1);
+      int styleType = getTech().get1(VP_OFFSET_14_STYLE_VIEWPORT_MODE1);
       if (styleType == DRW_STYLE_0_VIEWDRAWABLE) {
          styleViewPort = viewedDrawable.style;
       } else if (styleType == DRW_STYLE_1_VIEWPANE) {
@@ -3786,7 +3776,7 @@ public class ViewPane extends Drawable implements ITechViewPane, ITechDrawable, 
     * @return
     */
    private int topHeadersMod(int y) {
-      if (tech.get2Bits1(IBOViewPane.VP_OFFSET_04_HEADER_PLANET_MODE1) != PLANET_MODE_2_OVERLAY) {
+      if (boViewPane.get2Bits1(VP_OFFSET_04_HEADER_PLANET_MODE1) != PLANET_MODE_2_OVERLAY) {
          if (headerTop != null) {
             y += headerTop.getDrawnHeight();
          }
@@ -3821,17 +3811,17 @@ public class ViewPane extends Drawable implements ITechViewPane, ITechDrawable, 
 
       dc.append("hasAtLeastOneSizedDrawable=" + hasAtLeastOneSizedDrawable());
       if (hasAtLeastOneSizedDrawable()) {
-         append(dc, IBOViewPane.VP_OFFSET_12_INTERNAL_SIZING1, tech, VP_SIZER_1_TOP, "Top");
-         append(dc, IBOViewPane.VP_OFFSET_12_INTERNAL_SIZING1, tech, VP_SIZER_2_BOT, "Bot");
-         append(dc, IBOViewPane.VP_OFFSET_12_INTERNAL_SIZING1, tech, VP_SIZER_3_LEFT, "Left");
-         append(dc, IBOViewPane.VP_OFFSET_12_INTERNAL_SIZING1, tech, VP_SIZER_4_RIGHT, "Right");
-         append(dc, IBOViewPane.VP_OFFSET_12_INTERNAL_SIZING1, tech, VP_SIZER_5_TOP_CLOSE, "TopClose");
-         append(dc, IBOViewPane.VP_OFFSET_12_INTERNAL_SIZING1, tech, VP_SIZER_6_BOT_CLOSE, "BotClose");
-         append(dc, IBOViewPane.VP_OFFSET_12_INTERNAL_SIZING1, tech, VP_SIZER_7_LEFT_CLOSE, "LeftClose");
-         append(dc, IBOViewPane.VP_OFFSET_12_INTERNAL_SIZING1, tech, VP_SIZER_8_RIGHT_CLOSE, "RightClose");
+         append(dc, VP_OFFSET_12_INTERNAL_SIZING1, boViewPane, VP_SIZER_1_TOP, "Top");
+         append(dc, VP_OFFSET_12_INTERNAL_SIZING1, boViewPane, VP_SIZER_2_BOT, "Bot");
+         append(dc, VP_OFFSET_12_INTERNAL_SIZING1, boViewPane, VP_SIZER_3_LEFT, "Left");
+         append(dc, VP_OFFSET_12_INTERNAL_SIZING1, boViewPane, VP_SIZER_4_RIGHT, "Right");
+         append(dc, VP_OFFSET_12_INTERNAL_SIZING1, boViewPane, VP_SIZER_5_TOP_CLOSE, "TopClose");
+         append(dc, VP_OFFSET_12_INTERNAL_SIZING1, boViewPane, VP_SIZER_6_BOT_CLOSE, "BotClose");
+         append(dc, VP_OFFSET_12_INTERNAL_SIZING1, boViewPane, VP_SIZER_7_LEFT_CLOSE, "LeftClose");
+         append(dc, VP_OFFSET_12_INTERNAL_SIZING1, boViewPane, VP_SIZER_8_RIGHT_CLOSE, "RightClose");
       }
-      if (tech != null) {
-         gc.getDrawableCoreFactory().toStringViewPaneTech(tech, dc.newLevel());
+      if (boViewPane != null) {
+         gc.getDrawableCoreFactory().toStringViewPaneTech(boViewPane, dc.newLevel());
       }
       super.toString(dc.sup());
 
@@ -3869,10 +3859,10 @@ public class ViewPane extends Drawable implements ITechViewPane, ITechDrawable, 
       if (headerHoles != null) {
          sb = sb.newLevel();
          sb.append("#Header Holes");
-         sb.nlLvl("TopLeft", headerHoles[HOLE_0TOP_LEFT]);
-         sb.nlLvl("TopRight", headerHoles[HOLE_1TOP_RIGHT]);
-         sb.nlLvl("BotRight", headerHoles[HOLE_2BOT_RIGHT]);
-         sb.nlLvl("BotLeft", headerHoles[HOLE_3BOT_LEFT]);
+         sb.nlLvl("TopLeft", headerHoles[HOLE_0_TOP_LEFT]);
+         sb.nlLvl("TopRight", headerHoles[HOLE_1_TOP_RIGHT]);
+         sb.nlLvl("BotRight", headerHoles[HOLE_2_BOT_RIGHT]);
+         sb.nlLvl("BotLeft", headerHoles[HOLE_3_BOT_LEFT]);
       }
    }
 

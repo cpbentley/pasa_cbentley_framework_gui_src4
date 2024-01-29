@@ -25,10 +25,10 @@ import pasa.cbentley.framework.datamodel.src4.ctx.DataModelCtx;
 import pasa.cbentley.framework.drawx.src4.ctx.DrwCtx;
 import pasa.cbentley.framework.gui.src4.anim.AnimFactory;
 import pasa.cbentley.framework.gui.src4.anim.AnimOperator;
-import pasa.cbentley.framework.gui.src4.canvas.CanvasAppliDrawable;
+import pasa.cbentley.framework.gui.src4.canvas.CanvasAppliInputGui;
 import pasa.cbentley.framework.gui.src4.canvas.CanvasDrawControl;
 import pasa.cbentley.framework.gui.src4.canvas.FocusCtrl;
-import pasa.cbentley.framework.gui.src4.canvas.ITechCanvasAppliDrawable;
+import pasa.cbentley.framework.gui.src4.canvas.IBOCanvasAppliGui;
 import pasa.cbentley.framework.gui.src4.canvas.InputConfig;
 import pasa.cbentley.framework.gui.src4.canvas.StatorFactoryDrawable;
 import pasa.cbentley.framework.gui.src4.canvas.TopLevelCtrl;
@@ -64,8 +64,10 @@ import pasa.cbentley.framework.gui.src4.string.StringEditControl;
 import pasa.cbentley.framework.gui.src4.table.CellPolicy;
 import pasa.cbentley.framework.gui.src4.table.TableOperator;
 import pasa.cbentley.framework.gui.src4.utils.StatusData;
+import pasa.cbentley.framework.input.src4.ctx.IBOCtxSettingsInput;
 import pasa.cbentley.framework.input.src4.ctx.IBOTypesInput;
 import pasa.cbentley.framework.input.src4.ctx.InputCtx;
+import pasa.cbentley.framework.input.src4.interfaces.IBOCanvasAppli;
 import pasa.cbentley.layouter.src4.ctx.LayouterCtx;
 
 /**
@@ -112,9 +114,6 @@ public class GuiCtx extends ABOCtx implements ITechCtxSettingsAppGui {
 
    private CanvasGuiCtx[]           canvasCtxs;
 
-   private CanvasAppliDrawable[]    canvases;
-
-   private CanvasAppliDrawable      canvasRoot;
 
    protected final CmdCtx           cc;
 
@@ -229,7 +228,7 @@ public class GuiCtx extends ABOCtx implements ITechCtxSettingsAppGui {
       eventsTolopogy[IEventsGui.CHAR_EVENT_PROD_ID] = IEventsGui.CHAR_EVENT_NUM_MAX;
       eventBus = new EventBusArray(uc, this, eventsTolopogy);
 
-      canvases = new CanvasAppliDrawable[0];
+      canvasCtxs = new CanvasGuiCtx[2];
       focusCtrl = new FocusCtrl(this);
       uiaCtrl = new UserInteractionCtrl(this);
 
@@ -238,29 +237,19 @@ public class GuiCtx extends ABOCtx implements ITechCtxSettingsAppGui {
       }
    }
 
-   
    public IStatorFactory getStatorFactory() {
       return statorFactory;
    }
 
-
    public void a_Init() {
       super.a_Init();
-   }
-
-   public void addCanvas(CanvasAppliDrawable canvas) {
-      if (canvasRoot == null) {
-         canvasRoot = canvas;
-      }
-      canvases = ensureCapacity(canvases, canvasCount);
-      this.canvases[canvasCount] = canvas;
-      canvasCount++;
    }
 
    public void addCanvas(CanvasGuiCtx canvas) {
       if (canvasCtxRoot == null) {
          canvasCtxRoot = canvas;
       }
+      canvasCtxs = ensureCapacity(canvasCtxs, canvasCount + 1);
       this.canvasCtxs[canvasCount] = canvas;
       canvasCount++;
    }
@@ -272,27 +261,28 @@ public class GuiCtx extends ABOCtx implements ITechCtxSettingsAppGui {
    }
 
    /**
-    * 
+    * {@link IBOCanvasAppliGui}
     * @return
     */
    public ByteObject createTechCanvasAppliDrawableDefault() {
-      int type = IBOTypesInput.TYPE_1_TECH_CANVAS_APPLI;
-      int size = ITechCanvasAppliDrawable.CANVAS_APP_DRW_BASIC_SIZE;
+      int type = IBOCanvasAppli.CANVAS_APP_BASE_TYPE;
+      int size = IBOCanvasAppliGui.CANVAS_APP_DRW_BASIC_SIZE;
       ByteObject tech = cfc.getBOC().getByteObjectFactory().createByteObject(type, size);
+
+      int subType = IBOCanvasAppliGui.CANVAS_APP_TYPE_SUB_GUI;
+      tech.set1(IBOCanvasAppli.CANVAS_APP_OFFSET_02_TYPE_SUB1, subType);
 
       ic.setTechCanvasAppliDefault(tech);
       //maps from config defaults
-      int secondType = IBOTypesGui.TYPE_SUB_001_CANVAS_DRAWABLE;
-      tech.set1(ITechCanvasAppliDrawable.CANVAS_APP_OFFSET_02_TYPE1, secondType);
 
       setTechCanvasAppliDrawableDefault(tech);
 
       return tech;
    }
 
-   public CanvasAppliDrawable[] ensureCapacity(CanvasAppliDrawable[] ar, int size) {
+   public CanvasGuiCtx[] ensureCapacity(CanvasGuiCtx[] ar, int size) {
       if (size >= ar.length) {
-         CanvasAppliDrawable[] nar = new CanvasAppliDrawable[size + 1];
+         CanvasGuiCtx[] nar = new CanvasGuiCtx[size + 1];
          for (int i = 0; i < ar.length; i++) {
             nar[i] = ar[i];
          }
@@ -333,15 +323,18 @@ public class GuiCtx extends ABOCtx implements ITechCtxSettingsAppGui {
    }
 
    /**
-    * The first canvas created
+    * The first canvas created or set as root
     * @return
     */
-   public CanvasGuiCtx getCanvasCtxRoot() {
+   public CanvasGuiCtx getCanvasGCRoot() {
       return canvasCtxRoot;
    }
 
-   public CanvasAppliDrawable getCanvasRoot() {
-      return canvasRoot;
+   public CanvasAppliInputGui getCanvasRoot() {
+      if (canvasCtxRoot == null) {
+         return null;
+      }
+      return canvasCtxRoot.getCanvas();
    }
 
    public CmdCtx getCC() {
@@ -626,15 +619,17 @@ public class GuiCtx extends ABOCtx implements ITechCtxSettingsAppGui {
       return uiaCtrl;
    }
 
+   private ViewContext vcGhost;
+
    /**
-    * The root {@link ViewContext} of this {@link GuiCtx}
+    * Allows the creation of Drawable without a real Canvas but a Ghost canvas
+    * 
+    * to set a canvas, {@link Drawable#setViewContext(ViewContext)}
+    * 
     * @return
     */
-   public ViewContext getVCAppli() {
-      if (canvasRoot == null) {
-         throw new IllegalStateException("Initialize GuiCtx with at least 1 canvas");
-      }
-      return canvasRoot.getVCAppli();
+   public ViewContext getVCGhost() {
+      return vcGhost;
    }
 
    public ViewCommandListener getViewCommandListener() {
@@ -669,8 +664,12 @@ public class GuiCtx extends ABOCtx implements ITechCtxSettingsAppGui {
       uc.getWorkerThread().addToQueue(runnable);
    }
 
-   public void setCanvasCtxRoot(CanvasGuiCtx cac) {
-      this.canvasCtxRoot = cac;
+   /**
+    * Inverse of {@link GuiCtx#getCanvasGCRoot()}
+    * @param canvasGC
+    */
+   public void setCanvasGCRoot(CanvasGuiCtx canvasGC) {
+      this.canvasCtxRoot = canvasGC;
    }
 
    /**
@@ -696,22 +695,22 @@ public class GuiCtx extends ABOCtx implements ITechCtxSettingsAppGui {
 
       ByteObject settingsBO = getSettingsBO();
       int debugBarPosition = settingsBO.get1(ITechCtxSettingsAppGui.CTX_GUI_OFFSET_05_DEBUG_BAR_POSITION1);
-      bo.set1(ITechCanvasAppliDrawable.CANVAS_APP_DRW_OFFSET_05_DEBUG_BAR_POSITION1, debugBarPosition);
+      bo.set1(IBOCanvasAppliGui.CANVAS_APP_DRW_OFFSET_05_DEBUG_BAR_POSITION1, debugBarPosition);
 
       int debugMode = settingsBO.get1(ITechCtxSettingsAppGui.CTX_GUI_OFFSET_07_DEBUG_MODE1);
-      bo.set1(ITechCanvasAppliDrawable.CANVAS_APP_DRW_OFFSET_07_DEBUG_MODE1, debugMode);
+      bo.set1(IBOCanvasAppliGui.CANVAS_APP_DRW_OFFSET_07_DEBUG_MODE1, debugMode);
 
       int menuBarPosition = settingsBO.get1(ITechCtxSettingsAppGui.CTX_GUI_OFFSET_04_MENU_BAR_POSITION1);
-      bo.set1(ITechCanvasAppliDrawable.CANVAS_APP_DRW_OFFSET_04_MENU_BAR_POSITION1, menuBarPosition);
+      bo.set1(IBOCanvasAppliGui.CANVAS_APP_DRW_OFFSET_04_MENU_BAR_POSITION1, menuBarPosition);
 
       int menuBarType = settingsBO.get1(ITechCtxSettingsAppGui.CTX_GUI_OFFSET_06_MENU_BAR_TYPE1);
-      bo.set1(ITechCanvasAppliDrawable.CANVAS_APP_DRW_OFFSET_06_MENU_BAR_TYPE1, menuBarType);
+      bo.set1(IBOCanvasAppliGui.CANVAS_APP_DRW_OFFSET_06_MENU_BAR_TYPE1, menuBarType);
 
       boolean isOneThumb = settingsBO.hasFlag(ITechCtxSettingsAppGui.CTX_GUI_OFFSET_01_FLAG1, ITechCtxSettingsAppGui.CTX_GUI_FLAG_3_ONE_THUMB);
-      bo.setFlag(ITechCanvasAppliDrawable.CANVAS_APP_DRW_OFFSET_01_FLAG1, ITechCanvasAppliDrawable.CANVAS_APP_DRW_FLAG_3_ONE_THUMB, isOneThumb);
+      bo.setFlag(IBOCanvasAppliGui.CANVAS_APP_DRW_OFFSET_01_FLAG1, IBOCanvasAppliGui.CANVAS_APP_DRW_FLAG_3_ONE_THUMB, isOneThumb);
 
       boolean isUseMenuBar = settingsBO.hasFlag(ITechCtxSettingsAppGui.CTX_GUI_OFFSET_01_FLAG1, ITechCtxSettingsAppGui.CTX_GUI_FLAG_2_USER_MENU_BAR);
-      bo.setFlag(ITechCanvasAppliDrawable.CANVAS_APP_DRW_OFFSET_01_FLAG1, ITechCanvasAppliDrawable.CANVAS_APP_DRW_FLAG_4_USE_MENU_BAR, isUseMenuBar);
+      bo.setFlag(IBOCanvasAppliGui.CANVAS_APP_DRW_OFFSET_01_FLAG1, IBOCanvasAppliGui.CANVAS_APP_DRW_FLAG_4_USE_MENU_BAR, isUseMenuBar);
 
    }
 
@@ -720,7 +719,7 @@ public class GuiCtx extends ABOCtx implements ITechCtxSettingsAppGui {
          ByteObject techCanvasHost = getCUC().createBOCanvasHostDefault();
          ByteObject techCanvasAppli = createTechCanvasAppliDrawableDefault();
 
-         CanvasAppliDrawable canvas = new CanvasAppliDrawable(this, techCanvasAppli, techCanvasHost);
+         CanvasAppliInputGui canvas = new CanvasAppliInputGui(this, techCanvasAppli, techCanvasHost);
          //link to this canvas view 
          drawable.setViewContext(canvas.getVCAppli());
 

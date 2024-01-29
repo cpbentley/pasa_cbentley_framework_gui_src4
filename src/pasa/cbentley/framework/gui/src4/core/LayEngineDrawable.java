@@ -15,8 +15,8 @@ import pasa.cbentley.framework.gui.src4.interfaces.ITechDrawable;
 import pasa.cbentley.layouter.src4.engine.LayEngineRead;
 import pasa.cbentley.layouter.src4.engine.LayoutOperator;
 import pasa.cbentley.layouter.src4.engine.Zer2DRect;
-import pasa.cbentley.layouter.src4.tech.ITechLayout;
 import pasa.cbentley.layouter.src4.tech.IBOSizer;
+import pasa.cbentley.layouter.src4.tech.ITechLayout;
 
 /**
  * A 2D draw sizer defines the size of a rectangle relative to another one.
@@ -49,7 +49,6 @@ public class LayEngineDrawable extends LayEngineRead implements ITechLayout, ISt
     * Number of pixels that are substracted from dw.
     */
    protected int          minusW;
-
 
    /**
     * Never null. However, caching can be disabled
@@ -177,14 +176,13 @@ public class LayEngineDrawable extends LayEngineRead implements ITechLayout, ISt
       return drw;
    }
 
-   public int getPH() {
+   public int getPh() {
       return rect.getPh();
    }
 
-   public int getPW() {
+   public int getPw() {
       return rect.getPw();
    }
-
 
    public int getSizePotentialH() {
       return getSizeWComputed();
@@ -201,10 +199,6 @@ public class LayEngineDrawable extends LayEngineRead implements ITechLayout, ISt
       return getSizeWComputed();
    }
 
-   public StyleCache getStyleCache() {
-      return styleCache;
-   }
-
    /**
     * Current drawable width.
     * <br>
@@ -213,7 +207,6 @@ public class LayEngineDrawable extends LayEngineRead implements ITechLayout, ISt
    public int getW() {
       return rect.getW();
    }
-
 
    public int getX() {
       return rect.getX();
@@ -240,7 +233,33 @@ public class LayEngineDrawable extends LayEngineRead implements ITechLayout, ISt
       return hasFlagSizer(sizer, flag);
    }
 
+   public void incrPh(int ph) {
+      rect.incrPh(ph);
+   }
 
+   public void incrPw(int pw) {
+      rect.incrPw(pw);
+   }
+
+   public boolean isPhBiggerThanDh() {
+      return getPh() > getH();
+   }
+
+   public boolean isPwBiggerThanDw() {
+      return getPw() > getW();
+   }
+
+   public boolean isPwOrPhEqualsZero() {
+      return getPw() == 0 || getPh() == 0;
+   }
+
+   public void setPh(int ph) {
+      rect.setPh(ph);
+   }
+
+   public void setPw(int pw) {
+      rect.setPw(pw);
+   }
 
    public void setX(int x) {
       rect.setX(x);
@@ -339,4 +358,11 @@ public class LayEngineDrawable extends LayEngineRead implements ITechLayout, ISt
    }
    //#enddebug
 
+   public void setPwAsDw() {
+      rect.setPwAsDw();
+   }
+
+   public void setPhAsDh() {
+      rect.setPhAsDh();      
+   }
 }

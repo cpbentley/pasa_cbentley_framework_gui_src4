@@ -1,5 +1,6 @@
 package pasa.cbentley.framework.gui.src4.canvas;
 
+import pasa.cbentley.core.src4.logging.Dctx;
 import pasa.cbentley.framework.coreui.src4.tech.ITechInputFeedback;
 import pasa.cbentley.framework.gui.src4.anim.Realisator;
 import pasa.cbentley.framework.gui.src4.core.Drawable;
@@ -12,9 +13,7 @@ import pasa.cbentley.framework.input.src4.CanvasResult;
 import pasa.cbentley.framework.input.src4.ctx.IFlagsToStringInput;
 import pasa.cbentley.framework.input.src4.interfaces.ITechPaintThread;
 
-public class RepaintCtrlDrawable extends RepaintCtrl {
-
-   CanvasAppliDrawable                   canvasD;
+public class RepaintCtrlGui extends RepaintCtrl {
 
    /**
     * Base {@link ScreenResult}.
@@ -25,13 +24,16 @@ public class RepaintCtrlDrawable extends RepaintCtrl {
 
    protected final GuiCtx gc;
 
-   public RepaintCtrlDrawable(GuiCtx gc, CanvasAppliInput canvas) {
+   public RepaintCtrlGui(GuiCtx gc, CanvasAppliInput canvas) {
       super(gc.getIC(), canvas);
       this.gc = gc;
-      canvasD = (CanvasAppliDrawable) canvas;
-      if(this.getClass() == RepaintCtrlDrawable.class) {
+      if(this.getClass() == RepaintCtrlGui.class) {
          constructHelpers();
       }
+   }
+   
+   public CanvasAppliInputGui getCanvasAppliDrawable() {
+      return  (CanvasAppliInputGui)canvas;
    }
 
    public CanvasResult create(int id) {
@@ -182,7 +184,7 @@ public class RepaintCtrlDrawable extends RepaintCtrl {
          businessSR.setActionDoneRepaint(d);
 
          //force repaints
-         if (canvasD.hasDebugFlag(IFlagsToStringInput.Debug_8_ForceFullRepaints)) {
+         if (canvas.hasDebugFlag(IFlagsToStringInput.Debug_8_ForceFullRepaints)) {
             businessSR.setActionDoneRepaint();
          }
          businessSR.isRepaint();
@@ -206,4 +208,25 @@ public class RepaintCtrlDrawable extends RepaintCtrl {
    public CanvasResultDrawable getSD() {
       return (CanvasResultDrawable) getScreenResult();
    }
+   
+   //#mdebug
+   public void toString(Dctx dc) {
+      dc.root(this, RepaintCtrlGui.class, 220);
+      toStringPrivate(dc);
+      super.toString(dc.sup());
+   }
+
+   private void toStringPrivate(Dctx dc) {
+      
+   }
+
+   public void toString1Line(Dctx dc) {
+      dc.root1Line(this, RepaintCtrlGui.class);
+      toStringPrivate(dc);
+      super.toString1Line(dc.sup1Line());
+   }
+
+   //#enddebug
+   
+
 }

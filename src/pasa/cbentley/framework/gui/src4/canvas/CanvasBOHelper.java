@@ -1,15 +1,12 @@
 package pasa.cbentley.framework.gui.src4.canvas;
 
 import pasa.cbentley.byteobjects.src4.core.ByteObject;
-import pasa.cbentley.core.src4.ctx.UCtx;
-import pasa.cbentley.core.src4.logging.Dctx;
-import pasa.cbentley.core.src4.logging.IDLog;
 
-public class CanvasTechHelper implements ITechCanvasAppliDrawable {
+public class CanvasBOHelper implements IBOCanvasAppliGui {
 
-   private CanvasAppliDrawable canvas;
+   private CanvasAppliInputGui canvas;
 
-   public CanvasTechHelper(CanvasAppliDrawable canvas) {
+   public CanvasBOHelper(CanvasAppliInputGui canvas) {
       this.canvas = canvas;
    }
 
@@ -18,15 +15,15 @@ public class CanvasTechHelper implements ITechCanvasAppliDrawable {
    }
 
    /**
-    * {@link ITechCanvasAppliDrawable}
+    * {@link IBOCanvasAppliGui}
     * @return
     */
    private ByteObject getTechCanvasAppli() {
-      return canvas.getTechCanvasAppli();
+      return canvas.getBOCanvasAppli();
    }
 
    /**
-    * {@link ITechCanvasAppliDrawable#CANVAS_APP_DRW_OFFSET_09_PAINT_MODE1}
+    * {@link IBOCanvasAppliGui#CANVAS_APP_DRW_OFFSET_09_PAINT_MODE1}
     * @return
     */
    public int getPaintMode() {

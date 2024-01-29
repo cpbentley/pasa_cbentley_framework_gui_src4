@@ -82,7 +82,7 @@ public class ImageDrawable extends ViewDrawable {
          throw new NullPointerException();
       this.img = img;
       setStateFlag(ITechDrawable.STATE_14_CACHED, true);
-      setViewFlag(ITechViewDrawable.VIEW_GENE_28_NOT_SCROLLABLE, trim);
+      setFlagGene(ITechViewDrawable.FLAG_GENE_28_NOT_SCROLLABLE, trim);
    }
 
    /**
@@ -195,13 +195,17 @@ public class ImageDrawable extends ViewDrawable {
       }
    }
 
-   /**
-    * 
-    */
-   public void initViewDrawable(int width, int height) {
+   protected void initViewPortSub(int width, int height) {
+      //#debug
+      toDLog().pFlow("", this, ImageDrawable.class, "initViewPortSub@200", LVL_05_FINE, true);
+   }
+
+   public void initViewDrawable(LayEngineDrawable engine) {
       //image drawable just draws itself
-      ph = img.getHeight() + getStyleHConsumed();
-      pw = img.getWidth() + getStyleWConsumed();
+      int ph = img.getHeight() + getStyleHConsumed();
+      int pw = img.getWidth() + getStyleWConsumed();
+      layEngine.setPh(ph);
+      layEngine.setPw(pw);
    }
 
    public void setImage(RgbImage img) {
@@ -209,16 +213,27 @@ public class ImageDrawable extends ViewDrawable {
    }
 
    //#mdebug
-   public void toString(Dctx sb) {
-      sb.root(this, "ImageDrawable");
-      sb.nlLvl(img);
-      sb.nlLvlIgnoreNull("Filter", filter);
-      super.toString(sb.sup());
+   public void toString(Dctx dc) {
+      dc.root(this, ImageDrawable.class, 220);
+      toStringPrivate(dc);
+      super.toString(dc.sup());
+
+      dc.nlLvl(img);
+      dc.nlLvlIgnoreNull("Filter", filter);
+      dc.nlLvl(scale, "scale");
    }
 
-   public void toString1Line(Dctx sb) {
-      sb.root1Line(this, "ImageDrawable");
-      img.toString1Line(sb);
+   private void toStringPrivate(Dctx dc) {
+      dc.appendVarWithSpace("xincr", xincr);
+      dc.appendVarWithSpace("yincr", yincr);
    }
+
+   public void toString1Line(Dctx dc) {
+      dc.root1Line(this, ImageDrawable.class);
+      toStringPrivate(dc);
+      super.toString1Line(dc.sup1Line());
+   }
+
    //#enddebug
+
 }

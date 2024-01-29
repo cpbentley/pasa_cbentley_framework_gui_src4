@@ -3,9 +3,12 @@ package pasa.cbentley.framework.gui.src4.utils;
 import java.util.TimerTask;
 
 import pasa.cbentley.core.src4.ctx.UCtx;
+import pasa.cbentley.core.src4.interfaces.ITech;
 import pasa.cbentley.core.src4.logging.Dctx;
 import pasa.cbentley.core.src4.logging.IDLog;
 import pasa.cbentley.core.src4.logging.IStringable;
+import pasa.cbentley.core.src4.logging.ITechDev;
+import pasa.cbentley.core.src4.logging.ITechLvl;
 import pasa.cbentley.framework.gui.src4.ctx.GuiCtx;
 import pasa.cbentley.framework.gui.src4.interfaces.IDrawable;
 
@@ -48,7 +51,7 @@ public class RepaintTask extends TimerTask implements IStringable {
          }
       }
       //#debug
-      //toLog().printFlow("#RepaintTask Repainting for erasing Message " + id + " " + Thread.currentThread());
+      gc.toDLog().pFlow("RepaintTask Repainting for erasing Message " + id, this, RepaintTask.class, "run@54", ITechLvl.LVL_05_FINE, ITechDev.DEV_4_THREAD);
 
       //request a repaint but on which canvas? all? we don't know which canvas 
       d.getVC().getRepaintCtrlDraw().repaintDrawableCycleBusiness(null);

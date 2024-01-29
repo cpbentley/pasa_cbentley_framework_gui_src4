@@ -18,6 +18,7 @@ import pasa.cbentley.framework.gui.src4.ctx.IBOTypesGui;
 import pasa.cbentley.framework.gui.src4.interfaces.ITechCanvasDrawable;
 import pasa.cbentley.framework.gui.src4.interfaces.ITechDrawable;
 import pasa.cbentley.framework.gui.src4.table.TableView;
+import pasa.cbentley.framework.gui.src4.table.interfaces.ITechTable;
 import pasa.cbentley.framework.gui.src4.tech.ITechStringDrawable;
 
 /**
@@ -106,7 +107,7 @@ public class StringListInput extends StringDrawable implements IEventConsumer {
     */
    public void consumeEvent(BusEvent e) {
       if (e.getProducer() == listView) {
-         if (e.getEventID() == TableView.EVENT_ID_00_SELECT) {
+         if (e.getEventID() == ITechTable.EVENT_ID_00_SELECT) {
             //no parameter. just read the selected index from the TableView
             selectedModelIndex = listView.getSelectedIndex();
             updateString((InputConfig) e.getParamO2());
@@ -323,7 +324,7 @@ public class StringListInput extends StringDrawable implements IEventConsumer {
             listView.init(lw, lh);
             //position the table based on the area
             listView.setXY(this.getX(), this.getY());
-            listView.addEventListener(this, TableView.EVENT_ID_00_SELECT);
+            listView.addEventListener(this, ITechTable.EVENT_ID_00_SELECT);
          }
          //show it over
          listView.shShowDrawable(ic, ITechCanvasDrawable.SHOW_TYPE_1_OVER);

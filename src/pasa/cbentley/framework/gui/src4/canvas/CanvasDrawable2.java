@@ -24,7 +24,7 @@ import pasa.cbentley.framework.input.src4.InputState;
 import pasa.cbentley.framework.input.src4.CanvasResult;
 
 /**
- * Drawable to be used inside another {@link CanvasAppliDrawable}.
+ * Drawable to be used inside another {@link CanvasAppliInputGui}.
  * <br>
  * <br>
  * When Parent has an event, it.
@@ -44,7 +44,7 @@ public abstract class CanvasDrawable2 extends ObjectGC implements IDrawable {
 
    private int                   uiid;
 
-   protected CanvasAppliDrawable canvas;
+   protected CanvasAppliInputGui canvas;
 
 
    /**
@@ -52,11 +52,12 @@ public abstract class CanvasDrawable2 extends ObjectGC implements IDrawable {
     * @param cgc the canvas on which its being drawn.
     * @param canvas
     */
-   public CanvasDrawable2(CanvasGuiCtx cgc, CanvasAppliDrawable canvas, StyleClass sc) {
+   public CanvasDrawable2(CanvasGuiCtx cgc, CanvasAppliInputGui canvas, StyleClass sc) {
       super(cgc.getGC());
       this.cgc = cgc;
       this.canvas = canvas;
-      root = new Drawable(gc, sc, this);
+      root = new Drawable(gc, sc);
+      this.root.setParent(this);
       uiid = gc.getRepo().nextUIID();
    }
 
@@ -218,7 +219,7 @@ public abstract class CanvasDrawable2 extends ObjectGC implements IDrawable {
       return root.hasStateStyle(flag);
    }
 
-   public void init() {
+   public void initSize() {
       // TODO Auto-generated method stub
 
    }

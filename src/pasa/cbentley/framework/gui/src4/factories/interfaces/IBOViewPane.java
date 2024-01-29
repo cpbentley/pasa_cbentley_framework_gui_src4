@@ -91,9 +91,11 @@ public interface IBOViewPane extends IByteObject {
    public static final int VP_FLAGX_2_STYLE_VIEWPORT             = 1 << 1;
 
    /**
-    * Switch for drawing the style of the ViewDrawable as content
-    * <br>
+    * Flag for drawing the style of the {@link ViewDrawable} as content inside the ViewPane
+    * 
+    * <p>
     * The style used is always the ViewDrawable's style.
+    * </p>
     * 
     * No. Style is shown on first logic, then disappears.
     * style is shown on last logic if possible TODO
@@ -261,7 +263,7 @@ public interface IBOViewPane extends IByteObject {
     * <li>{@link TECH_VISUAL_3FILL}
     * <br>
     * <br>
-    * This should not be confused with Shrinking flags {@link ITechViewDrawable#VIEW_GENE_29_SHRINKABLE_W}.
+    * This should not be confused with Shrinking flags {@link ITechViewDrawable#FLAG_GENE_29_SHRINKABLE_W}.
     * <br>
     * This {@link IBOViewPane#VP_OFFSET_06_VISUAL_LEFT_OVER1} works when the ViewPane is scrolling the {@link ViewDrawable}
     * and some scrolling increments currenly shown do not need the whole ViewPort area.

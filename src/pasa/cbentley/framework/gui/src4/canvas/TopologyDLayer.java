@@ -11,6 +11,7 @@ import pasa.cbentley.framework.coreui.src4.tech.IInput;
 import pasa.cbentley.framework.drawx.src4.engine.GraphicsX;
 import pasa.cbentley.framework.gui.src4.core.Drawable;
 import pasa.cbentley.framework.gui.src4.ctx.GuiCtx;
+import pasa.cbentley.framework.gui.src4.ctx.ObjectGC;
 import pasa.cbentley.framework.gui.src4.interfaces.IAnimable;
 import pasa.cbentley.framework.gui.src4.interfaces.ITechCanvasDrawable;
 import pasa.cbentley.framework.gui.src4.interfaces.IDrawable;
@@ -88,27 +89,25 @@ import pasa.cbentley.framework.input.src4.ctx.IFlagsToStringInput;
  * @author Charles-Philip Bentley
  *
  */
-public class TopologyDLayer implements IStringable {
+public class TopologyDLayer extends ObjectGC {
 
-   private int            dlayerNextEmpty;
+   private int         dlayerNextEmpty;
 
-   private IDrawable[]    dlayers             = new IDrawable[10];
+   private IDrawable[] dlayers             = new IDrawable[10];
 
-   protected final GuiCtx gc;
+   private IDrawable[] intercepts          = new IDrawable[10];
 
-   private IDrawable[]    intercepts          = new IDrawable[10];
-
-   private int            nextEmptyIntercepts = 0;
+   private int         nextEmptyIntercepts = 0;
 
    /**
     * Number of Drawables in background Back
     */
-   private int            numBgs              = 0;
+   private int         numBgs              = 0;
 
-   private ViewContext    vc;
+   private ViewContext vc;
 
    public TopologyDLayer(GuiCtx gc, ViewContext vc) {
-      this.gc = gc;
+      super(gc);
       this.vc = vc;
    }
 
@@ -151,10 +150,17 @@ public class TopologyDLayer implements IStringable {
     * 
     */
    public void addDLayer(IDrawable view, int type) {
+      //avoid checking null by checking nu
+      if(dlayerNextEmpty == 0) {
+         dlayers[0] = view;
+         dlayerNextEmpty = 1;
+         return;
+      }
+      
       switch (type) {
          case ITechCanvasDrawable.SHOW_TYPE_0_REPLACE:
             //active exit animation of old drawable.
-            DrawableUtilz.aboutToHide(dlayers[0]);
+            dlayers[0].notifyEvent(ITechDrawable.EVENT_02_NOTIFY_HIDE);
             //just add the child as the root
             dlayers[0] = view;
             dlayerNextEmpty = 1;
@@ -215,7 +221,7 @@ public class TopologyDLayer implements IStringable {
    }
 
    /**
-    * Paint DLayer {@link Drawable}.
+    * Calls the {@link IDrawable#draw(GraphicsX)} methods on all
     * <br>
     * <br>
     * <br>
@@ -514,7 +520,7 @@ public class TopologyDLayer implements IStringable {
     * @param y
     * @return
     */
-   public IDrawable getDrawable(int x, int y, ExecutionCtxDraw ex) {
+   public IDrawable getDrawable(int x, int y, ExecutionContextGui ex) {
       for (int i = dlayerNextEmpty - 1; i >= 0; i--) {
          IDrawable d = dlayers[i];
          if (d != null) {
@@ -563,9 +569,12 @@ public class TopologyDLayer implements IStringable {
     * @param d
     */
    public void removeDrawable(IDrawable d) {
+      if(d == null) {
+         throw new NullPointerException();
+      }
       //#debug
       toDLog().pFlow("", d, TopologyDLayer.class, "removeDrawable", LVL_05_FINE, true);
-      DrawableUtilz.aboutToHide(d);
+      d.notifyEvent(ITechDrawable.EVENT_02_NOTIFY_HIDE);
       if (d.hasState(ITechDrawable.STATE_13_DISAPPEARING)) {
          return;
       } else {
@@ -617,7 +626,7 @@ public class TopologyDLayer implements IStringable {
    public void init() {
       for (int i = 0; i < dlayerNextEmpty; i++) {
          if (dlayers[i] != null) {
-            dlayers[i].init();
+            dlayers[i].initSize();
          }
       }
    }
@@ -650,38 +659,25 @@ public class TopologyDLayer implements IStringable {
    }
 
    //#mdebug
-   public String toString() {
-      return Dctx.toString(this);
+   public void toString(Dctx dc) {
+      dc.root(this, TopologyDLayer.class, 660);
+      toStringPrivate(dc);
+      super.toString(dc.sup());
+      dc.nlLvlArrayNotNull("Layers", dlayers, 0, dlayerNextEmpty);
+
+      dc.nlLvlArray1Line(intercepts, 0, nextEmptyIntercepts, "Intercepts");
    }
 
-   public IDLog toDLog() {
-      return gc.toDLog();
+   private void toStringPrivate(Dctx dc) {
+      dc.appendVarWithSpace("#Background Layers", numBgs);
    }
 
-   public void toString(Dctx sb) {
-      sb.root(this, TopologyDLayer.class);
-      sb.appendVarWithSpace("#Background Layers", numBgs);
-      Dctx dcLayers = sb.newLevel();
-      dcLayers.nlLvlArrayNotNull("Layers", dlayers, 0, dlayerNextEmpty);
-
-      sb.nlLvlArray1Line(intercepts, 0, nextEmptyIntercepts, "Intercepts");
-   }
-
-   public String toString1Line() {
-      return Dctx.toString1Line(this);
-   }
-
-   /**
-    * Called when  {@link Dctx} see the same object for another time
-    * @param dc
-    */
    public void toString1Line(Dctx dc) {
-      dc.root1Line(this, "Topology");
+      dc.root1Line(this, TopologyDLayer.class);
+      toStringPrivate(dc);
+      super.toString1Line(dc.sup1Line());
    }
 
-   public UCtx toStringGetUCtx() {
-      return gc.getUCtx();
-   }
    //#enddebug
 
 }

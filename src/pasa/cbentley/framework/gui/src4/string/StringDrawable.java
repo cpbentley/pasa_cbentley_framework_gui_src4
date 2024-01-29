@@ -519,7 +519,7 @@ public class StringDrawable extends ViewDrawable implements IBOStringDrawable, I
       //System.out.println("#StringDrawableContent InputMode=" + techDrawable.get1(IStringDrawable.INPUT_OFFSET_06_MODE1));
       //draw the caret
       //TODO set clip only if needed. use a helper perf flag for that.
-      if (hasViewFlag(ITechViewDrawable.VIEWSTATE_01_CLIP)) {
+      if (hasFlagView(ITechViewDrawable.FLAG_VSTATE_01_CLIP)) {
          //g.clipSet(getContentX(), getContentY(), getContentW(), getContentH());
       }
       //DrawableUtilz.debugScrollConfigs("StringDrawable.drawContent", scX, scY);
@@ -584,7 +584,7 @@ public class StringDrawable extends ViewDrawable implements IBOStringDrawable, I
       }
 
       //check to reset clip area.
-      if (hasViewFlag(ITechViewDrawable.VIEWSTATE_01_CLIP)) {
+      if (hasFlagView(ITechViewDrawable.FLAG_VSTATE_01_CLIP)) {
          // g.clipReset();
       }
 
@@ -609,9 +609,9 @@ public class StringDrawable extends ViewDrawable implements IBOStringDrawable, I
     * <li>Take the biggest of the units.
     * <li>
     * <br>
-    * Set {@link ITechViewDrawable#VIEWSTATE_06_NO_EAT_W_MUST_EXPAND} when width <= 0. 
+    * Set {@link ITechViewDrawable#FLAG_VSTATE_06_NO_EAT_W_MUST_EXPAND} when width <= 0. 
     * <br>
-    * Set {@link ITechViewDrawable#VIEWSTATE_07_NO_EAT_H_MUST_EXPAND} when height <= 0.
+    * Set {@link ITechViewDrawable#FLAG_VSTATE_07_NO_EAT_H_MUST_EXPAND} when height <= 0.
     *  <br>
     * <br>
     * <br>
@@ -921,8 +921,8 @@ public class StringDrawable extends ViewDrawable implements IBOStringDrawable, I
     */
    public int getSizePreferredHeight() {
       //TODO
-      if (hasViewFlag(VIEWSTATE_08_PREF_SIZE_COMPUTED)) {
-         return ph;
+      if (hasFlagView(FLAG_VSTATE_08_PREF_SIZE_COMPUTED)) {
+         return layEngine.getPh();
       } else {
          int strType = getStringType();
          if (strType == ITechStringDrawable.TYPE_1_TITLE) {
@@ -952,21 +952,23 @@ public class StringDrawable extends ViewDrawable implements IBOStringDrawable, I
          initStringer.setBreakWH(breakWidth, breakHeight);
          initStringer.setBreakMaxLines(maxLines);
          initStringer.buildAgain();
-         pw = metrics.getPrefWidth();
-         ph = metrics.getPrefHeight();
-         //
+         int pw = metrics.getPrefWidth();
+         int ph = metrics.getPrefHeight();
+         
+         layEngine.setPh(ph);
+         layEngine.setPw(pw);
 
          //clipping is only necessary when partial strings are drawn.
-         if ((hasViewFlag(VIEWSTATE_22_SCROLLED))) {
+         if ((hasFlagView(FLAG_VSTATE_22_SCROLLED))) {
             if (viewPane != null && viewPane.isContentClipped()) {
                //TODO is this possible?
                //clipping is also needed when init style is smaller than some state styles?
-               setViewFlag(ITechViewDrawable.VIEWSTATE_01_CLIP, true);
+               setFlagView(ITechViewDrawable.FLAG_VSTATE_01_CLIP, true);
             } else {
-               setViewFlag(ITechViewDrawable.VIEWSTATE_01_CLIP, false);
+               setFlagView(ITechViewDrawable.FLAG_VSTATE_01_CLIP, false);
             }
          } else {
-            setViewFlag(ITechViewDrawable.VIEWSTATE_01_CLIP, false);
+            setFlagView(ITechViewDrawable.FLAG_VSTATE_01_CLIP, false);
          }
       }
    }
@@ -1034,8 +1036,10 @@ public class StringDrawable extends ViewDrawable implements IBOStringDrawable, I
          initStringer.setBreakWH(breakWidth, breakHeight);
          initStringer.setBreakMaxLines(maxLines);
          initStringer.buildAgain();
-         pw = metrics.getPrefWidth();
-         ph = metrics.getPrefHeight();
+         int pw = metrics.getPrefWidth();
+         int ph = metrics.getPrefHeight();
+         layEngine.setPw(pw);
+         layEngine.setPh(ph);
          super.addStyleToPrefSize();
          //----------------------------
 
@@ -1046,16 +1050,16 @@ public class StringDrawable extends ViewDrawable implements IBOStringDrawable, I
          //         }
          //setDwDh(width, height); string type overrides sizer
          //clipping is only necessary when partial strings are drawn.
-         if ((hasViewFlag(VIEWSTATE_22_SCROLLED))) {
+         if ((hasFlagView(FLAG_VSTATE_22_SCROLLED))) {
             if (viewPane != null && viewPane.isContentClipped()) {
                //TODO is this possible?
                //clipping is also needed when init style is smaller than some state styles?
-               setViewFlag(ITechViewDrawable.VIEWSTATE_01_CLIP, true);
+               setFlagView(ITechViewDrawable.FLAG_VSTATE_01_CLIP, true);
             } else {
-               setViewFlag(ITechViewDrawable.VIEWSTATE_01_CLIP, false);
+               setFlagView(ITechViewDrawable.FLAG_VSTATE_01_CLIP, false);
             }
          } else {
-            setViewFlag(ITechViewDrawable.VIEWSTATE_01_CLIP, false);
+            setFlagView(ITechViewDrawable.FLAG_VSTATE_01_CLIP, false);
          }
 
          //set flags nav
@@ -1068,13 +1072,13 @@ public class StringDrawable extends ViewDrawable implements IBOStringDrawable, I
    private void initViewDrawableCharType(int width, int height) {
       if (width <= 0) {
          setDw(getStringer().getMetrics().getPrefCharWidth());
-         pw = getDw();
+         layEngine.setPwAsDw();
       }
       if (height <= 0) {
          setDh(getStringer().getMetrics().getPrefCharHeight());
-         ph = getDh();
+         layEngine.setPhAsDh();
       }
-      setViewFlag(ITechViewDrawable.VIEWSTATE_01_CLIP, false);
+      setFlagView(ITechViewDrawable.FLAG_VSTATE_01_CLIP, false);
    }
 
    /**
@@ -1327,24 +1331,24 @@ public class StringDrawable extends ViewDrawable implements IBOStringDrawable, I
             setShrink(false, false);
             break;
          case ITechStringDrawable.TYPE_1_TITLE:
-            setViewFlag(ITechViewDrawable.VIEW_GENE_28_NOT_SCROLLABLE, true);
-            setViewFlag(ITechViewDrawable.VIEWSTATE_12_CONTENT_W_DEPENDS_VIEWPORT, true);
+            setFlagView(ITechViewDrawable.FLAG_GENE_28_NOT_SCROLLABLE, true);
+            setFlagView(ITechViewDrawable.FLAG_VSTATE_12_CONTENT_W_DEPENDS_VIEWPORT, true);
             setShrink(false, true); //shrink vertically
             break;
          case ITechStringDrawable.TYPE_2_SCROLL_H:
             setShrink(false, true);
-            setViewFlag(ITechViewDrawable.VIEWSTATE_07_NO_EAT_H_MUST_EXPAND, true);
+            setFlagView(ITechViewDrawable.FLAG_VSTATE_07_NO_EAT_H_MUST_EXPAND, true);
             break;
          case ITechStringDrawable.TYPE_3_SCROLL_V:
             setShrink(false, true);
             //setViewFlag(IViewDrawable.VIEWSTATE_10_CONTENT_WIDTH_FOLLOWS_VIEWPORT, true);
-            setViewFlag(ITechViewDrawable.VIEWSTATE_12_CONTENT_W_DEPENDS_VIEWPORT, true);
+            setFlagView(ITechViewDrawable.FLAG_VSTATE_12_CONTENT_W_DEPENDS_VIEWPORT, true);
             break;
          case ITechStringDrawable.TYPE_4_NATURAL_NO_WRAP:
             setShrink(false, false);
             break;
          case ITechStringDrawable.TYPE_5_CHAR:
-            setViewFlag(ITechViewDrawable.VIEW_GENE_28_NOT_SCROLLABLE, true);
+            setFlagView(ITechViewDrawable.FLAG_GENE_28_NOT_SCROLLABLE, true);
             break;
          default:
             break;
@@ -1352,13 +1356,13 @@ public class StringDrawable extends ViewDrawable implements IBOStringDrawable, I
    }
 
    /**
-    * Sets flags like {@link ITechViewDrawable#VIEWSTATE_10_CONTENT_PW_VIEWPORT_DW}
+    * Sets flags like {@link ITechViewDrawable#FLAG_VSTATE_10_CONTENT_PW_VIEWPORT_DW}
     * @param type
     */
    public void setViewFlags(int type) {
       switch (type) {
          case ITechStringDrawable.TYPE_3_SCROLL_V:
-            setViewFlag(ITechViewDrawable.VIEWSTATE_10_CONTENT_PW_VIEWPORT_DW, true);
+            setFlagView(ITechViewDrawable.FLAG_VSTATE_10_CONTENT_PW_VIEWPORT_DW, true);
             break;
          default:
       }
@@ -1397,7 +1401,7 @@ public class StringDrawable extends ViewDrawable implements IBOStringDrawable, I
    public void stringUpdate() {
       this.layoutInvalidate(false);
       //layout 
-      init();
+      initSize();
    }
 
    /**

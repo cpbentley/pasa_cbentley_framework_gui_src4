@@ -1,10 +1,7 @@
 package pasa.cbentley.framework.gui.src4.string;
 
-import pasa.cbentley.core.src4.ctx.UCtx;
 import pasa.cbentley.core.src4.interfaces.C;
 import pasa.cbentley.core.src4.logging.Dctx;
-import pasa.cbentley.core.src4.logging.IDLog;
-import pasa.cbentley.framework.cmd.src4.ctx.CmdCtx;
 import pasa.cbentley.framework.cmd.src4.engine.CmdInstance;
 import pasa.cbentley.framework.cmd.src4.engine.CmdNode;
 import pasa.cbentley.framework.cmd.src4.engine.MCmd;
@@ -14,6 +11,7 @@ import pasa.cbentley.framework.gui.src4.canvas.InputConfig;
 import pasa.cbentley.framework.gui.src4.core.StyleClass;
 import pasa.cbentley.framework.gui.src4.core.ViewDrawable;
 import pasa.cbentley.framework.gui.src4.ctx.GuiCtx;
+import pasa.cbentley.framework.gui.src4.ctx.ObjectGC;
 import pasa.cbentley.framework.gui.src4.forms.ListRoot;
 import pasa.cbentley.framework.gui.src4.interfaces.ITechCanvasDrawable;
 import pasa.cbentley.framework.gui.src4.interfaces.IValidable;
@@ -21,8 +19,8 @@ import pasa.cbentley.framework.gui.src4.tech.ITechViewPane;
 
 /**
  * Used to show a dialog asking the user for a string. This is always part of a {@link CmdInstance} that is not yet
- * executed. The {@link InputRequestStr} job is to get the string parameter for the command.
- * <br>
+ * executed. The {@link RequestStringInput} job is to get the string parameter for the command.
+ * 
  * Or just gets a confirmation or cancel
  * <br>
  * <br>
@@ -34,7 +32,7 @@ import pasa.cbentley.framework.gui.src4.tech.ITechViewPane;
  * <li>{@link CmdController#CMD_05_CANCEL}
  * <br>
  * <br>
- * The {@link InputRequestStr} creates a command with the String in parameter
+ * The {@link RequestStringInput} creates a command with the String in parameter
  * This is the mechanism used for getting the feedback to the object requesting
  * <br>
  * <br>
@@ -42,35 +40,30 @@ import pasa.cbentley.framework.gui.src4.tech.ITechViewPane;
  * @author Charles-Philip
  *
  */
-public class InputRequestStr implements ICommandable {
+public class RequestStringInput extends ObjectGC implements ICommandable {
 
-   CmdCtx                 cc;
+   protected CmdInstance  ci;
 
-   CmdInstance            ci;
+   protected CmdNode      cmdNodeEditStr;
 
-   CmdNode            ctxEditStr;
-
-   protected final GuiCtx gc;
-
-   ICommandable           icon;
+   protected ICommandable icon;
 
    private StringDrawable sd;
 
-   IValidable             validator;
+   protected IValidable   validator;
 
-   public InputRequestStr(GuiCtx gc, StyleClass scStr, String title) {
+   public RequestStringInput(GuiCtx gc, StyleClass scStr, String title) {
+      super(gc);
 
-      this.gc = gc;
-      cc = gc.getCC();
-      ctxEditStr = cc.createCmdNode(null, "EditStr");
-      ctxEditStr.addMenuCmd(cc.CMD_04_OK);
-      ctxEditStr.addMenuCmd(cc.CMD_05_CANCEL);
+      cmdNodeEditStr = cc.createCmdNode(null, "EditStr");
+      cmdNodeEditStr.addMenuCmd(cc.CMD_04_OK);
+      cmdNodeEditStr.addMenuCmd(cc.CMD_05_CANCEL);
 
-      ctxEditStr.setListener(this);
+      cmdNodeEditStr.setListener(this);
 
       sd = new StringDrawable(gc, scStr, "");
 
-      sd.setCmdCtx(ctxEditStr);
+      sd.setCmdNote(cmdNodeEditStr);
 
       sd.getEditModule();
 
@@ -104,7 +97,7 @@ public class InputRequestStr implements ICommandable {
    }
 
    public CmdNode getCmdNode() {
-      return ctxEditStr;
+      return cmdNodeEditStr;
    }
 
    public ViewDrawable getView() {
@@ -118,28 +111,15 @@ public class InputRequestStr implements ICommandable {
    public void show(ICommandable icon, CmdInstance ci) {
       this.icon = icon;
       this.ci = ci;
-      //  Controller.getMe().loadDrawableCmds(d);
-      // Controller.getMe().newFocusKey(ic, d);
+
       sd.shShowDrawable((InputConfig) ci.getFeedback(), ITechCanvasDrawable.SHOW_TYPE_1_OVER);
    }
 
-   
    //#mdebug
-   public IDLog toDLog() {
-      return toStringGetUCtx().toDLog();
-   }
-
-   public String toString() {
-      return Dctx.toString(this);
-   }
-
    public void toString(Dctx dc) {
-      dc.root(this, "InputRequestStr");
+      dc.root(this, RequestStringInput.class, 130);
       toStringPrivate(dc);
-   }
-
-   public String toString1Line() {
-      return Dctx.toString1Line(this);
+      super.toString(dc.sup());
    }
 
    private void toStringPrivate(Dctx dc) {
@@ -147,17 +127,11 @@ public class InputRequestStr implements ICommandable {
    }
 
    public void toString1Line(Dctx dc) {
-      dc.root1Line(this, "InputRequestStr");
+      dc.root1Line(this, RequestStringInput.class);
       toStringPrivate(dc);
-   }
-
-   public UCtx toStringGetUCtx() {
-      return gc.getUCtx();
+      super.toString1Line(dc.sup1Line());
    }
 
    //#enddebug
-   
-
-
 
 }

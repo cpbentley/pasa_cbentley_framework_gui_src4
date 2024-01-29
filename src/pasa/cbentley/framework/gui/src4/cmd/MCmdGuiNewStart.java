@@ -4,7 +4,7 @@ import pasa.cbentley.byteobjects.src4.core.ByteObject;
 import pasa.cbentley.core.src4.event.BusEvent;
 import pasa.cbentley.core.src4.event.IEventConsumer;
 import pasa.cbentley.framework.coreui.src4.utils.ViewState;
-import pasa.cbentley.framework.gui.src4.canvas.CanvasAppliDrawable;
+import pasa.cbentley.framework.gui.src4.canvas.CanvasAppliInputGui;
 import pasa.cbentley.framework.gui.src4.canvas.InputConfig;
 import pasa.cbentley.framework.gui.src4.ctx.GuiCtx;
 import pasa.cbentley.framework.gui.src4.ctx.ITechCtxSettingsAppGui;
@@ -20,7 +20,7 @@ public class MCmdGuiNewStart extends MCmdGui implements IEventConsumer {
 
    public void execute(InputConfig ic) {
       CmdInstanceDrawable cmd = ic.getCmdInstance();
-      CanvasAppliDrawable cv = gc.getCanvasRoot();
+      CanvasAppliInputGui cv = gc.getCanvasRoot();
       AppliGui appliGui = gc.getAppli();
       IDrawable firstDrawable = null;
       //check if  view state

@@ -13,7 +13,7 @@ import pasa.cbentley.framework.drawx.src4.engine.GraphicsX;
 import pasa.cbentley.framework.drawx.src4.engine.RgbImage;
 import pasa.cbentley.framework.drawx.src4.string.StringMetrics;
 import pasa.cbentley.framework.gui.src4.anim.move.Move;
-import pasa.cbentley.framework.gui.src4.canvas.ExecutionCtxDraw;
+import pasa.cbentley.framework.gui.src4.canvas.ExecutionContextGui;
 import pasa.cbentley.framework.gui.src4.canvas.InputConfig;
 import pasa.cbentley.framework.gui.src4.canvas.PointerGestureDrawable;
 import pasa.cbentley.framework.gui.src4.canvas.ViewContext;
@@ -62,7 +62,7 @@ import pasa.cbentley.layouter.src4.tech.ITechSizer;
  * <br>
  * <br>
  * <b>Shrink Semantics</b> : <br>
- * Specialize the meaning of {@link ITechViewDrawable#VIEW_GENE_29_SHRINKABLE_W} and {@link ITechViewDrawable#VIEW_GENE_30_SHRINKABLE_H}. <br>
+ * Specialize the meaning of {@link ITechViewDrawable#FLAG_GENE_29_SHRINKABLE_W} and {@link ITechViewDrawable#FLAG_GENE_30_SHRINKABLE_H}. <br>
  * {@link ViewDrawable} shrinks to preferred size<br>.
  * The purpose of Shrink behaviors is to reduce drawable dimension (dw and dh) to preferred dimension +
  * the planetaries of the {@link ViewPane} <br>
@@ -110,44 +110,11 @@ public class ViewDrawable extends Drawable implements ITechViewDrawable {
    }
 
    /**
-    * The number of pixels this ViewDrawable needs vertically
-    * When pw < dw : either shrank
-    * <br>
-    * <br>
-    * Value includes style pixels
-    * <br>
-    * Value is initialized by {@link StringMetrics}.
-    */
-   protected int      ph;
-
-   /**
-    * The number of pixels this ViewDrawable's content needs horizontally
-    * pw = dw <=> ViewPane == null.
-    * <br>
-    * The preferred width is computed based on ViewDrawable's content
-    * and {@link LayEngineDrawable} definitions.
-    * <br>
-    * Value does not style pixels which are computed relative to preferred size.
-    * <br>
-    * The style is drawn 
-    * <li> {@link ITechViewPane#DRW_STYLE_0_VIEWDRAWABLE}
-    * <li> {@link ITechViewPane#DRW_STYLE_1_VIEWPANE}
-    * 
-    * Value is initialized by {@link StringMetrics}.
-    * When {@link ITechViewPane#DRW_STYLE_3_INSIDE_CONTENT} is true, the style is content
-    * and that case style is part of the preferred size.
-    * Often {@link ImageDrawable} will use style as content.
-    * <br>
-    * When a ViewPane is created, the preferred size might increase due to a header
-    * <br>
-    * Preferred size does not decrease.
-    */
-   protected int      pw;
-
-   /**
     * Specific state for the {@link ViewDrawable} class, related to {@link ViewPane}.
     */
-   protected int      viewFlags;
+   protected int      flagsView;
+
+   protected int      flagsGene;
 
    /**
     * The implicit view pane. It will manage drawable headers and scrollbars.
@@ -200,19 +167,21 @@ public class ViewDrawable extends Drawable implements ITechViewDrawable {
     * to redimensioin the ViewPort and the Scrollbars
     */
    protected void activateShrinkExpandFlags() {
+      int pw = layEngine.getPw();
       if (pw < getDw()) {
          if (layEngine.hasFlagSizerW(IBOSizer.SIZER_FLAG_2_ALLOW_SHRINK)) {
             setDw(pw);
          }
-         if (hasViewFlag(VIEW_GENE_29_SHRINKABLE_W)) {
+         if (hasFlagGene(FLAG_GENE_29_SHRINKABLE_W)) {
             setDw(pw);
          }
       }
+      int ph = layEngine.getPh();
       if (ph < getDh()) {
          if (layEngine.hasFlagSizerH(IBOSizer.SIZER_FLAG_2_ALLOW_SHRINK)) {
             setDw(pw);
          }
-         if (hasViewFlag(VIEW_GENE_30_SHRINKABLE_H)) {
+         if (hasFlagGene(FLAG_GENE_30_SHRINKABLE_H)) {
             setDh(ph);
          }
       }
@@ -226,8 +195,8 @@ public class ViewDrawable extends Drawable implements ITechViewDrawable {
     * When style dimension is relative preferred size ?
     */
    public void addStyleToPrefSize() {
-      pw += getStyleWConsumed();
-      ph += getStyleHConsumed();
+      layEngine.incrPh(getStyleHConsumed());
+      layEngine.incrPw(getStyleWConsumed());
    }
 
    public void commandAction(CmdInstance cmd) {
@@ -246,21 +215,6 @@ public class ViewDrawable extends Drawable implements ITechViewDrawable {
          //override sizer and pozers since viewpane is layout controlled
          viewPane.getLayEngine().setManualOverride(true);
       }
-   }
-
-   private void doInit(LayEngineDrawable ds) {
-      //based on cue sizers, subclass computes its preferred size.
-      //sizers might be contextual, init without any planetaries.
-      initViewDrawable(ds);
-
-      initDrawSize(ds);
-
-      //FILL or shrink? o
-
-      //after the first call. dw and dh are positive if correctly initialized. set the dh,dw so the ViewPane can init itself
-      //System.out.println("#ViewDrawable#init = #1 dw=" + dw + " dh=" + dh + " pw=" + pw + " ph=" + ph + " "+ this.toStringOneLine());
-      //once dw and dh are computed from the context
-      setPreferredTunedTDrawn();
    }
 
    public void doUndraw() {
@@ -567,7 +521,7 @@ public class ViewDrawable extends Drawable implements ITechViewDrawable {
       }
    }
 
-   public IDrawable getDrawable(int x, int y, ExecutionCtxDraw ex) {
+   public IDrawable getDrawable(int x, int y, ExecutionContextGui ex) {
       if (viewPane != null) {
          return viewPane.getDrawable(x, y, null);
       } else {
@@ -575,7 +529,7 @@ public class ViewDrawable extends Drawable implements ITechViewDrawable {
       }
    }
 
-   public IDrawable getDrawableViewPort(int x, int y, ExecutionCtxDraw ex) {
+   public IDrawable getDrawableViewPort(int x, int y, ExecutionContextGui ex) {
       return this;
    }
 
@@ -674,7 +628,7 @@ public class ViewDrawable extends Drawable implements ITechViewDrawable {
     * @return
     */
    public int getPreferredContentHeight() {
-      return ph - getStyleHConsumed();
+      return getSizePreferredHeight() - getStyleHConsumed();
    }
 
    /**
@@ -682,7 +636,7 @@ public class ViewDrawable extends Drawable implements ITechViewDrawable {
     * @return
     */
    public int getPreferredContentWidth() {
-      return pw - getStyleWConsumed();
+      return getSizePreferredWidth() - getStyleWConsumed();
    }
 
    /**
@@ -690,53 +644,36 @@ public class ViewDrawable extends Drawable implements ITechViewDrawable {
     * in its computation.
     */
    public int getPreferredHeight() {
-      return ph;
+      return getSizePreferredHeight();
    }
 
    /**
+    * The number of pixels this ViewDrawable's content needs horizontally
+    * pw = dw <=> ViewPane == null.
+    * <br>
+    * The preferred width is computed based on ViewDrawable's content
+    * and {@link LayEngineDrawable} definitions.
+    * <br>
+    * Value does not style pixels which are computed relative to preferred size.
+    * <br>
+    * The style is drawn 
+    * <li> {@link ITechViewPane#DRW_STYLE_0_VIEWDRAWABLE}
+    * <li> {@link ITechViewPane#DRW_STYLE_1_VIEWPANE}
+    * 
+    * Value is initialized by {@link StringMetrics}.
+    * When {@link ITechViewPane#DRW_STYLE_3_INSIDE_CONTENT} is true, the style is content
+    * and that case style is part of the preferred size.
+    * Often {@link ImageDrawable} will use style as content.
+    * <br>
+    * When a ViewPane is created, the preferred size might increase due to a header
+    * <br>
+    * Preferred size does not decrease.
     * Preferred width. Entirely content related. Totally unaware of {@link ViewPane}
     * in its computation.
     */
    public int getPreferredWidth() {
-      return pw;
+      return getSizePreferredWidth();
    }
-
-   /**
-    * Initialize <b>preferred</b> width and height of Drawable with {@link IDrawable#DIMENSION_API} semantics.
-    * <br>
-    * <br>
-    * Compute drawable width and height when :
-    * <li>width/height is 0 or negative.
-    * <br>
-    * <br>
-    * Based on those 4 values, a ViewPane may be created. <br>
-    * <br>
-    * Unless {@link ITechViewDrawable#VIEW_GENE_28_NOT_SCROLLABLE} is set, it creates a scrolling view when preferred sizes are bigger than
-    * drawable sizes.
-    * <br>
-    * <br>
-    * On the other hand if preferred sizes are smaller than drawable sizes, <b>shrink flags</b> will take effect
-    * and reduce drawable sizes to preferred sizes.
-    * <br>
-    * <br>
-    * Width and Height have each their own shrink flag {@link ITechViewDrawable#VIEW_GENE_29_SHRINKABLE_W} and {@link ITechViewDrawable#VIEW_GENE_30_SHRINKABLE_H}
-    * <br>
-    * <br>
-    * Return early when state {@link IDrawable#STATE_05_LAYOUTED} is set and dimension is unchanged.
-    * <br>
-    * <br>
-    * Once the drawn height and width are known, the super method {@link Drawable#init(int, int)} is called.
-    * <br>
-    * <br>
-    * Calls {@link ViewDrawable#initViewDrawable(int, int)} at the end.
-    * <br>
-    * <br>
-    */
-   //   public void init(int width, int height) {
-   //      //parent initialization of dw and dh
-   //      super.init(width, height);
-   //
-   //   }
 
    public ScrollConfig getSChorizontal() {
       if (viewPane != null) {
@@ -752,31 +689,35 @@ public class ViewDrawable extends Drawable implements ITechViewDrawable {
       return null;
    }
 
-   public int getSizeH(int sizeType) {
-      if (sizeType == ITechSizer.SIZER_PROP_05_CONTENT) {
-         return getViewPortContentH();
-      } else if (sizeType == ITechSizer.SIZER_PROP_01_PREFERRED) {
-         return ph;
-      } else {
-         return super.getSizeH(sizeType);
-      }
+   public int getSizeContentWidth() {
+      return layEngine.getContentW();
    }
 
    public int getSizePreferredWidth() {
-      return layEngine.getPW();
+      return layEngine.getPw();
    }
 
    public int getSizePreferredHeight() {
-      return layEngine.getPH();
+      return layEngine.getPh();
    }
 
-   public int getSizeW(int sizeType) {
+   public int getSizePropertyValueH(int sizeType) {
+      if (sizeType == ITechSizer.SIZER_PROP_05_CONTENT) {
+         return getViewPortContentH();
+      } else if (sizeType == ITechSizer.SIZER_PROP_01_PREFERRED) {
+         return getPreferredHeight();
+      } else {
+         return super.getSizePropertyValueH(sizeType);
+      }
+   }
+
+   public int getSizePropertyValueW(int sizeType) {
       if (sizeType == ITechSizer.SIZER_PROP_05_CONTENT) {
          return getViewPortContentW();
       } else if (sizeType == ITechSizer.SIZER_PROP_01_PREFERRED) {
-         return pw;
+         return getPreferredContentWidth();
       } else {
-         return super.getSizeW(sizeType);
+         return super.getSizePropertyValueW(sizeType);
       }
    }
 
@@ -822,11 +763,11 @@ public class ViewDrawable extends Drawable implements ITechViewDrawable {
       GraphicsX g = ri.getGraphicsX();
       //we needed not erase of special stuff. full
       g.setPaintCtxFlag(ITechCanvasDrawable.REPAINT_01_FULL, true);
-      boolean hasClip = hasViewFlag(VIEWSTATE_01_CLIP);
-      setViewFlag(VIEWSTATE_01_CLIP, false);
+      boolean hasClip = hasFlagView(FLAG_VSTATE_01_CLIP);
+      setFlagView(FLAG_VSTATE_01_CLIP, false);
       //
       drawViewDrawableContent(g, 0, 0, scx, scy);
-      setViewFlag(VIEWSTATE_01_CLIP, hasClip);
+      setFlagView(FLAG_VSTATE_01_CLIP, hasClip);
       return ri;
    }
 
@@ -891,8 +832,17 @@ public class ViewDrawable extends Drawable implements ITechViewDrawable {
       return getDw();
    }
 
-   public boolean hasViewFlag(int flag) {
-      return (viewFlags & flag) == flag;
+   /**
+    * <li>
+    * @param flag
+    * @return
+    */
+   public boolean hasFlagView(int flag) {
+      return (flagsView & flag) == flag;
+   }
+
+   public boolean hasFlagGene(int flag) {
+      return (flagsGene & flag) == flag;
    }
 
    /**
@@ -920,10 +870,10 @@ public class ViewDrawable extends Drawable implements ITechViewDrawable {
     * {@link ISizer}s definitions.
     * <br>
     * <br>
-    * PRE: Called by {@link Drawable#init()}
+    * PRE: Called by {@link Drawable#initSize()}
     * <br>
     */
-   public void initDrawable(LayEngineDrawable ds) {
+   protected void initDrawableSub() {
       if (hasState(ITechDrawable.STATE_08_NO_RELAYOUTING)) {
          //we check again because we don't know what happened in the super method
          return;
@@ -931,18 +881,29 @@ public class ViewDrawable extends Drawable implements ITechViewDrawable {
       //if we have a ViewPane with satellite, they might eat into the available space
 
       //first do init with raw values given. compute as if no viewpane
-      doInit(ds);
-      setViewFlag(VIEWSTATE_08_PREF_SIZE_COMPUTED, true);
+      //based on cue sizers, subclass computes its preferred size.
+      //sizers might be contextual, init without any planetaries.
+      initViewDrawable(layEngine);
 
-      if (this.getDebugName() == "matcher") {
-         toLog().pInit("After First doInit", this, ViewDrawable.class, "initDrawable");
+      initDrawSize();
+
+      //FILL or shrink? o
+
+      //after the first call. dw and dh are positive if correctly initialized. set the dh,dw so the ViewPane can init itself
+      //System.out.println("#ViewDrawable#init = #1 dw=" + dw + " dh=" + dh + " pw=" + pw + " ph=" + ph + " "+ this.toStringOneLine());
+      //once dw and dh are computed from the context
+      setPreferredTunedTDrawn();
+      setFlagView(FLAG_VSTATE_08_PREF_SIZE_COMPUTED, true);
+
+      if (this.toStringGetName() == "matcher") {
+         toDLog().pInit("After First doInit", this, ViewDrawable.class, "initDrawable");
       }
 
       //those pixel values will be used to init several times the viewpane
       //
       //save our sizers because we will receive new ones from the ViewPane
-      int viewPaneW = ds.getW(); //outer bounds that may be shrank a little by ViewPane policies
-      int viewPaneH = ds.getH(); //or increased by Expand Planets
+      int viewPaneW = layEngine.getW(); //outer bounds that may be shrank a little by ViewPane policies
+      int viewPaneH = layEngine.getH(); //or increased by Expand Planets
 
       //new sizers
 
@@ -951,7 +912,7 @@ public class ViewDrawable extends Drawable implements ITechViewDrawable {
       //ViewPane scrollbar creation
       boolean isScrolling = isScrollingNeeded();
       if (viewPane != null) {
-         boolean isViewPaneNeeded = isScrolling || hasViewFlag(ITechViewDrawable.VIEWSTATE_25_HEADERED);
+         boolean isViewPaneNeeded = isScrolling || hasFlagView(ITechViewDrawable.FLAG_VSTATE_25_HEADERED);
          if (isViewPaneNeeded) {
             //viewPane is not null because headers planetaries have been set
             viewPane.initViewPane(viewPaneW, viewPaneH);
@@ -1063,23 +1024,22 @@ public class ViewDrawable extends Drawable implements ITechViewDrawable {
     * Once preferred size are computed (or not if not possible)
     * <br>
     * Drawable sizes that depends on context are computed.
-    * @param ds
+    * @param layEngine
     */
-   public void initDrawSize(LayEngineDrawable ds) {
+   protected void initDrawSize() {
       //once preferred size is known, the actual drawn size is computed 
       //when preferred size was not computed, that means there is no preference is drawn.
       //now based on preferred values computed. adjust the contextual drawing sizes
 
       //taking into account the style
-      if (ds.isContextualW()) {
+      if (layEngine.isContextualW()) {
          //when contextual, headers cannot eat into our viewport area
-         this.setViewFlag(VIEWSTATE_06_NO_EAT_W_MUST_EXPAND, true);
-         ds.layoutUpdateSizeWCheck();
+         this.setFlagView(FLAG_VSTATE_06_NO_EAT_W_MUST_EXPAND, true);
+         layEngine.layoutUpdateSizeWCheck();
       }
-      if (ds.isContextualH()) {
-         this.setViewFlag(VIEWSTATE_07_NO_EAT_H_MUST_EXPAND, true);
-         ds.layoutUpdateSizeHCheck();
-         //computeContextualViewedHeight(ds);
+      if (layEngine.isContextualH()) {
+         this.setFlagView(FLAG_VSTATE_07_NO_EAT_H_MUST_EXPAND, true);
+         layEngine.layoutUpdateSizeHCheck();
       }
 
       int dw = getDw();
@@ -1090,8 +1050,8 @@ public class ViewDrawable extends Drawable implements ITechViewDrawable {
       setDh(dh + styleHConsumed);
 
       //at the end compute the style which might use the current Drawable context to compute etalon value
-      ds.addStyleToWidth(style);
-      ds.addStyleToHeight(style);
+      layEngine.addStyleToWidth(style);
+      layEngine.addStyleToHeight(style);
 
    }
 
@@ -1144,15 +1104,6 @@ public class ViewDrawable extends Drawable implements ITechViewDrawable {
    }
 
    /**
-    * Overriden by subclasses to initialize preferred dimension of Drawable {@link ViewDrawable#pw} and {@link ViewDrawable#ph}. <br> 
-    * Shrinking flags are <b>not</b> called here.
-    */
-   public void initViewDrawable() {
-
-   }
-
-   /**
-    * Overriden by subclasses to initialize preferred dimension of Drawable {@link ViewDrawable#pw} and {@link ViewDrawable#ph}. <br> 
     * <br>
     * Width and Height values follow the rules defined in {@link IDrawable#init(int, int)}. <br>
     * <br>
@@ -1177,9 +1128,9 @@ public class ViewDrawable extends Drawable implements ITechViewDrawable {
    }
 
    /**
-    * Initialize preferred size based on {@link LayEngineDrawable} and content of the ViewDrawable.
+    * Initialize preferred size to {@link LayEngineDrawable} based on {@link LayEngineDrawable} and content of the ViewDrawable.
     * <br>
-    * Will be called again Size given by the {@link ViewPane}. 
+    * Will be called again once another Size is given by the {@link ViewPane} if one is created. 
     * 
     * This computation of the preferred size does not include the style.
     * 
@@ -1202,7 +1153,7 @@ public class ViewDrawable extends Drawable implements ITechViewDrawable {
     * Tech in ViewPane setting the slave
     * <br>
     * When Flag 
-    * {@link ITechViewDrawable#VIEW_GENE_27_HEADER_TOP_PW}
+    * {@link ITechViewDrawable#FLAG_VSTATE_27_HEADER_TOP_PW}
     * 
     * @param ds
     * @param contentWidth
@@ -1214,23 +1165,25 @@ public class ViewDrawable extends Drawable implements ITechViewDrawable {
 
    /**
     * The first init method computes the base size.
-    * Afterwards ViewPane call this update.
-    * Sub class overrides {@link ViewDrawable#initViewPortSub(int, int)}.
-    * Where all it has to do is recalibrate the preferred size
-    * This method is called by the {@link ViewPane} when it has computed a new ViewPort dimension.
-    * <br>
-    * Default behavior is to call {@link ViewDrawable#initViewDrawable(int, int)}.
-    * <br>
-    * <br>
-    * Sets the drawable
     * 
-    * @param width positive ViewPort size
+    * <li>Afterwards ViewPane call this update.
+    * <li>Sub class overrides {@link ViewDrawable#initViewPortSub(int, int)}.
+    * Where all it has to do is recalibrate the preferred size
+    * <li>This method is called by the {@link ViewPane} when it has computed a new ViewPort dimension.
+    * 
+    * <p>
+    * 
+    * Default behavior is to call {@link ViewDrawable#initViewDrawable(int, int)}.
+    * Sets the drawable
+    * </p>
+    * 
+    * @param width positive ViewPort width size in pixels
     * @param height positive ViewPort height in pixels
     */
    public void initViewPort(int width, int height) {
       if (width <= 0) {
          //#debug
-         toLog().pInit("width=" + width + " height=" + height, this, ViewDrawable.class, "initViewPort");
+         toDLog().pInit("width=" + width + " height=" + height, this, ViewDrawable.class, "initViewPort");
          throw new IllegalArgumentException("" + width);
       }
       if (height <= 0) {
@@ -1246,8 +1199,7 @@ public class ViewDrawable extends Drawable implements ITechViewDrawable {
       initViewPortSub(width, height);
 
       if (viewPane.hasViewDrwStyle()) {
-         pw += getStyleWConsumed();
-         ph += getStyleHConsumed();
+         addStyleToPrefSize();
       }
    }
 
@@ -1259,7 +1211,7 @@ public class ViewDrawable extends Drawable implements ITechViewDrawable {
     * of the content with {@link ITechViewPane#DRW_STYLE_3_INSIDE_CONTENT}
     * <br>
     * If {@link ITechViewPane#DRW_STYLE_2_VIEWPORT} is set, caller will 
-    * add style to the preferred size.
+    * add ViewPort's style to the preferred size.
     * <br>
     * @param width Pixel size of the Viewport. Style is already taken out.
     * @param height Pixel size of the Viewport. Style is already taken out.
@@ -1270,7 +1222,7 @@ public class ViewDrawable extends Drawable implements ITechViewDrawable {
 
    public void invalidateLayout() {
       super.invalidateLayout();
-      setViewFlag(VIEWSTATE_08_PREF_SIZE_COMPUTED, false);
+      setFlagView(FLAG_VSTATE_08_PREF_SIZE_COMPUTED, false);
    }
 
    /**
@@ -1311,10 +1263,10 @@ public class ViewDrawable extends Drawable implements ITechViewDrawable {
     * <br>
     * That happens when either of those flags are set:
     * 
-    * <li> {@link ITechViewDrawable#VIEWSTATE_10_CONTENT_PW_VIEWPORT_DW}
-    * <li> {@link ITechViewDrawable#VIEWSTATE_11_CONTENT_PH_VIEWPORT_DH}
-    * <li> {@link ITechViewDrawable#VIEWSTATE_12_CONTENT_W_DEPENDS_VIEWPORT}
-    * <li> {@link ITechViewDrawable#VIEWSTATE_13_CONTENT_H_DEPENDS_VIEWPORT}
+    * <li> {@link ITechViewDrawable#FLAG_VSTATE_10_CONTENT_PW_VIEWPORT_DW}
+    * <li> {@link ITechViewDrawable#FLAG_VSTATE_11_CONTENT_PH_VIEWPORT_DH}
+    * <li> {@link ITechViewDrawable#FLAG_VSTATE_12_CONTENT_W_DEPENDS_VIEWPORT}
+    * <li> {@link ITechViewDrawable#FLAG_VSTATE_13_CONTENT_H_DEPENDS_VIEWPORT}
    
     * <br>
     * <br>
@@ -1324,10 +1276,10 @@ public class ViewDrawable extends Drawable implements ITechViewDrawable {
     * @return
     */
    public boolean isMalleable() {
-      if (hasViewFlag(VIEWSTATE_13_CONTENT_H_DEPENDS_VIEWPORT) || hasViewFlag(VIEWSTATE_12_CONTENT_W_DEPENDS_VIEWPORT)) {
+      if (hasFlagView(FLAG_VSTATE_13_CONTENT_H_DEPENDS_VIEWPORT) || hasFlagView(FLAG_VSTATE_12_CONTENT_W_DEPENDS_VIEWPORT)) {
          return true;
       }
-      return hasViewFlag(VIEWSTATE_10_CONTENT_PW_VIEWPORT_DW) || hasViewFlag(VIEWSTATE_11_CONTENT_PH_VIEWPORT_DH);
+      return hasFlagView(FLAG_VSTATE_10_CONTENT_PW_VIEWPORT_DW) || hasFlagView(FLAG_VSTATE_11_CONTENT_PH_VIEWPORT_DH);
    }
 
    /**
@@ -1360,10 +1312,10 @@ public class ViewDrawable extends Drawable implements ITechViewDrawable {
     * @return
     */
    public boolean isScrollingNeeded() {
-      if (hasViewFlag(VIEW_GENE_28_NOT_SCROLLABLE)) {
+      if (hasFlagGene(FLAG_GENE_28_NOT_SCROLLABLE)) {
          return false;
       }
-      return (pw > getDw() || ph > getDh());
+      return (layEngine.isPwBiggerThanDw() || layEngine.isPhBiggerThanDh());
    }
 
    /**
@@ -1386,7 +1338,7 @@ public class ViewDrawable extends Drawable implements ITechViewDrawable {
     */
    public void layoutInvalidate(boolean topDown) {
       super.layoutInvalidate(topDown);
-      setViewFlag(VIEWSTATE_08_PREF_SIZE_COMPUTED, false);
+      setFlagView(FLAG_VSTATE_08_PREF_SIZE_COMPUTED, false);
       if (viewPane != null) {
          viewPane.layoutInvalidate(false);
       }
@@ -1626,17 +1578,16 @@ public class ViewDrawable extends Drawable implements ITechViewDrawable {
    }
 
    /**
-    * Sets the header in the {@link ViewPane}.
-    * <br>
-    * Calling this method invalidates the layout? Yes.
-    * <br>
-    * <br>
-    * TODO? May the size of headers influence the preffered size? MLogViewer title bigger than Shrank Width
+    * Sets the header {@link IDrawable} in the {@link ViewPane}.
+    * 
+    * <li>Calling this method invalidates the layout? Yes.
+    * <li>TODO? May the size of headers influence the preffered size? MLogViewer title bigger than Shrank Width
     * Yes. Parameter
-    * <br>
-    * Planetary have their settings include sizer. 
+    * <li>Planetary have their settings include sizer. 
     * In case of a Title set as a top header.
     * <br>
+    * 
+    * <p>
     * 
     * The {@link ViewPane} gives a width constraint for Top and Bot headers.
     * This value must be respected unless. The sizer in parameters will try to influence
@@ -1647,12 +1598,15 @@ public class ViewDrawable extends Drawable implements ITechViewDrawable {
     * ViewPane header can have max sizer constraint, telling max 1/3 parent, min 1 logic for title string
     * with minimum having advantage. 
     * Is Eat mode is sizing? No. This mode is independant.
+    * </p>
+    * 
+    * <p>
     * 
     * What if Sizer has a shrink flag? It will shrink
     * Parent of Headers is the ViewPane.
-    * <br>
+    * </p>
     * @param d
-    * @param pos {@link C#POS_0_TOP}
+    * @param pos {@link C#POS_0_TOP} or {@link C#POS_1_BOT} or {@link C#POS_2_LEFT} or {@link C#POS_3_RIGHT}
     * @param mode planetary mode {@link ITechViewPane#PLANET_MODE_0_EAT} or {@link ITechViewPane#PLANET_MODE_1_EXPAND}
     */
    public void setHeader(IDrawable d, int pos, int mode) {
@@ -1660,8 +1614,18 @@ public class ViewDrawable extends Drawable implements ITechViewDrawable {
          createViewPane();
       }
       viewPane.setHeader(d, pos, mode);
-      setViewFlag(ITechViewDrawable.VIEWSTATE_25_HEADERED, true);
+      setFlagView(ITechViewDrawable.FLAG_VSTATE_25_HEADERED, true);
       invalidateLayout();
+   }
+
+   /**
+    * {@link ViewDrawable#setHeader(IDrawable, int, int)} with 
+    * <li> {@link C#POS_0_TOP};
+    * <li> {@link ITechViewPane#PLANET_MODE_0_EAT}
+    * @param d
+    */
+   public void setHeaderEatTop(IDrawable d) {
+      this.setHeader(d, C.POS_0_TOP, ITechViewPane.PLANET_MODE_0_EAT);
    }
 
    /**
@@ -1674,7 +1638,7 @@ public class ViewDrawable extends Drawable implements ITechViewDrawable {
          createViewPane();
       }
       viewPane.setHeaderClose(d, pos);
-      setViewFlag(ITechViewDrawable.VIEWSTATE_25_HEADERED, true);
+      setFlagView(ITechViewDrawable.FLAG_VSTATE_25_HEADERED, true);
       invalidateLayout();
    }
 
@@ -1689,7 +1653,7 @@ public class ViewDrawable extends Drawable implements ITechViewDrawable {
          createViewPane();
       }
       viewPane.setHeaderSized(d, pos, mode);
-      setViewFlag(ITechViewDrawable.VIEWSTATE_25_HEADERED, true);
+      setFlagView(ITechViewDrawable.FLAG_VSTATE_25_HEADERED, true);
 
    }
 
@@ -1707,8 +1671,8 @@ public class ViewDrawable extends Drawable implements ITechViewDrawable {
     * @param h
     */
    public void setPreferredSize(int w, int h) {
-      pw = w;
-      ph = h;
+      layEngine.setPh(h);
+      layEngine.setPw(w);
    }
 
    /**
@@ -1728,6 +1692,8 @@ public class ViewDrawable extends Drawable implements ITechViewDrawable {
     * Depends on minimum size
     */
    protected void setPreferredTunedTDrawn() {
+      int pw = getPreferredWidth();
+      int ph = getPreferredHeight();
       if (getDw() <= 0) {
          setDw(pw);
       }
@@ -1738,7 +1704,8 @@ public class ViewDrawable extends Drawable implements ITechViewDrawable {
          //preferred height was not computed by ViewDrawable
          if (getDh() > 0) {
             //takes the drawn. There won't be any scrolling since ph = dh.
-            ph = getDh();
+            int newPh = getDh();
+            layEngine.setPh(newPh);
          } else {
             //how can dh be 0 with style? style must be blank as well.
             //when drawable h 
@@ -1748,7 +1715,8 @@ public class ViewDrawable extends Drawable implements ITechViewDrawable {
       }
       if (pw == 0) {
          if (getDw() > 0) {
-            pw = getDw();
+            int newPw = getDw();
+            layEngine.setPw(newPw);
          } else {
             setBehaviorFlag(ITechDrawable.BEHAVIOR_02_EMPTY, true);
             throw new IllegalStateException("pw=" + pw + " dw =" + getDw());
@@ -1759,7 +1727,7 @@ public class ViewDrawable extends Drawable implements ITechViewDrawable {
    /**
     * Sets behaviour flags for the policy towards using extra unused pixel space that is when preferred size is smaller
     * than given size.
-    * <li> {@link ITechViewDrawable#VIEW_GENE_29_SHRINKABLE_W}
+    * <li> {@link ITechViewDrawable#FLAG_GENE_29_SHRINKABLE_W}
     * <li> {@link ITechViewDrawable#VIEW_GENE_29_SHRINKABLE_H}
     * <br>
     * <br>
@@ -1767,8 +1735,8 @@ public class ViewDrawable extends Drawable implements ITechViewDrawable {
     * @param h
     */
    public void setShrink(boolean w, boolean h) {
-      setViewFlag(VIEW_GENE_29_SHRINKABLE_W, w);
-      setViewFlag(VIEW_GENE_30_SHRINKABLE_H, h);
+      setFlagGene(FLAG_GENE_29_SHRINKABLE_W, w);
+      setFlagGene(FLAG_GENE_30_SHRINKABLE_H, h);
    }
 
    /**
@@ -1786,35 +1754,6 @@ public class ViewDrawable extends Drawable implements ITechViewDrawable {
       super.setStateFlag(flag, value);
    }
 
-   /**
-    * <li>Read the version of the class state.
-    * <li>Branch based on version or throw an {@link IllegalArgumentException}
-    * <li>Set state
-    * @param vs
-    */
-   public void setStateFrom(ViewState vs) {
-      super.setStateFrom(vs);
-      int ver = vs.readVersion();
-      if (ver == VER_VIEW_DRAW_01) {
-         viewFlags = vs.readInt();
-      } else {
-         vs.wrongVersion(ver);
-      }
-   }
-
-   /**
-    * Asks the {@link ViewPane} and link its viewstate
-    * <br>
-    * <br>
-    * See {@link Drawable#getViewState()}
-    */
-   public void setStateTo(ViewState vs) {
-      super.setStateTo(vs);
-      vs.setVersion(VER_VIEW_DRAW_01);
-      vs.writeInt(viewFlags);
-      //we don't set preferred size because it will be re-computed?
-   }
-
    public void setStyleClass(StyleClass sc) {
       super.setStyleClass(sc);
       if (viewPane != null) {
@@ -1823,29 +1762,18 @@ public class ViewDrawable extends Drawable implements ITechViewDrawable {
       }
    }
 
-   public void setViewFlag(int flag, boolean value) {
-      if (flag == VIEWSTATE_02_REPAINTING_CONTENT) {
+   protected void setFlagView(int flag, boolean value) {
+      if (flag == FLAG_VSTATE_02_REPAINTING_CONTENT) {
          //throw new NullPointerException();
       }
-      viewFlags = BitUtils.setFlag(viewFlags, flag, value);
+      flagsView = BitUtils.setFlag(flagsView, flag, value);
    }
 
-   //#enddebug
-
-   /**
-    * 
-    */
-   public void setViewState(ViewState vs) {
-      super.setViewState(vs);
-      if (vs != null) {
-         ViewState ns = vs.getMyState(ViewState.VS_INDEX_VIEWDRAWABLE);
-         if (ns != null) {
-            if (viewPane != null) {
-               ViewState vpState = vs.getMyState(ViewState.VS_INDEX_VIEWDRAWABLE);
-               viewPane.setViewState(vpState);
-            }
-         }
+   public void setFlagGene(int flag, boolean value) {
+      if (flag == FLAG_VSTATE_02_REPAINTING_CONTENT) {
+         //throw new NullPointerException();
       }
+      flagsGene = BitUtils.setFlag(flagsGene, flag, value);
    }
 
    /**
@@ -1862,10 +1790,11 @@ public class ViewDrawable extends Drawable implements ITechViewDrawable {
    //#mdebug
 
    public void toString(Dctx dc) {
-      dc.root(this, ViewDrawable.class);
-      ////
-      dc.appendVarWithSpace("pw", pw);
-      dc.appendVarWithSpace("ph", ph);
+      dc.root(this, ViewDrawable.class, 1890);
+      toStringPrivate(dc);
+      super.toString(dc.sup());
+      dc.appendVarWithSpace("pw", layEngine.getPw());
+      dc.appendVarWithSpace("ph", layEngine.getPh());
 
       dc.append(' ');
       dc.append("ContentXYWH=" + getContentX());
@@ -1893,12 +1822,10 @@ public class ViewDrawable extends Drawable implements ITechViewDrawable {
       ToStringStaticGui.toStringViewStates(this, dc);
       //sb.append(nl);
       dc.append("  ");
-      ToStringStaticGui.toStringViewBehavior(this, dc);
+      ToStringStaticGui.toStringViewGenes(this, dc);
       //When not
       dc.append(" Malleable=" + isMalleable());
       dc.append(" ScrollingNeeded=" + isScrollingNeeded());
-
-      super.toString(dc.sup());
 
       if (dc.hasFlagData(gc, IFlagsToStringGui.D_FLAG_17_VIEW_PANE)) {
          //Debug the ViewPane
@@ -1908,10 +1835,16 @@ public class ViewDrawable extends Drawable implements ITechViewDrawable {
       }
    }
 
+   private void toStringPrivate(Dctx dc) {
+
+   }
+
    public void toString1Line(Dctx dc) {
       dc.root1Line(this, ViewDrawable.class);
-      dc.append(" " + getDebugName());
+      toStringPrivate(dc);
+      super.toString1Line(dc.sup1Line());
    }
+
    //#enddebug
 
 }

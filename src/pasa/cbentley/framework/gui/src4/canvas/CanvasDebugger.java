@@ -58,7 +58,7 @@ public class CanvasDebugger extends Drawable {
    public CanvasDebugger(GuiCtx gc) {
       super(gc, gc.getClass(0));
       sb = new StringBBuilder(gc.getUCtx());
-      setDebugName("CanvasDebugger");
+      toStringSetName("CanvasDebugger");
    }
 
    /**
@@ -111,7 +111,7 @@ public class CanvasDebugger extends Drawable {
       IMFont f = gc.getCDC().getFontFactory().getFontDebug();
       int primitiveTally = g.getPrimitivetTally();
       int rgbTally = g.getRgbCount();
-      int numLayers = gc.getVCAppli().getTopo().getNumLayers();
+      int numLayers = gc.getCanvasRoot().getVCAppli().getTopo().getNumLayers();
       g.setColor(255, 255, 255);
       g.setFont(f);
       g.fillRect(0, 0, getDrawnWidth(), f.getHeight() * 2);
@@ -179,7 +179,7 @@ public class CanvasDebugger extends Drawable {
          dx += CharOpt.draw(g, y, dx, dy, f);
          dx += CharOpt.draw(g, " ", dx, dy, f);
          int mod = isd.getMode();
-         dx += CharOpt.draw(g, ToStringStaticCoreUi.getStringMod(mod), dx, dy, f);
+         dx += CharOpt.draw(g, ToStringStaticCoreUi.toStringMod(mod), dx, dy, f);
          int key = isd.getKeyCode();
          dx += CharOpt.draw(g, " ", dx, dy, f);
          dx += CharOpt.draw(g, key, dx, dy, f);

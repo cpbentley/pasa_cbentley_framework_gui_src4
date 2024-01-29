@@ -5,7 +5,7 @@ import pasa.cbentley.core.src4.logging.Dctx;
 import pasa.cbentley.framework.coredraw.src4.ctx.CoreDrawCtx;
 import pasa.cbentley.framework.coreui.src4.ctx.CoreUiCtx;
 import pasa.cbentley.framework.coreui.src4.tech.IBOCanvasHost;
-import pasa.cbentley.framework.gui.src4.canvas.CanvasAppliDrawable;
+import pasa.cbentley.framework.gui.src4.canvas.CanvasAppliInputGui;
 import pasa.cbentley.framework.gui.src4.ctx.config.IConfigCanvasGui;
 import pasa.cbentley.framework.gui.src4.interfaces.IDrawable;
 import pasa.cbentley.framework.gui.src4.menu.CmdMenuBar;
@@ -18,7 +18,7 @@ import pasa.cbentley.framework.input.src4.ctx.InputCtx;
  * 
  * {@link GuiCtx} singletons are components shared by all canvases in a the {@link GuiCtx} of an application.
  * 
- * Dissociated from {@link CanvasAppliDrawable} implementation so that you can have different implementations
+ * Dissociated from {@link CanvasAppliInputGui} implementation so that you can have different implementations
  * 
  * Singletons that belong to a Canvas, are located in this class.
  * 
@@ -30,10 +30,13 @@ import pasa.cbentley.framework.input.src4.ctx.InputCtx;
  */
 public class CanvasGuiCtx extends ObjectGC {
 
-   protected final CanvasAppliDrawable canvas;
+   protected final CanvasAppliInputGui canvas;
 
-   public CanvasGuiCtx(GuiCtx gc, CanvasAppliDrawable canvas) {
+   public CanvasGuiCtx(GuiCtx gc, CanvasAppliInputGui canvas) {
       super(gc);
+      if (canvas == null) {
+         throw new NullPointerException();
+      }
       this.canvas = canvas;
    }
 
@@ -41,7 +44,11 @@ public class CanvasGuiCtx extends ObjectGC {
       canvas.getIC().exitInputContext();
    }
 
-   public CanvasAppliDrawable getCanvas() {
+   /**
+    * never null
+    * @return
+    */
+   public CanvasAppliInputGui getCanvas() {
       return canvas;
    }
 
@@ -66,9 +73,9 @@ public class CanvasGuiCtx extends ObjectGC {
    }
 
    public IDrawable getRootDrawable() {
-      return canvas.getRoot();
+      return canvas.getTopoViewDrawable();
    }
-   
+
    //#mdebug
    public void toString(Dctx dc) {
       dc.root(this, CanvasGuiCtx.class, 90);
@@ -77,7 +84,7 @@ public class CanvasGuiCtx extends ObjectGC {
    }
 
    private void toStringPrivate(Dctx dc) {
-      
+
    }
 
    public void toString1Line(Dctx dc) {
@@ -87,7 +94,5 @@ public class CanvasGuiCtx extends ObjectGC {
    }
 
    //#enddebug
-   
-
 
 }

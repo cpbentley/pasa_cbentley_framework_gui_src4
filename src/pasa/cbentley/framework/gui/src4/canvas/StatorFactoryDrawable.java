@@ -19,7 +19,7 @@ public class StatorFactoryDrawable implements ITechStatorableGui, IStatorFactory
    public Object[] createArray(int classID, int size) {
       switch (classID) {
          case CLASSID_01_CANVAS_DRAWABLE:
-           return new CanvasAppliDrawable[size];
+           return new CanvasAppliInputGui[size];
          default:
             break;
       }
@@ -27,7 +27,7 @@ public class StatorFactoryDrawable implements ITechStatorableGui, IStatorFactory
    }
 
    public boolean isSupported(IStatorable statorable) {
-      if(statorable.getClass() == CanvasAppliDrawable.class) {
+      if(statorable.getClass() == CanvasAppliInputGui.class) {
          return true;
       }
       return false;
@@ -51,6 +51,6 @@ public class StatorFactoryDrawable implements ITechStatorableGui, IStatorFactory
       StatorReaderBO srbo = (StatorReaderBO)reader;
       ByteObject boCanvasHost = srbo.readByteObject();
       ByteObject boCanvasAppli = srbo.readByteObject();
-      return new CanvasAppliDrawable(gc,boCanvasAppli,boCanvasHost);
+      return new CanvasAppliInputGui(gc,boCanvasAppli,boCanvasHost);
    }
 }

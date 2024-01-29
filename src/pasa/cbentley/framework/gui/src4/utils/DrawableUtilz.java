@@ -14,11 +14,6 @@ import pasa.cbentley.framework.input.src4.InputState;
 
 public class DrawableUtilz {
 
-   public static void aboutToHide(IDrawable d) {
-      if (d != null) {
-         d.notifyEvent(ITechDrawable.EVENT_02_NOTIFY_HIDE);
-      }
-   }
 
    /**
     * Sets state flag to visible.

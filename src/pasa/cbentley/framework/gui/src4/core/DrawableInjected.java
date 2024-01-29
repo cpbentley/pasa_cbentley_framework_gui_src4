@@ -22,7 +22,8 @@ public class DrawableInjected extends Drawable {
    private IDrawListener dl;
 
    public DrawableInjected(GuiCtx gc, StyleClass sc, IDrawable parent, IDrawListener lis) {
-      super(gc, sc, parent);
+      super(gc, sc);
+      this.setParent(parent);
       this.dl = lis;
    }
 
@@ -50,6 +51,6 @@ public class DrawableInjected extends Drawable {
 
    public void toString1Line(Dctx dc) {
       dc.root(this, "DrawableInjected");
-      dc.appendWithSpace(" " + getDebugName());
+      dc.appendWithSpace(" " + toStringGetName());
    }
 }

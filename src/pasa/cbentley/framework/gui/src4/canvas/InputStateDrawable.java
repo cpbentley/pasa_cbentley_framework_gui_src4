@@ -12,12 +12,13 @@ import pasa.cbentley.framework.input.src4.InputState;
 import pasa.cbentley.framework.input.src4.gesture.GestureDetector;
 
 /**
- * Created by the {@link CanvasAppliDrawable} is a {@link CanvasAppliInput} is a {@link DisplayableAbstract}.
+ * Created by the {@link CanvasAppliInputGui} is a {@link CanvasAppliInput} is a {@link DisplayableAbstract}.
  * <br>
  * Extends {@link InputState} to handle input on {@link IDrawable}s.
  * <br>
  * <li> tracks dragged {@link IDrawable}
  * <li> drawable under a pointer
+ * 
  * @author Charles Bentley
  *
  */
@@ -25,7 +26,7 @@ public class InputStateDrawable extends InputState {
 
    protected final GuiCtx gc;
 
-   public InputStateDrawable(GuiCtx gc, CanvasAppliDrawable mc) {
+   public InputStateDrawable(GuiCtx gc, CanvasAppliInputGui mc) {
       super(gc.getIC(), mc);
       this.gc = gc;
    }

@@ -304,16 +304,17 @@ public class ScrollBar extends Drawable implements IBOScrollBar, IDrawableListen
     */
    private void createWrapperTwo() {
       StyleClass leftSC = styleClass.getStyleClass(IBOTypesGui.LINK_52_STYLE_SCROLLBAR_TOP_LEFT_WRAPPER);
-      topLeftFigure = new Drawable(gc, leftSC, this);
-      
+      topLeftFigure = new Drawable(gc, leftSC);
+      topLeftFigure.setParent(this);
       topLeftFigure.setBehaviorFlag(ITechDrawable.BEHAVIOR_23_PARENT_EVENT_CONTROL, true);
       //debug
-      topLeftFigure.setDebugName("Fig" + (hasTechFlag(SB_FLAG_1_VERT) ? "Top" : "Left"));
+      topLeftFigure.toStringSetName("Fig" + (hasTechFlag(SB_FLAG_1_VERT) ? "Top" : "Left"));
       StyleClass rightStyleKey = styleClass.getStyleClass(IBOTypesGui.LINK_53_STYLE_SCROLLBAR_BOT_RIGHT_WRAPPER);
-      botRightFigure = new Drawable(gc, rightStyleKey, this);
+      botRightFigure = new Drawable(gc, rightStyleKey);
+      botRightFigure.setParent(this);
       botRightFigure.setBehaviorFlag(ITechDrawable.BEHAVIOR_23_PARENT_EVENT_CONTROL, true);
       //debug
-      botRightFigure.setDebugName("Fig" + (hasTechFlag(SB_FLAG_1_VERT) ? "Bottom" : "Right"));
+      botRightFigure.toStringSetName("Fig" + (hasTechFlag(SB_FLAG_1_VERT) ? "Bottom" : "Right"));
    }
 
    /**
@@ -347,8 +348,8 @@ public class ScrollBar extends Drawable implements IBOScrollBar, IDrawableListen
       botRightFigure.setBehaviorFlag(ITechDrawable.BEHAVIOR_23_PARENT_EVENT_CONTROL, true);
 
       //debug
-      topLeftFigure.setDebugName("Fig" + (hasTechFlag(SB_FLAG_1_VERT) ? "Top" : "Left"));
-      botRightFigure.setDebugName("Fig" + (hasTechFlag(SB_FLAG_1_VERT) ? "Bottom" : "Right"));
+      topLeftFigure.toStringSetName("Fig" + (hasTechFlag(SB_FLAG_1_VERT) ? "Top" : "Left"));
+      botRightFigure.toStringSetName("Fig" + (hasTechFlag(SB_FLAG_1_VERT) ? "Bottom" : "Right"));
    }
 
    public void debugBB(GraphicsX g) {
@@ -900,7 +901,7 @@ public class ScrollBar extends Drawable implements IBOScrollBar, IDrawableListen
          throw new NullPointerException("Null Style");
       }
       //debug
-      setDebugName("Scrollbar " + (hasTechFlag(SB_FLAG_1_VERT) ? "Vertical" : "Horizontal"));
+      toStringSetName("Scrollbar " + (hasTechFlag(SB_FLAG_1_VERT) ? "Vertical" : "Horizontal"));
    }
 
    /**
@@ -1268,7 +1269,7 @@ public class ScrollBar extends Drawable implements IBOScrollBar, IDrawableListen
       repaintScrollbarAndContent(ic);
 
       //generates call drag method on View
-      pane.getViewed().manageDragCallBack(this);
+      pane.getViewDrawable().manageDragCallBack(this);
       if (trailer != null) {
          if (trailer.hasState(ITechDrawable.STATE_03_HIDDEN)) {
             trailer.init(0, 0);
@@ -1333,9 +1334,9 @@ public class ScrollBar extends Drawable implements IBOScrollBar, IDrawableListen
       //scroll action done on ScrollBar. we want to repaint the scrollbar and ViewDrawable's content.
       ic.srActionDoneRepaint(this);
       if (pane != null) {
-         ViewDrawable vd = pane.getViewed();
+         ViewDrawable vd = pane.getViewDrawable();
          //ask to repaint only the content of the viewpane
-         vd.setViewFlag(ITechViewDrawable.VIEWSTATE_02_REPAINTING_CONTENT, true);
+         vd.setFlagView(ITechViewDrawable.FLAG_VSTATE_02_REPAINTING_CONTENT, true);
          ic.srActionDoneRepaint(vd);
       }
    }
@@ -1413,15 +1414,17 @@ public class ScrollBar extends Drawable implements IBOScrollBar, IDrawableListen
          StyleClass bkey = styleClass.getStyleClass(IBOTypesGui.LINK_51_STYLE_SCROLLBAR_BLOCK_FIG);
          if (bkey != null) {
             //there is at least a block
-            blockFigure = new Drawable(gc, bkey, this);
+            blockFigure = new Drawable(gc, bkey);
+            blockFigure.setParent(this);
             blockFigure.setBehaviorFlag(ITechDrawable.BEHAVIOR_23_PARENT_EVENT_CONTROL, true);
-            blockFigure.setDebugName("BlockFigure");
+            blockFigure.toStringSetName("BlockFigure");
             //check if there is a special background
             StyleClass key = styleClass.getStyleClass(IBOTypesGui.LINK_50_STYLE_SCROLLBAR_BLOCK_BG);
-            blockBgFigure = new Drawable(gc, key, this);
+            blockBgFigure = new Drawable(gc, key);
+            blockBgFigure.setParent(this);
             blockBgFigure.setBehaviorFlag(ITechDrawable.BEHAVIOR_23_PARENT_EVENT_CONTROL, true);
             blockBgFigure.setStateFlag(ITechDrawable.STATE_27_OVERLAYED, true);
-            blockBgFigure.setDebugName("BlockBg");
+            blockBgFigure.toStringSetName("BlockBg");
          } else {
             //draw none. code breaks if a background and no block
          }

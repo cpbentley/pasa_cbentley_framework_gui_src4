@@ -221,7 +221,7 @@ public interface ITechDrawable extends IByteObject {
    /**
     * Set to tell that Drawable has inner vertical navigation.
     * <br>
-    * Decided when {@link IDrawable#init()} is called.
+    * Decided when {@link IDrawable#initSize()} is called.
     * <br>
     */
    public static final int BEHAVIOR_26_NAV_VERTICAL              = 1 << 25;
@@ -229,7 +229,7 @@ public interface ITechDrawable extends IByteObject {
    /**
     * Set to tell that Drawable has inner horizontal navigation.
     * <br>
-    * Decided when {@link IDrawable#init()} is called.
+    * Decided when {@link IDrawable#initSize()} is called.
     * <br>
     */
    public static final int BEHAVIOR_27_NAV_HORIZONTAL            = 1 << 26;

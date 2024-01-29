@@ -10,6 +10,7 @@ import pasa.cbentley.framework.gui.src4.core.ScrollConfig;
 import pasa.cbentley.framework.gui.src4.ctx.GuiCtx;
 import pasa.cbentley.framework.gui.src4.interfaces.ITechDrawable;
 import pasa.cbentley.framework.gui.src4.table.interfaces.IBOTableView;
+import pasa.cbentley.framework.gui.src4.table.interfaces.ITechTable;
 import pasa.cbentley.framework.gui.src4.tech.ITechViewPane;
 
 /**
@@ -80,7 +81,7 @@ public class Config implements IStringable {
     * Number of fully visible columns. 
     * <br>
     * <br>
-    * Might be zero (in case of {@link IBOTableView#HELPER_FLAG_03_CAP_OVERSIZE} ,1 or more. 
+    * Might be zero (in case of {@link ITechTable#HELPER_FLAG_03_CAP_OVERSIZE} ,1 or more. 
     * <br>
     * <br>
     * <li>With {@link ITechViewPane#SCROLL_TYPE_0_PIXEL_UNIT}, 1 if {@link ITechViewPane#VISUAL_1_PARTIAL} horizontally. 

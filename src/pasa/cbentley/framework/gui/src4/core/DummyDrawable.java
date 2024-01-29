@@ -28,7 +28,7 @@ public class DummyDrawable extends Drawable {
       setViewContext(vc);
    }
 
-   public void init() {
+   public void initSize() {
       setDw(vc.getWidth());
       setDh(vc.getHeight());
    }

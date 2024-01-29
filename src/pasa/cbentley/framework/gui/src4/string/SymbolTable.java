@@ -21,7 +21,7 @@ import pasa.cbentley.framework.gui.src4.ctx.IBOTypesGui;
 import pasa.cbentley.framework.gui.src4.factories.TablePolicyFactory;
 import pasa.cbentley.framework.gui.src4.interfaces.ITechDrawable;
 import pasa.cbentley.framework.gui.src4.table.TableView;
-import pasa.cbentley.framework.gui.src4.table.interfaces.IBOTableView;
+import pasa.cbentley.framework.gui.src4.table.interfaces.ITechTable;
 import pasa.cbentley.framework.gui.src4.tech.ITechViewPane;
 
 /**
@@ -95,7 +95,7 @@ public class SymbolTable extends TableView {
       techSymbol = styleClass.getByteObject(TECH_ID_CHAR_TABLE);
 
       CmdNode ctx = gc.getCC().createCmdNode("Symbols");
-      setCmdCtx(ctx);
+      setCmdNote(ctx);
 
       //create model
       IMFont f = getStyleOp().getStyleFont(style);
@@ -107,7 +107,7 @@ public class SymbolTable extends TableView {
       ByteObject sizer = gc.getLAC().getSizerFactory().getSizerFontCtx();
 
       base.setSizers(sizer, sizer);
-      base.init();
+      base.initSize();
       //init before getting x,y
       //used to compute preferred content sizes
       modelGenetics = gc.getTableGeneticsC().getGenetics(base.getDrawnWidth(), base.getDrawnHeight());
@@ -124,7 +124,7 @@ public class SymbolTable extends TableView {
       headerBotTitle = new StringDrawable(gc, scHeader, "");
       setHeader(headerBotTitle, C.POS_1_BOT, ITechViewPane.PLANET_MODE_0_EAT);
 
-      setHelperFlag(IBOTableView.HELPER_FLAG_20_SPECIAL_REPAINT, true);
+      setHelperFlag(ITechTable.HELPER_FLAG_20_SPECIAL_REPAINT, true);
    }
 
    protected void cmdNextPlane(InputConfig ic) {

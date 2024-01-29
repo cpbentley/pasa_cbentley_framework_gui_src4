@@ -239,20 +239,31 @@ public class TableLayoutView extends TableView implements IBOStringDrawable, ICo
       sd.setStringNoUpdate(str);
    }
 
-   public void show(ICommandable icon, CmdInstance ci) {
+   public void setCommandParams(ICommandable icon, CmdInstance ci) {
       this.icon = icon;
       this.ci = ci;
-      this.getVC().getDrawCtrlAppli().shShowDrawable((InputConfig) ci.getFeedback(), this, ITechCanvasDrawable.SHOW_TYPE_1_OVER);
+     }
+
+
+   //#mdebug
+   public void toString(Dctx dc) {
+      dc.root(this, TableLayoutView.class, 251);
+      toStringPrivate(dc);
+      super.toString(dc.sup());
    }
 
-   public void toString(Dctx sb) {
-      sb.root(this, "TableLayoutView");
-      super.toString(sb.sup());
+   private void toStringPrivate(Dctx dc) {
+      
    }
 
    public void toString1Line(Dctx dc) {
-      dc.root1Line(this, "TableLayoutView");
-      dc.appendWithSpace(" " + getDebugName());
+      dc.root1Line(this, TableLayoutView.class);
+      toStringPrivate(dc);
+      super.toString1Line(dc.sup1Line());
    }
+
+   //#enddebug
+   
+
 
 }

@@ -3,13 +3,11 @@ package pasa.cbentley.framework.gui.src4.core;
 import pasa.cbentley.byteobjects.src4.core.ByteObject;
 import pasa.cbentley.byteobjects.src4.ctx.IBOTypesDrw;
 import pasa.cbentley.core.src4.ctx.ICtx;
-import pasa.cbentley.core.src4.ctx.UCtx;
 import pasa.cbentley.core.src4.event.BusEvent;
 import pasa.cbentley.core.src4.helpers.StringBBuilder;
 import pasa.cbentley.core.src4.interfaces.C;
 import pasa.cbentley.core.src4.interfaces.ITechNav;
 import pasa.cbentley.core.src4.logging.Dctx;
-import pasa.cbentley.core.src4.logging.IDLog;
 import pasa.cbentley.core.src4.logging.IStringable;
 import pasa.cbentley.core.src4.stator.StatorReader;
 import pasa.cbentley.core.src4.stator.StatorWriter;
@@ -38,18 +36,19 @@ import pasa.cbentley.framework.gui.src4.anim.base.DrawableAnim;
 import pasa.cbentley.framework.gui.src4.anim.base.ImgAnimable;
 import pasa.cbentley.framework.gui.src4.anim.definitions.AlphaChangeRgb;
 import pasa.cbentley.framework.gui.src4.anim.move.Move;
-import pasa.cbentley.framework.gui.src4.canvas.CanvasAppliDrawable;
+import pasa.cbentley.framework.gui.src4.canvas.CanvasAppliInputGui;
 import pasa.cbentley.framework.gui.src4.canvas.CanvasDrawControl;
-import pasa.cbentley.framework.gui.src4.canvas.ExecutionCtxDraw;
+import pasa.cbentley.framework.gui.src4.canvas.ExecutionContextGui;
 import pasa.cbentley.framework.gui.src4.canvas.FocusCtrl;
 import pasa.cbentley.framework.gui.src4.canvas.InputConfig;
-import pasa.cbentley.framework.gui.src4.canvas.RepaintCtrlDrawable;
+import pasa.cbentley.framework.gui.src4.canvas.RepaintCtrlGui;
 import pasa.cbentley.framework.gui.src4.canvas.TopologyDLayer;
 import pasa.cbentley.framework.gui.src4.canvas.ViewContext;
 import pasa.cbentley.framework.gui.src4.cmd.CmdInstanceDrawable;
 import pasa.cbentley.framework.gui.src4.ctx.GuiCtx;
 import pasa.cbentley.framework.gui.src4.ctx.IBOTypesGui;
 import pasa.cbentley.framework.gui.src4.ctx.IFlagsToStringGui;
+import pasa.cbentley.framework.gui.src4.ctx.ObjectGC;
 import pasa.cbentley.framework.gui.src4.ctx.ToStringStaticGui;
 import pasa.cbentley.framework.gui.src4.interfaces.IAnimable;
 import pasa.cbentley.framework.gui.src4.interfaces.ICommandDrawable;
@@ -68,7 +67,6 @@ import pasa.cbentley.layouter.src4.engine.SizerFactory;
 import pasa.cbentley.layouter.src4.engine.Zer2DArea;
 import pasa.cbentley.layouter.src4.interfaces.ILayoutDelegate;
 import pasa.cbentley.layouter.src4.interfaces.ILayoutable;
-import pasa.cbentley.layouter.src4.tech.ITechLayout;
 import pasa.cbentley.layouter.src4.tech.ITechSizer;
 
 /**
@@ -167,7 +165,7 @@ import pasa.cbentley.layouter.src4.tech.ITechSizer;
  * @author Charles-Philip Bentley
  *
  */
-public class Drawable implements IDrawable, IBOStyle, IStringable, ILayoutable, ICommandDrawable {
+public class Drawable extends ObjectGC implements IDrawable, IBOStyle, IStringable, ILayoutable, ICommandDrawable {
 
    public static final int     VER_DRAWABLE_01 = 1;
 
@@ -218,7 +216,7 @@ public class Drawable implements IDrawable, IBOStyle, IStringable, ILayoutable, 
     */
    protected int               canvasID;
 
-   protected CmdNode           cmdCtx;
+   protected CmdNode           cmdNode;
 
    private int                 ctrl;
 
@@ -237,10 +235,6 @@ public class Drawable implements IDrawable, IBOStyle, IStringable, ILayoutable, 
     * <li>{@link IDrawable#addFullAnimation(IAnimable)}
     */
    protected DrawableAnimator  da;
-
-   private String              debugName;
-
-   protected final GuiCtx      gc;
 
    /**
     * Read only by external world.
@@ -284,7 +278,7 @@ public class Drawable implements IDrawable, IBOStyle, IStringable, ILayoutable, 
    /**
     * When created a Drawable is Hidden
     */
-   protected int               states          = ITechDrawable.STATE_03_HIDDEN;
+   protected int               states          = STATE_03_HIDDEN;
 
    /**
     * 
@@ -294,7 +288,7 @@ public class Drawable implements IDrawable, IBOStyle, IStringable, ILayoutable, 
    /**
     * The Draw method can only write to this field
     */
-   protected volatile int      statesVolatile  = ITechDrawable.STATE_03_HIDDEN;
+   protected volatile int      statesVolatile  = STATE_03_HIDDEN;
 
    /**
     * Set externally by positioning layout. Must be semi-opaque classless style.
@@ -379,10 +373,6 @@ public class Drawable implements IDrawable, IBOStyle, IStringable, ILayoutable, 
     */
    private int                 zindex          = -1;
 
-   public Drawable(GuiCtx gc, StyleClass sc) {
-      this(gc, sc, (IDrawable) null);
-   }
-
    /**
     * When the {@link StyleClass} is null, the root {@link StyleClass} is used.
     * <br>
@@ -391,29 +381,23 @@ public class Drawable implements IDrawable, IBOStyle, IStringable, ILayoutable, 
     * @param sc
     * @param parent
     */
-   public Drawable(GuiCtx gc, StyleClass sc, IDrawable parent) {
-      this.gc = gc;
+   public Drawable(GuiCtx gc, StyleClass sc) {
+      this(gc, sc, gc.getCanvasRoot().getVCAppli());
+   }
+
+   /**
+    * 
+    * @param gc
+    * @param sc
+    * @param vc
+    */
+   public Drawable(GuiCtx gc, StyleClass sc, ViewContext vc) {
+      super(gc);
       if (sc == null) {
          throw new NullPointerException("StyleClass cannot be null for a Drawable");
       }
-      this.styleClass = sc;
-
-      uiid = gc.getRepo().nextUIID();
-      this.parent = parent;
-      //a drawable is sized by default? Full ViewContext
-      layEngine = new LayEngineDrawable(gc, this);
-
-      vc = gc.getVCAppli();
-      //init style to root
-      style = styleClass.getRootStyle();
-      styleCache = new StyleCache(gc.getDC(), this, style);
-
-   }
-
-   public Drawable(GuiCtx gc, StyleClass sc, ViewContext vc) {
-      this.gc = gc;
-      if (sc == null) {
-         throw new NullPointerException("StyleClass cannot be null for a Drawable");
+      if (vc == null) {
+         vc = gc.getVCGhost();
       }
       this.styleClass = sc;
       uiid = gc.getRepo().nextUIID();
@@ -423,12 +407,6 @@ public class Drawable implements IDrawable, IBOStyle, IStringable, ILayoutable, 
       //init style to root
       style = styleClass.getRootStyle();
       styleCache = new StyleCache(gc.getDC(), this, style);
-   }
-
-   public Drawable(GuiCtx gc, ViewState vs) throws IllegalArgumentException {
-      this.gc = gc;
-      setViewState(vs);
-      vc = gc.getVCAppli();
    }
 
    /**
@@ -444,10 +422,6 @@ public class Drawable implements IDrawable, IBOStyle, IStringable, ILayoutable, 
 
    public void addCtrlFlags(int flags) {
       ctrl |= flags;
-   }
-
-   public void setDependency(ILayoutable lay, int flags) {
-      layEngine.setDependency(lay, flags);
    }
 
    /**
@@ -505,7 +479,7 @@ public class Drawable implements IDrawable, IBOStyle, IStringable, ILayoutable, 
     */
    public boolean cacheDimensionUpdate(RgbImage rgb) {
       switch (cacheType) {
-         case ITechDrawable.CACHE_1_CONTENT:
+         case CACHE_1_CONTENT:
             if (!isCacheDimensionOK(rgb, getContentW(), getContentH())) {
                rgb.changeDimension(getContentW(), getContentH());
                return true;
@@ -528,26 +502,22 @@ public class Drawable implements IDrawable, IBOStyle, IStringable, ILayoutable, 
       int initColor = getCacheBgColor();
       RgbCache rcache = gc.getDC().getCache();
       switch (cacheType) {
-         case ITechDrawable.CACHE_0_NONE:
+         case CACHE_0_NONE:
             cache = null;
-            setStateFlag(ITechDrawable.STATE_14_CACHED, false);
+            setStateFlag(STATE_14_CACHED, false);
             break;
-         case ITechDrawable.CACHE_1_CONTENT:
+         case CACHE_1_CONTENT:
             cache = rcache.create(getContentW(), getContentH(), initColor);
-            setStateFlag(ITechDrawable.STATE_14_CACHED, true);
+            setStateFlag(STATE_14_CACHED, true);
             break;
-         case ITechDrawable.CACHE_2_FULL:
-         case ITechDrawable.CACHE_3_BG_DECO:
+         case CACHE_2_FULL:
+         case CACHE_3_BG_DECO:
             cache = rcache.create(getDrawnWidth(), getDrawnHeight(), initColor);
-            setStateFlag(ITechDrawable.STATE_14_CACHED, true);
+            setStateFlag(STATE_14_CACHED, true);
             break;
          default:
             break;
       }
-   }
-
-   public int getStatorableClassID() {
-      throw new RuntimeException("Must be implemented by subclass");
    }
 
    /**
@@ -579,18 +549,18 @@ public class Drawable implements IDrawable, IBOStyle, IStringable, ILayoutable, 
       //System.out.println("#Drawable.updateRgbCache for " + this.toString1Line() + " \n\t" + rgb.toString("\n\t\t"));
       cacheGraphics.tickStart();
       switch (cacheType) {
-         case ITechDrawable.CACHE_1_CONTENT:
+         case CACHE_1_CONTENT:
             //what is content for ViewDrawable? it is what is inside the ViewPort
             cacheGraphics.setTranslationShift(-getContentX(), -getContentY());
             drawDrawableContent(cacheGraphics);
             break;
-         case ITechDrawable.CACHE_2_FULL:
+         case CACHE_2_FULL:
             //translation is needed because drawable coordinate is at 0,0
             cacheGraphics.setTranslationShift(-getX(), -getY());
             //scrollbar may have the hidden flag but paint ctx flag deals with it.
             draw(cacheGraphics);
             break;
-         case ITechDrawable.CACHE_3_BG_DECO:
+         case CACHE_3_BG_DECO:
             //what is decoration for ViewDrawable? Headers and Scrollbars?
             cacheGraphics.setTranslationShift(-getX(), -getY());
             drawDrawableBg(cacheGraphics);
@@ -598,7 +568,7 @@ public class Drawable implements IDrawable, IBOStyle, IStringable, ILayoutable, 
          default:
             break;
       }
-      setStateFlag(ITechDrawable.STATE_07_CACHE_INVALIDATED, true);
+      setStateFlag(STATE_07_CACHE_INVALIDATED, true);
       //when cache is automatic
       //#debug
       String msg = "Time=" + cacheGraphics.tickTime() + "ms" + " PrimitiveCount=" + cacheGraphics.getPrimitiveCount() + " " + Thread.currentThread();
@@ -618,22 +588,22 @@ public class Drawable implements IDrawable, IBOStyle, IStringable, ILayoutable, 
    public void cacheValidate() {
       boolean isValid = true;
       switch (cacheType) {
-         case ITechDrawable.CACHE_0_NONE:
+         case CACHE_0_NONE:
             break;
-         case ITechDrawable.CACHE_1_CONTENT:
+         case CACHE_1_CONTENT:
             break;
-         case ITechDrawable.CACHE_2_FULL:
+         case CACHE_2_FULL:
             if (getDrawnWidth() != cache.getWidth() || getDrawnHeight() != cache.getHeight()) {
                isValid = false;
             }
             break;
-         case ITechDrawable.CACHE_3_BG_DECO:
+         case CACHE_3_BG_DECO:
             break;
 
          default:
             break;
       }
-      setStateFlag(ITechDrawable.STATE_07_CACHE_INVALIDATED, isValid);
+      setStateFlag(STATE_07_CACHE_INVALIDATED, isValid);
    }
 
    /**
@@ -729,37 +699,37 @@ public class Drawable implements IDrawable, IBOStyle, IStringable, ILayoutable, 
 
       //start the drawing by locking the Drawable with flag
       try {
-         setStateFlag(ITechDrawable.STATE_01_DRAWING, true);
+         setStateFlag(STATE_01_DRAWING, true);
          if (g.hasPaintCtx(ITechCanvasDrawable.REPAINT_13_CACHE_UPDATE)) {
             drawDrawable(g);
          } else if (g.hasPaintCtx(ITechCanvasDrawable.REPAINT_11_NO_FLOW)) {
             drawDrawableIfCacheUseIt(g);
          } else {
-            if (hasState(ITechDrawable.STATE_03_HIDDEN)) {
+            if (hasState(STATE_03_HIDDEN)) {
                return;
             }
-            if (!hasState(ITechDrawable.STATE_06_STYLED)) {
+            if (!hasState(STATE_06_STYLED)) {
                //#debug
-               toLog().pDraw("Drawable" + getDebugName() + " not styled", this, Drawable.class, "draw");
-               init();
+               toDLog().pDraw("Drawable" + toStringGetName() + " not styled", this, Drawable.class, "draw");
+               initSize();
 
                //#debug
                //throw new RuntimeException("#Drawable Drawn attempt without being Styled " + this.toString1Line());
             }
             //what if invalidated during the draw process? by another thread?
-            if (!hasState(ITechDrawable.STATE_05_LAYOUTED)) {
+            if (!hasState(STATE_05_LAYOUTED)) {
                //#debug
-               toLog().pDraw("Drawable" + getDebugName() + " not layouted", this, Drawable.class, "draw");
-               init();
+               toDLog().pDraw("Drawable" + toStringGetName() + " not layouted", this, Drawable.class, "draw");
+               initSize();
 
                //#debug
                //throw new RuntimeException("#Drawable Drawn attempt without being Layouted " + this.toString1Line());
 
             }
-            if (!hasState(ITechDrawable.STATE_26_POSITIONED)) {
+            if (!hasState(STATE_26_POSITIONED)) {
                initPosition();
             }
-            if (hasState(ITechDrawable.STATE_20_ANIMATED_FULL_HIDDEN)) {
+            if (hasState(STATE_20_ANIMATED_FULL_HIDDEN)) {
                //ask the animation director to delegate to active IAnimable
                if (da != null) {
                   da.drawAnimations(g);
@@ -767,7 +737,7 @@ public class Drawable implements IDrawable, IBOStyle, IStringable, ILayoutable, 
                return;
             }
             if (da != null) {
-               if (hasState(ITechDrawable.STATE_21_ANIMATED_LAYERS)) {
+               if (hasState(STATE_21_ANIMATED_LAYERS)) {
                   drawDrawableAnimated(g);
                }
             }
@@ -777,7 +747,7 @@ public class Drawable implements IDrawable, IBOStyle, IStringable, ILayoutable, 
                drawSpecial(g);
                return;
             }
-            if (!hasBehavior(ITechDrawable.BEHAVIOR_17_CLIP_CONTROLLED)) {
+            if (!hasBehavior(BEHAVIOR_17_CLIP_CONTROLLED)) {
                int cx = g.getClipX();
                boolean isClipped = true;
                if (cx < x) {
@@ -792,19 +762,19 @@ public class Drawable implements IDrawable, IBOStyle, IStringable, ILayoutable, 
                      }
                   }
                }
-               setStateFlag(ITechDrawable.STATE_29_CLIPPED, isClipped);
+               setStateFlag(STATE_29_CLIPPED, isClipped);
             }
             if (!g.hasPaintCtx(ITechCanvasDrawable.REPAINT_01_FULL)) {
                eraseDrawNotFull(g);
             }
             drawDrawableIfCacheUseIt(g);
-            if (!hasState(ITechDrawable.STATE_02_DRAWN)) {
-               setStateFlag(ITechDrawable.STATE_02_DRAWN, true);
+            if (!hasState(STATE_02_DRAWN)) {
+               setStateFlag(STATE_02_DRAWN, true);
             }
          }
       } finally {
          //release the lock
-         setStateFlag(ITechDrawable.STATE_01_DRAWING, false);
+         setStateFlag(STATE_01_DRAWING, false);
       }
    }
 
@@ -820,18 +790,18 @@ public class Drawable implements IDrawable, IBOStyle, IStringable, ILayoutable, 
     */
    private void drawCache(GraphicsX g) {
       switch (cacheType) {
-         case ITechDrawable.CACHE_0_NONE:
+         case CACHE_0_NONE:
             drawDrawable(g);
             break;
-         case ITechDrawable.CACHE_1_CONTENT:
+         case CACHE_1_CONTENT:
             drawDrawableBg(g);
             cache.draw(g, getContentX(), getContentY());
             drawDrawableFg(g);
             break;
-         case ITechDrawable.CACHE_2_FULL:
+         case CACHE_2_FULL:
             cache.draw(g, getX(), getY());
             break;
-         case ITechDrawable.CACHE_3_BG_DECO:
+         case CACHE_3_BG_DECO:
             cache.draw(g, getX(), getY());
             drawDrawableContent(g);
             drawDrawableFg(g);
@@ -855,7 +825,7 @@ public class Drawable implements IDrawable, IBOStyle, IStringable, ILayoutable, 
          if (cache != null) {
             cache.setFlag(RgbImage.FLAG_09_USED, true);
             cacheUpdate(cache);
-            setStateFlag(ITechDrawable.STATE_07_CACHE_INVALIDATED, false);
+            setStateFlag(STATE_07_CACHE_INVALIDATED, false);
          }
       } else {
          cache.setFlag(RgbImage.FLAG_09_USED, true);
@@ -864,9 +834,9 @@ public class Drawable implements IDrawable, IBOStyle, IStringable, ILayoutable, 
          //2# check if Drawable content has changed since last cache update
          //3# check if Cache RgbImage has been modified by an animation
          cacheValidate();
-         if (hasState(ITechDrawable.STATE_07_CACHE_INVALIDATED)) {
+         if (hasState(STATE_07_CACHE_INVALIDATED)) {
             cacheUpdate(cache);
-            setStateFlag(ITechDrawable.STATE_07_CACHE_INVALIDATED, false);
+            setStateFlag(STATE_07_CACHE_INVALIDATED, false);
             //notify img listeners, that image content has changed
             cache.setFlag(RgbImage.FLAG_14_MODIFIED, false);
          }
@@ -1056,7 +1026,7 @@ public class Drawable implements IDrawable, IBOStyle, IStringable, ILayoutable, 
     */
    private void drawDrawableIfCacheUseIt(GraphicsX g) {
       //cache management
-      if (hasBehavior(ITechDrawable.BEHAVIOR_10_FORCE_CACHING) && !hasBehavior(ITechDrawable.BEHAVIOR_11_DISABLE_CACHING)) {
+      if (hasBehavior(BEHAVIOR_10_FORCE_CACHING) && !hasBehavior(BEHAVIOR_11_DISABLE_CACHING)) {
 
          drawCachedDrawable(g);
       } else {
@@ -1112,7 +1082,7 @@ public class Drawable implements IDrawable, IBOStyle, IStringable, ILayoutable, 
          //#debug
          toDLog().pDraw(msg, this, Drawable.class, "eraseDrawNotFull", LVL_05_FINE, true);
 
-         if (hasState(ITechDrawable.STATE_24_HOLED)) {
+         if (hasState(STATE_24_HOLED)) {
             //TODO why Scrollbar does not override this method?
             int[] holes = getHoles();
             //erase the area minus the holes
@@ -1136,7 +1106,7 @@ public class Drawable implements IDrawable, IBOStyle, IStringable, ILayoutable, 
          IDrawable parent = getParent();
          g.clipSet(getX(), getY(), getDw(), getDh());
          if (parent != null) {
-            if (!parent.hasState(ITechDrawable.STATE_01_DRAWING)) {
+            if (!parent.hasState(STATE_01_DRAWING)) {
                if (parent.isOpaque()) {
                   //if parent is not opaque? draw layers below until find master canvas
                   if (parent instanceof Drawable) {
@@ -1159,14 +1129,14 @@ public class Drawable implements IDrawable, IBOStyle, IStringable, ILayoutable, 
          g.clipReset();
 
          //reset erase repaint directive flags which have been acted upon
-         setBehaviorFlag(ITechDrawable.BEHAVIOR_13_REPAINT_PARENT_STYLE, false);
-         setBehaviorFlag(ITechDrawable.BEHAVIOR_14_REPAINT_MASTER_CANVAS, false);
+         setBehaviorFlag(BEHAVIOR_13_REPAINT_PARENT_STYLE, false);
+         setBehaviorFlag(BEHAVIOR_14_REPAINT_MASTER_CANVAS, false);
 
       }
    }
 
    public AnimCreator getAnimCreator() {
-      return vc.getCanvasCtx().getAnimCreator();
+      return vc.getCanvasDrawable().getAnimCreator();
    }
 
    public Zer2DArea getArea() {
@@ -1181,8 +1151,8 @@ public class Drawable implements IDrawable, IBOStyle, IStringable, ILayoutable, 
       }
    }
 
-   public CanvasAppliDrawable getCanvas() {
-      return vc.getCanvasCtx();
+   public CanvasAppliInputGui getCanvas() {
+      return vc.getCanvasDrawable();
    }
 
    /**
@@ -1204,8 +1174,8 @@ public class Drawable implements IDrawable, IBOStyle, IStringable, ILayoutable, 
     * <li> root
     */
    public CmdNode getCmdNode() {
-      if (cmdCtx != null) {
-         return cmdCtx;
+      if (cmdNode != null) {
+         return cmdNode;
       } else if (parent != null) {
          return parent.getCmdNode();
       } else {
@@ -1248,6 +1218,10 @@ public class Drawable implements IDrawable, IBOStyle, IStringable, ILayoutable, 
       return layEngine.getContentY();
    }
 
+   public ICtx getCtxOwner() {
+      return gc;
+   }
+
    /**
     * The bit numberal state 16 bits by default
     * A Table may sort Drawables according to their CType
@@ -1257,26 +1231,13 @@ public class Drawable implements IDrawable, IBOStyle, IStringable, ILayoutable, 
       return ctype;
    }
 
-   //#mdebug
-   public String getDebugName() {
-      if (debugName == null) {
-         return getClass().getName() + " " + toStringDimension();
-      }
-      return debugName;
-   }
-
-   //#enddebug
-   public void getDebugName1() {
-
-   }
-
    public ILayoutable[] getDependencies() {
       // TODO Auto-generated method stub
       return null;
    }
 
    protected int getDh() {
-      return getDS().getSizeDrawnHeight();
+      return layEngine.getSizeDrawnHeight();
    }
 
    /**
@@ -1287,7 +1248,7 @@ public class Drawable implements IDrawable, IBOStyle, IStringable, ILayoutable, 
     * When a child is outside the parent?, the parent will not be.
     * <br>
     * This method constructs the visible. 
-    * {@link TopologyDLayer#getDrawable(int, int, ExecutionCtxDraw)} gets to 
+    * {@link TopologyDLayer#getDrawable(int, int, ExecutionContextGui)} gets to 
     * direct.
     * <br>
     * When a child is outside a parent, it must be drawn as a layer.
@@ -1295,7 +1256,7 @@ public class Drawable implements IDrawable, IBOStyle, IStringable, ILayoutable, 
     * By default return this. Parent is responsible to check for boundary.
     * <br>
     */
-   public IDrawable getDrawable(int x, int y, ExecutionCtxDraw ex) {
+   public IDrawable getDrawable(int x, int y, ExecutionContextGui ex) {
       return this;
    }
 
@@ -1317,25 +1278,28 @@ public class Drawable implements IDrawable, IBOStyle, IStringable, ILayoutable, 
     * 0 when Immaterial
     */
    public int getDrawnHeight() {
-      if (hasBehavior(ITechDrawable.BEHAVIOR_16_IMMATERIAL)) {
+      if (hasBehavior(BEHAVIOR_16_IMMATERIAL)) {
          return 0;
       }
       return getDh();
    }
 
+   /**
+    * 0 when Immaterial
+    */
    public int getDrawnWidth() {
-      if (hasBehavior(ITechDrawable.BEHAVIOR_16_IMMATERIAL)) {
+      if (hasBehavior(BEHAVIOR_16_IMMATERIAL)) {
          return 0;
       }
       return getDw();
    }
 
-   public LayEngineDrawable getDS() {
-      return layEngine;
-   }
-
+   /**
+    * Not 0 when Immaterial
+    * 
+    */
    protected int getDw() {
-      return getDS().getSizeDrawnWidth();
+      return layEngine.getSizeDrawnWidth();
    }
 
    public FocusCtrl getFocusCtrl() {
@@ -1488,10 +1452,10 @@ public class Drawable implements IDrawable, IBOStyle, IStringable, ILayoutable, 
       return layEngine.getY();
    }
 
-   public RepaintCtrlDrawable getRepaintCtrlDraw() {
+   public RepaintCtrlGui getRepaintCtrlDraw() {
       ViewContext viewContext = vc;
       if (viewContext == null) {
-         viewContext = gc.getCanvasCtxRoot().getCanvas().getVCRoot();
+         viewContext = gc.getCanvasGCRoot().getCanvas().getVCRoot();
       }
       return viewContext.getRepaintCtrlDraw();
    }
@@ -1509,7 +1473,7 @@ public class Drawable implements IDrawable, IBOStyle, IStringable, ILayoutable, 
 
       //update the cache if it does not match type requested
       //&& !hasState(STATE_07_CACHE_INVALIDATED)
-      if (false && cache != null && cacheType == type && !hasState(ITechDrawable.STATE_07_CACHE_INVALIDATED)) {
+      if (false && cache != null && cacheType == type && !hasState(STATE_07_CACHE_INVALIDATED)) {
          return cache;
       } else {
          cache = null;
@@ -1526,7 +1490,7 @@ public class Drawable implements IDrawable, IBOStyle, IStringable, ILayoutable, 
     * Calls {@link Drawable#getRgbImage(int, int)} with opaque black or fully transparent if {@link ITechDrawable#STATE_17_OPAQUE} is not set.
     */
    public RgbImage getRgbImage(int type) {
-      if (hasState(ITechDrawable.STATE_17_OPAQUE)) {
+      if (hasState(STATE_17_OPAQUE)) {
          return getRgbImage(type, IColors.FULLY_OPAQUE_BLACK);
       }
       return getRgbImage(type, 0);
@@ -1559,23 +1523,23 @@ public class Drawable implements IDrawable, IBOStyle, IStringable, ILayoutable, 
       GraphicsX g = ri.getGraphicsX();
       g.setTranslationShift(-getX(), -getY());
       switch (type) {
-         case ITechDrawable.IMAGE_0_ALL:
+         case IMAGE_0_ALL:
             drawDrawableIfCacheUseIt(g);
             break;
-         case ITechDrawable.IMAGE_1_CONTENT:
+         case IMAGE_1_CONTENT:
             drawDrawableContent(g);
             break;
-         case ITechDrawable.IMAGE_2_BG:
+         case IMAGE_2_BG:
             drawDrawableBg(g);
             break;
-         case ITechDrawable.IMAGE_3_FG:
+         case IMAGE_3_FG:
             drawDrawableFg(g);
             break;
-         case ITechDrawable.IMAGE_4_CONTENT_BG:
+         case IMAGE_4_CONTENT_BG:
             drawDrawableBg(g);
             drawDrawableContent(g);
             break;
-         case ITechDrawable.IMAGE_5_CONTENT_FG:
+         case IMAGE_5_CONTENT_FG:
             drawDrawableContent(g);
             drawDrawableFg(g);
             break;
@@ -1632,17 +1596,6 @@ public class Drawable implements IDrawable, IBOStyle, IStringable, ILayoutable, 
       return getFontStyle().getWidthWeigh();
    }
 
-   public int getSizeH(int sizeType) {
-      if (sizeType == ITechSizer.SIZER_PROP_05_CONTENT) {
-         return layEngine.getContentH();
-      }
-      return getSizeDrawnHeight();
-   }
-
-   public int getSizePaddingWidth() {
-      return getSizeW(ITechSizer.SIZER_PROP_06_CONTENT_PAD);
-   }
-
    public int getSizePreferredHeight() {
       //we don't have ph here at this lvl
       return layEngine.getH();
@@ -1650,6 +1603,14 @@ public class Drawable implements IDrawable, IBOStyle, IStringable, ILayoutable, 
 
    public int getSizePreferredWidth() {
       return layEngine.getW();
+   }
+
+   public int getSizeW(int sizeType) {
+      return getSizePropertyValueW(sizeType);
+   }
+
+   public int getSizeH(int sizeType) {
+      return getSizePropertyValueH(sizeType);
    }
 
    public int getSizePropertyValueH(int property) {
@@ -1663,15 +1624,25 @@ public class Drawable implements IDrawable, IBOStyle, IStringable, ILayoutable, 
          case ITechSizer.SIZER_PROP_05_CONTENT:
             return getSizeContentHeight();
          case ITechSizer.SIZER_PROP_06_CONTENT_PAD:
-            return getSizeContentHeight() + layEngine.getStyleCache().getStyleWPadding();
+            return getSizeContentHeight() + styleCache.getStyleWPadding();
          case ITechSizer.SIZER_PROP_07_CONTENT_PAD_BORDER:
-            return getSizeContentHeight() + layEngine.getStyleCache().getStyleWPadding();
+            return getSizeContentHeight() + styleCache.getStyleHPaddingBorder();
          case ITechSizer.SIZER_PROP_10_PAD:
-            return getSizeContentHeight() + layEngine.getStyleCache().getStyleWPadding();
+            return styleCache.getStyleHPadding();
+         case ITechSizer.SIZER_PROP_11_PAD_BORDER:
+            return styleCache.getStyleHPaddingBorder();
+         case ITechSizer.SIZER_PROP_12_PAD_BORDER_MARGIN:
+            return styleCache.getStyleHPaddingBorderMargin();
+         case ITechSizer.SIZER_PROP_13_BORDER:
+            return styleCache.getStyleHBorder();
+         case ITechSizer.SIZER_PROP_14_BORDER_MARGIN:
+            return styleCache.getStyleHBorderMargin();
+         case ITechSizer.SIZER_PROP_15_MARGIN:
+            return styleCache.getStyleHMargin();
          default:
             break;
       }
-      return 0;
+      throw new IllegalArgumentException();
    }
 
    public int getSizePropertyValueW(int property) {
@@ -1685,16 +1656,25 @@ public class Drawable implements IDrawable, IBOStyle, IStringable, ILayoutable, 
          case ITechSizer.SIZER_PROP_05_CONTENT:
             return getSizeContentWidth();
          case ITechSizer.SIZER_PROP_06_CONTENT_PAD:
-            //you want the area 2
-            return getSizeContentWidth() + layEngine.getStyleCache().getStyleWPadding();
+            return getSizeContentWidth() + styleCache.getStyleWPadding();
          case ITechSizer.SIZER_PROP_07_CONTENT_PAD_BORDER:
-            return getSizeContentHeight() + layEngine.getStyleCache().getStyleWPadding();
+            return getSizeContentWidth() + styleCache.getStyleWPaddingBorder();
          case ITechSizer.SIZER_PROP_10_PAD:
-            return getSizeContentHeight() + layEngine.getStyleCache().getStyleWPadding();
+            return styleCache.getStyleWPadding();
+         case ITechSizer.SIZER_PROP_11_PAD_BORDER:
+            return styleCache.getStyleWPaddingBorder();
+         case ITechSizer.SIZER_PROP_12_PAD_BORDER_MARGIN:
+            return styleCache.getStyleWPaddingBorderMargin();
+         case ITechSizer.SIZER_PROP_13_BORDER:
+            return styleCache.getStyleWBorder();
+         case ITechSizer.SIZER_PROP_14_BORDER_MARGIN:
+            return styleCache.getStyleWBorderMargin();
+         case ITechSizer.SIZER_PROP_15_MARGIN:
+            return styleCache.getStyleWMargin();
          default:
             break;
       }
-      return 0;
+      throw new IllegalArgumentException();
    }
 
    public int getSizeUnitHeight() {
@@ -1707,21 +1687,15 @@ public class Drawable implements IDrawable, IBOStyle, IStringable, ILayoutable, 
       return layEngine.getW();
    }
 
-   public int getSizeW(int sizeType) {
-      if (sizeType == ITechSizer.SIZER_PROP_05_CONTENT) {
-         return layEngine.getContentW();
-      } else if (sizeType == ITechSizer.SIZER_PROP_06_CONTENT_PAD) {
-         return layEngine.getContentW() + styleCache.getStyleWPadding();
-      } else if (sizeType == ITechSizer.SIZER_PROP_07_CONTENT_PAD_BORDER) {
-         return layEngine.getW() - styleCache.getStyleWMargin();
-      }
-      return getSizeDrawnWidth();
-   }
-
    public int getSizeX(int sizeType) {
       int x = getPozeXComputed();
-      if (sizeType == ITechSizer.SIZER_PROP_05_CONTENT) {
-         return x + getStyleWLeftConsumed();
+      switch (sizeType) {
+         case ITechSizer.SIZER_PROP_05_CONTENT:
+            return x + getStyleWLeftConsumed();
+         case ITechSizer.SIZER_PROP_06_CONTENT_PAD:
+            return x + getStyleWLeftConsumed() - styleCache.getStyleWPaddingLeft();
+         default:
+            break;
       }
       return x;
    }
@@ -1731,6 +1705,10 @@ public class Drawable implements IDrawable, IBOStyle, IStringable, ILayoutable, 
          return getY() + getStyleHTopConsumed();
       }
       return getY();
+   }
+
+   public int getStatorableClassID() {
+      throw new RuntimeException("Must be implemented by subclass");
    }
 
    public ByteObject getStructStyle() {
@@ -1852,10 +1830,6 @@ public class Drawable implements IDrawable, IBOStyle, IStringable, ILayoutable, 
       return layEngine.getW();
    }
 
-   public int getWidthPreferred() {
-      return getSizePreferredWidth();
-   }
-
    public int getWidthUnit() {
       return getSizeUnitWidth();
    }
@@ -1910,10 +1884,25 @@ public class Drawable implements IDrawable, IBOStyle, IStringable, ILayoutable, 
    }
 
    /**
-    * {@link IDrawable} states
-    * <br>
-    * Thread safe because volatile field.
-    * <br>
+    * {@link IDrawable} states. Thread safe because volatile field.
+    * 
+    * <li>{@link ITechDrawable#STATE_01_DRAWING}
+    * <li>{@link ITechDrawable#STATE_02_DRAWN}
+    * <li>{@link ITechDrawable#STATE_03_HIDDEN}
+    * <li>{@link ITechDrawable#STATE_04_DRAWN_OUTSIDE}
+    * <li>{@link ITechDrawable#STATE_05_LAYOUTED}
+    * <li>{@link ITechDrawable#STATE_06_STYLED}
+    * <li>{@link ITechDrawable#STATE_07_CACHE_INVALIDATED}
+    * <li>{@link ITechDrawable#STATE_08_NO_RELAYOUTING}
+    * <li>{@link ITechDrawable#STATE_09_TRIMMED}
+    * <li>{@link ITechDrawable#STATE_10_CLIPPED}
+    * <li>{@link ITechDrawable#STATE_11_ANIMATING}
+    * <li>{@link ITechDrawable#STATE_12_APPEARING}
+    * <li>{@link ITechDrawable#STATE_13_DISAPPEARING}
+    * <li>{@link ITechDrawable#STATE_14_CACHED}
+    * <li>{@link ITechDrawable#STATE_15_EMPTY}
+    * <li>{@link ITechDrawable#STATE_16_TRANSLUCENT}
+    * <li>{@link ITechDrawable#STATE_17_OPAQUE}
     */
    public boolean hasState(int flag) {
       return (states & flag) == flag;
@@ -1923,6 +1912,21 @@ public class Drawable implements IDrawable, IBOStyle, IStringable, ILayoutable, 
       return (statesNav & flag) == flag;
    }
 
+   /**
+    * States that modify the styling
+    * 
+    * <li>{@link ITechDrawable#STYLE_01_CUSTOM}
+    * <li>{@link ITechDrawable#STYLE_02_CUSTOM}
+    * <li>{@link ITechDrawable#STYLE_03_MARKED}
+    * <li>{@link ITechDrawable#STYLE_04_GREYED}
+    * <li>{@link ITechDrawable#STYLE_05_SELECTED}
+    * <li>{@link ITechDrawable#STYLE_06_FOCUSED_KEY}
+    * <li>{@link ITechDrawable#STYLE_07_FOCUSED_POINTER}
+    * <li>{@link ITechDrawable#STYLE_08_PRESSED}
+    * <li>{@link ITechDrawable#STYLE_09_DRAGGED}
+    * <li>{@link ITechDrawable#STYLE_10_DRAGGED_OVER}
+    * <li>{@link ITechDrawable#STYLE_11_CUSTOM}
+    */
    public boolean hasStateStyle(int flag) {
       return (styleStates & flag) == flag;
    }
@@ -1936,10 +1940,6 @@ public class Drawable implements IDrawable, IBOStyle, IStringable, ILayoutable, 
     */
    public boolean hasStateVolatile(int flag) {
       return (statesVolatile & flag) == flag;
-   }
-
-   public ICtx getCtxOwner() {
-      return gc;
    }
 
    /**
@@ -1965,31 +1965,32 @@ public class Drawable implements IDrawable, IBOStyle, IStringable, ILayoutable, 
     * Reminder. Logical Positions are computed on demand. usually just before the draw
     * Setting a raw x
     */
-   public void init() {
-      setStateFlag(ITechDrawable.STATE_30_LAYOUTING, true);
+   public void initSize() {
+      setStateFlag(STATE_30_LAYOUTING, true);
       //compute pixel size based
       //might not have changed but context has changed!
       int oldDw = getDw();
       int oldDh = getDh();
 
-      if (!hasState(ITechDrawable.STATE_06_STYLED)) {
+      if (!hasState(STATE_06_STYLED)) {
          styleValidate();
       }
 
       initStyleLoad(); //load init style?
-      setStateFlagPrivate(ITechDrawable.STATE_08_NO_RELAYOUTING, false);
+      setStateFlagPrivate(STATE_08_NO_RELAYOUTING, false);
 
       layEngine.layoutUpdateSizeCheck();
-      initDrawable(layEngine);
-
+      
+      initDrawableSub();
       initStyleUnload();
 
       //set flag just before sending event
-      setStateFlag(ITechDrawable.STATE_05_LAYOUTED, true);
+      setStateFlag(STATE_05_LAYOUTED, true);
+      setStateFlag(STATE_30_LAYOUTING, false);
+
       if (pactor != null && (getDw() != oldDw || getDh() != oldDh)) {
-         pactor.notifyEvent(this, ITechDrawable.EVENT_12_SIZE_CHANGED, null);
+         pactor.notifyEvent(this, EVENT_12_SIZE_CHANGED, null);
       }
-      setStateFlag(ITechDrawable.STATE_30_LAYOUTING, false);
    }
 
    /**
@@ -2036,7 +2037,6 @@ public class Drawable implements IDrawable, IBOStyle, IStringable, ILayoutable, 
       LayouterCtx lac = gc.getLAC();
       SizerFactory sizerFactory = lac.getSizerFactory();
       if (width > 0) {
-         this.layEngine.setManualOverrideW(true);
          layEngine.setOverrideW(width);
       } else {
          if (width == 0) {
@@ -2049,8 +2049,7 @@ public class Drawable implements IDrawable, IBOStyle, IStringable, ILayoutable, 
          }
       }
       if (height > 0) {
-         this.layEngine.setManualOverrideH(true);
-         layEngine.setOverrideH(width);
+         layEngine.setOverrideH(height);
       } else {
          if (height == 0) {
             layEngine.setManualOverrideH(false);
@@ -2061,8 +2060,21 @@ public class Drawable implements IDrawable, IBOStyle, IStringable, ILayoutable, 
             layEngine.getArea().setSizerH(sizerFactory.getSizerLogicUnit(-height));
          }
       }
-      init();
+      initSize();
 
+   }
+
+   public void setPixelsW(int w) {
+      layEngine.setOverrideW(w);
+   }
+
+   public void setPixelsH(int h) {
+      layEngine.setOverrideH(h);
+   }
+
+   public void setSizePixels(int w, int h) {
+      layEngine.setOverrideW(w);
+      layEngine.setOverrideH(h);
    }
 
    /**
@@ -2077,13 +2089,17 @@ public class Drawable implements IDrawable, IBOStyle, IStringable, ILayoutable, 
     * @param width
     * @param height
     */
-   public void initDrawable(LayEngineDrawable ds) {
+   protected void initDrawableSub() {
 
    }
 
-   public void initH(ByteObject sizerH) {
+   /**
+    * Modifies the H sizer and directly call the initSize method
+    * @param sizerH
+    */
+   public void initSizerH(ByteObject sizerH) {
       layEngine.getLay().setSizerH(sizerH);
-      init();
+      initSize();
    }
 
    /**
@@ -2094,8 +2110,11 @@ public class Drawable implements IDrawable, IBOStyle, IStringable, ILayoutable, 
     * {@link Drawable} B position and dimension are both relative to
     * Drawable A. 
     * Drawable A moves in his Parent Rectangle. Drawable B managed by Parent
+    * 
     * Everytime Drawable A position is invalidated, Parent requests a init on all
     * children. 
+    * 
+    * {@link ITechDrawable#STATE_26_POSITIONED}
     */
    public void initPosition() {
       layoutUpdatePositionCheck();
@@ -2135,9 +2154,9 @@ public class Drawable implements IDrawable, IBOStyle, IStringable, ILayoutable, 
     * Init the width, keep the actual height definition 
     * @param sizerW
     */
-   public void initW(ByteObject sizerW) {
+   public void initSizerW(ByteObject sizerW) {
       layEngine.getLay().setSizerW(sizerW);
-      init();
+      initSize();
    }
 
    /**
@@ -2147,7 +2166,7 @@ public class Drawable implements IDrawable, IBOStyle, IStringable, ILayoutable, 
     * What if a component new layout influence the layout of another component that was not invalidated?
     * 
     * <br>
-    * The {@link IDrawable#draw(GraphicsX)} will call {@link IDrawable#init()}
+    * The {@link IDrawable#draw(GraphicsX)} will call {@link IDrawable#initSize()}
     * <br>
     * 
     * The goal is to avoid multiple relayouts in the interval of 2 repaints.
@@ -2158,8 +2177,8 @@ public class Drawable implements IDrawable, IBOStyle, IStringable, ILayoutable, 
    public void invalidateLayout() {
       //#debug
       toDLog().pInit("Layout Invalided", this, Drawable.class, "invalidateLayout", LVL_03_FINEST, true);
-      setStateFlag(ITechDrawable.STATE_05_LAYOUTED, false);
-      setStateFlag(ITechDrawable.STATE_26_POSITIONED, false);
+      setStateFlag(STATE_05_LAYOUTED, false);
+      setStateFlag(STATE_26_POSITIONED, false);
    }
 
    /***
@@ -2180,7 +2199,7 @@ public class Drawable implements IDrawable, IBOStyle, IStringable, ILayoutable, 
          styleClass = gc.getClass(id);
       }
       invalidateLayout();
-      setStateFlag(ITechDrawable.STATE_06_STYLED, false);
+      setStateFlag(STATE_06_STYLED, false);
    }
 
    /**
@@ -2210,12 +2229,12 @@ public class Drawable implements IDrawable, IBOStyle, IStringable, ILayoutable, 
     * @return
     */
    public boolean isOpaque() {
-      if (this.hasState(ITechDrawable.STATE_18_OPAQUE_COMPUTED)) {
-         return this.hasState(ITechDrawable.STATE_17_OPAQUE);
+      if (this.hasState(STATE_18_OPAQUE_COMPUTED)) {
+         return this.hasState(STATE_17_OPAQUE);
       } else {
          boolean b = getStyleOp().isOpaqueBgLayersStyle(style, getStyleAreas());
-         this.setStateFlag(ITechDrawable.STATE_17_OPAQUE, b);
-         this.setStateFlag(ITechDrawable.STATE_18_OPAQUE_COMPUTED, true);
+         this.setStateFlag(STATE_17_OPAQUE, b);
+         this.setStateFlag(STATE_18_OPAQUE_COMPUTED, true);
          return b;
       }
    }
@@ -2287,7 +2306,7 @@ public class Drawable implements IDrawable, IBOStyle, IStringable, ILayoutable, 
     * Force the resizing of everything drawable in the chain.
     * <br>
     * The layout flags are first set to false, then reinit of with
-    * {@link Drawable#init()}
+    * {@link Drawable#initSize()}
     * @param child not null when cause of update was a change in 
     * Drawable will decide if it needs to update its dimension.
     */
@@ -2297,7 +2316,7 @@ public class Drawable implements IDrawable, IBOStyle, IStringable, ILayoutable, 
       int w = getDrawnWidth();
       int h = getDrawnHeight();
 
-      init();
+      initSize();
       if (parent != null) {
          if (w != getDrawnWidth() || h != getDrawnHeight() || x != getX() || y != getY()) {
             parent.layoutUpdate(child);
@@ -2354,15 +2373,15 @@ public class Drawable implements IDrawable, IBOStyle, IStringable, ILayoutable, 
     * Overrides this method
     */
    public void manageKeyInput(InputConfig ic) {
-      if (parent != null && hasBehavior(ITechDrawable.BEHAVIOR_23_PARENT_EVENT_CONTROL)) {
+      if (parent != null && hasBehavior(BEHAVIOR_23_PARENT_EVENT_CONTROL)) {
          if (parent instanceof IDrawableListener) {
-            ((IDrawableListener) parent).notifyEvent(this, ITechDrawable.EVENT_13_KEY_EVENT, ic);
+            ((IDrawableListener) parent).notifyEvent(this, EVENT_13_KEY_EVENT, ic);
          } else {
             throw new ClassCastException("Parent Drawable must implement IPointerActor");
          }
       }
       if (pactor != null) {
-         pactor.notifyEvent(this, ITechDrawable.EVENT_13_KEY_EVENT, ic);
+         pactor.notifyEvent(this, EVENT_13_KEY_EVENT, ic);
       }
 
    }
@@ -2438,15 +2457,15 @@ public class Drawable implements IDrawable, IBOStyle, IStringable, ILayoutable, 
 
       //use a callback
       //First pass. check
-      if (parent != null && hasBehavior(ITechDrawable.BEHAVIOR_23_PARENT_EVENT_CONTROL)) {
+      if (parent != null && hasBehavior(BEHAVIOR_23_PARENT_EVENT_CONTROL)) {
          if (parent instanceof IDrawableListener) {
-            ((IDrawableListener) parent).notifyEvent(this, ITechDrawable.EVENT_14_POINTER_EVENT, ic);
+            ((IDrawableListener) parent).notifyEvent(this, EVENT_14_POINTER_EVENT, ic);
          } else {
             throw new ClassCastException("Parent Drawable must implement IPointerActor");
          }
       }
       if (pactor != null) {
-         pactor.notifyEvent(this, ITechDrawable.EVENT_14_POINTER_EVENT, ic);
+         pactor.notifyEvent(this, EVENT_14_POINTER_EVENT, ic);
       }
       if (!ic.sr.isDrawableStatesSet()) {
          managePointerStateStyle(ic);
@@ -2482,14 +2501,14 @@ public class Drawable implements IDrawable, IBOStyle, IStringable, ILayoutable, 
          gc.getFocusCtrl().newFocusPointerPress(ic, this);
       } else if (ic.isPressed()) {
 
-         setStateStyle(ITechDrawable.STYLE_08_PRESSED, true);
+         setStateStyle(STYLE_08_PRESSED, true);
          //only do the gesture ctrl flow if no gesture has already been registered.
          //ie. if the drawable is not already in the gesture
          gc.getFocusCtrl().newFocusPointerPress(ic, this);
          ic.srActionDoneRepaint(this);
       } else if (ic.isReleased()) {
-         setStateStyle(ITechDrawable.STYLE_08_PRESSED, false);
-         setStateStyle(ITechDrawable.STYLE_09_DRAGGED, false);
+         setStateStyle(STYLE_08_PRESSED, false);
+         setStateStyle(STYLE_09_DRAGGED, false);
          //the release is done outside the drawable but it got called because 
          //it was the draggable. so it gets a chance to set state
          if (!DrawableUtilz.isInside(ic, this)) {
@@ -2499,7 +2518,7 @@ public class Drawable implements IDrawable, IBOStyle, IStringable, ILayoutable, 
          //Controller.getMe().draggedRemover(this, ic);
 
       } else if (ic.isDraggedPointer0Button0()) {
-         setStateStyle(ITechDrawable.STYLE_09_DRAGGED, true);
+         setStateStyle(STYLE_09_DRAGGED, true);
          ic.srActionDoneRepaint(this);
       } else if (ic.isWheeled()) {
 
@@ -2584,37 +2603,37 @@ public class Drawable implements IDrawable, IBOStyle, IStringable, ILayoutable, 
     */
    public void notifyEvent(final int event, Object o) {
       //#debug
-      toLog().pEvent1(ToStringStaticGui.toStringEvent(event) + " : " + ToStringStaticGui.toStringStates(this), this, Drawable.class, "notifyEvent");
+      toDLog().pEvent1(ToStringStaticGui.toStringEvent(event) + " : " + ToStringStaticGui.toStringStates(this), this, Drawable.class, "notifyEvent");
 
       switch (event) {
-         case ITechDrawable.EVENT_01_NOTIFY_SHOW:
+         case EVENT_01_NOTIFY_SHOW:
             notifyEventShow();
             break;
-         case ITechDrawable.EVENT_02_NOTIFY_HIDE:
+         case EVENT_02_NOTIFY_HIDE:
             notifyEventHide();
             break;
-         case ITechDrawable.EVENT_03_KEY_FOCUS_GAIN:
+         case EVENT_03_KEY_FOCUS_GAIN:
             notifyEventKeyFocusGain((BusEvent) o);
             break;
-         case ITechDrawable.EVENT_04_KEY_FOCUS_LOSS:
+         case EVENT_04_KEY_FOCUS_LOSS:
             notifyEventKeyFocusLost((BusEvent) o);
             break;
-         case ITechDrawable.EVENT_05_ANIM_FINISHED:
+         case EVENT_05_ANIM_FINISHED:
             notifyEventAnimFinished(o);
             break;
-         case ITechDrawable.EVENT_06_ANIM_STARTED:
+         case EVENT_06_ANIM_STARTED:
             notifyEventAnimStarted(o);
             break;
-         case ITechDrawable.EVENT_07_POINTER_FOCUS_LOSS:
-            setStateStyle(ITechDrawable.STYLE_07_FOCUSED_POINTER, false);
+         case EVENT_07_POINTER_FOCUS_LOSS:
+            setStateStyle(STYLE_07_FOCUSED_POINTER, false);
             break;
-         case ITechDrawable.EVENT_08_POINTER_FOCUS_GAIN:
-            setStateStyle(ITechDrawable.STYLE_07_FOCUSED_POINTER, true);
+         case EVENT_08_POINTER_FOCUS_GAIN:
+            setStateStyle(STYLE_07_FOCUSED_POINTER, true);
             break;
-         case ITechDrawable.EVENT_10_STYLE_STATE_CHANGE:
+         case EVENT_10_STYLE_STATE_CHANGE:
             //cast Object to event state change container.
             break;
-         case ITechDrawable.EVENT_11_REFRESH_CLEAN:
+         case EVENT_11_REFRESH_CLEAN:
             //cast Object to event state change container.
             notifyEventRefresh();
             break;
@@ -2661,13 +2680,13 @@ public class Drawable implements IDrawable, IBOStyle, IStringable, ILayoutable, 
       if (da != null) {
          da.showExit();
       }
-      if (!hasState(ITechDrawable.STATE_13_DISAPPEARING)) {
-         setStateFlag(ITechDrawable.STATE_03_HIDDEN, true);
+      if (!hasState(STATE_13_DISAPPEARING)) {
+         setStateFlag(STATE_03_HIDDEN, true);
       }
    }
 
    public void notifyEventKeyFocusGain(BusEvent e) {
-      setStateStyle(ITechDrawable.STYLE_06_FOCUSED_KEY, true);
+      setStateStyle(STYLE_06_FOCUSED_KEY, true);
    }
 
    /**
@@ -2678,7 +2697,7 @@ public class Drawable implements IDrawable, IBOStyle, IStringable, ILayoutable, 
     * 
     */
    public void notifyEventKeyFocusLost(BusEvent e) {
-      setStateStyle(ITechDrawable.STYLE_06_FOCUSED_KEY, false);
+      setStateStyle(STYLE_06_FOCUSED_KEY, false);
    }
 
    public void notifyEventRefresh() {
@@ -2706,7 +2725,7 @@ public class Drawable implements IDrawable, IBOStyle, IStringable, ILayoutable, 
       if (da != null) {
          da.notifyShow();
       }
-      setStateFlag(ITechDrawable.STATE_03_HIDDEN, false);
+      setStateFlag(STATE_03_HIDDEN, false);
    }
 
    /**
@@ -2770,7 +2789,7 @@ public class Drawable implements IDrawable, IBOStyle, IStringable, ILayoutable, 
                   if (animsDrw[j] != null) {
                      animsDrw[j].setValue(IBOAnim.ANIM_OFFSET_06_TARGET1, flag, 1);
                      FigDrawable fg = new FigDrawable(gc, gc.getDefaultStyles().getEmptyStyleClass(), styleSub);
-                     fg.setBehaviorFlag(ITechDrawable.BEHAVIOR_04_CONTENT_ONLY, true);
+                     fg.setBehaviorFlag(BEHAVIOR_04_CONTENT_ONLY, true);
                      //create an intermediary 
                      IAnimable ianim = gc.getAnimFactory().createDrawableAnimable(animsDrw[j], fg);
                      addAnimationLayer(ianim);
@@ -2846,10 +2865,10 @@ public class Drawable implements IDrawable, IBOStyle, IStringable, ILayoutable, 
     * 
     * When to initialize a {@link CmdCtx} in {@link Drawable} constructor?
     * 
-    * @param ctx
+    * @param cmdNode
     */
-   public void setCmdCtx(CmdNode ctx) {
-      cmdCtx = ctx;
+   public void setCmdNote(CmdNode cmdNode) {
+      this.cmdNode = cmdNode;
    }
 
    public void setCtrlFlag(int flag, boolean value) {
@@ -2873,12 +2892,12 @@ public class Drawable implements IDrawable, IBOStyle, IStringable, ILayoutable, 
       styleInvalidate();
    }
 
-   public void setDebugName(String name) {
-      debugName = name;
+   public void setDependency(ILayoutable lay, int flags) {
+      layEngine.setDependency(lay, flags);
    }
 
    protected void setDh(int dh) {
-      this.getDS().setOverrideH(dh);
+      this.layEngine.setOverrideH(dh);
    }
 
    /**
@@ -2914,7 +2933,7 @@ public class Drawable implements IDrawable, IBOStyle, IStringable, ILayoutable, 
    }
 
    protected void setDw(int dw) {
-      this.getDS().setOverrideW(dw);
+      this.layEngine.setOverrideW(dw);
    }
 
    /**
@@ -2957,8 +2976,24 @@ public class Drawable implements IDrawable, IBOStyle, IStringable, ILayoutable, 
     * @param h
     */
    public void setSizers(ByteObject w, ByteObject h) {
-      layEngine.getLay().setSizerW(w);
+      setSizerW(w);
+      setSizerH(h);
+   }
+
+   /**
+    * Sets reference. Does not compute anything
+    * @param h
+    */
+   public void setSizerH(ByteObject h) {
       layEngine.getLay().setSizerH(h);
+   }
+
+   /**
+    * Sets reference. Does not compute anything
+    * @param w
+    */
+   public void setSizerW(ByteObject w) {
+      layEngine.getLay().setSizerW(w);
    }
 
    /**
@@ -3046,7 +3081,7 @@ public class Drawable implements IDrawable, IBOStyle, IStringable, ILayoutable, 
          styleValidate();
          //TODO do we invalidate Layout?
          //we do have to invalidate opaqueness
-         setStateFlag(ITechDrawable.STATE_18_OPAQUE_COMPUTED, false);
+         setStateFlag(STATE_18_OPAQUE_COMPUTED, false);
       } else {
          //#debug
          toDLog().pState("IG \t" + msgBase, this, Drawable.class, "setStateStyle", LVL_05_FINE, true);
@@ -3092,6 +3127,9 @@ public class Drawable implements IDrawable, IBOStyle, IStringable, ILayoutable, 
       states = BitUtils.setFlag(states, flag, value);
    }
 
+   /**
+    * 
+    */
    public void setViewContext(ViewContext vc) {
       this.vc = vc;
    }
@@ -3234,7 +3272,7 @@ public class Drawable implements IDrawable, IBOStyle, IStringable, ILayoutable, 
     * @param g
     */
    public void show(GraphicsX g) {
-      DrawableUtilz.aboutToShow(this);
+      this.notifyEvent(EVENT_01_NOTIFY_SHOW);
       draw(g);
    }
 
@@ -3311,9 +3349,9 @@ public class Drawable implements IDrawable, IBOStyle, IStringable, ILayoutable, 
    //   }
 
    protected void styleInvalidate() {
-      setStateFlag(ITechDrawable.STATE_06_STYLED, false);
-      setStateFlag(ITechDrawable.STATE_18_OPAQUE_COMPUTED, false);
-      setStateFlag(ITechDrawable.STATE_07_CACHE_INVALIDATED, true);
+      setStateFlag(STATE_06_STYLED, false);
+      setStateFlag(STATE_18_OPAQUE_COMPUTED, false);
+      setStateFlag(STATE_07_CACHE_INVALIDATED, true);
       styleCache.invalidateValues();
    }
 
@@ -3347,24 +3385,13 @@ public class Drawable implements IDrawable, IBOStyle, IStringable, ILayoutable, 
       processAnimFigure(currentStyle);
 
       //state style previously made are set.
-      setStateFlag(ITechDrawable.STATE_06_STYLED, true);
-   }
-
-   public IDLog toDLog() {
-      return gc.toDLog();
-   }
-
-   //#mdebug
-   public IDLog toLog() {
-      return gc.toDLog();
-   }
-
-   public String toString() {
-      return Dctx.toString(this);
+      setStateFlag(STATE_06_STYLED, true);
    }
 
    public void toString(Dctx dc) {
-      dc.root(this, Drawable.class);
+      dc.root(this, Drawable.class, 3360);
+      toStringPrivate(dc);
+      super.toString(dc.sup());
       dc.append(" x=" + getX() + " y=" + getY());
       dc.append(" dw=" + getDw());
       if (getDw() != getDrawnWidth()) {
@@ -3430,6 +3457,8 @@ public class Drawable implements IDrawable, IBOStyle, IStringable, ILayoutable, 
 
       }
 
+      dc.nlLvl(styleCache, "styleCache");
+
       if (dc.hasFlagData(gc, IFlagsToStringGui.D_FLAG_02_STYLE_CLASS)) {
          //cannot be null
          dc.nlLvl(styleClass);
@@ -3450,22 +3479,17 @@ public class Drawable implements IDrawable, IBOStyle, IStringable, ILayoutable, 
       }
 
       dc.nlLvlList("Listener", pactor);
-      dc.nlLvl(cmdCtx, "CmdCtx");
+      dc.nlLvl(cmdNode, "CmdCtx");
 
       dc.listNulls();
    }
 
-   public String toString1Line() {
-      return Dctx.toString1Line(this);
-   }
-
    public void toString1Line(Dctx dc) {
-      dc.root1Line(this, "Drawable");
+      dc.root1Line(this, Drawable.class);
+      toStringPrivate(dc);
+      super.toString1Line(dc.sup1Line());
       if (parent != null && parent instanceof IDrawListener) {
          dc.append("Injected by '" + parent.toString1Line() + "'");
-      }
-      if (debugName != null) {
-         dc.appendWithSpace(debugName);
       }
       dc.append(toStringDimension());
    }
@@ -3474,19 +3498,15 @@ public class Drawable implements IDrawable, IBOStyle, IStringable, ILayoutable, 
       return "[" + getX() + "," + getY() + " " + getDrawnWidth() + "," + getDrawnHeight() + "]";
    }
 
-   public UCtx toStringGetUCtx() {
-      return gc.getUCtx();
-   }
-
-   public String toStringName() {
-      return debugName;
-   }
-
    public String toStringOneLineStates() {
       StringBBuilder sb = new StringBBuilder(gc.getUCtx());
       sb.append("");
       sb.append(ToStringStaticGui.toStringStates(this));
       return sb.toString();
+   }
+
+   private void toStringPrivate(Dctx dc) {
+
    }
    //#enddebug
 }

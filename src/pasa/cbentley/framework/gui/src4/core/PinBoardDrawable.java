@@ -227,12 +227,13 @@ public class PinBoardDrawable extends ViewDrawable {
          //no content
          ph = 10;
       }
-      this.ph = ph;
       if (pw == 0) {
          //no content
          pw = 10;
       }
-      this.pw = pw;
+      layEngine.setPw(pw);
+      layEngine.setPh(ph);
+      
       addStyleToPrefSize();
 
       //update positions

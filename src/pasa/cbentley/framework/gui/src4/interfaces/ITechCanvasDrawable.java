@@ -151,7 +151,7 @@ public interface ITechCanvasDrawable extends ITech {
    public static final int REPAINT_10_SPECIAL            = 1 << 9;
 
    /**
-    * When set, ignores states in the {@link IDrawable#draw(mordan.draw.GraphicsX)} method.
+    * When set, ignores states in the {@link IDrawable#draw(GraphicsX)} method.
     * <li> {@link ITechDrawable#STATE_03_HIDDEN}
     * <li> {@link ITechDrawable#STATE_02_DRAWN}
     * <li> {@link ITechDrawable#STATE_20_ANIMATED_FULL_HIDDEN}
@@ -192,6 +192,9 @@ public interface ITechCanvasDrawable extends ITech {
 
    public static final int SCREEN_3_RIGHT_ROTATED        = 3;
 
+   /**
+    * 
+    */
    public static final int CMD_PRO_0                     = 0;
 
    public static final int CMD_PRO_1                     = 1;

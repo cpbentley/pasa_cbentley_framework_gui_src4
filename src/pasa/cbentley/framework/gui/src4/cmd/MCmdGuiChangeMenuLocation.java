@@ -17,7 +17,7 @@ import pasa.cbentley.framework.gui.src4.interfaces.IUIView;
 import pasa.cbentley.framework.gui.src4.menu.CmdMenuBar;
 import pasa.cbentley.framework.gui.src4.menu.IMenus;
 import pasa.cbentley.framework.gui.src4.table.TableView;
-import pasa.cbentley.framework.gui.src4.table.interfaces.IBOTableView;
+import pasa.cbentley.framework.gui.src4.table.interfaces.ITechTable;
 
 public class MCmdGuiChangeMenuLocation extends MCmdGui implements IEventConsumer {
 
@@ -42,7 +42,7 @@ public class MCmdGuiChangeMenuLocation extends MCmdGui implements IEventConsumer
    public void execute(InputConfig ic) {
       CmdInstance cmd = ic.getCmdInstance();
       //default menu bar is the one of the root canvas
-      CmdMenuBar cm = gc.getCanvasCtxRoot().getMenuBar();
+      CmdMenuBar cm = gc.getCanvasGCRoot().getMenuBar();
       int pos = cm.getMenuBarTech().get1(IMenus.MENUS_OFFSET_02_POSITION1);
       //iterate version of command
       if (cmd.hasFlag(CmdInstance.STATE_FLAG_2_CANCELED))
@@ -71,7 +71,7 @@ public class MCmdGuiChangeMenuLocation extends MCmdGui implements IEventConsumer
          tv.getLay().layPoz_BotToBot_OfParent();
          tv.getLay().layPoz_EndToEnd_Parent();
 
-         tv.addEventListener(this, IBOTableView.EVENT_ID_00_SELECT);
+         tv.addEventListener(this, ITechTable.EVENT_ID_00_SELECT);
          //show the form as child of current front drawable
          menuPosTable = tv;
          activeCmdMenuPos = cmd;

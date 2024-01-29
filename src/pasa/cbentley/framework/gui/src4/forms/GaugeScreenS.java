@@ -56,7 +56,7 @@ public class GaugeScreenS extends TableLayoutView implements IBProgessable {
       ctx.addMenuCmd(ICmdsView.CMD_05_CANCEL);
       ctx.addMenuCmd(ICmdsView.VCMD_13_HIDE);
 
-      setCmdCtx(ctx);
+      setCmdNote(ctx);
    }
 
    /**

@@ -55,9 +55,9 @@ public class InputConfig implements IStringable, IInput, IActionFeedback {
 
    public CanvasResultDrawable sr;
 
-   protected final CanvasAppliDrawable  canvas;
+   protected final CanvasAppliInputGui  canvas;
 
-   public InputConfig(GuiCtx gc, CanvasAppliDrawable canvas, InputStateDrawable isd, CanvasResultDrawable srd) {
+   public InputConfig(GuiCtx gc, CanvasAppliInputGui canvas, InputStateDrawable isd, CanvasResultDrawable srd) {
       this.canvas = canvas;
       is = isd;
       sr = srd;
@@ -78,7 +78,7 @@ public class InputConfig implements IStringable, IInput, IActionFeedback {
       return gc;
    }
 
-   public CanvasAppliDrawable getCanvas() {
+   public CanvasAppliInputGui getCanvas() {
       return canvas;
    }
 
@@ -696,7 +696,7 @@ public class InputConfig implements IStringable, IInput, IActionFeedback {
    }
 
    public String toStringMod() {
-      return ToStringStaticCoreUi.getStringMod(is.getMode());
+      return ToStringStaticCoreUi.toStringMod(is.getMode());
    }
    //#enddebug
 

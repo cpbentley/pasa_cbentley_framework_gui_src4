@@ -12,9 +12,9 @@ import pasa.cbentley.framework.coreui.src4.utils.ViewState;
 import pasa.cbentley.framework.drawx.src4.engine.GraphicsX;
 import pasa.cbentley.framework.drawx.src4.engine.RgbImage;
 import pasa.cbentley.framework.gui.src4.anim.move.Move;
-import pasa.cbentley.framework.gui.src4.canvas.CanvasAppliDrawable;
+import pasa.cbentley.framework.gui.src4.canvas.CanvasAppliInputGui;
 import pasa.cbentley.framework.gui.src4.canvas.CanvasResultDrawable;
-import pasa.cbentley.framework.gui.src4.canvas.ExecutionCtxDraw;
+import pasa.cbentley.framework.gui.src4.canvas.ExecutionContextGui;
 import pasa.cbentley.framework.gui.src4.canvas.FocusCtrl;
 import pasa.cbentley.framework.gui.src4.canvas.InputConfig;
 import pasa.cbentley.framework.gui.src4.canvas.TopologyDLayer;
@@ -184,7 +184,7 @@ public interface IDrawable extends IStringable, ITechDrawable, IStatorable, IBen
     */
    public void drawDrawable(GraphicsX g);
 
-   public CanvasAppliDrawable getCanvas();
+   public CanvasAppliInputGui getCanvas();
 
    /**
     * Children {@link IDrawable} managed by this {@link IDrawable}.
@@ -211,7 +211,7 @@ public interface IDrawable extends IStringable, ITechDrawable, IStatorable, IBen
     */
    public int getCType();
 
-   public IDrawable getDrawable(int x, int y, ExecutionCtxDraw ex);
+   public IDrawable getDrawable(int x, int y, ExecutionContextGui ex);
 
    /**
     * 
@@ -460,7 +460,7 @@ public interface IDrawable extends IStringable, ITechDrawable, IStatorable, IBen
    /**
     * Init with the defaults sizer or the sizers set by {@link IDrawable#setSizers(ByteObject, ByteObject)}
     */
-   public void init();
+   public void initSize();
 
    /**
     * Initialize the drawable width and height of the {@link IDrawable} using {@link ITechDrawable#DIMENSION_API} semantics.
@@ -514,7 +514,7 @@ public interface IDrawable extends IStringable, ITechDrawable, IStatorable, IBen
     * Force the resizing of everything drawable in the chain.
     * <br>
     * The layout flags are first set to false, then reinit of with
-    * {@link Drawable#init()}
+    * {@link Drawable#initSize()}
     * @param child not null when cause of update was a change in 
     * Drawable will decide if it needs to update its dimension.
     */
@@ -586,42 +586,9 @@ public interface IDrawable extends IStringable, ITechDrawable, IStatorable, IBen
     */
    public void manageRepeatInput(InputConfig ic);
 
-   //   /**
-   //    * Call Back for DownCmd
-   //    *
-   //    */
-   //   public void navigateDown(InputConfig ic);
-   //
-   //   /**
-   //    * Called only if {@link ITechDrawable#BEHAVIOR_27_NAV_HORIZONTAL} is true.
-   //    * <br>
-   //    * First call in cycle with {@link InputConfig#isFirstNavCycle()}
-   //    * <br>
-   //    * Second call, implements any second cycle stuff like cycles or other stuff.
-   //    * @param ic
-   //    */
-   //   public void navigateLeft(InputConfig ic);
-   //
-   //   /**
-   //    * Implement to the right horizontal traversal
-   //    * @param ic
-   //    */
-   //   public void navigateRight(InputConfig ic);
-   //
-   //   /**
-   //    * 
-   //    * @param ic
-   //    */
-   //   public void navigateSelect(InputConfig ic);
-   //
-   //   /**
-   //    * Call Back for Up Command
-   //    *
-   //    */
-   //   public void navigateUp(InputConfig ic);
 
    /**
-    * Same as {@link IDrawable#notifyEvent(int, Object)} but with a null Object
+    * See {@link IDrawable#notifyEvent(int, Object)}  with a null Object
     * @param event
     */
    public void notifyEvent(int event);
@@ -796,21 +763,22 @@ public interface IDrawable extends IStringable, ITechDrawable, IStatorable, IBen
    public void shiftXY(int dx, int dy);
 
    /**
-    * Draws Drawable on {@link GraphicsX} with animation control flow. 
-    * <br>
-    * <br>
-    * Any {@link ByteObject#ANIM_TIME_1_ENTRY} animation is launched. 
-    * <br>
-    * If animation requires it, Drawable stays hidden until the animation finishes, then a final repaint
-    * is called and {@link IDrawable#draw(GraphicsX)} do its thing. <br>
-    * Entry animation might just animate a FG layer while the Drawable is visible
-    * Hidden, when all Drawable pixel are animated into the screen.
-    * <br>
-    * <br>
+    * Draws the {@link IDrawable} on {@link GraphicsX} with animation control flow. 
+    * 
+    * <p>
+    * Animation control flow means
+    * <li>Any {@link ByteObject#ANIM_TIME_1_ENTRY} animation is launched. 
+    * <li>If animation requires it, Drawable stays hidden until the animation finishes,
+    * <li>Then a final repaint is called and {@link IDrawable#draw(GraphicsX)} do its thing.
+    * <li> Entry animation might just animate a FG layer while the Drawable is visible
+    * <li> Hidden, when all Drawable pixel are animated into the screen.
+    * </p>
+    * 
+    * 
     * <b>Implementation Note</b> : <br>
-    * Sets {@link ITechDrawable#STATE_03_HIDDEN} to false. <br>
-    * Notify events {@link ITechDrawable#EVENT_01_NOTIFY_SHOW} and {@link ITechDrawable#EVENT_08_POINTER_FOCUS_GAIN}. <br>
-    * Finally, calls {@link IDrawable#draw(GraphicsX)}.
+    * <li> Sets {@link ITechDrawable#STATE_03_HIDDEN} to false. <br>
+    * <li>Notify events {@link ITechDrawable#EVENT_01_NOTIFY_SHOW} and {@link ITechDrawable#EVENT_08_POINTER_FOCUS_GAIN}. <br>
+    * <li>Finally, calls {@link IDrawable#draw(GraphicsX)}.
     * <br>
     * <br>
     * @param g

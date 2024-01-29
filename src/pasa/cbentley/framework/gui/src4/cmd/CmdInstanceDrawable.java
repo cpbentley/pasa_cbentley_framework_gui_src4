@@ -6,7 +6,7 @@ import pasa.cbentley.framework.cmd.src4.engine.CmdNode;
 import pasa.cbentley.framework.cmd.src4.engine.MCmd;
 import pasa.cbentley.framework.cmd.src4.trigger.CmdTrigger;
 import pasa.cbentley.framework.coreui.src4.tech.ITechInputFeedback;
-import pasa.cbentley.framework.gui.src4.canvas.ExecutionCtxDraw;
+import pasa.cbentley.framework.gui.src4.canvas.ExecutionContextGui;
 import pasa.cbentley.framework.gui.src4.canvas.InputConfig;
 import pasa.cbentley.framework.gui.src4.ctx.GuiCtx;
 import pasa.cbentley.framework.gui.src4.interfaces.IDrawable;
@@ -62,8 +62,8 @@ public class CmdInstanceDrawable extends CmdInstance {
       return childCmd;
    }
 
-   public ExecutionCtxDraw getDExCtx() {
-      return (ExecutionCtxDraw) exeCtx;
+   public ExecutionContextGui getDExCtx() {
+      return (ExecutionContextGui) exeCtx;
    }
 
    public InputConfig getIC() {

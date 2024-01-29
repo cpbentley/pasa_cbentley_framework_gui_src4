@@ -6,8 +6,8 @@ import pasa.cbentley.core.src4.logging.Dctx;
 import pasa.cbentley.framework.gui.src4.anim.base.DrawableAnim;
 import pasa.cbentley.framework.gui.src4.anim.move.Move;
 import pasa.cbentley.framework.gui.src4.canvas.CanvasResultDrawable;
-import pasa.cbentley.framework.gui.src4.canvas.CanvasAppliDrawable;
-import pasa.cbentley.framework.gui.src4.canvas.RepaintCtrlDrawable;
+import pasa.cbentley.framework.gui.src4.canvas.CanvasAppliInputGui;
+import pasa.cbentley.framework.gui.src4.canvas.RepaintCtrlGui;
 import pasa.cbentley.framework.gui.src4.ctx.GuiCtx;
 import pasa.cbentley.framework.gui.src4.interfaces.IAnimable;
 import pasa.cbentley.framework.gui.src4.interfaces.IDrawable;
@@ -78,9 +78,9 @@ public class Realisator1Thread extends Realisator implements ITechAnimable {
 
    private long                 timeTurns;
 
-   protected final CanvasAppliDrawable   canvas;
+   protected final CanvasAppliInputGui   canvas;
 
-   public Realisator1Thread(GuiCtx gc, CanvasAppliDrawable canvas) {
+   public Realisator1Thread(GuiCtx gc, CanvasAppliInputGui canvas) {
       super(gc);
       this.canvas = canvas;
       //asks the Canvas to create an animation screen result object
@@ -237,7 +237,7 @@ public class Realisator1Thread extends Realisator implements ITechAnimable {
    public void run() {
       try {
          final ITimeCtrl time = gc.getCFC().getTimeCtrl();
-         final RepaintCtrlDrawable rcd = canvas.getRepaintCtrlDraw();
+         final RepaintCtrlGui rcd = canvas.getRepaintCtrlDraw();
          //all this is in the animation thread
          while (true) {
             if (numAnimations == 0) {

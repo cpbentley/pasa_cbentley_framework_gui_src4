@@ -7,7 +7,7 @@ import pasa.cbentley.core.src4.interfaces.C;
 import pasa.cbentley.core.src4.logging.Dctx;
 import pasa.cbentley.core.src4.logging.IStringable;
 import pasa.cbentley.framework.drawx.src4.engine.GraphicsX;
-import pasa.cbentley.framework.gui.src4.canvas.CanvasAppliDrawable;
+import pasa.cbentley.framework.gui.src4.canvas.CanvasAppliInputGui;
 import pasa.cbentley.framework.gui.src4.ctx.GuiCtx;
 import pasa.cbentley.framework.gui.src4.interfaces.IDrawable;
 
@@ -23,7 +23,7 @@ public class ForegroundsQueues implements IStringable {
       ds[0] = null;
    }
 
-   private CanvasAppliDrawable canvas;
+   private CanvasAppliInputGui canvas;
 
    private Timer      foregroundsTimer = new Timer();
 
@@ -35,7 +35,7 @@ public class ForegroundsQueues implements IStringable {
 
    private GuiCtx     gc;
 
-   public ForegroundsQueues(GuiCtx gc, CanvasAppliDrawable canvas) {
+   public ForegroundsQueues(GuiCtx gc, CanvasAppliInputGui canvas) {
       this.gc = gc;
       this.canvas = canvas;
    }

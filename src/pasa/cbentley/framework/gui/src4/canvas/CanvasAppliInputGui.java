@@ -19,22 +19,25 @@ import pasa.cbentley.framework.coreui.src4.exec.ExecEntry;
 import pasa.cbentley.framework.coreui.src4.exec.ExecutionContext;
 import pasa.cbentley.framework.coreui.src4.interfaces.ICanvasHost;
 import pasa.cbentley.framework.coreui.src4.interfaces.ITechEventHost;
+import pasa.cbentley.framework.coreui.src4.tech.IBOCanvasHost;
+import pasa.cbentley.framework.coreui.src4.tech.IInput;
 import pasa.cbentley.framework.coreui.src4.tech.ITechCodes;
 import pasa.cbentley.framework.coreui.src4.tech.ITechHostUI;
-import pasa.cbentley.framework.coreui.src4.tech.IInput;
-import pasa.cbentley.framework.coreui.src4.tech.IBOCanvasHost;
 import pasa.cbentley.framework.drawx.src4.engine.GraphicsX;
 import pasa.cbentley.framework.drawx.src4.engine.RgbImage;
+import pasa.cbentley.framework.drawx.src4.tech.ITechGraphicsX;
 import pasa.cbentley.framework.gui.src4.anim.AnimCreator;
 import pasa.cbentley.framework.gui.src4.cmd.CmdInstanceDrawable;
 import pasa.cbentley.framework.gui.src4.core.FigDrawable;
+import pasa.cbentley.framework.gui.src4.core.StyleClass;
 import pasa.cbentley.framework.gui.src4.core.TopoViewDrawable;
 import pasa.cbentley.framework.gui.src4.ctx.CanvasGuiCtx;
 import pasa.cbentley.framework.gui.src4.ctx.GuiCtx;
 import pasa.cbentley.framework.gui.src4.ctx.ITechCtxSettingsAppGui;
+import pasa.cbentley.framework.gui.src4.ctx.ToStringStaticGui;
 import pasa.cbentley.framework.gui.src4.interfaces.ICmdsView;
 import pasa.cbentley.framework.gui.src4.interfaces.IDrawable;
-import pasa.cbentley.framework.gui.src4.interfaces.IDrawableExCtx;
+import pasa.cbentley.framework.gui.src4.interfaces.ITechExecutionContextGui;
 import pasa.cbentley.framework.gui.src4.interfaces.IDrawableListener;
 import pasa.cbentley.framework.gui.src4.interfaces.ITechCanvasDrawable;
 import pasa.cbentley.framework.gui.src4.interfaces.ITechDrawable;
@@ -49,8 +52,8 @@ import pasa.cbentley.framework.input.src4.CanvasResult;
 import pasa.cbentley.framework.input.src4.InputState;
 import pasa.cbentley.framework.input.src4.RepaintCtrl;
 import pasa.cbentley.framework.input.src4.ScreenOrientationCtrl;
-import pasa.cbentley.framework.input.src4.interfaces.ITechPaintThread;
 import pasa.cbentley.framework.input.src4.interfaces.ITechInputCycle;
+import pasa.cbentley.framework.input.src4.interfaces.ITechPaintThread;
 import pasa.cbentley.layouter.src4.engine.LayouterDebugBreaker;
 import pasa.cbentley.layouter.src4.engine.PozerFactory;
 import pasa.cbentley.layouter.src4.engine.SizerFactory;
@@ -70,44 +73,36 @@ import pasa.cbentley.layouter.src4.engine.SizerFactory;
  * @author Charles Bentley
  *
  */
-public class CanvasAppliDrawable extends CanvasAppliInput implements IDrawableListener, IAInitable {
+public class CanvasAppliInputGui extends CanvasAppliInput implements IDrawableListener, IAInitable {
 
-   public void stateReadFrom(StatorReader state) {
-      super.stateReadFrom(state);
-   }
-
-   public void stateWriteTo(StatorWriter state) {
-      super.stateWriteTo(state);
-   }
-
-   private AnimCreator               animCreator;
+   private AnimCreator       animCreator;
 
    /**
     * Clearing color at the start of each painting cycle. The clearing can be disabled
     */
-   private int                       backgroundColor;
+   private int               backgroundColor;
 
-   private CanvasDebugger            canvasDebug;
+   private CanvasGuiCtx      canvasGC;
 
-   private CmdCtx                    cc;
+   private CmdCtx            cc;
 
-   int                               cmdProcessingMode;
+   int                       cmdProcessingMode;
 
-   protected GraphicsXD              destGraphicsX;
+   protected GraphicsXD      destGraphicsX;
 
-   private CanvasDrawControl         drwControl;
+   private CanvasDrawControl drwControl;
 
-   private CanvasAppliDrawableExtras extras;
+   private CanvasExtras      extras;
 
-   private ForegroundsQueues         foregroundQueues;
+   private ForegroundsQueues foregroundQueues;
 
-   private GuiCtx                    gc;
+   private GuiCtx            gc;
 
-   private boolean                   isPainting;
+   private boolean           isPainting;
 
-   ExecutionCtxDraw                         previous;
+   ExecutionContextGui       previous;
 
-   private RenderMetrics             renderMetrics;
+   private RenderMetrics     renderMetrics;
 
    /**
     * The rotation state.
@@ -117,22 +112,16 @@ public class CanvasAppliDrawable extends CanvasAppliInput implements IDrawableLi
     * <li> {@link ITechCanvasDrawable#SCREEN_3_RIGHT_ROTATED}
     * 
     */
-   protected int                     screenConfig = ITechHostUI.SCREEN_0_TOP_NORMAL;
+   protected int             screenConfig = ITechHostUI.SCREEN_0_TOP_NORMAL;
 
-   private CanvasTechHelper          settingsHelper;
+   private CanvasBOHelper    settingsHelper;
 
-   private StyleAdapter              styleAdapter;
+   public CanvasBOHelper getCanvasBOHelper() {
+      return settingsHelper;
+   }
 
-   /**
-    * Tracks the current visible stack of {@link IDrawable}.
-    * In this topology,
-    * 0,0 is the Screen.
-    * <br>
-    * This reference will never change.
-    * <br>
-    * Can be read by both threads.
-    */
-   private TopologyDLayer            topologyRoot;
+   private StyleAdapter       styleAdapter;
+
 
    /**
     * The root element of this View. There can only be one.
@@ -141,65 +130,71 @@ public class CanvasAppliDrawable extends CanvasAppliInput implements IDrawableLi
     * <br>
     * Fixed size.
     */
-   protected TopoViewDrawable        topoViewDrawableRoot;
+   protected TopoViewDrawable topoViewDrawableRoot;
 
-   private ViewContext               vcContent;
+   private ViewContext        vcContent;
 
-   private ViewContext               vcRoot;
+   private ViewContext        vcRoot;
 
-   private CanvasGuiCtx canvasGC;
-
-   public CanvasAppliDrawable(GuiCtx gc, ByteObject canvasTechHost) {
+   public CanvasAppliInputGui(GuiCtx gc, ByteObject canvasTechHost) {
       this(gc, gc.createTechCanvasAppliDrawableDefault(), canvasTechHost);
    }
 
    /**
-    * Creates a {@link CanvasAppliDrawable} with its {@link ICanvasHost}
+    * Creates a {@link CanvasAppliInputGui} with its {@link ICanvasHost}
     * At constructor time, the Canvas size is known.
     * <br>
     * 
-    * Automatically registers {@link CanvasAppliDrawable} with {@link GuiCtx}
+    * Automatically registers {@link CanvasAppliInputGui} with {@link GuiCtx}
     * 
     * @param gc
-    * @param techCanvasAppli {@link ITechCanvasAppliDrawable}
+    * @param techCanvasAppli {@link IBOCanvasAppliGui}
     * @param techCanvasHost {@link IBOCanvasHost}
     */
-   public CanvasAppliDrawable(GuiCtx gc, ByteObject techCanvasAppli, ByteObject techCanvasHost) {
+   public CanvasAppliInputGui(GuiCtx gc, ByteObject techCanvasAppli, ByteObject techCanvasHost) {
       super(gc.getIC(), techCanvasAppli, techCanvasHost);
       this.gc = gc;
       this.cc = gc.getCC();
       this.canvasGC = new CanvasGuiCtx(gc, this);
-      gc.addCanvas(this);
+      gc.addCanvas(canvasGC);
 
       //only call this if we are leaf
-      if (this.getClass() == CanvasAppliDrawable.class) {
+      if (this.getClass() == CanvasAppliInputGui.class) {
          a_Init();
       }
 
       //#debug
-      toDLog().pInit("Size inside constructor w=" + getWidth() + " h=" + getHeight(), null, CanvasAppliDrawable.class, "CanvasAppliDrawable", LVL_05_FINE, true);
+      toDLog().pInit("Size inside constructor w=" + getWidth() + " h=" + getHeight(), null, CanvasAppliInputGui.class, "CanvasAppliDrawable", LVL_05_FINE, true);
    }
 
-   public CanvasGuiCtx getCanvasGC() {
-      return canvasGC;
-   }
    /**
     * Because those helpers are designed to be extended
     */
    public void a_Init() {
       super.a_Init();
-      settingsHelper = new CanvasTechHelper(this);
-      extras = new CanvasAppliDrawableExtras(gc, this);
+      settingsHelper = new CanvasBOHelper(this);
+      extras = new CanvasExtras(gc, this);
       drwControl = new CanvasDrawControl(gc, this);
       renderMetrics = new RenderMetrics(gc);
 
       constructHelpersDrawable(gc);
 
       applySettingsCanvas();
+      
+      destGraphicsX = new GraphicsXD(gc);
+      int paintMode = settingsHelper.getPaintMode();
+      destGraphicsX.setPaintMode(paintMode, getWidth(), getHeight());
+      destGraphicsX.toStringSetName("RootGraphics");
    }
 
-   private CmdMenuBar cmdMenuBar;
-
+   /**
+    * Object for painting. Updated every paint event with {@link GraphicsXD#setGraphics(IGraphics)}
+    * 
+    * @return
+    */
+   public GraphicsXD getGraphicsXD() {
+      return destGraphicsX;
+   }
    /**
     * <li> Creates Menu Bar if settings require it. 
     * {@link ITechCtxSettingsAppGui#CTX_GUI_FLAG_2_USER_MENU_BAR}
@@ -208,31 +203,7 @@ public class CanvasAppliDrawable extends CanvasAppliInput implements IDrawableLi
     * @param mm
     */
    public void applySettingsCanvas() {
-
-      boolean useMenuBar = settingsHelper.isUsingMenuBar();
-      ByteObject settingsGuiCtx = gc.getSettingsBO();
-      //define which menu bar to use
-      //if only root canvas
-      if (useMenuBar) {
-         if (cmdMenuBar == null) {
-            //TODO the style class will depend on the menu type
-            //how can this be static
-            cmdMenuBar = new CmdMenuBar(gc, gc.getClass(IUIView.SC_1_MENU));
-            cmdMenuBar.getLay().laySiz_Preferred();
-         }
-         int pos = settingsGuiCtx.get1(ITechCtxSettingsAppGui.CTX_GUI_OFFSET_04_MENU_BAR_POSITION1);
-         topoViewDrawableRoot.setHeader(cmdMenuBar, pos, ITechViewPane.PLANET_MODE_0_EAT);
-      } else {
-         if (cmdMenuBar != null) {
-            topoViewDrawableRoot.removeDrawable(cmdMenuBar);
-         }
-      }
-      //update with the menu bar
-      extras.setMenuBar(cmdMenuBar);
-
-      int debugMode = settingsHelper.getDebugMode();
-      setDebugMode(debugMode);
-
+      extras.applySettingsCanvas();
    }
 
    public void checkRenderThread() {
@@ -263,7 +234,11 @@ public class CanvasAppliDrawable extends CanvasAppliInput implements IDrawableLi
    private void clearPhysicalCanvas(GraphicsXD g) {
       clearCanvasWithBgColor(g);
       //sets the Drawn flag to false 
-      topologyRoot.setStateFlags(ITechDrawable.STATE_02_DRAWN, false);
+      getTopologyRoot().setStateFlags(ITechDrawable.STATE_02_DRAWN, false);
+   }
+
+   public TopologyDLayer getTopologyRoot() {
+      return vcRoot.getTopo();
    }
 
    private void cmdPro2() {
@@ -289,7 +264,7 @@ public class CanvasAppliDrawable extends CanvasAppliInput implements IDrawableLi
     * @param cc
     * @param icc
     */
-   private int cmdProCmdRepo(int state, ExecutionCtxDraw icc, int ctxcat) {
+   private int cmdProCmdRepo(int state, ExecutionContextGui icc, int ctxcat) {
       if (state == ICmdListener.PRO_STATE_0) {
          state = gc.getViewCommandListener().processGUIEvent(icc, ctxcat);
          return state;
@@ -308,10 +283,10 @@ public class CanvasAppliDrawable extends CanvasAppliInput implements IDrawableLi
       if (state == ICmdListener.PRO_STATE_0) {
          //a cmd was not processed
          //TODO aqcuire lock on topology. business threads might update it
-         boolean isDone = topologyRoot.intercepts(icc);
+         boolean isDone = getTopologyRoot().intercepts(icc);
          if (!isDone) {
             //send the event down to the Drawables
-            topologyRoot.manageInput(icc);
+            getTopologyRoot().manageInput(icc);
          }
          //         isDone = appliTopo.intercepts(icc);
          //         if (!isDone) {
@@ -326,43 +301,41 @@ public class CanvasAppliDrawable extends CanvasAppliInput implements IDrawableLi
     * @param ic
     */
    public void cmdSelectPointer(InputConfig ic) {
-      boolean isDone = topologyRoot.intercepts(ic);
+      boolean isDone = getTopologyRoot().intercepts(ic);
       if (!isDone) {
          //send the event down to the Drawablesd
-         topologyRoot.manageInput(ic);
+         getTopologyRoot().manageInput(ic);
       }
    }
 
    private void constructHelpersDrawable(GuiCtx gc) {
       //we separate root, to display things outside the application. such as a debug banner
-      vcRoot = new ViewContext(gc, this);
-      vcRoot.toStringSetDebugName("Root");
-      topologyRoot = vcRoot.getTopo();
-      //create the first ViewContext
+      vcRoot = new ViewContext(gc, canvasGC);
+      vcRoot.toStringSetDebugName("vcRoot");
+
       vcRoot.setWidth(getWidth());
       vcRoot.setHeight(getHeight());
 
       //#debug
-      toDLog().pInit("ViewContext Root with first W and H ", vcRoot, CanvasAppliDrawable.class, "constructHelpersDrawable", LVL_05_FINE, true);
+      toDLog().pInit("ViewContext Root with first W and H ", vcRoot, CanvasAppliInputGui.class, "constructHelpersDrawable", LVL_05_FINE, true);
 
-      vcRoot.setTopo(topologyRoot);
 
-      vcContent = new ViewContext(gc, this);
-      vcContent.toStringSetDebugName("Appli");
-      vcContent.setParent(vcRoot);
+      vcContent = new ViewContext(gc, canvasGC);
+      vcContent.toStringSetDebugName("vcContent");
+      vcContent.setParentVC(vcRoot);
 
-      //set the no style style
-      topoViewDrawableRoot = new TopoViewDrawable(gc, gc.getClass(IUIView.SC_6_EMPTY), vcRoot, vcContent);
+      StyleClass scEmpty = gc.getClass(IUIView.SC_6_EMPTY);
+      topoViewDrawableRoot = new TopoViewDrawable(gc, scEmpty, vcRoot, vcContent);
 
       //#debug
-      topoViewDrawableRoot.setDebugName("RootDrawable");
+      topoViewDrawableRoot.toStringSetName("RootDrawable");
 
       topoViewDrawableRoot.getLay().layFullViewContext();
 
       //#debug
       gc.getLAC().toStringSetDebugBreaks(new LayouterDebugBreaker(gc.getLAC(), topoViewDrawableRoot));
 
-      //place it
+      //place it at the bottom
       vcRoot.getTopo().addDLayer(topoViewDrawableRoot, ITechCanvasDrawable.SHOW_TYPE_0_REPLACE);
 
       //#debug
@@ -379,7 +352,7 @@ public class CanvasAppliDrawable extends CanvasAppliInput implements IDrawableLi
    }
 
    protected RepaintCtrl createRepaintCtrl() {
-      return new RepaintCtrlDrawable(gc, this);
+      return new RepaintCtrlGui(gc, this);
 
    }
 
@@ -387,10 +360,16 @@ public class CanvasAppliDrawable extends CanvasAppliInput implements IDrawableLi
       return (CanvasResultDrawable) repaintControl.create(ITechInputCycle.CYCLE_2_ANIMATION_EVENT);
    }
 
+   /**
+    * Special case when the event is a {@link CanvasHostEvent}
+    * @param is
+    * @param sr
+    * @param che
+    */
    protected void ctrlAppEvent(InputState is, CanvasResult sr, CanvasHostEvent che) {
       int actionType = che.getActionType();
       //#debug
-      toDLog().pEvent1("" + actionType, is, CanvasAppliDrawable.class, "ctrlAppEvent");
+      toDLog().pEvent1("" + actionType, is, CanvasAppliInputGui.class, "ctrlAppEvent");
 
       if (actionType == ITechEventHost.ACTION_1_CLOSE) {
       } else if (actionType == ITechEventHost.ACTION_2_MOVED) {
@@ -455,7 +434,7 @@ public class CanvasAppliDrawable extends CanvasAppliInput implements IDrawableLi
     */
    protected void ctrlUIEvent(InputState ic, CanvasResult sr) {
       //#debug
-      toDLog().pFlow("", this, CanvasAppliDrawable.class, "ctrlUIEvent@line416", LVL_03_FINEST, true);
+      toDLog().pFlow("", this, CanvasAppliInputGui.class, "ctrlUIEvent@line416", LVL_03_FINEST, true);
 
       if (ic.getEventCurrent() instanceof CanvasHostEvent) {
          ctrlAppEvent(ic, sr, (CanvasHostEvent) ic.getEventCurrent());
@@ -463,14 +442,14 @@ public class CanvasAppliDrawable extends CanvasAppliInput implements IDrawableLi
       }
 
       if (ic.isKeyTyped(ITechCodes.KEY_F2)) {
-         toDLog().pAlways("F2 Debug CanvasView", this, CanvasAppliDrawable.class, "ctrlUIEvent");
+         toDLog().pAlways("F2 Debug CanvasView", this, CanvasAppliInputGui.class, "ctrlUIEvent");
          return;
       }
       if (ic.isKeyPressed(ITechCodes.KEY_F3)) {
-         toDLog().pAlways("F3 Debug InputState", ic, CanvasAppliDrawable.class, "ctrlUIEvent");
+         toDLog().pAlways("F3 Debug InputState", ic, CanvasAppliInputGui.class, "ctrlUIEvent");
       }
       if (ic.isKeyPressed(ITechCodes.KEY_F4)) {
-         toDLog().pAlways("F4 Debug Coordinator", gc.getCFC().getCoordinator(), CanvasAppliDrawable.class, "ctrlUIEvent");
+         toDLog().pAlways("F4 Debug Coordinator", gc.getCFC().getCoordinator(), CanvasAppliInputGui.class, "ctrlUIEvent");
       }
       InputStateDrawable id = (InputStateDrawable) ic;
       CanvasResultDrawable sd = (CanvasResultDrawable) sr;
@@ -495,7 +474,7 @@ public class CanvasAppliDrawable extends CanvasAppliInput implements IDrawableLi
             }
          }
       }
-      ExecutionCtxDraw exd = new ExecutionCtxDraw(gc);
+      ExecutionContextGui exd = new ExecutionContextGui(gc);
       exd.setInputConfig(icc);
       //when only pointer pressed 
       //TODO. we must get pointer events first so they pointer presses change the focus and thus
@@ -523,7 +502,7 @@ public class CanvasAppliDrawable extends CanvasAppliInput implements IDrawableLi
          lockAcquireRender();
          //we must sync on the GUI thread to access. TODO wait for 
          //last execution context to be finished? i.e. shown on 
-         IDrawable d = topologyRoot.getDrawable(icc.is.getX(), icc.is.getY(), exd);
+         IDrawable d = getTopologyRoot().getDrawable(icc.is.getX(), icc.is.getY(), exd);
          //it is the drawable to be focused in its category? always??
          if (d != null) {
             //set the states here? mouse animation hooks?
@@ -558,13 +537,13 @@ public class CanvasAppliDrawable extends CanvasAppliInput implements IDrawableLi
       ExecEntry ee = null;
       while ((ee = exd.getNext()) != null) {
          int type = ee.type;
-         if (type == IDrawableExCtx.TYPE_0_EVENT) {
+         if (type == ITechExecutionContextGui.EXEC_TYPE_0_EVENT) {
             BusEvent be = (BusEvent) ee.o;
             be.putOnBus();
-         } else if (type == IDrawableExCtx.TYPE_1_RUN) {
+         } else if (type == ITechExecutionContextGui.EXEC_TYPE_1_RUN) {
             Runnable d = (Runnable) ee.o;
             exd.addRender(ee);
-         } else if (type == IDrawableExCtx.TYPE_2_DRAW) {
+         } else if (type == ITechExecutionContextGui.EXEC_TYPE_2_DRAW) {
             IDrawable d = (IDrawable) ee.o;
             int action = ee.action;
             //issue is that it is not sized already.. so pointless?
@@ -581,9 +560,7 @@ public class CanvasAppliDrawable extends CanvasAppliInput implements IDrawableLi
 
       sr.setExCtx(exd);
 
-      if (canvasDebug != null) {
-         sd.setActionDoneRepaint(canvasDebug);
-      }
+      extras.ctrlUIEvent(ic, sd);
 
    }
 
@@ -619,6 +596,15 @@ public class CanvasAppliDrawable extends CanvasAppliInput implements IDrawableLi
       cd.getDExCtx().addDrawn(cue);
    }
 
+   public void doThreadGUI() {
+      if (!isThreadRender()) {
+         //TODO debug current thread
+         //#debug
+         toDLog().pInit("Not Gui Thread " + Thread.currentThread(), null, CanvasAppliInputGui.class, "threadGui");
+         throw new RuntimeException();
+      }
+   }
+
    public void doUpdateAppliVC() {
 
       //      //#mdebug
@@ -648,15 +634,19 @@ public class CanvasAppliDrawable extends CanvasAppliInput implements IDrawableLi
       return animCreator;
    }
 
+   public CanvasGuiCtx getCanvasGC() {
+      return canvasGC;
+   }
+
    public CanvasDebugger getDebugCanvas() {
-      return canvasDebug;
+      return extras.getDebugCanvas();
    }
 
    public CanvasDrawControl getDrwCtrl() {
       return drwControl;
    }
 
-   public CanvasAppliDrawableExtras getExtras() {
+   public CanvasExtras getExtras() {
       return extras;
    }
 
@@ -667,13 +657,17 @@ public class CanvasAppliDrawable extends CanvasAppliInput implements IDrawableLi
       return foregroundQueues;
    }
 
+   public GuiCtx getGC() {
+      return gc;
+   }
+
    /**
-    * System menubar of the {@link CanvasAppliDrawable}
+    * System menubar of the {@link CanvasAppliInputGui}
     * Collects the cmd of the current command node.
     * @return
     */
    public CmdMenuBar getMenuBar() {
-      return cmdMenuBar;
+      return extras.getMenuBar();
    }
 
    public RenderMetrics getRenderMetrics() {
@@ -683,20 +677,20 @@ public class CanvasAppliDrawable extends CanvasAppliInput implements IDrawableLi
    /**
     * Returns singleton until a Canvas Structural Change event occurs.
     */
-   public RepaintCtrlDrawable getRepaintCtrlDraw() {
+   public RepaintCtrlGui getRepaintCtrlDraw() {
       //#mdebug
       if (repaintControl == null) {
          throw new NullPointerException();
       }
       //#enddebug
-      return (RepaintCtrlDrawable) repaintControl;
+      return (RepaintCtrlGui) repaintControl;
    }
 
    /**
     * The {@link IDrawable} first drawn for the Appli
     * @return
     */
-   public IDrawable getRoot() {
+   public TopoViewDrawable getTopoViewDrawable() {
       return topoViewDrawableRoot;
    }
 
@@ -706,8 +700,8 @@ public class CanvasAppliDrawable extends CanvasAppliInput implements IDrawableLi
     * @return
     */
    public RgbImage getSSVirtualCanvasAsImage(int bgColor) {
-      int w = gc.getVCAppli().getWidth();
-      int h = gc.getVCAppli().getHeight();
+      int w = gc.getCanvasRoot().getVCAppli().getWidth();
+      int h = gc.getCanvasRoot().getVCAppli().getHeight();
       RgbImage img = gc.getDC().getRgbCache().create(w, h, bgColor);
       GraphicsX gx = img.getGraphicsX(GraphicsX.MODE_2_RGB_IMAGE);
       gx.setPaintCtxFlag(ITechCanvasDrawable.REPAINT_01_FULL, true);
@@ -716,6 +710,10 @@ public class CanvasAppliDrawable extends CanvasAppliInput implements IDrawableLi
       return img;
    }
 
+   /**
+    * 
+    * @return
+    */
    public StyleAdapter getStyleAdapter() {
       if (styleAdapter == null) {
          styleAdapter = gc.getStyleAdapterDefault();
@@ -738,18 +736,14 @@ public class CanvasAppliDrawable extends CanvasAppliInput implements IDrawableLi
    public ViewContext getVCRoot() {
       return vcRoot;
    }
-   
-   public GuiCtx getGC() {
-      return gc;
-   }
 
    public void layoutInvalidate() {
-      topologyRoot.invalidateLayout();
+      getTopologyRoot().invalidateLayout();
    }
 
    public void notifyEvent(IDrawable d, int event, Object o) {
       //#debug
-      //toLog().ptEvent1("Event=" + Drawable.toStringEvent(event) + " ", d, CanvasView.class, "notifyEvent");
+      toDLog().pEvent1("Event=" + ToStringStaticGui.toStringEvent(event), d, CanvasAppliInputGui.class, "notifyEvent@755");
 
       if (event == ITechDrawable.EVENT_12_SIZE_CHANGED) {
          if (d == topoViewDrawableRoot) {
@@ -785,7 +779,7 @@ public class CanvasAppliDrawable extends CanvasAppliInput implements IDrawableLi
          //appliTopo.drawLayers(g);
 
          //draw the root topology on top
-         topologyRoot.drawLayers(g);
+         getTopologyRoot().drawLayers(g);
 
          //and finally draw the foregrounds
          if (foregroundQueues != null) {
@@ -800,10 +794,7 @@ public class CanvasAppliDrawable extends CanvasAppliInput implements IDrawableLi
 
       //after the clip reset if any, paint the menu bar
 
-      //draw top debug header information
-      if (canvasDebug != null) {
-         canvasDebug.paintDebugComplete(g, time);
-      }
+      extras.paintCanvasContent(g, time);
 
    }
 
@@ -852,15 +843,15 @@ public class CanvasAppliDrawable extends CanvasAppliInput implements IDrawableLi
          w = getHeight();
          h = getWidth();
       }
-      if (destGraphicsX.getPaintMode() == GraphicsX.MODE_0_SCREEN) {
+      if (destGraphicsX.getPaintMode() == ITechGraphicsX.MODE_0_SCREEN) {
          //we must give the size of the Virtual canvas for the image layer
-         destGraphicsX.setPaintMode(GraphicsX.MODE_1_IMAGE, w, h);
+         destGraphicsX.setPaintMode(ITechGraphicsX.MODE_1_IMAGE, w, h);
       }
       sizeChanged(w, h);
    }
 
    /**
-    * Main Render method to draw {@link CanvasAppliDrawable} content. 
+    * Main Render method to draw {@link CanvasAppliInputGui} content. 
     * 
     * <b>Threading Mode</b>
     * <li>Called in the render thread {@link ITechPaintThread#THREAD_2_RENDER}
@@ -869,7 +860,7 @@ public class CanvasAppliDrawable extends CanvasAppliInput implements IDrawableLi
     * <li> It can also be called in a Business Thread when painting ? Not a good idea.
     * <br>
     * 
-    * {@link RepaintCtrlDrawable} tracks the context;
+    * {@link RepaintCtrlGui} tracks the context;
     * 
     * <br>
     * <br>
@@ -919,7 +910,7 @@ public class CanvasAppliDrawable extends CanvasAppliInput implements IDrawableLi
       //1 execute runnables from the execution context in the screenres before
       ExecutionContext ex = sr.getExecCtx();
       if (ex != null) {
-         ExecutionCtxDraw dec = (ExecutionCtxDraw) ex;
+         ExecutionContextGui dec = (ExecutionContextGui) ex;
          dec.renderStart();
 
       }
@@ -930,19 +921,15 @@ public class CanvasAppliDrawable extends CanvasAppliInput implements IDrawableLi
       //#debug
       String msg = "Clip " + "[" + g.getClipX() + "," + g.getClipY() + " " + g.getClipWidth() + "," + g.getClipHeight() + "]";
       //#debug
-      toDLog().pDraw(msg, null, CanvasAppliDrawable.class, "render");
+      toDLog().pDraw(msg, null, CanvasAppliInputGui.class, "render");
 
       CanvasResultDrawable renderCause = (CanvasResultDrawable) sr;
       //clean clip sequence since this is a new paint job
       super.paintStart();
-      //create new GraphicsXDrawable context
+      
+      /////////////////////////////////////////////////////////////////
       if (destGraphicsX == null) {
-         //init the 
-         destGraphicsX = new GraphicsXD(gc);
-         int paintMode = settingsHelper.getPaintMode();
-         destGraphicsX.setPaintMode(paintMode, getWidth(), getHeight());
-         destGraphicsX.toStringSetName("RootGraphics");
-         //destGraphicsX = new GraphicsX(GraphicsX.MODE_IMAGE, getWidth(), getHeight());
+         throw new NullPointerException();
       }
       if (destGraphicsX.getPaintMode() == GraphicsX.MODE_0_SCREEN) {
          //when paint mode is not screen, we have to draw
@@ -970,7 +957,7 @@ public class CanvasAppliDrawable extends CanvasAppliInput implements IDrawableLi
       int repaintFlags = renderCause.getRepaintFlag();
       if (repaintFlags == 0) {
          //#debug
-         toDLog().pDraw("Repaint Flag is Zero. Sync Error or something", this, CanvasAppliDrawable.class, "render", LVL_05_FINE, true);
+         toDLog().pDraw("Repaint Flag is Zero. Sync Error or something", this, CanvasAppliInputGui.class, "render", LVL_05_FINE, true);
          repaintFlags = ITechCanvasDrawable.REPAINT_01_FULL;
       }
       repaintFlags |= ITechCanvasDrawable.REPAINT_14_SYSTEM_REPAINT;
@@ -987,7 +974,7 @@ public class CanvasAppliDrawable extends CanvasAppliInput implements IDrawableLi
       super.paintEnd();
 
       //#debug
-      toDLog().pDraw("End of Paint", this, CanvasAppliDrawable.class, "render", LVL_03_FINEST, true);
+      toDLog().pDraw("End of Paint", this, CanvasAppliInputGui.class, "render", LVL_03_FINEST, true);
 
       //reset repaint flags
       isPainting = false;
@@ -1001,9 +988,8 @@ public class CanvasAppliDrawable extends CanvasAppliInput implements IDrawableLi
     * @param g
     */
    public void render1(GraphicsXD g) {
-      if (canvasDebug != null) {
-         canvasDebug.debugRender1Start(g);
-      }
+      extras.renderDebugStart(g);
+
       //ask the device to time
       long time = gc.getCFC().getTimeCtrl().getTickNano();
 
@@ -1015,9 +1001,8 @@ public class CanvasAppliDrawable extends CanvasAppliInput implements IDrawableLi
       //average time painting, average event time processing.
       renderMetrics.addFrame(time, duration);
 
-      if (canvasDebug != null) {
-         canvasDebug.debugRender1End(g, this.getRenderMetrics());
-      }
+      extras.renderDebugEnd(g);
+
    }
 
    /**
@@ -1037,23 +1022,7 @@ public class CanvasAppliDrawable extends CanvasAppliInput implements IDrawableLi
     * @param mode
     */
    public void setDebugMode(int mode) {
-      if (mode != ITechCanvasDrawable.DEBUG_0_NONE) {
-         if (canvasDebug == null) {
-            canvasDebug = new CanvasDebugger(gc);
-            canvasDebug.setViewContext(vcRoot);
-         }
-         canvasDebug.setDebugMode(mode);
-         int pos = settingsHelper.getDebugBarPosition();
-         canvasDebug.setOrientation(pos);
-         //sets the header with no specific sizer. ViewPane sets its own.
-         topoViewDrawableRoot.setHeader(canvasDebug, C.POS_0_TOP, ITechViewPane.PLANET_MODE_0_EAT);
-      } else {
-         if (canvasDebug != null) {
-            //remove it from
-            topoViewDrawableRoot.removeDrawable(canvasDebug);
-         }
-         canvasDebug = null;
-      }
+      extras.setDebugMode(mode);
    }
 
    /**
@@ -1085,9 +1054,9 @@ public class CanvasAppliDrawable extends CanvasAppliInput implements IDrawableLi
     * Adapt the call if screen is rotated
     * Adapt font ratios
     */
-   public void sizeChanged(int w, int h) {
+   private void sizeChanged(int w, int h) {
       //#debug
-      toDLog().pEvent("w=" + w + " h=" + h + " getWidth=" + getWidth() + " getHeight=" + getHeight(), null, CanvasAppliDrawable.class, "sizeChanged");
+      toDLog().pEvent("w=" + w + " h=" + h + " getWidth=" + getWidth() + " getHeight=" + getHeight(), null, CanvasAppliInputGui.class, "sizeChanged");
 
       vcRoot.setHeight(h);
       vcRoot.setWidth(w);
@@ -1114,31 +1083,29 @@ public class CanvasAppliDrawable extends CanvasAppliInput implements IDrawableLi
       layoutInvalidate();
 
       //#debug
-      toDLog().pInit("End: w=" + getWidth() + " h=" + getHeight(), null, CanvasAppliDrawable.class, "initCanvasSize@line721");
+      toDLog().pInit("End: w=" + getWidth() + " h=" + getHeight(), null, CanvasAppliInputGui.class, "initCanvasSize@line721");
 
       this.repaint();
    }
 
-   public void doThreadGUI() {
-      if (!isThreadRender()) {
-         //TODO debug current thread
-         //#debug
-         toDLog().pInit("Not Gui Thread " + Thread.currentThread(), null, CanvasAppliDrawable.class, "threadGui");
-         throw new RuntimeException();
-      }
+   public void stateReadFrom(StatorReader state) {
+      super.stateReadFrom(state);
+   }
+
+   public void stateWriteTo(StatorWriter state) {
+      super.stateWriteTo(state);
    }
 
    //#mdebug
    public void toString(Dctx dc) {
-      dc.root(this, CanvasAppliDrawable.class);
+      dc.root(this, CanvasAppliInputGui.class);
       dc.appendVarWithSpace("IsPainting", isPainting);
       dc.appendColorWithSpace("EraseColor", backgroundColor);
       dc.appendVarWithSpace("cmdProcessingMode", cmdProcessingMode);
       super.toString(dc.sup());
       dc.nlLvl(vcRoot, "viewContextRoot");
       dc.nlLvl(vcContent, "viewContextAppli");
-      dc.nlLvl(canvasDebug, "canvasDebug");
-      dc.nlLvl(cmdMenuBar, "cmdMenuBar");
+      dc.nlLvl(extras, "extras");
       dc.nlLvl(topoViewDrawableRoot, "topoViewDrawableRoot");
       dc.nlLvl("ForegroundQueues", foregroundQueues);
       dc.nlLvl(destGraphicsX, "destGraphicsX");
@@ -1151,7 +1118,7 @@ public class CanvasAppliDrawable extends CanvasAppliInput implements IDrawableLi
     * @param dc
     */
    public void toString1Line(Dctx dc) {
-      dc.root1Line(this, CanvasAppliDrawable.class);
+      dc.root1Line(this, CanvasAppliInputGui.class);
    }
    //#enddebug
 

@@ -18,7 +18,7 @@ import pasa.cbentley.framework.gui.src4.core.StyleClass;
 import pasa.cbentley.framework.gui.src4.ctx.GuiCtx;
 import pasa.cbentley.framework.gui.src4.interfaces.IDrawable;
 import pasa.cbentley.framework.gui.src4.interfaces.IValidable;
-import pasa.cbentley.framework.gui.src4.string.InputRequestStr;
+import pasa.cbentley.framework.gui.src4.string.RequestStringInput;
 import pasa.cbentley.framework.gui.src4.string.T9;
 import pasa.cbentley.framework.gui.src4.table.TableLayoutView;
 import pasa.cbentley.framework.gui.src4.table.TableView;
@@ -265,7 +265,7 @@ public class ListUIRecords extends TableLayoutView implements IValidable {
 
    /**
     * Call Back for validating the new String object. <br>
-    * User was shown a {@link InputRequestStr} for write a new object string. <br>
+    * User was shown a {@link RequestStringInput} for write a new object string. <br>
     * <br>
     * When OK button is pressed, {@link IValidable#stringValidation(String)} is called.
     * New data is saved in this method.

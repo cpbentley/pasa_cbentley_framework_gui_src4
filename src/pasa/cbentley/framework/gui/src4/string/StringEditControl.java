@@ -23,12 +23,12 @@ import pasa.cbentley.framework.drawx.src4.engine.GraphicsX;
 import pasa.cbentley.framework.drawx.src4.factories.interfaces.IBOBox;
 import pasa.cbentley.framework.drawx.src4.string.Stringer;
 import pasa.cbentley.framework.drawx.src4.style.IBOStyle;
-import pasa.cbentley.framework.gui.src4.canvas.CanvasAppliDrawable;
+import pasa.cbentley.framework.gui.src4.canvas.CanvasAppliInputGui;
 import pasa.cbentley.framework.gui.src4.canvas.CanvasResultDrawable;
 import pasa.cbentley.framework.gui.src4.canvas.InputConfig;
 import pasa.cbentley.framework.gui.src4.canvas.InputStateDrawable;
-import pasa.cbentley.framework.gui.src4.canvas.MEventDrawable;
-import pasa.cbentley.framework.gui.src4.canvas.RepaintCtrlDrawable;
+import pasa.cbentley.framework.gui.src4.canvas.BusEventGui;
+import pasa.cbentley.framework.gui.src4.canvas.RepaintCtrlGui;
 import pasa.cbentley.framework.gui.src4.canvas.TopologyDLayer;
 import pasa.cbentley.framework.gui.src4.core.Drawable;
 import pasa.cbentley.framework.gui.src4.core.DrawableInjected;
@@ -43,6 +43,7 @@ import pasa.cbentley.framework.gui.src4.interfaces.ITechCanvasDrawable;
 import pasa.cbentley.framework.gui.src4.interfaces.ITechDrawable;
 import pasa.cbentley.framework.gui.src4.menu.MenuBar;
 import pasa.cbentley.framework.gui.src4.table.TableView;
+import pasa.cbentley.framework.gui.src4.table.interfaces.ITechTable;
 import pasa.cbentley.framework.gui.src4.tech.ITechStringDrawable;
 import pasa.cbentley.framework.gui.src4.utils.DrawableUtilz;
 import pasa.cbentley.framework.input.src4.interfaces.ITechPaintThread;
@@ -324,7 +325,7 @@ public class StringEditControl extends TableView implements IDrawListener, IBOSt
       StyleClass letterSK = styleClass.getStyleClass(LINK_913_LETTER_CHOICE);
 
       //we want to disable global cell style
-      setHelperFlag(HELPER_FLAG_21_MODEL_STYLE, true);
+      setHelperFlag(ITechTable.HELPER_FLAG_21_MODEL_STYLE, true);
 
       //link selected style
       ByteObject selectedStyle = styleClass.getStateStyle(ITechDrawable.STYLE_05_SELECTED);
@@ -370,13 +371,13 @@ public class StringEditControl extends TableView implements IDrawListener, IBOSt
       predictionTable = new TableView(gc, sc, gc.getTablePolicyC().getButtonLine(true, 0, 0), predictionModel);
       predictionTable.init(0, 0);
 
-      predictionTable.addEventListener(this, TableView.EVENT_ID_00_SELECT);
+      predictionTable.addEventListener(this, ITechTable.EVENT_ID_00_SELECT);
 
       puncts = new ObjectTableModel(gc.getDMC(), punctuations);
       punctuationTable = new TableView(gc, sc, gc.getTablePolicyC().getButtonLine(true, 0, 0), puncts);
       punctuationTable.init(0, 0);
 
-      punctuationTable.addEventListener(this, TableView.EVENT_ID_00_SELECT);
+      punctuationTable.addEventListener(this, ITechTable.EVENT_ID_00_SELECT);
       //parenting
       setParentLink(drawableSpecial);
       setParentLink(drawableT9);
@@ -420,29 +421,29 @@ public class StringEditControl extends TableView implements IDrawListener, IBOSt
     * 
     */
    public void consumeEvent(BusEvent e) {
-      if (e instanceof MEventDrawable) {
-         consumeEventDrawable((MEventDrawable) e);
+      if (e instanceof BusEventGui) {
+         consumeEventDrawable((BusEventGui) e);
       }
    }
 
-   public void consumeEventDrawable(MEventDrawable e) {
+   public void consumeEventDrawable(BusEventGui e) {
       //#debug
       toDLog().pEvent("msg", e, StringEditControl.class, "consumeEventDrawable", LVL_05_FINE, true);
 
       if (e.getProducer() == charSetsTableView) {
-         if (e.getEventID() == TableView.EVENT_ID_00_SELECT) {
+         if (e.getEventID() == ITechTable.EVENT_ID_00_SELECT) {
             eventCharSetSelected(e);
          }
       } else if (e.getProducer() == symbolTable) {
-         if (e.getEventID() == TableView.EVENT_ID_00_SELECT) {
+         if (e.getEventID() == ITechTable.EVENT_ID_00_SELECT) {
             eventSymbolSelected(e);
          }
       } else if (e.getProducer() == predictionTable) {
-         if (e.getEventID() == TableView.EVENT_ID_00_SELECT) {
+         if (e.getEventID() == ITechTable.EVENT_ID_00_SELECT) {
             eventPredictionSelected(e);
          }
       } else if (e.getProducer() == punctuationTable) {
-         if (e.getEventID() == TableView.EVENT_ID_00_SELECT) {
+         if (e.getEventID() == ITechTable.EVENT_ID_00_SELECT) {
             eventPunctuationSelected(e);
          }
       } else if (e.getProducer() == pulseThread) {
@@ -512,7 +513,7 @@ public class StringEditControl extends TableView implements IDrawListener, IBOSt
       }
    }
 
-   public void eventCharSetSelected(MEventDrawable e) {
+   public void eventCharSetSelected(BusEventGui e) {
       //no parameter. just read the selected index from the TableView
       int selectedIndex = charSetsTableView.getSelectedIndex();
       String str = Symbs.charsets[selectedIndex];
@@ -532,7 +533,7 @@ public class StringEditControl extends TableView implements IDrawListener, IBOSt
     * <br>
     * @param e
     */
-   private void eventPredictionSelected(MEventDrawable e) {
+   private void eventPredictionSelected(BusEventGui e) {
       int selectedIndex = predictionTable.getSelectedIndex();
       String str = pr.getPred(selectedIndex);
       //overwrite or insert word on prefix 
@@ -921,7 +922,7 @@ public class StringEditControl extends TableView implements IDrawListener, IBOSt
       //TODO create a new Table so we don't run into sync issues
       Runnable uiUpdate = new SearchPrefixRunnable(gc, ic, its);
       //syncrhonize once on the ScreenResult
-      RepaintCtrlDrawable repaintCtrlDraw = gc.getCanvasCtxRoot().getCanvas().getRepaintCtrlDraw();
+      RepaintCtrlGui repaintCtrlDraw = gc.getCanvasGCRoot().getCanvas().getRepaintCtrlDraw();
       repaintCtrlDraw.repaintDrawableCycleBusiness(predictionTable, uiUpdate);
 
    }
@@ -963,7 +964,7 @@ public class StringEditControl extends TableView implements IDrawListener, IBOSt
             charSetsTableView.setXY(drawableCharSet.getX() + drawableCharSet.getDrawnWidth(), drawableCharSet.getY());
             charSetsTableView.init(0, 0);
             //register select event
-            charSetsTableView.addEventListener(this, TableView.EVENT_ID_00_SELECT);
+            charSetsTableView.addEventListener(this, ITechTable.EVENT_ID_00_SELECT);
          }
          //transfer key focus to the newly visible Drawable.
          //this drawable gets the vertical navigation
@@ -984,7 +985,7 @@ public class StringEditControl extends TableView implements IDrawListener, IBOSt
             symbolTable = new SymbolTable(gc, symbolStyleClass);
             symbolTable.getLay().layFullViewContext();
             //tries if space allows it to use it like a virtual keyboard
-            symbolTable.addEventListener(this, TableView.EVENT_ID_00_SELECT);
+            symbolTable.addEventListener(this, ITechTable.EVENT_ID_00_SELECT);
          }
          //show it over
          symbolTable.shShowDrawable(ic, ITechCanvasDrawable.SHOW_TYPE_1_OVER);
@@ -1046,7 +1047,7 @@ public class StringEditControl extends TableView implements IDrawListener, IBOSt
     * @param sd {@link StringDrawable}
     * @param e {@link BusEvent} specified by {@link IFocusEvent}.
     */
-   public void takeControl(StringDrawable sd, MEventDrawable e) {
+   public void takeControl(StringDrawable sd, BusEventGui e) {
       if (controlledSD == sd) {
          return;
       }
@@ -1114,7 +1115,7 @@ public class StringEditControl extends TableView implements IDrawListener, IBOSt
       }
       //Controller.getMe().getTopologyNav().positionToplogy(this, C.POS_0_TOP, sd);
       //request a repaint
-      CanvasAppliDrawable cd = gc.getCanvasCtxRoot().getCanvas();
+      CanvasAppliInputGui cd = gc.getCanvasGCRoot().getCanvas();
       //we don't know in which thread we are running. let the ctrl figure it
       cd.getRepaintCtrlDraw().repaintDrawableCycleBusiness(sd);
       cd.getRepaintCtrlDraw().repaintDrawableCycleBusiness(this);

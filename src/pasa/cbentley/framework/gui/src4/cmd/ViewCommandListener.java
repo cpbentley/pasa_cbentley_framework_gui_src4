@@ -19,9 +19,9 @@ import pasa.cbentley.framework.coreui.src4.tech.ITechCodes;
 import pasa.cbentley.framework.coreui.src4.tech.IInput;
 import pasa.cbentley.framework.coreui.src4.tech.ITechInputFeedback;
 import pasa.cbentley.framework.coreui.src4.utils.ViewState;
-import pasa.cbentley.framework.gui.src4.canvas.CanvasAppliDrawable;
+import pasa.cbentley.framework.gui.src4.canvas.CanvasAppliInputGui;
 import pasa.cbentley.framework.gui.src4.canvas.CanvasResultDrawable;
-import pasa.cbentley.framework.gui.src4.canvas.ExecutionCtxDraw;
+import pasa.cbentley.framework.gui.src4.canvas.ExecutionContextGui;
 import pasa.cbentley.framework.gui.src4.canvas.InputConfig;
 import pasa.cbentley.framework.gui.src4.canvas.InputStateDrawable;
 import pasa.cbentley.framework.gui.src4.core.Drawable;
@@ -31,7 +31,7 @@ import pasa.cbentley.framework.gui.src4.ctx.ObjectGC;
 import pasa.cbentley.framework.gui.src4.interfaces.IBOUserInterAction;
 import pasa.cbentley.framework.gui.src4.interfaces.ICmdsView;
 import pasa.cbentley.framework.gui.src4.menu.CmdMenuBar;
-import pasa.cbentley.framework.gui.src4.string.InputRequestStr;
+import pasa.cbentley.framework.gui.src4.string.RequestStringInput;
 import pasa.cbentley.framework.gui.src4.table.TableView;
 import pasa.cbentley.framework.input.src4.CanvasAppliInput;
 import pasa.cbentley.framework.input.src4.InputState;
@@ -132,7 +132,7 @@ public class ViewCommandListener extends ObjectGC implements ICmdsView, ICommand
     * <br>
     * 
     * <b>Event Handling</b> <br>
-    * {@link TableView} is often used in the same purpose as {@link InputRequestStr}.
+    * {@link TableView} is often used in the same purpose as {@link RequestStringInput}.
     * <br>
     * <li>a {@link MCmd} requires input. Model create a {@link TableView} with its data model to choose data from.
     * <li>Registers as an {@link ICmdListener} to the {@link ICmdsCmd#CMD_ID_SELECT} {@link MCmd}
@@ -279,7 +279,7 @@ public class ViewCommandListener extends ObjectGC implements ICmdsView, ICommand
    public void processCmd(int vcmdID) {
       //at this stage, we have at least once visible canvas
       //a cmd has a rootCanvas associated
-      CanvasAppliDrawable canvasView = gc.getCanvasRoot();
+      CanvasAppliInputGui canvasView = gc.getCanvasRoot();
       InputStateDrawable isd = (InputStateDrawable) canvasView.getEvCtrl().getState();
       CanvasResultDrawable srd = canvasView.getRepaintCtrlDraw().getSD();
       InputConfig ic = new InputConfig(gc, canvasView, isd, srd);
@@ -384,7 +384,7 @@ public class ViewCommandListener extends ObjectGC implements ICmdsView, ICommand
     * @param sr
     * @return processing state
     */
-   public int processGUIEvent(ExecutionCtxDraw dex, int ctxcat) {
+   public int processGUIEvent(ExecutionContextGui dex, int ctxcat) {
       //if any error, reset all triggers and output log
       try {
 

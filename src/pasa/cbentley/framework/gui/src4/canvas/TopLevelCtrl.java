@@ -144,8 +144,6 @@ public class TopLevelCtrl implements IStringable {
       for (int i = 0; i < roots.length; i++) {
          IDrawable drawable = roots[i];
          if (drawable != null) {
-            ViewState vs = drawable.getViewState();
-            ByteObject state = vs.getState();
 
          }
       }
@@ -160,12 +158,9 @@ public class TopLevelCtrl implements IStringable {
    public void destroyTopLevel(int id) {
       IDrawable drawable = roots[id];
       if (drawable != null) {
-         ViewState vs = drawable.getViewState();
 
          ByteObject topl = getTopLevel(id);
          topl.removeSub(IBOTypesBOC.TYPE_037_CLASS_STATE);
-         ByteObject state = vs.getState();
-         topl.addSub(state);
 
          saveTopLevel(id);
       }
@@ -399,7 +394,7 @@ public class TopLevelCtrl implements IStringable {
       }
    }
 
-   public void showPage(ExecutionCtxDraw ex, int newPageid, boolean addToHistory) {
+   public void showPage(ExecutionContextGui ex, int newPageid, boolean addToHistory) {
       if (newPageid != currentPageID) {
          int oldPageID = currentPageID;
          IDrawable old = roots[oldPageID];

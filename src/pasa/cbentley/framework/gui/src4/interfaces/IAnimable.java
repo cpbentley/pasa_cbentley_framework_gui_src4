@@ -11,7 +11,7 @@ import pasa.cbentley.framework.gui.src4.anim.base.DrawableAnim;
 import pasa.cbentley.framework.gui.src4.anim.base.ImgAnimable;
 import pasa.cbentley.framework.gui.src4.anim.definitions.AlphaChangeRgb;
 import pasa.cbentley.framework.gui.src4.anim.move.Move;
-import pasa.cbentley.framework.gui.src4.canvas.CanvasAppliDrawable;
+import pasa.cbentley.framework.gui.src4.canvas.CanvasAppliInputGui;
 import pasa.cbentley.framework.gui.src4.canvas.ViewContext;
 import pasa.cbentley.framework.gui.src4.core.Drawable;
 import pasa.cbentley.framework.gui.src4.core.RgbDrawable;
@@ -172,7 +172,7 @@ public interface IAnimable extends IStringable, ITechAnimable {
     * {@link IDrawable} delegates drawing to the Animation.
     * <br>
     * Also provides the {@link ViewContext} Canvas context if any. That is used for requesting
-    * a repaint on the {@link CanvasAppliDrawable}
+    * a repaint on the {@link CanvasAppliInputGui}
     * <br>
     * @return
     */

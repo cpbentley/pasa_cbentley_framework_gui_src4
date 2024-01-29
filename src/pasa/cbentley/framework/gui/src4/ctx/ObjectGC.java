@@ -8,9 +8,12 @@ import pasa.cbentley.framework.cmd.src4.ctx.CmdCtx;
 
 public class ObjectGC implements IStringable {
 
-   protected final GuiCtx gc;
-
    protected final CmdCtx cc;
+
+   //#debug
+   private String         debugName;
+
+   protected final GuiCtx gc;
 
    public ObjectGC(GuiCtx gc) {
       this.gc = gc;
@@ -22,6 +25,17 @@ public class ObjectGC implements IStringable {
    }
 
    //#mdebug
+   public String toStringGetName() {
+      return debugName;
+   }
+
+
+   public void toStringSetName(String name) {
+      debugName = name;
+   }
+   //#enddebug
+
+   //#mdebug
    public IDLog toDLog() {
       return toStringGetUCtx().toDLog();
    }
@@ -31,16 +45,12 @@ public class ObjectGC implements IStringable {
    }
 
    public void toString(Dctx dc) {
-      dc.root(this, ObjectGC.class, "@line5");
+      dc.root(this, ObjectGC.class, 45);
       toStringPrivate(dc);
    }
 
    public String toString1Line() {
       return Dctx.toString1Line(this);
-   }
-
-   private void toStringPrivate(Dctx dc) {
-
    }
 
    public void toString1Line(Dctx dc) {
@@ -50,6 +60,16 @@ public class ObjectGC implements IStringable {
 
    public UCtx toStringGetUCtx() {
       return gc.getUCtx();
+   }
+
+   public String toStringName() {
+      return debugName;
+   }
+
+   private void toStringPrivate(Dctx dc) {
+      if (debugName != null) {
+         dc.appendBracketedWithSpace(debugName);
+      }
    }
 
    //#enddebug

@@ -21,7 +21,7 @@ import pasa.cbentley.framework.input.src4.InputState;
 import pasa.cbentley.framework.input.src4.CanvasResult;
 
 /**
- * Drawable to be used inside another {@link CanvasAppliDrawable}.
+ * Drawable to be used inside another {@link CanvasAppliInputGui}.
  * <br>
  * <br>
  * When Parent has an event, it.
@@ -211,7 +211,7 @@ public abstract class CanvasDrawable extends CanvasAppliInput implements IDrawab
       return root.hasStateStyle(flag);
    }
 
-   public void init() {
+   public void initSize() {
       // TODO Auto-generated method stub
 
    }

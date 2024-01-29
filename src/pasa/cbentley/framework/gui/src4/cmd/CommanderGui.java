@@ -15,7 +15,7 @@ import pasa.cbentley.framework.coreui.src4.tech.IBOCanvasHost;
 import pasa.cbentley.framework.coreui.src4.tech.ITechInputFeedback;
 import pasa.cbentley.framework.coreui.src4.utils.ViewState;
 import pasa.cbentley.framework.drawx.src4.engine.RgbImage;
-import pasa.cbentley.framework.gui.src4.canvas.CanvasAppliDrawable;
+import pasa.cbentley.framework.gui.src4.canvas.CanvasAppliInputGui;
 import pasa.cbentley.framework.gui.src4.canvas.InputConfig;
 import pasa.cbentley.framework.gui.src4.canvas.RgbImageSaveTask;
 import pasa.cbentley.framework.gui.src4.canvas.ViewContext;
@@ -65,7 +65,7 @@ public class CommanderGui extends CommanderAbstract implements ICmdsView, ITechI
 
    protected void cmdDebug() {
       //#debug
-      System.out.println(gc.getCanvasCtxRoot().toString());
+      System.out.println(gc.getCanvasGCRoot().toString());
    }
 
    private void cmdDebugFlags() {
@@ -79,7 +79,7 @@ public class CommanderGui extends CommanderAbstract implements ICmdsView, ITechI
 
    protected void cmdDebugCanvasToggle(CmdInstanceDrawable cmd) {
       CanvasGuiCtx cac = (CanvasGuiCtx) cmd.paramO;
-      CanvasAppliDrawable canvas = cac.getCanvas();
+      CanvasAppliInputGui canvas = cac.getCanvas();
       if (cmd.hasFlag(CmdInstance.STATE_FLAG_4_UNDO)) {
          int oldMode = cmd.getParamInt(0);
          canvas.setDebugMode(oldMode);
@@ -172,7 +172,7 @@ public class CommanderGui extends CommanderAbstract implements ICmdsView, ITechI
       //height is 30%
       ByteObject boH = sizerFactory.getSizerRatio100ViewCtx(30);
       strDrawableHelpData.setSizers(boW, boH);
-      strDrawableHelpData.init();
+      strDrawableHelpData.initSize();
 
       strDrawableHelpData.shShowDrawable((InputConfig) cmd.getFeedback(), ITechCanvasDrawable.SHOW_TYPE_1_OVER);
 
@@ -230,7 +230,7 @@ public class CommanderGui extends CommanderAbstract implements ICmdsView, ITechI
 
    private void cmdPause() {
 
-      CanvasAppliDrawable cv = gc.getCanvasCtxRoot().getCanvas();
+      CanvasAppliInputGui cv = gc.getCanvasGCRoot().getCanvas();
       AppliGui am = gc.getAppli();
 
       //check if  view state
@@ -248,7 +248,7 @@ public class CommanderGui extends CommanderAbstract implements ICmdsView, ITechI
    }
 
    private void cmdResetDebug(InputConfig ic) {
-      CanvasAppliDrawable cv = gc.getCanvasCtxRoot().getCanvas();
+      CanvasAppliInputGui cv = gc.getCanvasGCRoot().getCanvas();
       cv.getDebugCanvas().reset();
 
       ic.cmdActionOnDrawable(cv.getDebugCanvas());
@@ -257,7 +257,7 @@ public class CommanderGui extends CommanderAbstract implements ICmdsView, ITechI
 
    private void cmdScreenshot(CmdInstance cmd) {
       int bgColor = cmd.param;
-      CanvasAppliDrawable canvas = gc.getCanvasCtxRoot().getCanvas();
+      CanvasAppliInputGui canvas = gc.getCanvasGCRoot().getCanvas();
       final RgbImage img = canvas.getSSVirtualCanvasAsImage(bgColor);
       RgbImageSaveTask task = new RgbImageSaveTask(gc, canvas.getRepaintCtrlDraw(), img);
       gc.getUCtx().getWorkerThread().addToQueue(task);
@@ -267,7 +267,7 @@ public class CommanderGui extends CommanderAbstract implements ICmdsView, ITechI
    private void cmdSelectPointer(CmdInstanceDrawable cmd) {
       //depending on the state of the commands
 
-      gc.getCanvasCtxRoot().getCanvas().cmdSelectPointer(cmd.getIC());
+      gc.getCanvasGCRoot().getCanvas().cmdSelectPointer(cmd.getIC());
    }
 
    /**
@@ -276,7 +276,7 @@ public class CommanderGui extends CommanderAbstract implements ICmdsView, ITechI
     */
    protected void cmdToggleDebug() {
       int mode = gc.getSettingsBO().get1(ITechCtxSettingsAppGui.CTX_GUI_OFFSET_07_DEBUG_MODE1);
-      CanvasAppliDrawable canvas = gc.getCanvasCtxRoot().getCanvas();
+      CanvasAppliInputGui canvas = gc.getCanvasGCRoot().getCanvas();
       if (mode == ITechCanvasDrawable.DEBUG_2_COMPLETE) {
          canvas.setDebugMode(ITechCanvasDrawable.DEBUG_0_NONE);
       } else {
@@ -310,7 +310,7 @@ public class CommanderGui extends CommanderAbstract implements ICmdsView, ITechI
          //create one
          MLogViewer log = new MLogViewer(gc, gc.getClass(1));
          log.getLay().layFullViewContext();
-         log.setViewContext(gc.getCanvasCtxRoot().getCanvas().getVCAppli());
+         log.setViewContext(gc.getCanvasGCRoot().getCanvas().getVCAppli());
          gc.setCtxLogViewer(log);
 
          boolean hasMultiWindows = gc.getCFC().getHostCore().hasFeatureSupport(ITechHostCore.SUP_ID_24_MULTIPLE_WINDOWS);
@@ -323,7 +323,7 @@ public class CommanderGui extends CommanderAbstract implements ICmdsView, ITechI
             bo.set2(IBOCanvasHost.TCANVAS_OFFSET_03_ID2, ITechCtxSettingsAppGui.CANVAS_ID_LOGVIEWER);
 
             //creation of a canvas goes through the 
-            CanvasAppliDrawable canvas = new CanvasAppliDrawable(gc, bo);
+            CanvasAppliInputGui canvas = new CanvasAppliInputGui(gc, bo);
 
             canvas.getCanvasHost().setDefaultStartPosition();
             canvas.showNotify();
@@ -335,7 +335,7 @@ public class CommanderGui extends CommanderAbstract implements ICmdsView, ITechI
          } else {
             //get the viewctx of the current canvas
 
-            log.setViewContext(gc.getCanvasCtxRoot().getCanvas().getVCAppli());
+            log.setViewContext(gc.getCanvasGCRoot().getCanvas().getVCAppli());
          }
 
       }

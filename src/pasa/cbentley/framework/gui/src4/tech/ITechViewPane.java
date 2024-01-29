@@ -12,7 +12,8 @@ import pasa.cbentley.framework.gui.src4.string.StringDrawable;
 import pasa.cbentley.framework.gui.src4.table.TableView;
 
 /**
- * {@link ViewPane} tech flags.
+ * {@link ViewPane} tech flags for {@link IBOViewPane}
+ * 
  * @author Charles-Philip Bentley
  *
  */

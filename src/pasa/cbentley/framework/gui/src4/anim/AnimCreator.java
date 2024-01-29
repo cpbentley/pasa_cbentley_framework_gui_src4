@@ -3,7 +3,7 @@ package pasa.cbentley.framework.gui.src4.anim;
 import pasa.cbentley.core.src4.ctx.UCtx;
 import pasa.cbentley.core.src4.logging.Dctx;
 import pasa.cbentley.core.src4.logging.IDLog;
-import pasa.cbentley.framework.gui.src4.canvas.CanvasAppliDrawable;
+import pasa.cbentley.framework.gui.src4.canvas.CanvasAppliInputGui;
 import pasa.cbentley.framework.gui.src4.ctx.GuiCtx;
 import pasa.cbentley.framework.gui.src4.ctx.ObjectGC;
 import pasa.cbentley.framework.gui.src4.interfaces.IAnimable;
@@ -28,9 +28,9 @@ public class AnimCreator extends ObjectGC implements IBOAnim {
 
    private Realisator         realisator;
 
-   protected final CanvasAppliDrawable canvas;
+   protected final CanvasAppliInputGui canvas;
 
-   public AnimCreator(GuiCtx gc, CanvasAppliDrawable canvas) {
+   public AnimCreator(GuiCtx gc, CanvasAppliInputGui canvas) {
       super(gc);
       this.canvas = canvas;
    }

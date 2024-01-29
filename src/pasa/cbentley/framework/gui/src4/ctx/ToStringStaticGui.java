@@ -11,23 +11,23 @@ import pasa.cbentley.framework.gui.src4.interfaces.ITechDrawable;
 import pasa.cbentley.framework.gui.src4.interfaces.ITechViewDrawable;
 import pasa.cbentley.framework.gui.src4.table.interfaces.IBOCellPolicy;
 import pasa.cbentley.framework.gui.src4.table.interfaces.IBOTablePolicy;
-import pasa.cbentley.framework.gui.src4.table.interfaces.IBOTableView;
+import pasa.cbentley.framework.gui.src4.table.interfaces.ITechTable;
 import pasa.cbentley.framework.gui.src4.tech.ITechStringDrawable;
 import pasa.cbentley.framework.gui.src4.tech.ITechViewPane;
 
 public class ToStringStaticGui extends ToStringStaticBase {
 
-   public static String toStringViewBehavior(int state) {
+   public static String toStringViewFlagGene(int state) {
       switch (state) {
-         case ITechViewDrawable.VIEW_GENE_28_NOT_SCROLLABLE:
+         case ITechViewDrawable.FLAG_GENE_28_NOT_SCROLLABLE:
             return "NotScrollable";
-         case ITechViewDrawable.VIEW_GENE_29_SHRINKABLE_W:
+         case ITechViewDrawable.FLAG_GENE_29_SHRINKABLE_W:
             return "ShrinkableW";
-         case ITechViewDrawable.VIEW_GENE_30_SHRINKABLE_H:
+         case ITechViewDrawable.FLAG_GENE_30_SHRINKABLE_H:
             return "ShrinkableH";
-         case ITechViewDrawable.VIEW_GENE_31_EXPANDABLE_W:
+         case ITechViewDrawable.FLAG_GENE_31_EXPANDABLE_W:
             return "ExpandableW";
-         case ITechViewDrawable.VIEW_GENE_32_EXPANDABLE_H:
+         case ITechViewDrawable.FLAG_GENE_32_EXPANDABLE_H:
             return "ExpandableH";
          default:
             return "Unknown" + state;
@@ -654,27 +654,27 @@ public class ToStringStaticGui extends ToStringStaticBase {
    }
 
    private static void debugViewBehavior(ViewDrawable d, int flag, Dctx sb) {
-      if (d.hasViewFlag(flag)) {
-         sb.append(toStringViewBehavior(flag));
+      if (d.hasFlagView(flag)) {
+         sb.append(toStringViewFlagGene(flag));
          sb.append(" ");
       }
    }
 
    private static void debugViewStateFlag(ViewDrawable d, int flag, Dctx sb) {
-      if (d.hasViewFlag(flag)) {
-         sb.append(debugViewState(flag));
+      if (d.hasFlagView(flag)) {
+         sb.append(toStringViewState(flag));
          sb.append(" ");
       }
    }
 
-   public static void toStringViewBehavior(ViewDrawable d, Dctx sb) {
+   public static void toStringViewGenes(ViewDrawable d, Dctx sb) {
       sb.append("ViewBehavior=[");
       int oc = sb.getCount();
-      debugViewBehavior(d, ITechViewDrawable.VIEW_GENE_28_NOT_SCROLLABLE, sb);
-      debugViewBehavior(d, ITechViewDrawable.VIEW_GENE_29_SHRINKABLE_W, sb);
-      debugViewBehavior(d, ITechViewDrawable.VIEW_GENE_30_SHRINKABLE_H, sb);
-      debugViewBehavior(d, ITechViewDrawable.VIEW_GENE_31_EXPANDABLE_W, sb);
-      debugViewBehavior(d, ITechViewDrawable.VIEW_GENE_32_EXPANDABLE_H, sb);
+      debugViewBehavior(d, ITechViewDrawable.FLAG_GENE_28_NOT_SCROLLABLE, sb);
+      debugViewBehavior(d, ITechViewDrawable.FLAG_GENE_29_SHRINKABLE_W, sb);
+      debugViewBehavior(d, ITechViewDrawable.FLAG_GENE_30_SHRINKABLE_H, sb);
+      debugViewBehavior(d, ITechViewDrawable.FLAG_GENE_31_EXPANDABLE_W, sb);
+      debugViewBehavior(d, ITechViewDrawable.FLAG_GENE_32_EXPANDABLE_H, sb);
 
       if (sb.getCount() != oc) {
          sb.reverse(1);
@@ -682,51 +682,63 @@ public class ToStringStaticGui extends ToStringStaticBase {
       sb.append("]");
    }
 
-   public static String toStringViewFlag(int flag) {
-      switch (flag) {
-         case ITechViewDrawable.VIEW_GENE_29_SHRINKABLE_W:
-            return "Shrinkable_W";
-         case ITechViewDrawable.VIEW_GENE_32_EXPANDABLE_H:
-            return "Expandable_H";
-         case ITechViewDrawable.VIEW_GENE_30_SHRINKABLE_H:
-            return "Shrinkable_H";
-         case ITechViewDrawable.VIEW_GENE_31_EXPANDABLE_W:
-            return "Expandable_W";
-         default:
-            return "Unknown";
-      }
-   }
 
-   public static String debugViewState(int state) {
+   public static String toStringViewState(int state) {
       switch (state) {
-         case ITechViewDrawable.VIEWSTATE_01_CLIP:
+         case ITechViewDrawable.FLAG_VSTATE_01_CLIP:
             return "Clip";
-         case ITechViewDrawable.VIEWSTATE_02_REPAINTING_CONTENT:
+         case ITechViewDrawable.FLAG_VSTATE_02_REPAINTING_CONTENT:
             return "RepaintContent";
-         case ITechViewDrawable.VIEWSTATE_06_NO_EAT_W_MUST_EXPAND:
+         case ITechViewDrawable.FLAG_VSTATE_03_VIEWPANE_OVERLAY:
+            return "ViewPaneOverlay";
+         case ITechViewDrawable.FLAG_VSTATE_04_NO_CONTENT_STATE:
+            return "NoContentState";
+         case ITechViewDrawable.FLAG_VSTATE_05_:
+            return "";
+         case ITechViewDrawable.FLAG_VSTATE_06_NO_EAT_W_MUST_EXPAND:
             return "ExpandW";
-         case ITechViewDrawable.VIEWSTATE_07_NO_EAT_H_MUST_EXPAND:
+         case ITechViewDrawable.FLAG_VSTATE_07_NO_EAT_H_MUST_EXPAND:
             return "ExpandH";
-         case ITechViewDrawable.VIEWSTATE_10_CONTENT_PW_VIEWPORT_DW:
+         case ITechViewDrawable.FLAG_VSTATE_08_PREF_SIZE_COMPUTED:
+            return "PrefSizeComputed";
+         case ITechViewDrawable.FLAG_VSTATE_09_:
+            return "";
+         case ITechViewDrawable.FLAG_VSTATE_10_CONTENT_PW_VIEWPORT_DW:
             return "ContentWFollows";
-         case ITechViewDrawable.VIEWSTATE_11_CONTENT_PH_VIEWPORT_DH:
+         case ITechViewDrawable.FLAG_VSTATE_11_CONTENT_PH_VIEWPORT_DH:
             return "ContentHFollow";
-         case ITechViewDrawable.VIEWSTATE_12_CONTENT_W_DEPENDS_VIEWPORT:
+         case ITechViewDrawable.FLAG_VSTATE_12_CONTENT_W_DEPENDS_VIEWPORT:
             return "ContentWDepends";
-         case ITechViewDrawable.VIEWSTATE_13_CONTENT_H_DEPENDS_VIEWPORT:
+         case ITechViewDrawable.FLAG_VSTATE_13_CONTENT_H_DEPENDS_VIEWPORT:
             return "ContentHDepends";
-         case ITechViewDrawable.VIEWSTATE_14_LOGICAL_WIDTH:
+         case ITechViewDrawable.FLAG_VSTATE_14_LOGICAL_WIDTH:
             return "LogicalW";
-         case ITechViewDrawable.VIEWSTATE_15_LOGICAL_HEIGHT:
+         case ITechViewDrawable.FLAG_VSTATE_15_LOGICAL_HEIGHT:
             return "LogicalH";
-         case ITechViewDrawable.VIEWSTATE_16_SHRANK_W:
+         case ITechViewDrawable.FLAG_VSTATE_16_SHRANK_W:
             return "ShrankW";
-         case ITechViewDrawable.VIEWSTATE_17_SHRANK_H:
+         case ITechViewDrawable.FLAG_VSTATE_17_SHRANK_H:
             return "ShrankH";
-         case ITechViewDrawable.VIEWSTATE_18_EXPANDED_W:
+         case ITechViewDrawable.FLAG_VSTATE_18_EXPANDED_W:
             return "ExpandedW";
-         case ITechViewDrawable.VIEWSTATE_19_EXPANDED_H:
+         case ITechViewDrawable.FLAG_VSTATE_19_EXPANDED_H:
             return "ExpandedH";
+         case ITechViewDrawable.FLAG_VSTATE_20_:
+            return "";
+         case ITechViewDrawable.FLAG_VSTATE_21_VP_STYLE_DRAWN:
+            return "VpStyleDrawn";
+         case ITechViewDrawable.FLAG_VSTATE_22_SCROLLED:
+            return "Scrolled";
+         case ITechViewDrawable.FLAG_VSTATE_23_SCROLLED_H:
+            return "ScrolledH";
+         case ITechViewDrawable.FLAG_VSTATE_24_SCROLLED_V:
+            return "ScrolledV";
+         case ITechViewDrawable.FLAG_VSTATE_25_HEADERED:
+            return "Headered";
+         case ITechViewDrawable.FLAG_VSTATE_26_:
+            return "";
+         case ITechViewDrawable.FLAG_VSTATE_27_HEADER_TOP_PW:
+            return "HeaderTopPw";
          default:
             return "Unknown";
       }
@@ -735,20 +747,20 @@ public class ToStringStaticGui extends ToStringStaticBase {
    public static void toStringViewStates(ViewDrawable d, Dctx sb) {
       sb.append("ViewState=[");
       int oc = sb.getCount();
-      debugViewStateFlag(d, ITechViewDrawable.VIEWSTATE_01_CLIP, sb);
-      debugViewStateFlag(d, ITechViewDrawable.VIEWSTATE_02_REPAINTING_CONTENT, sb);
-      debugViewStateFlag(d, ITechViewDrawable.VIEWSTATE_06_NO_EAT_W_MUST_EXPAND, sb);
-      debugViewStateFlag(d, ITechViewDrawable.VIEWSTATE_07_NO_EAT_H_MUST_EXPAND, sb);
-      debugViewStateFlag(d, ITechViewDrawable.VIEWSTATE_10_CONTENT_PW_VIEWPORT_DW, sb);
-      debugViewStateFlag(d, ITechViewDrawable.VIEWSTATE_11_CONTENT_PH_VIEWPORT_DH, sb);
-      debugViewStateFlag(d, ITechViewDrawable.VIEWSTATE_12_CONTENT_W_DEPENDS_VIEWPORT, sb);
-      debugViewStateFlag(d, ITechViewDrawable.VIEWSTATE_13_CONTENT_H_DEPENDS_VIEWPORT, sb);
-      debugViewStateFlag(d, ITechViewDrawable.VIEWSTATE_14_LOGICAL_WIDTH, sb);
-      debugViewStateFlag(d, ITechViewDrawable.VIEWSTATE_15_LOGICAL_HEIGHT, sb);
-      debugViewStateFlag(d, ITechViewDrawable.VIEWSTATE_16_SHRANK_W, sb);
-      debugViewStateFlag(d, ITechViewDrawable.VIEWSTATE_17_SHRANK_H, sb);
-      debugViewStateFlag(d, ITechViewDrawable.VIEWSTATE_18_EXPANDED_W, sb);
-      debugViewStateFlag(d, ITechViewDrawable.VIEWSTATE_19_EXPANDED_H, sb);
+      debugViewStateFlag(d, ITechViewDrawable.FLAG_VSTATE_01_CLIP, sb);
+      debugViewStateFlag(d, ITechViewDrawable.FLAG_VSTATE_02_REPAINTING_CONTENT, sb);
+      debugViewStateFlag(d, ITechViewDrawable.FLAG_VSTATE_06_NO_EAT_W_MUST_EXPAND, sb);
+      debugViewStateFlag(d, ITechViewDrawable.FLAG_VSTATE_07_NO_EAT_H_MUST_EXPAND, sb);
+      debugViewStateFlag(d, ITechViewDrawable.FLAG_VSTATE_10_CONTENT_PW_VIEWPORT_DW, sb);
+      debugViewStateFlag(d, ITechViewDrawable.FLAG_VSTATE_11_CONTENT_PH_VIEWPORT_DH, sb);
+      debugViewStateFlag(d, ITechViewDrawable.FLAG_VSTATE_12_CONTENT_W_DEPENDS_VIEWPORT, sb);
+      debugViewStateFlag(d, ITechViewDrawable.FLAG_VSTATE_13_CONTENT_H_DEPENDS_VIEWPORT, sb);
+      debugViewStateFlag(d, ITechViewDrawable.FLAG_VSTATE_14_LOGICAL_WIDTH, sb);
+      debugViewStateFlag(d, ITechViewDrawable.FLAG_VSTATE_15_LOGICAL_HEIGHT, sb);
+      debugViewStateFlag(d, ITechViewDrawable.FLAG_VSTATE_16_SHRANK_W, sb);
+      debugViewStateFlag(d, ITechViewDrawable.FLAG_VSTATE_17_SHRANK_H, sb);
+      debugViewStateFlag(d, ITechViewDrawable.FLAG_VSTATE_18_EXPANDED_W, sb);
+      debugViewStateFlag(d, ITechViewDrawable.FLAG_VSTATE_19_EXPANDED_H, sb);
 
       if (sb.getCount() != oc) {
          sb.reverse(1);
@@ -776,17 +788,17 @@ public class ToStringStaticGui extends ToStringStaticBase {
 
    public static String toStringPSelectMode(int value) {
       switch (value) {
-         case IBOTableView.PSELECT_0_NONE:
+         case ITechTable.PSELECT_0_NONE:
             return "SELECT_NONE";
-         case IBOTableView.PSELECT_1_PRESS:
+         case ITechTable.PSELECT_1_PRESS:
             return "PRESS";
-         case IBOTableView.PSELECT_2_PRESS_RELEASE:
+         case ITechTable.PSELECT_2_PRESS_RELEASE:
             return "PRESS_RELEASE";
-         case IBOTableView.PSELECT_4_PRESS_DOUBLE:
+         case ITechTable.PSELECT_4_PRESS_DOUBLE:
             return "PRESS_DOUBLE";
-         case IBOTableView.PSELECT_3_SELECTED_PRESS:
+         case ITechTable.PSELECT_3_SELECTED_PRESS:
             return "PRESS_SELECTED";
-         case IBOTableView.PSELECT_5_PRESS_RELEASE_DOUBLE:
+         case ITechTable.PSELECT_5_PRESS_RELEASE_DOUBLE:
             return "PRESS_RELEASE_DOUBLE";
          default:
             return "Unknown" + value;

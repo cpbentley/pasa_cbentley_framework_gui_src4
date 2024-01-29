@@ -80,7 +80,7 @@ public class MLogViewer extends TableView implements IMLog, IMemFreeable {
    }
 
    /**
-    * Sets the {@link ITechViewDrawable#VIEW_GENE_31_EXPANDABLE_W}
+    * Sets the {@link ITechViewDrawable#FLAG_GENE_31_EXPANDABLE_W}
     * @param styleKey
     * @param its
     * @param policy
@@ -88,7 +88,7 @@ public class MLogViewer extends TableView implements IMLog, IMemFreeable {
    public MLogViewer(GuiCtx gc, StyleClass sc, ByteObject policy, IntToObjects its) {
       super(gc, sc, policy);
       UCtx uc = gc.getUCtx();
-      setViewFlag(ITechViewDrawable.VIEW_GENE_31_EXPANDABLE_W, true);
+      setFlagGene(ITechViewDrawable.FLAG_GENE_31_EXPANDABLE_W, true);
       if(its == null) {
          its = new IntToObjects(uc);
       }

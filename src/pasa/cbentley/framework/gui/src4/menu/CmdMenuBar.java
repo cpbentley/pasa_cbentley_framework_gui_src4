@@ -27,7 +27,7 @@ import pasa.cbentley.framework.gui.src4.interfaces.IDrawable;
 import pasa.cbentley.framework.gui.src4.interfaces.ITechDrawable;
 import pasa.cbentley.framework.gui.src4.string.StringDrawable;
 import pasa.cbentley.framework.gui.src4.table.TableView;
-import pasa.cbentley.framework.gui.src4.table.interfaces.IBOTableView;
+import pasa.cbentley.framework.gui.src4.table.interfaces.ITechTable;
 import pasa.cbentley.framework.gui.src4.utils.DrawableUtilz;
 
 /**
@@ -243,7 +243,7 @@ public class CmdMenuBar extends TableView implements IEventConsumer, ICmdsView {
       techBar = styleClass.getByteObject(IBOTypesGui.LINK_75_MENU_BAR_TECH);
       //no need to get channel info. since we are a subclass and we are only interested by select which we override
       //EventChannel.addConsumerProducer(this, TableView.EVENT_ID_0SELECT, tv, tv.getProducerID());
-      setHelperFlag(HELPER_FLAG_21_MODEL_STYLE, true);
+      setHelperFlag(ITechTable.HELPER_FLAG_21_MODEL_STYLE, true);
 
       StyleClass scLeft = styleClass.getStyleClass(LINK_CHILD_1LEFT_STYLE, LINK_CHILD_5_MENU_ITEM);
       StyleClass scMiddle = styleClass.getStyleClass(LINK_CHILD_2MIDDLE_STYLE, LINK_CHILD_5_MENU_ITEM);
@@ -303,7 +303,7 @@ public class CmdMenuBar extends TableView implements IEventConsumer, ICmdsView {
 
       }
       if (e.getProducer() == cmdTableView) {
-         if (e.getEventID() == IBOTableView.EVENT_ID_00_SELECT) {
+         if (e.getEventID() == ITechTable.EVENT_ID_00_SELECT) {
             //
             FocusCtrl fc = gc.getFocusCtrl();
             int focusCount = fc.getKeyFocusCount();
@@ -355,13 +355,13 @@ public class CmdMenuBar extends TableView implements IEventConsumer, ICmdsView {
          initSizeSubMenuTable();
          initSubMenuTablePosition();
          //#debug
-         toLog().pInit("Menu Table Created : ", cmdTableView, CmdMenuBar.class, "updateCmdTableView");
+         toDLog().pInit("Menu Table Created : ", cmdTableView, CmdMenuBar.class, "updateCmdTableView");
       }
    }
 
    public void doUpdateLayoutNoSubMenu(boolean topDown) {
       super.layoutInvalidate(topDown);
-      init();
+      initSize();
    }
 
    /**
@@ -513,7 +513,7 @@ public class CmdMenuBar extends TableView implements IEventConsumer, ICmdsView {
          cmdTableView.setShrink(true, true);
          cmdTableView.setParent(this);
          cmdTableView.setModelOffset(currentModelOffset);
-         cmdTableView.addEventListener(this, TableView.EVENT_ID_00_SELECT);
+         cmdTableView.addEventListener(this, ITechTable.EVENT_ID_00_SELECT);
 
          //there is lots of tweaks to be made based on the device
          //         if (getDevice().isAnimated()) {
@@ -595,7 +595,7 @@ public class CmdMenuBar extends TableView implements IEventConsumer, ICmdsView {
 
    public void layoutInvalidate(boolean topDown) {
       super.layoutInvalidate(topDown);
-      init();
+      initSize();
       doUpdateCmdTableView();
    }
 

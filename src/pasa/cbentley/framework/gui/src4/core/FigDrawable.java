@@ -146,13 +146,18 @@ public class FigDrawable extends Drawable implements ITechFigure {
     * Nothing to init.
     * 
     * Why?
-    * Because {@link Drawable#init()} did all the work already.
+    * Because {@link Drawable#initSize()} did all the work already.
     * <br>
     * A Figure in a {@link FigDrawable} does not modify the dw and dh. Purely decided by sizers.
     * <br>
     * When a Figure has internal sizers and anchors, it will draw relative to dh and dw.
     */
    public void initDrawable(LayEngineDrawable ds) {
+   }
+
+   public void managePointerInput(InputConfig ic) {
+      //#debug
+      toDLog().pEvent1("x=" + ic.is.getX() + " y=" + ic.is.getY(), null, FigDrawable.class, "managePointerInput");
    }
 
    /**
@@ -191,11 +196,6 @@ public class FigDrawable extends Drawable implements ITechFigure {
       lastDrawVersion = 0;
    }
 
-   public void managePointerInput(InputConfig ic) {
-      //#debug
-      toLog().pEvent1("x=" + ic.is.getX() + " y=" + ic.is.getY(), null, FigDrawable.class, "managePointerInput");
-   }
-
    public void setSourceCache(SourceCache sc, int dir) {
       this.sc = sc;
       this.dir = dir;
@@ -203,20 +203,26 @@ public class FigDrawable extends Drawable implements ITechFigure {
 
    //#mdebug
 
-   public void toString1Line(Dctx dc) {
-      dc.root1Line(this, "FigDrawable");
-      figure.toString(dc);
+   public void toString(Dctx dc) {
+      dc.root(this, FigDrawable.class, 210);
+      toStringPrivate(dc);
+      super.toString(dc.sup());
+      dc.nlLvlNullTitle("Figure", figure);
+   }
+
+   private void toStringPrivate(Dctx dc) {
+      dc.appendVarWithSpace("lastDrawVersion", lastDrawVersion);
       dc.append(toStringDimension());
    }
 
-   public void toString(Dctx sb) {
-      sb.root(this, "FigDrawable");
-      sb.append(" lastDrawVersion=");
-      sb.append(lastDrawVersion);
-      sb.nl();
-      sb.nlLvlNullTitle("Figure", figure);
-      super.toString(sb.sup());
+   public void toString1Line(Dctx dc) {
+      dc.root1Line(this, FigDrawable.class);
+      toStringPrivate(dc);
+      super.toString1Line(dc.sup1Line());
+
+      figure.toString1Line(dc);
    }
+
    //#enddebug
 
 }

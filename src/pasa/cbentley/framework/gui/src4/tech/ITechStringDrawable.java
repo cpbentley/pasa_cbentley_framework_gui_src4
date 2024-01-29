@@ -111,7 +111,7 @@ public interface ITechStringDrawable extends ITech {
    /**
     * Title string: one line of text trimmed at width.
     * <br>
-    * <li>No Scrolling {@link ITechViewDrawable#VIEW_GENE_28_NOT_SCROLLABLE}.
+    * <li>No Scrolling {@link ITechViewDrawable#FLAG_GENE_28_NOT_SCROLLABLE}.
     * <li>When negative width, only shows X letters. Ignores the rest.
     * <li>When 0 width, shows the whole title
     * <li>In all cases, only show 1 line, thus ignores new lines
@@ -131,8 +131,8 @@ public interface ITechStringDrawable extends ITech {
     * <br>
     * Equivalent to
     * <li>Preset for <b>init(x,-1)</b>.
-    * <li>Scrolling {@link ITechViewDrawable#VIEW_GENE_28_NOT_SCROLLABLE} 
-    * <li>Shrinking vertically {@link ITechViewDrawable#VIEW_GENE_30_SHRINKABLE_H}
+    * <li>Scrolling {@link ITechViewDrawable#FLAG_GENE_28_NOT_SCROLLABLE} 
+    * <li>Shrinking vertically {@link ITechViewDrawable#FLAG_GENE_30_SHRINKABLE_H}
     * <li>Ignores new lines.
     * <li>top,bottom and vertical scrollbar pixels must be in expand mode
     */
@@ -148,7 +148,7 @@ public interface ITechStringDrawable extends ITech {
     * <li>Shrink to fit. 
     * <li>No Partial. 
     * <li>Scrolling vertically is enabled.
-    * <li>Shrinking vertically {@link ITechViewDrawable#VIEWSTATE_10_CONTENT_PW_VIEWPORT_DW}
+    * <li>Shrinking vertically {@link ITechViewDrawable#FLAG_VSTATE_10_CONTENT_PW_VIEWPORT_DW}
     * <br>
     * <br>
     * In this type of String, the Width Sizer is overriden with {@link ISizer#ETALON_0_SIZEE_CTX}

@@ -17,7 +17,7 @@ import pasa.cbentley.framework.gui.src4.factories.CellPolicyFactory;
 import pasa.cbentley.framework.gui.src4.interfaces.ICmdsView;
 import pasa.cbentley.framework.gui.src4.interfaces.IUIView;
 import pasa.cbentley.framework.gui.src4.table.TableView;
-import pasa.cbentley.framework.gui.src4.table.interfaces.IBOTableView;
+import pasa.cbentley.framework.gui.src4.table.interfaces.ITechTable;
 
 /**
  * One instance per langTable
@@ -104,7 +104,7 @@ public class MCmdGuiChangeLanguage extends MCmdGui implements IEventConsumer {
             //set the selection to the language
             //init once the model has been set.
             tv.init(0, 0);
-            tv.addEventListener(this, IBOTableView.EVENT_ID_00_SELECT);
+            tv.addEventListener(this, ITechTable.EVENT_ID_00_SELECT);
             //show the form as child of current front drawable
             langTable = tv;
             activeCmdLang = cmd;

@@ -206,8 +206,6 @@ public interface IBOTypesGui extends IBOTypesBOC {
 
    public static final int  TYPE_200_EXTENSION                        = 200;
 
-   public static final int  TYPE_SUB_001_CANVAS_DRAWABLE              = 1;
-
    /**
     * Defines the style of attached {@link StringEditControl}.
     * <br>

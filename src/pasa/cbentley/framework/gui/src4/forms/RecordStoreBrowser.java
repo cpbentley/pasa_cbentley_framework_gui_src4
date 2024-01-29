@@ -16,7 +16,7 @@ import pasa.cbentley.framework.gui.src4.canvas.InputConfig;
 import pasa.cbentley.framework.gui.src4.core.StyleClass;
 import pasa.cbentley.framework.gui.src4.ctx.GuiCtx;
 import pasa.cbentley.framework.gui.src4.interfaces.ICmdsView;
-import pasa.cbentley.framework.gui.src4.string.InputRequestStr;
+import pasa.cbentley.framework.gui.src4.string.RequestStringInput;
 import pasa.cbentley.framework.gui.src4.table.TableLayoutView;
 import pasa.cbentley.framework.gui.src4.tech.ITechStringDrawable;
 
@@ -141,7 +141,7 @@ public class RecordStoreBrowser extends TableLayoutView implements IAppendable, 
          //ask co
          int i = this.getSelectedIndex();
          String msg = "Delete" + this.getBrowsedString(i) + "?";
-         InputRequestStr ir = new InputRequestStr(gc, getStyleClass(), msg);
+         RequestStringInput ir = new RequestStringInput(gc, getStyleClass(), msg);
          ir.show(this, cmd);
       } else {
          if (cmd.param == 1) {
@@ -157,7 +157,7 @@ public class RecordStoreBrowser extends TableLayoutView implements IAppendable, 
     */
    private void cmdGoto(CmdInstance cmd) {
       if (cmd.param == 0) {
-         InputRequestStr sd;
+         RequestStringInput sd;
          //
          String msg = "Go To ID";
          ByteObject strTech = gc.getDrawableStringFactory().getStringTechEdit(ITechStringDrawable.TYPE_1_TITLE, 5, ITechStringDrawable.INPUT_TYPE_2_NUMERIC);

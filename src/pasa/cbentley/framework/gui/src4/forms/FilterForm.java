@@ -92,7 +92,7 @@ public class FilterForm extends TableLayoutView implements ICommandable, IBOStri
       ctx.addMenuCmd(ICmdsCmd.CMD_06_APPLY);
       ctx.addMenuCmd(ICmdsCmd.CMD_23_DELETE);
       ctx.addMenuCmd(ICmdsCmd.CMD_26_SAVE);
-      setCmdCtx(ctx);
+      setCmdNote(ctx);
 
       this.formAppend(filterRoot);
 
@@ -138,7 +138,7 @@ public class FilterForm extends TableLayoutView implements ICommandable, IBOStri
       for (int i = 0; i < its.strings.length; i++) {
          valueLis.formAppend(its.strings[i], null);
       }
-      valueLis.addCmds(this, cmdCtx, null);
+      valueLis.addCmds(this, cmdNode, null);
 
       ListRoot fieldList = new ListRoot(gc, getStyleClass(), "", valueLis);
       CmdNode ctx = fieldList.getCmdNode();
@@ -158,7 +158,7 @@ public class FilterForm extends TableLayoutView implements ICommandable, IBOStri
       opLis.formAppend(sl.getString("op_0"), null);
       opLis.formAppend(sl.getString("op_1"), null);
 
-      opLis.addCmds(this, cmdCtx, null);
+      opLis.addCmds(this, cmdNode, null);
 
       //#style filterEntry
       ListRoot opList = new ListRoot(gc, getStyleClass(), "Op:", opLis);
@@ -195,7 +195,7 @@ public class FilterForm extends TableLayoutView implements ICommandable, IBOStri
          default:
             break;
       }
-      opLis.addCmds(this, cmdCtx, null);
+      opLis.addCmds(this, cmdNode, null);
 
       //#style filterEntry
       ListRoot opList = new ListRoot(gc, getStyleClass(), "Op:", opLis);

@@ -2,16 +2,18 @@ package pasa.cbentley.framework.gui.src4.canvas;
 
 import pasa.cbentley.core.src4.interfaces.C;
 import pasa.cbentley.framework.drawx.src4.engine.GraphicsX;
+import pasa.cbentley.framework.gui.src4.ctx.IBOTypesGui;
 import pasa.cbentley.framework.gui.src4.interfaces.ITechCanvasDrawable;
+import pasa.cbentley.framework.input.src4.ctx.IBOTypesInput;
 import pasa.cbentley.framework.input.src4.interfaces.IBOCanvasAppli;
 
 /**
  * Extends {@link IBOCanvasAppli} for drawable application
  * 
  */
-public interface ITechCanvasAppliDrawable extends IBOCanvasAppli {
+public interface IBOCanvasAppliGui extends IBOCanvasAppli {
 
-   public static final int CANVAS_APP_DRW_1_TYPE_DRAWABLE                = 1;
+   public static final int CANVAS_APP_TYPE_SUB_GUI                       = 2;
 
    public static final int CANVAS_APP_DRW_BASIC_SIZE                     = CANVAS_APP_BASIC_SIZE + 16;
 

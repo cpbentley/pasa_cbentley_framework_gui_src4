@@ -6,6 +6,7 @@ import pasa.cbentley.core.src4.logging.IDLog;
 import pasa.cbentley.framework.coredraw.src4.interfaces.IMFont;
 import pasa.cbentley.framework.gui.src4.ctx.CanvasGuiCtx;
 import pasa.cbentley.framework.gui.src4.ctx.GuiCtx;
+import pasa.cbentley.framework.gui.src4.ctx.ObjectGC;
 import pasa.cbentley.layouter.src4.interfaces.IStyler;
 
 /**
@@ -29,7 +30,7 @@ import pasa.cbentley.layouter.src4.interfaces.IStyler;
  * @author Charles-Philip Bentley
  *
  */
-public class StyleAdapter implements IStyler {
+public class StyleAdapter extends ObjectGC implements IStyler {
 
    protected IMFont       z_refFont       = null;
 
@@ -47,14 +48,13 @@ public class StyleAdapter implements IStyler {
 
    public int             gradientIncr    = 1;
 
-   protected final GuiCtx gc;
 
    public StyleAdapter(GuiCtx gc) {
       this(gc,1.0f);
    }
 
    public StyleAdapter(GuiCtx gc, float scaleA) {
-      this.gc = gc;
+      super(gc);
       this.scaleA = scaleA;
    }
 
@@ -151,37 +151,26 @@ public class StyleAdapter implements IStyler {
       return scaleIt(1);
    }
 
+
    //#mdebug
-   public IDLog toDLog() {
-      return toStringGetUCtx().toDLog();
-   }
-
-   public String toString() {
-      return Dctx.toString(this);
-   }
-
    public void toString(Dctx dc) {
-      dc.root(this, "StyleAdapter");
+      dc.root(this, StyleAdapter.class, 160);
       toStringPrivate(dc);
-   }
-
-   public String toString1Line() {
-      return Dctx.toString1Line(this);
+      super.toString(dc.sup());
    }
 
    private void toStringPrivate(Dctx dc) {
-
+      
    }
 
    public void toString1Line(Dctx dc) {
-      dc.root1Line(this, "StyleAdapter");
+      dc.root1Line(this, StyleAdapter.class);
       toStringPrivate(dc);
-   }
-
-   public UCtx toStringGetUCtx() {
-      return gc.getUCtx();
+      super.toString1Line(dc.sup1Line());
    }
 
    //#enddebug
+   
+
 
 }

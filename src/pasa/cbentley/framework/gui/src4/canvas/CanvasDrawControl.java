@@ -34,11 +34,11 @@ import pasa.cbentley.framework.gui.src4.table.TableView;
  */
 public class CanvasDrawControl {
 
-   private CanvasAppliDrawable canvas;
+   private CanvasAppliInputGui canvas;
 
    protected final GuiCtx      gc;
 
-   public CanvasDrawControl(GuiCtx gc, CanvasAppliDrawable canvas) {
+   public CanvasDrawControl(GuiCtx gc, CanvasAppliInputGui canvas) {
       this.gc = gc;
       this.canvas = canvas;
    }

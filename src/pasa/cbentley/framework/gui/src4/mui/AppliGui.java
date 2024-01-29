@@ -13,7 +13,7 @@ import pasa.cbentley.framework.core.src4.app.IBOCtxSettingsAppli;
 import pasa.cbentley.framework.coreui.src4.interfaces.ICanvasAppli;
 import pasa.cbentley.framework.coreui.src4.tech.IBOCanvasHost;
 import pasa.cbentley.framework.coreui.src4.utils.ViewState;
-import pasa.cbentley.framework.gui.src4.canvas.CanvasAppliDrawable;
+import pasa.cbentley.framework.gui.src4.canvas.CanvasAppliInputGui;
 import pasa.cbentley.framework.gui.src4.canvas.CanvasResultDrawable;
 import pasa.cbentley.framework.gui.src4.canvas.InputConfig;
 import pasa.cbentley.framework.gui.src4.canvas.InputStateDrawable;
@@ -47,9 +47,9 @@ public abstract class AppliGui extends AppliAbstract {
 
    private boolean             isInit = false;
 
-   private CanvasAppliDrawable root0;
+   private CanvasAppliInputGui root0;
 
-   private CanvasAppliDrawable root1;
+   private CanvasAppliInputGui root1;
 
    /**
     * Sanity checks that sub classes have called every method
@@ -69,10 +69,10 @@ public abstract class AppliGui extends AppliAbstract {
    }
 
    /**
-    * Chance for sub class to do some stuff after {@link CanvasAppliDrawable} was created.
+    * Chance for sub class to do some stuff after {@link CanvasAppliInputGui} was created.
     * @param cv
     */
-   protected void canvasCreated(CanvasAppliDrawable cv) {
+   protected void canvasCreated(CanvasAppliInputGui cv) {
 
    }
 
@@ -91,7 +91,7 @@ public abstract class AppliGui extends AppliAbstract {
          if (id <= 0) {
             if (root0 == null) {
                //there can only be one root?
-               root0 = new CanvasAppliDrawable(gc, tech);
+               root0 = new CanvasAppliInputGui(gc, tech);
                return root0;
             } else {
                //throw new IllegalStateException("Root0 is already created");
@@ -100,7 +100,7 @@ public abstract class AppliGui extends AppliAbstract {
          } else if (id == 1) {
             if (root1 == null) {
                //there can only be one root?
-               root1 = new CanvasAppliDrawable(gc, tech);
+               root1 = new CanvasAppliInputGui(gc, tech);
                return root1;
             } else {
                return null;
@@ -108,7 +108,7 @@ public abstract class AppliGui extends AppliAbstract {
             }
          } else if (id == 2) {
             //this canvas... how do distinguish from several?
-            CanvasAppliDrawable ide = new CanvasAppliDrawable(gc, tech);
+            CanvasAppliInputGui ide = new CanvasAppliInputGui(gc, tech);
             if (root1 == null) {
                throw new IllegalStateException();
             }
@@ -131,7 +131,7 @@ public abstract class AppliGui extends AppliAbstract {
          techCanvas.set2(IBOCanvasHost.TCANVAS_OFFSET_07_ICON_ID2, 0);
          techCanvas.set2(IBOCanvasHost.TCANVAS_OFFSET_08_TITLE_ID_ID2, 0);
          //TODO problem when root. root MUST always be shown on start up ?
-         root0 = (CanvasAppliDrawable) createCanvas(1, techCanvas, null);
+         root0 = (CanvasAppliInputGui) createCanvas(1, techCanvas, null);
       }
       return root0;
    }
@@ -270,7 +270,7 @@ public abstract class AppliGui extends AppliAbstract {
     */
    protected void subAppStarted() {
 
-      CanvasAppliDrawable canvasView = gc.getCanvasRoot();
+      CanvasAppliInputGui canvasView = gc.getCanvasRoot();
       InputStateDrawable isd = (InputStateDrawable) canvasView.getEvCtrl().getState();
       CanvasResultDrawable srd = canvasView.getRepaintCtrlDraw().getSD();
       InputConfig ic = new InputConfig(gc, canvasView, isd, srd);

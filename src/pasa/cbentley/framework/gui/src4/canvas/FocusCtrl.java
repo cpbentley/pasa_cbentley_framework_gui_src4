@@ -26,7 +26,7 @@ import pasa.cbentley.framework.gui.src4.utils.DrawableUtilz;
 import pasa.cbentley.framework.input.src4.InputState;
 
 /**
- * Manages the focus for a {@link CanvasAppliDrawable}
+ * Manages the focus for a {@link CanvasAppliInputGui}
  * 
  * {@link FocusCtrl} is thread safe because the Update Thread
  * query and the GUI thread writes when a new Drawable is shown.
@@ -515,7 +515,7 @@ public class FocusCtrl implements IStringable {
          if (newKeyFocus == null) {
             newKeyFocus = topo.getTop();
             if (newKeyFocus == null) {
-               newKeyFocus = gc.getCanvasCtxRoot().getRootDrawable();
+               newKeyFocus = gc.getCanvasGCRoot().getRootDrawable();
             }
          }
       }
@@ -529,7 +529,7 @@ public class FocusCtrl implements IStringable {
     * @param drawExCtx
     * @param d
     */
-   public void drawableShow(ExecutionCtxDraw drawExCtx, IDrawable d) {
+   public void drawableShow(ExecutionContextGui drawExCtx, IDrawable d) {
       setNewFocus(d, ICmdsView.CTX_CAT_0_KEY);
       d.getVC().getTopo().addDLayer(d, ITechCanvasDrawable.SHOW_TYPE_1_OVER);
    }

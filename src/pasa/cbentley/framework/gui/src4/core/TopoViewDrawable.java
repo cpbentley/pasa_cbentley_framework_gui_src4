@@ -2,7 +2,7 @@ package pasa.cbentley.framework.gui.src4.core;
 
 import pasa.cbentley.core.src4.logging.Dctx;
 import pasa.cbentley.framework.drawx.src4.engine.GraphicsX;
-import pasa.cbentley.framework.gui.src4.canvas.ExecutionCtxDraw;
+import pasa.cbentley.framework.gui.src4.canvas.ExecutionContextGui;
 import pasa.cbentley.framework.gui.src4.canvas.InputConfig;
 import pasa.cbentley.framework.gui.src4.canvas.TopologyDLayer;
 import pasa.cbentley.framework.gui.src4.canvas.ViewContext;
@@ -46,17 +46,17 @@ public class TopoViewDrawable extends ViewDrawable {
       topology.drawLayers(g);
    }
 
-   public IDrawable getDrawableViewPort(int x, int y, ExecutionCtxDraw ex) {
+   public IDrawable getDrawableViewPort(int x, int y, ExecutionContextGui ex) {
       return topology.getDrawable(x, y, null);
    }
 
-   public void init() {
+   public void initSize() {
       //let the drawable init
-      super.init();
+      super.initSize();
 
       //#mdebug
       String msg = "x=" + this.getContentX() + " y=" + this.getContentY() + " w=" + this.getViewPortContentW() + " h=" + this.getViewPortContentH() + " ";
-      toLog().pInit1(msg, this, TopoViewDrawable.class, "init");
+      toDLog().pInit1(msg, this, TopoViewDrawable.class, "init");
       //#enddebug
       //set the viewcontext
       vcContent.setWidth(getViewPortContentW());
@@ -68,19 +68,23 @@ public class TopoViewDrawable extends ViewDrawable {
 
    protected void initViewDrawable(LayEngineDrawable ds) {
       //we are not scrollable
-      setViewFlag(ITechViewDrawable.VIEW_GENE_28_NOT_SCROLLABLE, true);
-      setViewFlag(ITechViewDrawable.VIEWSTATE_10_CONTENT_PW_VIEWPORT_DW, true);
-      setViewFlag(ITechViewDrawable.VIEWSTATE_11_CONTENT_PH_VIEWPORT_DH, true);
+      setFlagGene(ITechViewDrawable.FLAG_GENE_28_NOT_SCROLLABLE, true);
+      setFlagView(ITechViewDrawable.FLAG_VSTATE_10_CONTENT_PW_VIEWPORT_DW, true);
+      setFlagView(ITechViewDrawable.FLAG_VSTATE_11_CONTENT_PH_VIEWPORT_DH, true);
       //our preferred size depends on the content
-      pw = vcContent.getWidth();
-      ph = vcContent.getHeight();
-
+      int pw = vcContent.getWidth();
+      int ph = vcContent.getHeight();
+      layEngine.setPw(pw);
+      layEngine.setPh(ph);
+      
       //once finished update the viewcontext
    }
 
    protected void initViewPortSub(int width, int height) {
-      pw = width;
-      ph = height;
+      int pw = width;
+      int ph = height;
+      layEngine.setPw(pw);
+      layEngine.setPh(ph);
    }
 
    public void layoutInvalidate(boolean noParentInvalidate) {
@@ -90,7 +94,7 @@ public class TopoViewDrawable extends ViewDrawable {
 
    public void manageGestureInput(InputConfig ic) {
       //#debug
-      toLog().pFlow("", null, TopoViewDrawable.class, "manageGestureInput@line96", LVL_03_FINEST, true);
+      toDLog().pFlow("", null, TopoViewDrawable.class, "manageGestureInput@line96", LVL_03_FINEST, true);
       topology.manageGestureInput(ic);
    }
 
@@ -100,39 +104,39 @@ public class TopoViewDrawable extends ViewDrawable {
 
    public void manageKeyInput(InputConfig ic) {
       //#debug
-      toLog().pFlow("" + ic.is.getLastDeviceEvent().toString1Line(), null, TopoViewDrawable.class, "manageKeyInput@line90", LVL_03_FINEST, true);
+      toDLog().pFlow("" + ic.is.getLastDeviceEvent().toString1Line(), null, TopoViewDrawable.class, "manageKeyInput@line90", LVL_03_FINEST, true);
       topology.manageKeyInput(ic);
    }
 
    public void manageOtherInput(InputConfig ic) {
       //#debug
-      toLog().pFlow("", null, TopoViewDrawable.class, "manageOtherInput@line96", LVL_03_FINEST, true);
+      toDLog().pFlow("", null, TopoViewDrawable.class, "manageOtherInput@line96", LVL_03_FINEST, true);
       topology.manageOtherInput(ic);
    }
 
    public void managePointerInput(InputConfig ic) {
       //#debug
-      toLog().pFlow("x=" + ic.is.getX() + " y=" + ic.is.getY(), null, TopoViewDrawable.class, "managePointerInput@line96", LVL_03_FINEST, true);
+      toDLog().pFlow("x=" + ic.is.getX() + " y=" + ic.is.getY(), null, TopoViewDrawable.class, "managePointerInput@line96", LVL_03_FINEST, true);
       topology.managePointerInput(ic);
    }
 
    public void manageRepeatInput(InputConfig ic) {
       //#debug
-      toLog().pFlow("", null, TopoViewDrawable.class, "manageRepeatInput@line96", LVL_03_FINEST, true);
+      toDLog().pFlow("", null, TopoViewDrawable.class, "manageRepeatInput@line96", LVL_03_FINEST, true);
       topology.manageRepeatInput(ic);
    }
 
    public void toString(Dctx sb) {
       sb.root(this, TopoViewDrawable.class, "119");
-      sb.appendWithSpace("'" + getDebugName() + "'");
+      sb.appendWithSpace("'" + toStringGetName() + "'");
       super.toString(sb.sup());
-      sb.nlLvl(topology, "TopologyDLayer for" + getDebugName());
+      sb.nlLvl(topology, "TopologyDLayer for" + toStringGetName());
       sb.nlLvl(vcContent, "ViewContext of ViewPort");
    }
 
    public void toString1Line(Dctx dc) {
       dc.root1Line(this, TopoViewDrawable.class);
-      dc.appendWithSpace("'" + getDebugName() + "'");
+      dc.appendWithSpace("'" + toStringGetName() + "'");
       dc.appendWithSpace(layEngine.toString1Line());
    }
 }

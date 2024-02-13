@@ -4,21 +4,20 @@ import pasa.cbentley.byteobjects.src4.core.ByteObject;
 import pasa.cbentley.byteobjects.src4.ctx.IBOTypesBOC;
 import pasa.cbentley.byteobjects.src4.objects.function.Function;
 import pasa.cbentley.byteobjects.src4.objects.function.FunctionFactory;
-import pasa.cbentley.core.src4.ctx.UCtx;
 import pasa.cbentley.core.src4.logging.Dctx;
-import pasa.cbentley.core.src4.logging.IDLog;
 import pasa.cbentley.core.src4.utils.BitUtils;
 import pasa.cbentley.framework.drawx.src4.engine.GraphicsX;
-import pasa.cbentley.framework.gui.src4.anim.AnimCreator;
+import pasa.cbentley.framework.gui.src4.anim.AnimManager;
 import pasa.cbentley.framework.gui.src4.anim.IBOAnim;
 import pasa.cbentley.framework.gui.src4.anim.ITechAnim;
 import pasa.cbentley.framework.gui.src4.anim.Realisator;
 import pasa.cbentley.framework.gui.src4.anim.definitions.AlphaChangeRgb;
 import pasa.cbentley.framework.gui.src4.anim.definitions.ByteObjectAnim;
-import pasa.cbentley.framework.gui.src4.anim.move.Move;
 import pasa.cbentley.framework.gui.src4.anim.move.FunctionMove;
+import pasa.cbentley.framework.gui.src4.anim.move.Move;
 import pasa.cbentley.framework.gui.src4.ctx.GuiCtx;
 import pasa.cbentley.framework.gui.src4.ctx.IBOTypesGui;
+import pasa.cbentley.framework.gui.src4.ctx.ObjectGC;
 import pasa.cbentley.framework.gui.src4.ctx.ToStringStaticGui;
 import pasa.cbentley.framework.gui.src4.interfaces.IAnimable;
 import pasa.cbentley.framework.gui.src4.interfaces.IDrawable;
@@ -101,13 +100,13 @@ import pasa.cbentley.framework.gui.src4.interfaces.ITechDrawable;
  * <br>
  * <br>
  * @author Charles-Philip Bentley
- * @see AnimCreator
+ * @see AnimManager
  * @see ByteObjectAnim
  * @see ImgAnimable
  * @see IAnimable
  *
  */
-public abstract class DrawableAnim implements IAnimable {
+public abstract class DrawableAnim extends ObjectGC implements IAnimable {
 
    private int[]        bounds  = new int[5];
 
@@ -187,16 +186,13 @@ public abstract class DrawableAnim implements IAnimable {
     */
    protected int        turn    = 0;
 
-   protected final GuiCtx gc;
-
-
    /**
     * 
     * @param d
     * @param techTab
     */
    public DrawableAnim(GuiCtx gc, IDrawable d, ByteObject def) {
-      this.gc = gc;
+      super(gc);
       if (d == null)
          throw new NullPointerException("Null BaseAnimable Drawable");
       if (def == null)
@@ -212,12 +208,16 @@ public abstract class DrawableAnim implements IAnimable {
     * @param d
     * @param f might be null if subclass handles function and turns itself.
     */
-   public DrawableAnim(GuiCtx gc,IDrawable d, Function f) {
-      this.gc = gc;
+   public DrawableAnim(GuiCtx gc, IDrawable d, Function f) {
+      super(gc);
       if (d == null)
          throw new NullPointerException("Null BaseAnimable Drawable");
       this.d = d;
       this.stepFunction = f;
+   }
+
+   protected AnimManager getAnimCreator() {
+      return d.getCanvas().getAnimCreator();
    }
 
    /**
@@ -382,13 +382,9 @@ public abstract class DrawableAnim implements IAnimable {
     */
    public void loadHeavyResources() {
       loadHeavyResourcesSub();
-      
+
       //animator thread might sleeping. notify realisator by waking up for start the animation
       getAnimCreator().animWakeUp();
-   }
-
-   protected AnimCreator getAnimCreator() {
-      return d.getCanvas().getAnimCreator();
    }
 
    public void loadHeavyResourcesSub() {
@@ -498,8 +494,7 @@ public abstract class DrawableAnim implements IAnimable {
 
    public void setEntryMainStates() {
       IAnimable anim = this;
-      
-      
+
       //#debug
       String msg = anim.toString1Line() + " for " + d.toString1Line() + " " + Thread.currentThread();
       //#debug
@@ -560,20 +555,10 @@ public abstract class DrawableAnim implements IAnimable {
    }
 
    //#mdebug
-   public String toString() {
-      return Dctx.toString(this);
-   }
-
-   public String toString1Line() {
-      return Dctx.toString1Line(this);
-   }
-
-   public IDLog toDLog() {
-      return gc.toDLog();
-   }
-
    public void toString(Dctx dc) {
-      dc.root(this, "DrawableAnim ");
+      dc.root(this, DrawableAnim.class, 570);
+      toStringPrivate(dc);
+      super.toString(dc.sup());
 
       dc.append(" Speed=" + sleep);
       dc.append(" Timing=" + ToStringStaticGui.debugTiming(getTiming()));
@@ -588,14 +573,16 @@ public abstract class DrawableAnim implements IAnimable {
       dc.nlLvl("StepFunction", stepFunction);
    }
 
-   
    public void toString1Line(Dctx dc) {
-      dc.root1Line(this, "DrawableAnim");
+      dc.root1Line(this, DrawableAnim.class);
+      toStringPrivate(dc);
+      super.toString1Line(dc.sup1Line());
    }
-   
-   public UCtx toStringGetUCtx() {
-      return gc.getUCtx();
+
+   private void toStringPrivate(Dctx dc) {
+
    }
 
    //#enddebug
+
 }

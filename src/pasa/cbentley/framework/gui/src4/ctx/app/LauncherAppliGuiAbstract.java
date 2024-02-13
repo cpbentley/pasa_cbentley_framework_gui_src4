@@ -16,7 +16,7 @@ import pasa.cbentley.framework.datamodel.src4.ctx.DataModelCtx;
 import pasa.cbentley.framework.datamodel.src4.ctx.IConfigDataModel;
 import pasa.cbentley.framework.drawx.src4.ctx.ConfigDrawXDefault;
 import pasa.cbentley.framework.drawx.src4.ctx.DrwCtx;
-import pasa.cbentley.framework.drawx.src4.ctx.IConfigDrawx;
+import pasa.cbentley.framework.drawx.src4.ctx.IConfigDrawX;
 import pasa.cbentley.framework.gui.src4.ctx.GuiCtx;
 import pasa.cbentley.framework.gui.src4.ctx.config.IConfigAppGui;
 import pasa.cbentley.framework.input.src4.ctx.ConfigInputDefault;
@@ -50,7 +50,7 @@ public abstract class LauncherAppliGuiAbstract extends LauncherAppliAbstract  {
       CoreDataCtx coreDataCtx = cfc.getCoreDataCtx();
       CoreDrawCtx cdc = cfc.getCUC().getCDC();
       LayouterCtx lac = new LayouterCtx(boc);
-      IConfigDrawx configDrawX = getConfigDrawx(cfc);
+      IConfigDrawX configDrawX = getConfigDrawx(cfc);
       DrwCtx dc = new DrwCtx(configDrawX, cdc, lac);
 
       IConfigInput configInput = getConfigInput(cfc);
@@ -109,7 +109,7 @@ public abstract class LauncherAppliGuiAbstract extends LauncherAppliAbstract  {
     * @param cfc
     * @return
     */
-   protected IConfigDrawx getConfigDrawx(CoreFrameworkCtx cfc) {
+   protected IConfigDrawX getConfigDrawx(CoreFrameworkCtx cfc) {
       return new ConfigDrawXDefault(uc);
    }
 

@@ -3,40 +3,43 @@ package pasa.cbentley.framework.gui.src4.string;
 import pasa.cbentley.byteobjects.src4.core.ByteObject;
 import pasa.cbentley.byteobjects.src4.ctx.IBOTypesDrw;
 import pasa.cbentley.core.src4.event.BusEvent;
-import pasa.cbentley.core.src4.i8n.IString;
+import pasa.cbentley.core.src4.i8n.I8nString;
 import pasa.cbentley.core.src4.io.XString;
 import pasa.cbentley.core.src4.logging.Dctx;
 import pasa.cbentley.framework.coredraw.src4.interfaces.IMFont;
-import pasa.cbentley.framework.coreui.src4.utils.ViewState;
 import pasa.cbentley.framework.drawx.src4.ctx.ToStringStaticDrawx;
 import pasa.cbentley.framework.drawx.src4.engine.GraphicsX;
+import pasa.cbentley.framework.drawx.src4.factories.interfaces.IBOFigString;
 import pasa.cbentley.framework.drawx.src4.string.StringMetrics;
 import pasa.cbentley.framework.drawx.src4.string.Stringer;
 import pasa.cbentley.framework.drawx.src4.string.interfaces.ITechStringDrw;
-import pasa.cbentley.framework.drawx.src4.string.interfaces.ITechStringer;
+import pasa.cbentley.framework.drawx.src4.style.IBOStyle;
 import pasa.cbentley.framework.gui.src4.canvas.InputConfig;
 import pasa.cbentley.framework.gui.src4.canvas.ViewContext;
 import pasa.cbentley.framework.gui.src4.cmd.CmdInstanceDrawable;
 import pasa.cbentley.framework.gui.src4.core.Drawable;
 import pasa.cbentley.framework.gui.src4.core.FigDrawable;
-import pasa.cbentley.framework.gui.src4.core.LayEngineDrawable;
+import pasa.cbentley.framework.gui.src4.core.LayouterEngineDrawable;
 import pasa.cbentley.framework.gui.src4.core.ScrollConfig;
 import pasa.cbentley.framework.gui.src4.core.StyleClass;
 import pasa.cbentley.framework.gui.src4.core.ViewDrawable;
 import pasa.cbentley.framework.gui.src4.core.ViewPane;
 import pasa.cbentley.framework.gui.src4.ctx.GuiCtx;
-import pasa.cbentley.framework.gui.src4.ctx.IFlagsToStringGui;
 import pasa.cbentley.framework.gui.src4.ctx.IBOTypesGui;
 import pasa.cbentley.framework.gui.src4.ctx.ToStringStaticGui;
-import pasa.cbentley.framework.gui.src4.factories.interfaces.IBOStringDrawable;
+import pasa.cbentley.framework.gui.src4.factories.interfaces.IBOStringData;
 import pasa.cbentley.framework.gui.src4.interfaces.IDrawListener;
 import pasa.cbentley.framework.gui.src4.interfaces.IDrawable;
 import pasa.cbentley.framework.gui.src4.interfaces.ITechDrawable;
 import pasa.cbentley.framework.gui.src4.interfaces.ITechViewDrawable;
 import pasa.cbentley.framework.gui.src4.table.TableView;
+import pasa.cbentley.framework.gui.src4.tech.ITechLayoutDrawable;
 import pasa.cbentley.framework.gui.src4.tech.ITechStringDrawable;
 import pasa.cbentley.framework.gui.src4.tech.ITechViewPane;
 import pasa.cbentley.framework.gui.src4.utils.DrawableUtilz;
+import pasa.cbentley.layouter.src4.engine.SizerFactory;
+import pasa.cbentley.layouter.src4.tech.IBOSizer;
+import pasa.cbentley.layouter.src4.tech.ITechLayout;
 import pasa.cbentley.powerdata.spec.src4.power.IPowerCharCollector;
 
 /**
@@ -47,9 +50,9 @@ import pasa.cbentley.powerdata.spec.src4.power.IPowerCharCollector;
  * <li>Scaled single Char using {@link IDrwTypes#TYPE_070_TEXT_EFFECTS}
  * <br>
  * <br>
- * <li> Read only {@link ITechStringDrawable#MODE_0_READ}
- * <li> chars are Selectable {@link ITechStringDrawable#MODE_1_SELECT}
- * <li> chars are editable and selectable {@link ITechStringDrawable#MODE_2_EDIT}
+ * <li> Read only {@link ITechStringDrawable#S_ACTION_MODE_0_READ}
+ * <li> chars are Selectable {@link ITechStringDrawable#S_ACTION_MODE_1_SELECT}
+ * <li> chars are editable and selectable {@link ITechStringDrawable#S_ACTION_MODE_2_EDIT}
  * <br>
  * For drawing a scaled char figure, one can also use {@link FigDrawable} and {@link IDrw#FIG_TYPE_10_STRING}
  * <br>
@@ -73,24 +76,25 @@ import pasa.cbentley.powerdata.spec.src4.power.IPowerCharCollector;
  * <br>
  * Strings are malleable in both X and Y axis.<br>
  * 
- * For ease of use presets have been defined. The default preset {@link ITechStringDrawable#TYPE_0_NONE} does nothing.
- *  Others override implicit width and height values given by 
- * {@link StringDrawable#initViewDrawable(int, int)}. The shrink behaviors are also decided by the preset. <br>
+ * For ease of use presets have been defined. The default preset {@link ITechStringDrawable#PRESET_CONFIG_0_NONE} does nothing.
+ *  Others override sizers width and sizer height values given by {@link StringDrawable#initViewDrawable(LayouterEngineDrawable)}.
+ *  
+ * The shrink behaviors are also decided by the preset. <br>
  * Concerning area constraints, the StringDrawable have preset constraint types.
  * <br>
  * <b>Preset Configurations</b> :
- * <li> {@link ITechStringDrawable#TYPE_0_NONE}. No default shrink behavior. Take into account implicit width and height values.
+ * <li> {@link ITechStringDrawable#PRESET_CONFIG_0_NONE}. No default shrink behavior. Take into account implicit width and height values.
  * <ol>
- * <li>When both height and width is 0, behaves like {@link ITechStringDrawable#TYPE_4_NATURAL_NO_WRAP} but without scrolling.
+ * <li>When both height and width is 0, behaves like {@link ITechStringDrawable#PRESET_CONFIG_4_NATURAL_NO_WRAP} but without scrolling.
  * Preferred size being equal to drawn size.
- * <li>When height is 0. Behaves like {@link ITechStringDrawable#TYPE_3_SCROLL_V} without the shrinkH and no scrolling.
+ * <li>When height is 0. Behaves like {@link ITechStringDrawable#PRESET_CONFIG_3_SCROLL_V} without the shrinkH and no scrolling.
  * <li>When width is 0, dw = pw.
  * </ol>
- * <li> {@link ITechStringDrawable#TYPE_1_TITLE}. One line of trimmed at width text. No Shrinking. Width and Height decides area.
- * <li> {@link ITechStringDrawable#TYPE_3_SCROLL_V}. X lines of text constrained at width. Shrink to fit as many lines as possible
+ * <li> {@link ITechStringDrawable#PRESET_CONFIG_1_TITLE}. One line of trimmed at width text. No Shrinking. Width and Height decides area.
+ * <li> {@link ITechStringDrawable#PRESET_CONFIG_3_SCROLL_V}. X lines of text constrained at width. Shrink to fit as many lines as possible
  * allowed by height. Take into account negative init for the number of visual lines to be seen in the ViewPort
- * <li> {@link ITechStringDrawable#TYPE_2_SCROLL_H}. Horizontal scrolling.
- * <li> {@link ITechStringDrawable#TYPE_4_NATURAL_NO_WRAP}
+ * <li> {@link ITechStringDrawable#PRESET_CONFIG_2_SCROLL_H}. Horizontal scrolling.
+ * <li> {@link ITechStringDrawable#PRESET_CONFIG_4_NATURAL_NO_WRAP}
  * <br>
  * Presets' shrink behavior is decided at construction time but may be changed afterwards.
  * <br>
@@ -124,7 +128,7 @@ import pasa.cbentley.powerdata.spec.src4.power.IPowerCharCollector;
  * <br>
  * TODO Automatic Edition options in StringTech:
  * {@link StringDrawable#manageKeyInput(InputConfig)} Fire
- * See {@link EditModule}.
+ * See {@link StringEditModule}.
  * <br>
  * <br>
  * <b>String localization</b>
@@ -133,7 +137,7 @@ import pasa.cbentley.powerdata.spec.src4.power.IPowerCharCollector;
  * <br>
  * <br>
  * 
- * @see IString
+ * @see I8nString
  * <br>
  * <br>
  * @author Charles-Philip Bentley
@@ -141,205 +145,61 @@ import pasa.cbentley.powerdata.spec.src4.power.IPowerCharCollector;
  * 
  *
  */
-public class StringDrawable extends ViewDrawable implements IBOStringDrawable, IDrawListener {
-
-   public static final int STR_VIEWSTATE_STR = 10;
-
-   public static StringDrawable[] ensureCapacity(StringDrawable[] ar, int index) {
-      if (index < ar.length)
-         return ar;
-      StringDrawable[] nar = new StringDrawable[index + 1];
-      for (int i = 0; i < ar.length; i++) {
-         nar[i] = ar[i];
-      }
-      return nar;
-   }
-
-   /**
-    * Decides which breaking method to use according to context {@link IBOStringDrawable#INPUT_OFFSET_02_STRING_TYPE1}
-    * <br>
-    * <br>
-    * <li>{@link ITechStringDrawable#TYPE_0_NONE}
-    * <li>{@link ITechStringDrawable#TYPE_1_TITLE} of 1 or 2 characters are never trimmed.
-    * <br>
-    * Logical width prevents the following break types:
-    * <li> {@link ITechStringDrw#BREAK_4_TRIM_SINGLE_LINE}
-    * <br>
-    * <br>
-    * @param width
-    * @param height
-    * @param type {@link ITechStringDrawable#TYPE_0_NONE} ,  {@link ITechStringDrawable#TYPE_1_TITLE}, ...
-    * @return
-    */
-   public static int getBreakType(int width, int height, int type, int len, Stringer st) {
-      int breakType = ITechStringDrw.BREAK_0_NONE;
-      switch (type) {
-         case ITechStringDrawable.TYPE_0_NONE:
-            //
-            if (width > 0) {
-               if (height == 0) {
-                  //infinite number of lines drawn. no scrolling no trimming.
-                  breakType = ITechStringDrw.BREAK_1_WIDTH;
-               } else if (height < 0) {
-                  //height (1,2,3,...) visible lines //trim/scrolling the rest depending on behavior.
-                  if (height == -1) {
-                     breakType = ITechStringDrw.BREAK_4_TRIM_SINGLE_LINE;
-                  } else {
-                     breakType = ITechStringDrw.BREAK_5_TRIM_FIT_HEIGHT;
-                  }
-               } else {
-                  breakType = ITechStringDrw.BREAK_5_TRIM_FIT_HEIGHT;
-               }
-            } else {
-               if (width == 0) {
-                  //everything 
-                  breakType = ITechStringDrw.BREAK_0_NONE;
-               } else if (width < 0) {
-                  //only a few
-               }
-            }
-            break;
-         case ITechStringDrawable.TYPE_2_SCROLL_H:
-            breakType = ITechStringDrw.BREAK_3_ONE_LINE;
-            break;
-         case ITechStringDrawable.TYPE_1_TITLE:
-            breakType = ITechStringDrw.BREAK_4_TRIM_SINGLE_LINE;
-            if (width <= 0) {
-               //no trimming. take all the width needed
-               breakType = ITechStringDrw.BREAK_0_NONE;
-            } else if (width < 0) {
-               //set clipping and ignore breaks
-               breakType = ITechStringDrw.BREAK_0_NONE;
-            }
-            if (len <= 2) {
-               //no trimming
-               breakType = ITechStringDrw.BREAK_0_NONE;
-            }
-            break;
-         case ITechStringDrawable.TYPE_4_NATURAL_NO_WRAP:
-            breakType = ITechStringDrw.BREAK_2_NATURAL;
-            break;
-         case ITechStringDrawable.TYPE_3_SCROLL_V:
-            breakType = ITechStringDrw.BREAK_1_WIDTH;
-            if (width == 0) {
-               breakType = ITechStringDrw.BREAK_0_NONE;
-            }
-            break;
-
-         default:
-            throw new IllegalArgumentException();
-      }
-      return breakType;
-   }
-
-   public static int getMaxLines(int width, int height, int type) {
-      int maxLines = -1;
-      switch (type) {
-         case ITechStringDrawable.TYPE_0_NONE:
-            if (width > 0) {
-               if (height == 0) {
-               } else if (height < 0) {
-                  int numLines = 0 - height;
-                  maxLines = numLines;
-               } else {
-               }
-            } else {
-               if (width == 0) {
-               }
-            }
-            break;
-         case ITechStringDrawable.TYPE_2_SCROLL_H:
-            break;
-         case ITechStringDrawable.TYPE_1_TITLE:
-            maxLines = 1;
-            break;
-         case ITechStringDrawable.TYPE_4_NATURAL_NO_WRAP:
-            break;
-         case ITechStringDrawable.TYPE_3_SCROLL_V:
-            break;
-         default:
-            throw new IllegalArgumentException();
-      }
-      return maxLines;
-   }
-
-
-
-   /**
-    * Whenever edition occurs, a new array is created, edition will never occurs in the source array
-    * 
-    */
-   char[]          chars;
+public class StringDrawable extends ViewDrawable implements IBOStringData, IDrawListener {
 
    /**
     * Controls the Input of characters.
     * <br>
-    * {@link EditModule} calls back {@link StringDrawable} with
+    * {@link StringEditModule} calls back {@link StringDrawable} with
     * <li> {@link StringDrawable#deleteCharAt(int)}
     * <li> {@link StringDrawable#addChar(int, char)}
     * <br>
     * <br>
-    * Set external by {@link StringEditControl} using {@link StringDrawable#setEditModule(EditModule)}.
+    * Set external by {@link StringEditControl} using {@link StringDrawable#setEditModule(StringEditModule)}.
     * <br>
     */
-   EditModule      editModule;
+   StringEditModule    editModule;
 
    /**
-    * 
-    */
-   int             len;
-
-   /**
-    * When offset is different than zero, it means the String data is taken from a read only. Unless the special 
-    * flag {@link IBOStringDrawable#INPUT_FLAG_6_KEEP_ARRAY} is set. in which case, the array reference
-    * is never changed and neither the offset.
-    */
-   int             offset;
-
-   /**
-    * Everytime, it is drawn, The Stringer must be updated if the {@link IString}
+    * Everytime, it is drawn, The Stringer must be updated if the {@link I8nString}
     * content has changed.
     */
-   private IString str;
+   protected I8nString str;
 
    /**
     * Valid until invalidate by new string or init method
     */
-   Stringer        stringer;
+   Stringer            stringer;
 
-   /**
-    * 
-    */
-   //int           typeStr;
+   private ByteObject  boFigString;
+
+   public StringDrawable(GuiCtx gc, StyleClass sc, char[] cs, int offset, int len, ByteObject boStringData) {
+      super(gc, sc);
+
+      //before creating stringer, we need the style and boStringData decided
+      initTech(boStringData);
+      createStringer();
+      setStringNoUpdate(cs, offset, len);
+   }
 
    public StringDrawable(GuiCtx gc, StyleClass sc, char[] str, int offset, int len) {
-      super(gc, sc);
-      if (str == null)
-         throw new NullPointerException("null string");
-      this.chars = str;
-      this.offset = offset;
-      this.len = len;
-      initTech();
-   }
-
-   public StringDrawable(GuiCtx gc, StyleClass sc, IPowerCharCollector charco) {
-      super(gc, sc);
+      this(gc, sc, str, offset, len, null);
 
    }
 
-   public StringDrawable(GuiCtx gc, StyleClass sc, IString str) {
+   public StringDrawable(GuiCtx gc, StyleClass sc, I8nString str) {
       super(gc, sc);
       if (str == null)
          throw new NullPointerException("null string");
       this.str = str;
-      initTech();
+      initTech(null);
    }
 
    /**
     * Creates a {@link StringDrawable} to display the String using the given style.
     * <br>
     * <br>
-    * The {@link IBOStringDrawable#INPUT_OFFSET_02_STRING_TYPE1} decides the breaking during
+    * The {@link IBOStringData#SDATA_OFFSET_02_PRESET_CONFIG1} decides the breaking during
     * initialization.
     * 
     * @param sc
@@ -350,29 +210,22 @@ public class StringDrawable extends ViewDrawable implements IBOStringDrawable, I
    }
 
    /**
-    * Overrides the Tech from the style class
+    * Overrides the {@link IBOStringData} from the style class
     * <br>
     * <br>
     * 
     * @param sc
     * @param str
-    * @param tech
+    * @param boStringData
     */
-   public StringDrawable(GuiCtx gc, StyleClass sc, String str, ByteObject tech) {
+   public StringDrawable(GuiCtx gc, StyleClass sc, String str, ByteObject boStringData) {
       super(gc, sc);
-      if (str == null) {
-         str = "";
-      }
+
+      initTech(boStringData);
+
+      setBOStringData(boStringData);
+      createStringer();
       setStringNoUpdate(str);
-      if (tech != null) {
-         techDrawable = tech;
-      } else {
-         techDrawable = styleClass.getByteObject(IBOTypesGui.LINK_41_TECH_STRING);
-         if (techDrawable == null) {
-            techDrawable = gc.getDrawableStringFactory().getStringTech(ITechStringDrawable.TYPE_1_TITLE);
-         }
-      }
-      setTypeString(techDrawable.get1(IBOStringDrawable.INPUT_OFFSET_02_STRING_TYPE1));
    }
 
    /**
@@ -381,27 +234,25 @@ public class StringDrawable extends ViewDrawable implements IBOStringDrawable, I
     * 
     * @param str
     * @param st
-    * @param type Predefined type hardcode type from constructor.
+    * @param presetConfig Predefined type hardcode type from constructor.
     * It is too cumbersome to create a style class just for a type variation
     * But it was designed for that
     */
-   public StringDrawable(GuiCtx gc, StyleClass sc, String str, int type) {
+   public StringDrawable(GuiCtx gc, StyleClass sc, String str, int presetConfig) {
       super(gc, sc);
-      if (str == null) {
-         str = "";
-         //throw new NullPointerException();
+
+      ByteObject boStringDrawable = styleClass.getByteObject(IBOTypesGui.LINK_41_BO_STRING_DRAWABLE);
+      if (boStringDrawable == null) {
+         boStringDrawable = gc.getDrawableStringFactory().getStringTech(presetConfig);
       }
+      if (presetConfig != -1) {
+         boStringDrawable = boStringDrawable.cloneCopyHead();
+         boStringDrawable.set1(IBOStringData.SDATA_OFFSET_02_PRESET_CONFIG1, presetConfig);
+      }
+      initTech(boStringDrawable);
+      createStringer();
       setStringNoUpdate(str);
-      techDrawable = styleClass.getByteObject(IBOTypesGui.LINK_41_TECH_STRING);
-      if (techDrawable == null) {
-         techDrawable = gc.getDrawableStringFactory().getStringTech(type);
-      }
-      if (type != -1) {
-         techDrawable = techDrawable.cloneCopyHead();
-         techDrawable.set1(IBOStringDrawable.INPUT_OFFSET_02_STRING_TYPE1, type);
-      }
-      type = techDrawable.get1(IBOStringDrawable.INPUT_OFFSET_02_STRING_TYPE1);
-      setTypeString(type);
+
    }
 
    /**
@@ -421,27 +272,20 @@ public class StringDrawable extends ViewDrawable implements IBOStringDrawable, I
     * @param c
     */
    public synchronized void addChar(int indexRelative, char c) {
-      chars = gc.getUCtx().getMem().ensureCapacity(chars, len + 1, 1);
-      for (int i = len - 1; i >= indexRelative; i--) {
-         chars[i + 1] = chars[i];
-      }
-      chars[indexRelative] = c;
-      len++;
-      getStringer().getEditor().addChar(chars, indexRelative, c);
-      stringUpdate();
+      throw new RuntimeException();
    }
 
    public synchronized void addChars(int indexRelative, char[] chars) {
-
+      throw new RuntimeException();
    }
 
    /**
     * 
-    * When receiving key focus {@link ITechDrawable#EVENT_03_KEY_FOCUS_GAIN}  and flag {@link IBOStringDrawable#INPUT_FLAG_5_AUTO_EDIT_MODE} is set,
+    * When receiving key focus {@link ITechDrawable#EVENT_03_KEY_FOCUS_GAIN}  and flag {@link IBOStringData#SDATA_FLAG_5_AUTO_EDIT_MODE} is set,
     * {@link StringDrawable} toggles on Edition mode.
     * <br>
-    * When in mode {@link ITechStringDrawable#TYPE_1_TITLE}, type is temporarily set to {@link ITechStringDrawable#TYPE_3_SCROLL_V}
-    * or {@link ITechStringDrawable#TYPE_2_SCROLL_H} using the given size at the time the switch is made.
+    * When in mode {@link ITechStringDrawable#PRESET_CONFIG_1_TITLE}, type is temporarily set to {@link ITechStringDrawable#PRESET_CONFIG_3_SCROLL_V}
+    * or {@link ITechStringDrawable#PRESET_CONFIG_2_SCROLL_H} using the given size at the time the switch is made.
     * <br>
     * On certain conditions, when size of {@link StringDrawable} is deemed too small (less than 10 letters space), an edit window appears above.
     * <br> 
@@ -462,23 +306,56 @@ public class StringDrawable extends ViewDrawable implements IBOStringDrawable, I
       ic.srActionDoneRepaint();
    }
 
+   private void initPreferredSizeFromViewPortArea(LayouterEngineDrawable ds, int breakWidth, int breakHeight) {
+
+      //#debug
+      toDLog().pInit("breakWidth=" + breakWidth + " breakHeight=" + breakHeight, this, StringDrawable.class, "initPreferredSizeFromViewPortArea@312", LVL_05_FINE, true);
+
+      Stringer initStringer = getStringer();
+      StringMetrics metrics = initStringer.getMetrics();
+      int typeStr = getPresetConfig();
+      if (typeStr == ITechStringDrawable.PRESET_CONFIG_5_CHAR) {
+         initViewDrawableCharType(breakWidth, breakHeight);
+      } else {
+         //----------------------------
+         //compute breaks, preferred dimension given dim parameters and type
+
+         initStringer.setAreaWH(breakWidth, breakHeight);
+         initStringer.setBreakOnArea();
+
+         initStringer.buildAgain();
+
+         int pw = metrics.getPrefWidth();
+         int ph = metrics.getPrefHeight();
+
+         ds.setPh(ph);
+         ds.setPw(pw);
+
+         //clipping is only necessary when partial strings are drawn.
+         if ((hasFlagView(FLAG_VSTATE_22_SCROLLED))) {
+            if (viewPane != null && viewPane.isContentClipped()) {
+               //TODO is this possible?
+               //clipping is also needed when init style is smaller than some state styles?
+               setFlagView(ITechViewDrawable.FLAG_VSTATE_01_CLIP, true);
+            } else {
+               setFlagView(ITechViewDrawable.FLAG_VSTATE_01_CLIP, false);
+            }
+         } else {
+            setFlagView(ITechViewDrawable.FLAG_VSTATE_01_CLIP, false);
+         }
+      }
+   }
+
    /**
     * 
     * @param indexRelative
     */
    public synchronized void deleteCharAt(int indexRelative) {
-      int start = offset + indexRelative;
-      for (int i = start; i < len - 1; i++) {
-         chars[i] = chars[i + 1];
-      }
-      len--;
-      getStringer().deleteCharAt(chars, indexRelative);
-      stringUpdate();
-
+      throw new RuntimeException();
    }
 
    public synchronized void deleteCharsAt(int indexRelative, int len) {
-
+      throw new RuntimeException();
    }
 
    /**
@@ -493,7 +370,7 @@ public class StringDrawable extends ViewDrawable implements IBOStringDrawable, I
       boolean isNavH = false;
       boolean isNavV = false;
       boolean isSelect = false;
-      isSelect = (techDrawable.get1(INPUT_OFFSET_06_MODE1) == ITechStringDrawable.MODE_2_EDIT) ? true : false;
+      isSelect = (boStringDrawable.get1(SDATA_OFFSET_06_ACTION_MODE1) == ITechStringDrawable.S_ACTION_MODE_2_EDIT) ? true : false;
       if (editModule != null) {
          isNavH = true;
          isNavV = true;
@@ -520,13 +397,13 @@ public class StringDrawable extends ViewDrawable implements IBOStringDrawable, I
       //draw the caret
       //TODO set clip only if needed. use a helper perf flag for that.
       if (hasFlagView(ITechViewDrawable.FLAG_VSTATE_01_CLIP)) {
-         //g.clipSet(getContentX(), getContentY(), getContentW(), getContentH());
+         g.clipSet(getContentX(), getContentY(), getContentW(), getContentH());
       }
       //DrawableUtilz.debugScrollConfigs("StringDrawable.drawContent", scX, scY);
       //decides the number of lines to draw
       int hNum = getNumOfLines();
       int hOffset = 0;
-      int wNum = len;
+      int wNum = stringer.getLen();
       int wOffset = 0;
       if (scX != null) {
          switch (scX.getTypeUnit()) {
@@ -543,14 +420,15 @@ public class StringDrawable extends ViewDrawable implements IBOStringDrawable, I
                break;
             case ITechViewPane.SCROLL_TYPE_2_PAGE_UNIT:
                int c = scX.getSIStart();//multiply this
-               wNum = len - wOffset;
+               wNum = stringer.getLen() - wOffset;
                break;
             default:
                throw new IllegalArgumentException();
          }
       }
       if (scY != null) {
-         //System.out.println(scY.toString());
+         //#debug
+         toDLog().pFlow("msg", scY, StringDrawable.class, "drawViewDrawableContent", LVL_05_FINE, true);
          switch (scY.getTypeUnit()) {
             case ITechViewPane.SCROLL_TYPE_0_PIXEL_UNIT:
                //draw helper will automatically starts/stops when characters are over the content area.
@@ -572,10 +450,11 @@ public class StringDrawable extends ViewDrawable implements IBOStringDrawable, I
       }
       //System.out.println("@StringDrawable#draw wOffset=" + wOffset + " wNum=" + wNum + " hOffset=" + hOffset + " hNum=" + hNum);
       //alignment is applied when drawing area is bigger than content size
-      getStringer().setAreaWH(getContentW(), getContentH());
+      Stringer stringer2 = getStringer();
+      stringer2.setAreaWH(getContentW(), getContentH());
       ByteObject styleAnchor = getStyleOp().getStyleAnchor(style);
-      getStringer().setAnchor(styleAnchor);
-      getStringer().drawOffsets(g, x, y, wOffset, wNum, hOffset, hNum);
+      stringer2.setAnchor(styleAnchor);
+      stringer2.drawOffsets(g, x, y, wOffset, wNum, hOffset, hNum);
       //System.out.println(getStringer());
 
       if (editModule != null) {
@@ -585,7 +464,7 @@ public class StringDrawable extends ViewDrawable implements IBOStringDrawable, I
 
       //check to reset clip area.
       if (hasFlagView(ITechViewDrawable.FLAG_VSTATE_01_CLIP)) {
-         // g.clipReset();
+         g.clipReset();
       }
 
    }
@@ -601,77 +480,97 @@ public class StringDrawable extends ViewDrawable implements IBOStringDrawable, I
       sec.doTakeControl(this);
    }
 
+   public ByteObject getBOStringData() {
+      return boStringDrawable;
+   }
 
    /**
-    * From type of display String, compute and override drawable width <b>dw</b> and drawable height <b>dh</b>.
+    * Decides which breaking method to use according to context {@link IBOStringData#SDATA_OFFSET_02_PRESET_CONFIG1}
     * <br>
-    * Negative values with variable units size: <br>
-    * <li>Take the biggest of the units.
-    * <li>
     * <br>
-    * Set {@link ITechViewDrawable#FLAG_VSTATE_06_NO_EAT_W_MUST_EXPAND} when width <= 0. 
+    * <li>{@link ITechStringDrawable#PRESET_CONFIG_0_NONE}
+    * <li>{@link ITechStringDrawable#PRESET_CONFIG_1_TITLE} of 1 or 2 characters are never trimmed.
     * <br>
-    * Set {@link ITechViewDrawable#FLAG_VSTATE_07_NO_EAT_H_MUST_EXPAND} when height <= 0.
-    *  <br>
+    * Logical width prevents the following break types:
+    * <li> {@link ITechStringDrw#BREAK_4_TRIM_SINGLE_LINE}
     * <br>
     * <br>
     * @param width
     * @param height
+    * @param type {@link ITechStringDrawable#PRESET_CONFIG_0_NONE} ,  {@link ITechStringDrawable#PRESET_CONFIG_1_TITLE}, ...
+    * @return
     */
-   //   protected void setDwDh(int width, int height) {
-   //      int typeStr = techDrawable.get1(IStringDrawable.INPUT_OFFSET_02_STRING_TYPE1);
-   //      switch (typeStr) {
-   //         case IStringDrawable.TYPE_0_NONE:
-   //            super.setDwDh(width, height);
-   //            break;
-   //         case IStringDrawable.TYPE_2_SCROLL_H:
-   //            super.setDwDh(width, -1);
-   //            break;
-   //         case IStringDrawable.TYPE_1_TITLE:
-   //            //ignore h
-   //            super.setDwDh(width, 1);
-   //            break;
-   //         case IStringDrawable.TYPE_4_NATURAL_NO_WRAP:
-   //            super.setDwDh(width, height);
-   //            break;
-   //         case IStringDrawable.TYPE_3_SCROLL_V:
-   //            super.setDwDh(width, height);
-   //            break;
-   //         default:
-   //            throw new IllegalArgumentException();
-   //
-   //      }
-   //   }
+   public int getBreakType(int width, int height, int type, int len) {
+      int breakType = ITechStringDrw.BREAK_0_NONE;
+      switch (type) {
+         case ITechStringDrawable.PRESET_CONFIG_0_NONE:
+            //
+            if (width > 0) {
+               if (height == 0) {
+                  //infinite number of lines drawn. no scrolling no trimming.
+                  breakType = ITechStringDrw.BREAK_1_WIDTH;
+               } else if (height < 0) {
+                  //height (1,2,3,...) visible lines //trim/scrolling the rest depending on behavior.
+                  if (height == -1) {
+                     breakType = ITechStringDrw.BREAK_4_TRIM_SINGLE_LINE;
+                  } else {
+                     breakType = ITechStringDrw.BREAK_5_TRIM_FIT_HEIGHT;
+                  }
+               } else {
+                  breakType = ITechStringDrw.BREAK_5_TRIM_FIT_HEIGHT;
+               }
+            } else {
+               if (width == 0) {
+                  //everything 
+                  breakType = ITechStringDrw.BREAK_0_NONE;
+               } else if (width < 0) {
+                  //only a few
+               }
+            }
+            break;
+         case ITechStringDrawable.PRESET_CONFIG_2_SCROLL_H:
+            breakType = ITechStringDrw.BREAK_3_ONE_LINE;
+            break;
+         case ITechStringDrawable.PRESET_CONFIG_1_TITLE:
+            breakType = ITechStringDrw.BREAK_4_TRIM_SINGLE_LINE;
+            if (width <= 0) {
+               //no trimming. take all the width needed
+               breakType = ITechStringDrw.BREAK_0_NONE;
+            } else if (width < 0) {
+               //set clipping and ignore breaks
+               breakType = ITechStringDrw.BREAK_0_NONE;
+            }
+            if (len <= 2) {
+               //no trimming
+               breakType = ITechStringDrw.BREAK_0_NONE;
+            }
+            break;
+         case ITechStringDrawable.PRESET_CONFIG_4_NATURAL_NO_WRAP:
+            breakType = ITechStringDrw.BREAK_2_NATURAL;
+            break;
+         case ITechStringDrawable.PRESET_CONFIG_3_SCROLL_V:
+            breakType = ITechStringDrw.BREAK_1_WIDTH;
+            if (width == 0) {
+               breakType = ITechStringDrw.BREAK_0_NONE;
+            }
+            break;
 
-   protected int getDesiredVisualWidth(int w) {
-      int typeStr = techDrawable.get1(IBOStringDrawable.INPUT_OFFSET_02_STRING_TYPE1);
-      switch (typeStr) {
-         case ITechStringDrawable.TYPE_0_NONE:
-            return w;
-         case ITechStringDrawable.TYPE_2_SCROLL_H:
-            return w;
-         case ITechStringDrawable.TYPE_1_TITLE:
-            return w;
-         case ITechStringDrawable.TYPE_4_NATURAL_NO_WRAP:
-            return w;
-         case ITechStringDrawable.TYPE_3_SCROLL_V:
-            return w;
          default:
             throw new IllegalArgumentException();
-
       }
+      return breakType;
    }
 
    /**
     * 
-    * @return {@link EditModule} initialized with this {@link StringDrawable}.
+    * @return {@link StringEditModule} initialized with this {@link StringDrawable}.
     */
-   public EditModule getEditModule() {
+   public StringEditModule getEditModule() {
       return editModule;
    }
 
    public int getLen() {
-      return len;
+      return stringer.getLen();
    }
 
    /**
@@ -688,6 +587,43 @@ public class StringDrawable extends ViewDrawable implements IBOStringDrawable, I
    }
 
    /**
+    * Computes the maximum number of lines to be displayed.
+    * 
+    * -1 meaning any number
+    * @param width
+    * @param height
+    * @param preset
+    * @return
+    */
+   public int getMaxLines(int width, int height, int preset) {
+      int maxLines = -1;
+      switch (preset) {
+         case ITechStringDrawable.PRESET_CONFIG_0_NONE:
+            ByteObject sizerH = layEngine.getSizerH();
+            if (sizerH != null) {
+               int etalon = sizerH.get1(IBOSizer.SIZER_OFFSET_03_ETALON1);
+               int prop = sizerH.get1(IBOSizer.SIZER_OFFSET_05_ET_PROPERTY1);
+               if (etalon == ITechLayoutDrawable.ETALON_0_SIZEE_CTX && prop == ITechLayoutDrawable.SIZER_PROP_02_UNIT_LOGIC) {
+                  int lines = sizerH.get2(IBOSizer.SIZER_OFFSET_08_FRACTION_TOP2);
+                  maxLines = lines;
+               }
+            }
+            break;
+         case ITechStringDrawable.PRESET_CONFIG_1_TITLE:
+         case ITechStringDrawable.PRESET_CONFIG_5_CHAR:
+            maxLines = 1;
+            break;
+         case ITechStringDrawable.PRESET_CONFIG_2_SCROLL_H:
+         case ITechStringDrawable.PRESET_CONFIG_3_SCROLL_V:
+         case ITechStringDrawable.PRESET_CONFIG_4_NATURAL_NO_WRAP:
+            break;
+         default:
+            throw new IllegalArgumentException();
+      }
+      return maxLines;
+   }
+
+   /**
     * As currently initialized what is the number of lines used to draw the String?
     * Default is 1
     * @return
@@ -697,7 +633,42 @@ public class StringDrawable extends ViewDrawable implements IBOStringDrawable, I
    }
 
    public int getOffset() {
-      return offset;
+      return stringer.getOffsetChar();
+   }
+
+   /**
+    * From {@link IBOStringData#SDATA_OFFSET_02_PRESET_CONFIG1}
+    * 
+    * <li> {@link ITechStringDrawable#PRESET_CONFIG_0_NONE}
+    * <li> {@link ITechStringDrawable#PRESET_CONFIG_1_TITLE}
+    * <li> {@link ITechStringDrawable#PRESET_CONFIG_2_SCROLL_H}
+    * <li> {@link ITechStringDrawable#PRESET_CONFIG_3_SCROLL_V}
+    * <li> {@link ITechStringDrawable#PRESET_CONFIG_4_NATURAL_NO_WRAP}
+    * <li> {@link ITechStringDrawable#PRESET_CONFIG_5_CHAR}
+    * 
+    * @return
+    */
+   public int getPresetConfig() {
+      return boStringDrawable.get1(IBOStringData.SDATA_OFFSET_02_PRESET_CONFIG1);
+   }
+
+   /**
+    * Overrides
+    */
+   public int getSizePreferredHeight() {
+      //TODO
+      if (hasFlagView(FLAG_VSTATE_08_PREF_SIZE_COMPUTED)) {
+         return layEngine.getPh();
+      } else {
+         int preset = getPresetConfig();
+         if (preset == ITechStringDrawable.PRESET_CONFIG_1_TITLE) {
+            //a preferred title H is 1 line
+            return getStringMetrics().getPrefCharHeight();
+            //logic 2 is 2 lines
+         }
+         //when no computed.. it was called by init method
+         return vc.getHeight();
+      }
    }
 
    /**
@@ -706,21 +677,9 @@ public class StringDrawable extends ViewDrawable implements IBOStringDrawable, I
     * @return non null
     */
    public String getString() {
-      return new String(chars, offset, len);
+      return stringer.getDisplayedString();
    }
 
-   /**
-    * copies the techdrawable.
-    * Invalidates the layout
-    * @param type
-    */
-   //   public void setStringType(int type) {
-   //      techDrawable = techDrawable.cloneCopyHeadRefParams();
-   //      techDrawable.set1(IStringDrawable.INPUT_OFFSET_02_STRING_TYPE1, type);
-   //      invalidateLayout();
-   //   }
-
-   //#enddebug
    /**
     * Returns the String actually displayed on the Screen.
     * <br>
@@ -734,10 +693,7 @@ public class StringDrawable extends ViewDrawable implements IBOStringDrawable, I
     * @return
     */
    public String getStringDisplayed() {
-      if (stringer != null) {
-         return stringer.getDisplayedString();
-      }
-      return new String(chars, offset, len);
+      return stringer.getDisplayedString();
    }
 
    /**
@@ -752,61 +708,68 @@ public class StringDrawable extends ViewDrawable implements IBOStringDrawable, I
     * @return {@link Stringer}
     */
    public Stringer getStringer() {
-      ByteObject strStyle = getStringerStyle();
-      if (stringer == null) {
-         stringer = new Stringer(gc.getDC());
-         if (chars == null) {
-            setStringNoUpdate("nullChars");
-         }
-         //old issue.. when x,y are modified afterwards? stringer needs to be updated
-         stringer.setAreaXYWH(getContentX(), getContentY(), getContentW(), getContentH());
-         stringer.setStringFig(strStyle, chars, offset, len);
-      } else {
-         //check identity if not matchin, re-initialize Stringer.
-         stringer.setTextObjectArea(strStyle, getContentX(), getContentY(), getContentW(), getContentH());
-      }
+      return stringer;
+   }
+
+   private Stringer createStringer() {
+      ByteObject textFigure = getStringerStyle();
+      stringer = new Stringer(gc.getDC());
+      stringer.setTextFigure(textFigure);
+      //old issue.. when x,y are modified afterwards? stringer needs to be updated
+      stringer.setAreaXYWH(getContentX(), getContentY(), getContentW(), getContentH());
       return stringer;
    }
 
    /**
-    * Gets the {@link ByteObject} style to be used for computing {@link StringMetrics} in {@link Stringer}.
-    * <br>
-    * <br>
-    * @return cannot be null and must be {@link IBOTypesDrw#TYPE_050_FIGURE}
+    * The {@link IBOFigString} overriding style's
+    * 
+    * <p>
+    * When null, {@link StringDrawable} will use the {@link IBOStyle} from its {@link StyleClass}
+    * </p>
+    * 
+    * <p>
+    * Set it using {@link StringDrawable#setBOFigString(ByteObject)}
+    * </p>
+    * @return
     */
-   private ByteObject getStringerStyle() {
-      int initStyle = techDrawable.get4(INPUT_OFFSET_07_INIT_STYLE_FLAGS4);
-      ByteObject strStyle = null;
-      //System.out.println("#StringDrawable InitStyle " + initStyle + " " + new String(chars, offset, Math.min(len, 15)) + " " + toStringDimension());
-      if (initStyle == 0) {
-         strStyle = getStyleOp().getContentStyle(style);
-      } else {
-         strStyle = getStyleOp().getContentStyle(styleClass.getStyle(initStyle, ctype, structStyle));
-      }
-      if (strStyle == null) {
-         //#debug
-         toDLog().pNull("Style could not be Found", this, StringDrawable.class, "getStringerStyle", LVL_09_WARNING, true);
-         strStyle = gc.getStyleManager().getDefaultContentStyle();
-      }
-      //#mdebug
-      strStyle.checkType(IBOTypesDrw.TYPE_050_FIGURE);
-      //#enddebug
-      return strStyle;
+   public ByteObject getBOFigString() {
+      return boFigString;
+   }
+   
+   public void setBOFigString(ByteObject boFigString) {
+      this.boFigString = boFigString;
+      this.stringer.setTextFigure(boFigString);
    }
 
    /**
-    * From tech gets {@link IBOStringDrawable#INPUT_OFFSET_02_STRING_TYPE1}
-    * <br>
-    * <li> {@link ITechStringDrawable#TYPE_1_TITLE}
-    * <li> {@link ITechStringDrawable#TYPE_3_SCROLL_V}
-    * <li> {@link ITechStringDrawable#TYPE_2_SCROLL_H}
-    * <li> {@link ITechStringDrawable#TYPE_1_TITLE}
-    * <li> {@link ITechStringDrawable#TYPE_1_TITLE}
+    * Gets the {@link IBOFigString} used for computing {@link StringMetrics} in {@link Stringer}.
     * 
-    * @return
+    * @return cannot be null and must be {@link IBOTypesDrw#TYPE_050_FIGURE}
     */
-   public int getStringType() {
-      return techDrawable.get1(IBOStringDrawable.INPUT_OFFSET_02_STRING_TYPE1);
+   private ByteObject getStringerStyle() {
+      int initStyle = boStringDrawable.get4(SDATA_OFFSET_07_INIT_STYLE_FLAGS4);
+      ByteObject strFigure = null;
+      //System.out.println("#StringDrawable InitStyle " + initStyle + " " + new String(chars, offset, Math.min(len, 15)) + " " + toStringDimension());
+      if (initStyle == 0) {
+         strFigure = getStyleOp().getContentStyle(style);
+      } else {
+         strFigure = getStyleOp().getContentStyle(styleClass.getStyle(initStyle, ctype, structStyle));
+      }
+      if (strFigure == null) {
+         //#debug
+         toDLog().pNull("Style could not be Found", this, StringDrawable.class, "getStringerStyle", LVL_09_WARNING, true);
+         strFigure = gc.getStyleManager().getDefaultContentStyle();
+      }
+      //#mdebug
+      strFigure.checkType(IBOTypesDrw.TYPE_050_FIGURE);
+      //#enddebug
+      return strFigure;
+   }
+
+   public StringMetrics getStringMetrics() {
+      Stringer initStringer = getStringer();
+      StringMetrics metrics = initStringer.getMetrics();
+      return metrics;
    }
 
    /**
@@ -817,24 +780,7 @@ public class StringDrawable extends ViewDrawable implements IBOStringDrawable, I
     * @return non null
     */
    public XString getStringX() {
-      return new XString(gc.getUCtx(), chars, offset, len);
-   }
-
-   public ByteObject getTechDrawable() {
-      return techDrawable;
-   }
-
-   /**
-    * Saves string when it is user mutable. Otherwise the string is code bound.
-    */
-   public ViewState getViewState() {
-      ViewState vs = super.getViewState();
-
-      //only save string when string is mutable, i.e 
-      if (techDrawable.get1(INPUT_OFFSET_06_MODE1) == ITechStringDrawable.MODE_2_EDIT) {
-         vs.itos.add(getString(), STR_VIEWSTATE_STR);
-      }
-      return vs;
+      return stringer.getStringX();
    }
 
    public boolean initListen(ByteObject sizerW, ByteObject sizerH, Drawable d) {
@@ -851,7 +797,7 @@ public class StringDrawable extends ViewDrawable implements IBOStringDrawable, I
       if (scX != null) {
          if (scX.getTypeUnit() == ITechViewPane.SCROLL_TYPE_1_LOGIC_UNIT) {
             int incrementPixelSize = getStyleOp().getPW(style, "  ");
-            scX.initConfigLogic(incrementPixelSize, getContentW(), len);
+            scX.initConfigLogic(incrementPixelSize, getContentW(), stringer.getLen());
          } else {
             DrawableUtilz.initConfigX(this, scX);
          }
@@ -871,202 +817,76 @@ public class StringDrawable extends ViewDrawable implements IBOStringDrawable, I
    /**
     * 
     */
-   protected void initTech() {
-      techDrawable = styleClass.getByteObject(IBOTypesGui.LINK_41_TECH_STRING);
-      if (techDrawable == null) {
-         techDrawable = gc.getDrawableStringFactory().getDefaultStringTech();
+   protected void initTech(ByteObject boStringData) {
+      if (boStringData == null) {
+         boStringData = styleClass.getByteObject(IBOTypesGui.LINK_41_BO_STRING_DRAWABLE);
+         if (boStringData == null) {
+            boStringData = gc.getDrawableStringFactory().getDefaultStringTech();
+         }
       }
-      int type = techDrawable.get1(IBOStringDrawable.INPUT_OFFSET_02_STRING_TYPE1);
+      this.boStringDrawable = boStringData;
+      int type = boStringDrawable.get1(IBOStringData.SDATA_OFFSET_02_PRESET_CONFIG1);
       setTypeString(type);
    }
 
    /**
-    * Compute preferred size based on String type and sizers.
-    * <br>
-    * For example {@link ITechStringDrawable#TYPE_3_SCROLL_V} will take preferred size 
+    * Compute preferred size based on String preset configuration and sizers.
+    * <p>
+    * 
+    * For example {@link ITechStringDrawable#PRESET_CONFIG_3_SCROLL_V} will take preferred size 
     * from {@link ViewContext}.
-    * <br>
-    * What is sizerH says {@link ISizer#ET_TYPE_1_LOGIC_SIZE} of -2 ? SizerH tells about
-    * the Drawable size! Here we compute the preferred size. In which case we take into
-    * account the breakWidth to break a String
-    * <br>
-    * @param ds
-    */
-   public void initViewDrawable(LayEngineDrawable ds) {
-      //nullify stringer to force reinitialization
-      Stringer initStringer = getStringer();
-      StringMetrics metrics = initStringer.getMetrics();
-
-      int breakWidth = ds.getW();
-      int breakHeight = ds.getH();
-
-      //#debug
-      toDLog().pInit("breakWidth=" + breakWidth + " breakHeight=" + breakHeight, this, StringDrawable.class, "initViewDrawable", LVL_05_FINE, true);
-
-      initBreak(breakWidth, breakHeight);
-      //use the content area to size ourselves
-      //set view flag that preferred size has been computed
-      //set flags nav
-      doUpdateNavBehavior();
-   }
-
-   public StringMetrics getStringMetrics() {
-      Stringer initStringer = getStringer();
-      StringMetrics metrics = initStringer.getMetrics();
-      return metrics;
-   }
-
-   /**
-    * Overrides
-    */
-   public int getSizePreferredHeight() {
-      //TODO
-      if (hasFlagView(FLAG_VSTATE_08_PREF_SIZE_COMPUTED)) {
-         return layEngine.getPh();
-      } else {
-         int strType = getStringType();
-         if (strType == ITechStringDrawable.TYPE_1_TITLE) {
-            //a preferred title H is 1 line
-            return getStringMetrics().getPrefCharHeight();
-            //logic 2 is 2 lines
-         }
-         //when no computed.. it was called by init method
-         return vc.getHeight();
-      }
-   }
-
-   private void initBreak(int breakWidth, int breakHeight) {
-      Stringer initStringer = getStringer();
-      StringMetrics metrics = initStringer.getMetrics();
-      int typeStr = getStringType();
-      if (typeStr == ITechStringDrawable.TYPE_5_CHAR) {
-         initViewDrawableCharType(breakWidth, breakHeight);
-      } else {
-         //----------------------------
-         //compute breaks, preferred dimension given dim parameters and type
-         //#debug
-         toDLog().pInit("", initStringer, StringDrawable.class, "initBreak", LVL_05_FINE, false);
-
-         int breakType = getBreakType(breakWidth, breakHeight, typeStr, len, initStringer);
-         int maxLines = getMaxLines(breakWidth, breakHeight, typeStr);
-         initStringer.setBreakWH(breakWidth, breakHeight);
-         initStringer.setBreakMaxLines(maxLines);
-         initStringer.buildAgain();
-         int pw = metrics.getPrefWidth();
-         int ph = metrics.getPrefHeight();
-         
-         layEngine.setPh(ph);
-         layEngine.setPw(pw);
-
-         //clipping is only necessary when partial strings are drawn.
-         if ((hasFlagView(FLAG_VSTATE_22_SCROLLED))) {
-            if (viewPane != null && viewPane.isContentClipped()) {
-               //TODO is this possible?
-               //clipping is also needed when init style is smaller than some state styles?
-               setFlagView(ITechViewDrawable.FLAG_VSTATE_01_CLIP, true);
-            } else {
-               setFlagView(ITechViewDrawable.FLAG_VSTATE_01_CLIP, false);
-            }
-         } else {
-            setFlagView(ITechViewDrawable.FLAG_VSTATE_01_CLIP, false);
-         }
-      }
-   }
-
-   /**
+    * </p>
+    * 
     * The init method of Drawable has already been called by {@link ViewDrawable}. <br>
     * <br>
     * <p>
-    * The {@link IBOStringDrawable#INPUT_OFFSET_02_STRING_TYPE1} applies to decide how the preferred dimension is computed.
-    * <li> {@link ITechStringDrawable#TYPE_2_SCROLL_H} gives all text on 1 line.  </li>
-    * <li> {@link ITechStringDrawable#TYPE_4_NATURAL_NO_WRAP}  </li>
-    * <li> {@link ITechStringDrawable#TYPE_1_TITLE} text is trimmed to fit area </li>
-    * <li> {@link ITechStringDrawable#TYPE_3_SCROLL_V}  </li>
-    * <br>
-    * <br>
-    * For {@link ITechStringDrawable#TYPE_0_NONE},
+    * The {@link IBOStringData#SDATA_OFFSET_02_PRESET_CONFIG1} applies to decide how the preferred dimension is computed.
+    * <li> {@link ITechStringDrawable#PRESET_CONFIG_2_SCROLL_H} gives all text on 1 line.  </li>
+    * <li> {@link ITechStringDrawable#PRESET_CONFIG_4_NATURAL_NO_WRAP}  </li>
+    * <li> {@link ITechStringDrawable#PRESET_CONFIG_1_TITLE} text is trimmed to fit area </li>
+    * <li> {@link ITechStringDrawable#PRESET_CONFIG_3_SCROLL_V}  </li>
+    * 
+    * 
+    * <p>
+    * 
+    * For {@link ITechStringDrawable#PRESET_CONFIG_0_NONE},
     * <li> When <i>width</i> and <i>height</i> values are <b>both positive</b>, fit and trim if no scrolling set.
     * <li>When height is <b>negative</b>, the Drawable Area must be for X lines + any ViewPane's planetaries.
-    * <br>
     * Since String are malleable, when either width or height is Zero, drawable area will equal preferred area and no scrollbar is visible.
     * <li> When both <i>width</i> and <i>height</i> values are <b>Zero</b>, no scrollbar is created and type is overriden to
-    * {@link ITechStringDrawable#TYPE_4_NATURAL_NO_WRAP}
+    * {@link ITechStringDrawable#PRESET_CONFIG_4_NATURAL_NO_WRAP}
     * <li>When <i>width</i> is <b>positive</b> and <i>height</i> is <b>0</b>. width is pixel set with at least one character and an infinite number of lines.
-    * type is overriden to {@link ITechStringDrawable#TYPE_3_SCROLL_V} with infinite lines
-    * <li>When <i>width</i> is <b>0</b> and <i>height</i> is <b>positive</b>, type is overriden to {@link ITechStringDrawable#TYPE_2_SCROLL_H} with characters
-    * <br>
-    * <br>
+    * type is overriden to {@link ITechStringDrawable#PRESET_CONFIG_3_SCROLL_V} with infinite lines
+    * <li>When <i>width</i> is <b>0</b> and <i>height</i> is <b>positive</b>, type is overriden to {@link ITechStringDrawable#PRESET_CONFIG_2_SCROLL_H} with characters
+    * 
+    * </p>
+    * 
     * @param width drawable unchanged width raw width given to the {@link Drawable#init(int, int)} or diminished viewport width?
     * Negative width is used based on fwPrefCharWidth
     * @param height drawable height
     * 
+    * <p>
+    * 
+    * What if the sizerH says {@link ITechLayout#SIZER_PROP_02_UNIT_LOGIC} of 2 ? SizerH tells about
+    * the Drawable size! So that logic size is already computed into engine Height.
+    * 
+    * Here we compute the preferred size. In which case we take into
+    * account the breakWidth to break a String
+    * </p>
     * 
     * TODO decides which Style to use when doing the init. We want the SELECTED bold font for the char computations.
     * Since String is not editable, Stringer can relax some stuff.
     * <br>
     * This is automatic in {@link Drawable#init(int, int)} method using {@link StyleClass#getInitStyle()}
+   
+    * @param ds
     */
-   public void initViewDrawable(int width, int height) {
-      //nullify stringer to force reinitialization
-      stringer = null;
-      int typeStr = getStringType();
-      if (typeStr == ITechStringDrawable.TYPE_5_CHAR) {
-         initViewDrawableCharType(width, height);
-      } else {
-         Stringer initStringer = getStringer();
-         StringMetrics metrics = initStringer.getMetrics();
-         int breakWidth = width;
-         if (breakWidth > 0) {
-            breakWidth = getContentW();
-         } else if (breakWidth < 0) {
-            breakWidth = -breakWidth * metrics.getPrefCharWidth();
-         }
-         int breakHeight = height;
-         if (breakHeight > 0) {
-            breakHeight = getContentH();
-         } else if (breakHeight < 0) {
-            breakHeight = -breakHeight * metrics.getPrefCharHeight();
-         }
-         setViewFlags(typeStr);
-
-         //----------------------------
-         //compute breaks, preferred dimension given dim parameters and type
-         getBreakType(breakWidth, breakHeight, typeStr, len, initStringer);
-         int maxLines = getMaxLines(breakWidth, breakHeight, typeStr);
-         initStringer.setBreakWH(breakWidth, breakHeight);
-         initStringer.setBreakMaxLines(maxLines);
-         initStringer.buildAgain();
-         int pw = metrics.getPrefWidth();
-         int ph = metrics.getPrefHeight();
-         layEngine.setPw(pw);
-         layEngine.setPh(ph);
-         super.addStyleToPrefSize();
-         //----------------------------
-
-         //         if (hasBehavior(IDrawable.BEHAVIOR_02_EMPTY) && (pw == 0 || ph == 0)) {
-         //            System.out.println(this);
-         //            System.out.println("pw=" + pw + " ph=" + ph);
-         //            throw new IllegalStateException();
-         //         }
-         //setDwDh(width, height); string type overrides sizer
-         //clipping is only necessary when partial strings are drawn.
-         if ((hasFlagView(FLAG_VSTATE_22_SCROLLED))) {
-            if (viewPane != null && viewPane.isContentClipped()) {
-               //TODO is this possible?
-               //clipping is also needed when init style is smaller than some state styles?
-               setFlagView(ITechViewDrawable.FLAG_VSTATE_01_CLIP, true);
-            } else {
-               setFlagView(ITechViewDrawable.FLAG_VSTATE_01_CLIP, false);
-            }
-         } else {
-            setFlagView(ITechViewDrawable.FLAG_VSTATE_01_CLIP, false);
-         }
-
-         //set flags nav
-         doUpdateNavBehavior();
-
-      }
-
+   public void initViewDrawable(LayouterEngineDrawable ds) {
+      int breakWidth = ds.getW();
+      int breakHeight = ds.getH();
+      initPreferredSizeFromViewPortArea(ds, breakWidth, breakHeight);
+      //set flags nav
+      doUpdateNavBehavior();
    }
 
    private void initViewDrawableCharType(int width, int height) {
@@ -1081,11 +901,8 @@ public class StringDrawable extends ViewDrawable implements IBOStringDrawable, I
       setFlagView(ITechViewDrawable.FLAG_VSTATE_01_CLIP, false);
    }
 
-   /**
-    * Called when a ViewPort is created or changed
-    */
    protected void initViewPortSub(int width, int height) {
-      initBreak(width, height);
+      initPreferredSizeFromViewPortArea(layEngine, width, height);
    }
 
    /**
@@ -1094,11 +911,12 @@ public class StringDrawable extends ViewDrawable implements IBOStringDrawable, I
     * @return
     */
    public boolean isValidAbsoluteIndex(int index) {
-      return index >= offset && index < offset + len;
+      return stringer.isValidAbsoluteIndex(index);
+
    }
 
    /**
-    * Forwards to the {@link EditModule}.
+    * Forwards to the {@link StringEditModule}.
     * <br>
     */
    public void manageKeyInput(InputConfig ic) {
@@ -1111,6 +929,12 @@ public class StringDrawable extends ViewDrawable implements IBOStringDrawable, I
       }
    }
 
+   public void manageNavigate(CmdInstanceDrawable cd, int navEvent) {
+      if (editModule != null) {
+         editModule.manageNavigate(cd, navEvent);
+      }
+   }
+
    /**
     * To finalize editing with the mouse, you have to press a Finish button.
     * <br>
@@ -1119,7 +943,7 @@ public class StringDrawable extends ViewDrawable implements IBOStringDrawable, I
     */
    public void managePointerInputViewPort(InputConfig ic) {
       //SystemLog.printFlow("#StringDrawable#managePointerInputViewPort Slaved=" + (ic.getSlaveDrawable() != null) + " " + this.toStringOneLine());
-      if (techDrawable.get1(INPUT_OFFSET_06_MODE1) == ITechStringDrawable.MODE_2_EDIT) {
+      if (boStringDrawable.get1(SDATA_OFFSET_06_ACTION_MODE1) == ITechStringDrawable.S_ACTION_MODE_2_EDIT) {
          //         if (editModule == null && ic.isDoubleTap) {
          //            Controller.getMe().giveControlEdit(this,null);
          //            ic.srActionDoneRepaint();
@@ -1136,7 +960,7 @@ public class StringDrawable extends ViewDrawable implements IBOStringDrawable, I
    }
 
    /**
-    * When in edit Mode, {@link EditModule} moves the caret and then updates the {@link ScrollConfig}
+    * When in edit Mode, {@link StringEditModule} moves the caret and then updates the {@link ScrollConfig}
     * When not in edit mode, ask {@link ViewDrawable} to forward event to any {@link ViewPane}
     * <br>
     */
@@ -1163,12 +987,6 @@ public class StringDrawable extends ViewDrawable implements IBOStringDrawable, I
    public void navigateRight(InputConfig ic) {
       if (editModule != null)
          editModule.navigateRight(ic);
-   }
-
-   public void manageNavigate(CmdInstanceDrawable cd, int navEvent) {
-      if (editModule != null) {
-         editModule.manageNavigate(cd, navEvent);
-      }
    }
 
    /**
@@ -1244,19 +1062,27 @@ public class StringDrawable extends ViewDrawable implements IBOStringDrawable, I
       editRemoveCtrl();
    }
 
+   /**
+    * 
+    * @param boStringData {@link IBOStringData}
+    */
+   public void setBOStringData(ByteObject boStringData) {
+      styleInvalidate();
+      this.boStringDrawable = boStringData;
+      int presetConfig = boStringDrawable.get1(IBOStringData.SDATA_OFFSET_02_PRESET_CONFIG1);
+      setTypeString(presetConfig);
+   }
+
    public void setChar(char c) {
       setChars(new char[] { c }, 0, 1);
    }
 
    public void setCharAt(int i, char c) {
-      chars[i] = c;
-      getStringer().setCharAt(i, c);
+      stringer.setCharAt(i, c);
    }
 
    public void setChars(char[] c, int offset, int len) {
-      this.chars = c;
-      this.offset = offset;
-      this.len = len;
+      stringer.setString(c, offset, len);
    }
 
    /**
@@ -1270,12 +1096,72 @@ public class StringDrawable extends ViewDrawable implements IBOStringDrawable, I
    }
 
    /**
-    * Sets the {@link EditModule} when the {@link StringDrawable} is edited.
+    * Sets the {@link StringEditModule} when the {@link StringDrawable} is edited.
     * @param module
     */
-   public void setEditModule(EditModule module) {
+   public void setEditModule(StringEditModule module) {
       editModule = module;
       doUpdateNavBehavior();
+   }
+
+   public void setSizersPreset_1CharPerLines(int numLinesMax) {
+      SizerFactory fac = getSizerFac();
+      ByteObject sizerW = fac.getSizerLogicUnit(1);
+
+      ByteObject sizerH = fac.getSizerPrefLazy();
+      if (numLinesMax > 0) {
+         sizerH = fac.getSizerLogicUnit(numLinesMax);
+      }
+      this.setSizers(sizerW, sizerH);
+   }
+
+   /**
+    * 
+    * @param width
+    */
+   public void setSizersPreset_1LineAtWidth(int width) {
+      SizerFactory fac = getSizerFac();
+      ByteObject sizerW = fac.getSizerPrefLazy();
+      if (width > 0) {
+         sizerW = fac.getSizerRaw(width);
+      }
+      ByteObject sizerH = fac.getSizerLogicUnit(1);
+      this.setSizers(sizerW, sizerH);
+   }
+
+   public SizerFactory getSizerFac() {
+      return gc.getLAC().getFactorySizer();
+   }
+
+   /**
+    * One line as long as it needs to be
+    */
+   public void setSizersPreset_1LineLong() {
+      setSizersPreset_1LineAtWidth(0);
+   }
+
+   public void setSizersPreset_Free() {
+      SizerFactory fac = getSizerFac();
+      ByteObject sizerPref = fac.getSizerPrefLazy();
+      setSizers(sizerPref, sizerPref);
+   }
+
+   public void setSizersPreset_FreeWidthYLines(int numLinesMax) {
+      SizerFactory fac = getSizerFac();
+      ByteObject sizerPref = fac.getSizerPrefLazy();
+      ByteObject sizerH = fac.getSizerPrefLazy();
+      if (numLinesMax > 0) {
+         sizerH = fac.getSizerLogicUnit(numLinesMax);
+      }
+      setSizers(sizerPref, sizerH);
+   }
+
+   /**
+    * Trim on width, show as many lines. not scrollable
+    * @param numLinesMax
+    */
+   public void setSizersPreset_TrimOnWidth(int width) {
+
    }
 
    /**
@@ -1293,14 +1179,19 @@ public class StringDrawable extends ViewDrawable implements IBOStringDrawable, I
     * @param str
     */
    public void setStringNoUpdate(String str) {
-      if (str == null)
-         throw new NullPointerException();
-      stringer = null;
-      this.chars = str.toCharArray();
-      this.offset = 0;
-      this.len = str.length();
-      //update Stringer?
+      if (str == null) {
+         str = "";
+      }
+      stringer.setString(str);
       setStateFlag(ITechDrawable.STATE_32_CHANGED, true);
+   }
+
+   public void setStringNoUpdate(char[] cs, int offset, int len) {
+      if (cs == null) {
+         stringer.setString("");
+      } else {
+         stringer.setString(cs, offset, len);
+      }
    }
 
    /**
@@ -1308,46 +1199,37 @@ public class StringDrawable extends ViewDrawable implements IBOStringDrawable, I
     */
    public void setStyleClass(StyleClass sc) {
       super.setStyleClass(sc);
-      initTech();
+      initTech(null);
    }
 
    /**
-    * Un style the {@link Drawable}/
-    * @param t
-    */
-   public void setTechDrawable(ByteObject t) {
-      styleInvalidate();
-      techDrawable = t;
-   }
-
-   /**
-    * Changes the way the String is constrainted. Changes are applied at the next layout
+    * Changes the way the String is constrained. Changes are applied at the next layout
     * @param type
     */
    private void setTypeString(int type) {
-      setViewFlags(type);
+      setViewFlagsFromStringType(type);
       switch (type) {
-         case ITechStringDrawable.TYPE_0_NONE:
+         case ITechStringDrawable.PRESET_CONFIG_0_NONE:
             setShrink(false, false);
             break;
-         case ITechStringDrawable.TYPE_1_TITLE:
+         case ITechStringDrawable.PRESET_CONFIG_1_TITLE:
             setFlagView(ITechViewDrawable.FLAG_GENE_28_NOT_SCROLLABLE, true);
             setFlagView(ITechViewDrawable.FLAG_VSTATE_12_CONTENT_W_DEPENDS_VIEWPORT, true);
             setShrink(false, true); //shrink vertically
             break;
-         case ITechStringDrawable.TYPE_2_SCROLL_H:
+         case ITechStringDrawable.PRESET_CONFIG_2_SCROLL_H:
             setShrink(false, true);
             setFlagView(ITechViewDrawable.FLAG_VSTATE_07_NO_EAT_H_MUST_EXPAND, true);
             break;
-         case ITechStringDrawable.TYPE_3_SCROLL_V:
+         case ITechStringDrawable.PRESET_CONFIG_3_SCROLL_V:
             setShrink(false, true);
             //setViewFlag(IViewDrawable.VIEWSTATE_10_CONTENT_WIDTH_FOLLOWS_VIEWPORT, true);
             setFlagView(ITechViewDrawable.FLAG_VSTATE_12_CONTENT_W_DEPENDS_VIEWPORT, true);
             break;
-         case ITechStringDrawable.TYPE_4_NATURAL_NO_WRAP:
+         case ITechStringDrawable.PRESET_CONFIG_4_NATURAL_NO_WRAP:
             setShrink(false, false);
             break;
-         case ITechStringDrawable.TYPE_5_CHAR:
+         case ITechStringDrawable.PRESET_CONFIG_5_CHAR:
             setFlagView(ITechViewDrawable.FLAG_GENE_28_NOT_SCROLLABLE, true);
             break;
          default:
@@ -1359,28 +1241,12 @@ public class StringDrawable extends ViewDrawable implements IBOStringDrawable, I
     * Sets flags like {@link ITechViewDrawable#FLAG_VSTATE_10_CONTENT_PW_VIEWPORT_DW}
     * @param type
     */
-   public void setViewFlags(int type) {
+   private void setViewFlagsFromStringType(int type) {
       switch (type) {
-         case ITechStringDrawable.TYPE_3_SCROLL_V:
+         case ITechStringDrawable.PRESET_CONFIG_3_SCROLL_V:
             setFlagView(ITechViewDrawable.FLAG_VSTATE_10_CONTENT_PW_VIEWPORT_DW, true);
             break;
          default:
-      }
-   }
-
-   /**
-    * When setting viewstate, the element with focus, takes the focus.
-    * 
-    */
-   public void setViewState(ViewState vs) {
-      super.setViewState(vs);
-      if (techDrawable.get1(INPUT_OFFSET_06_MODE1) == ITechStringDrawable.MODE_2_EDIT) {
-         String str = (String) vs.itos.findIntObject(STR_VIEWSTATE_STR);
-         if (str != null) {
-            chars = str.toCharArray();
-            len = str.length();
-            offset = 0;
-         }
       }
    }
 
@@ -1394,12 +1260,18 @@ public class StringDrawable extends ViewDrawable implements IBOStringDrawable, I
       }
    }
 
-   public void shiftXY(int dx, int dy) {
-      setXY(getX() + dx, getY() + dy);
+   public void initPosition() {
+      super.initPosition();
+      int x = getX();
+      int y = getY();
+      int contentW = getContentW();
+      int contentH = getContentH();
+      stringer.setAreaXYWH(x, y, contentW, contentH);
+
    }
 
    public void stringUpdate() {
-      this.layoutInvalidate(false);
+      super.invalidateLayout();
       //layout 
       initSize();
    }
@@ -1409,7 +1281,7 @@ public class StringDrawable extends ViewDrawable implements IBOStringDrawable, I
     * @param ic
     */
    private void toggleEdition(InputConfig ic) {
-      if (techDrawable.get1(INPUT_OFFSET_06_MODE1) == ITechStringDrawable.MODE_2_EDIT) {
+      if (boStringDrawable.get1(SDATA_OFFSET_06_ACTION_MODE1) == ITechStringDrawable.S_ACTION_MODE_2_EDIT) {
          //enter works with multiple lines? Yes with a short one
          if (ic.isFire() && ic.isReleased()) {
             //
@@ -1428,41 +1300,36 @@ public class StringDrawable extends ViewDrawable implements IBOStringDrawable, I
    }
 
    //#mdebug
-
-   public void toString(Dctx sb) {
-      sb.root(this, "StringDrawable");
-      sb.append(ToStringStaticGui.debugStringType(techDrawable.get1(IBOStringDrawable.INPUT_OFFSET_02_STRING_TYPE1)));
+   public void toString(Dctx dc) {
+      dc.root(this, StringDrawable.class, 1440);
+      toStringPrivate(dc);
+      super.toString(dc.sup());
       IMFont f = getStyleOp().getStyleFont(style);
-      sb.append(' ');
-      sb.append(ToStringStaticDrawx.debugFontBrackets(f));
-      sb.nl();
-      String str = new String(chars, offset, len);
-      sb.append(str);
-      sb.append(" len=" + str.length() + "");
-      //--------
-      //---
-      sb.nl();
-      gc.getDrawableStringOperator().toStringTech(techDrawable, sb.newLevel());
-
-      if (sb.hasFlagData(gc, IFlagsToStringGui.D_FLAG_03_STRINGER) && stringer != null) {
-         sb.nlLvl(stringer);
-      }
-      if (editModule != null) {
-         sb.nlLvl(editModule);
-      }
-      super.toString(sb.sup());
+      dc.append(' ');
+      dc.append(ToStringStaticDrawx.toStringFontBrackets(f));
+      dc.nl();
+      dc.nlLvl(boStringDrawable, "boStringDrawable");
+      dc.nlLvl(stringer, "stringer");
+      dc.nlLvl(editModule, "editModule");
    }
 
-   public void toString1Line(Dctx sb) {
-      sb.root1Line(this, "StringDrawable");
-      sb.append("'");
-      sb.append(new String(chars, offset, Math.min(len, 15)));
-      sb.append("' ");
+   public void toString1Line(Dctx dc) {
+      dc.root1Line(this, StringDrawable.class);
+      toStringPrivate(dc);
+      super.toString1Line(dc.sup1Line());
+      dc.append("' ");
       if (styleStates != 0) {
-         ToStringStaticGui.toStringBehavior(this, sb);
+         ToStringStaticGui.toStringBehavior(this, dc);
       }
-      sb.append(" ");
-      sb.append(style.getMyHashCode());
+      dc.append(" ");
+      dc.append(style.getMyHashCode());
    }
+
+   private void toStringPrivate(Dctx dc) {
+      dc.append(ToStringStaticGui.debugStringType(boStringDrawable.get1(IBOStringData.SDATA_OFFSET_02_PRESET_CONFIG1)));
+
+   }
+
+   //#enddebug
 
 }

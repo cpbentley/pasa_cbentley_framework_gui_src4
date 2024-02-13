@@ -17,6 +17,7 @@ import pasa.cbentley.framework.datamodel.src4.table.ObjectTableModel;
 import pasa.cbentley.framework.gui.src4.canvas.FocusCtrl;
 import pasa.cbentley.framework.gui.src4.canvas.InputConfig;
 import pasa.cbentley.framework.gui.src4.core.Drawable;
+import pasa.cbentley.framework.gui.src4.core.LayouterEngineDrawable;
 import pasa.cbentley.framework.gui.src4.core.StyleClass;
 import pasa.cbentley.framework.gui.src4.ctx.GuiCtx;
 import pasa.cbentley.framework.gui.src4.ctx.IBOTypesGui;
@@ -563,13 +564,8 @@ public class CmdMenuBar extends TableView implements IEventConsumer, ICmdsView {
       }
    }
 
-   /**
-    * 
-    */
-   public void initViewDrawable(int width, int height) {
-      //first make sure the current model command strings are loaded
-      super.initViewDrawable(width, height);
-
+   
+   protected void initViewDrawable(LayouterEngineDrawable ds) {
       if (cmdTableView != null) {
          //make an update on the menu sizes
          //initSizeSubMenuTable();

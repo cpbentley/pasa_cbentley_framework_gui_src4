@@ -10,13 +10,14 @@ import pasa.cbentley.framework.drawx.src4.ctx.DrwCtx;
 import pasa.cbentley.framework.drawx.src4.factories.AnchorFactory;
 import pasa.cbentley.framework.drawx.src4.factories.BoxFactory;
 import pasa.cbentley.framework.drawx.src4.factories.FigureFactory;
-import pasa.cbentley.framework.drawx.src4.factories.TblrFactory;
 import pasa.cbentley.framework.drawx.src4.factories.interfaces.IBOFigure;
 import pasa.cbentley.framework.drawx.src4.style.IBOStyle;
 import pasa.cbentley.framework.drawx.src4.style.StyleFactory;
 import pasa.cbentley.framework.drawx.src4.style.StyleOperator;
 import pasa.cbentley.framework.drawx.src4.tech.ITechFigure;
 import pasa.cbentley.framework.gui.src4.ctx.GuiCtx;
+import pasa.cbentley.layouter.src4.ctx.IBOTypesLayout;
+import pasa.cbentley.layouter.src4.engine.TblrFactory;
 
 public class DefaultStyles extends BOAbstractFactory implements IBOStyle, ITechFigure, IBOTypesDrw {
 
@@ -84,11 +85,11 @@ public class DefaultStyles extends BOAbstractFactory implements IBOStyle, ITechF
       ByteObject text = figureFactory.getFigString(IMFont.FACE_SYSTEM, IMFont.STYLE_PLAIN, IMFont.SIZE_3_MEDIUM, 0);
       ByteObject anchor = anchorFac.getCenterCenter();
       //simple 2 border
-      ByteObject border = tblrFactory.getTBLR(2);
+      ByteObject border = tblrFactory.getTBLRCoded(2);
       ByteObject figBorder = figureFactory.getFigBorder(border, borderColor);
       //simple background gradient
-      ByteObject bg = figureFactory.getFigRect(horiz, pcolor, scolor, 0);
-      ByteObject pad = tblrFactory.getTBLR(2);
+      ByteObject bg = figureFactory.getFigRectGrad(horiz, pcolor, scolor, 0);
+      ByteObject pad = tblrFactory.getTBLRCoded(2);
       ByteObject[] bgs = new ByteObject[] { bg, figBorder };
       ByteObject style = styleFactory.getStyle(bgs, text, anchor, pad, border);
       return style;
@@ -103,11 +104,11 @@ public class DefaultStyles extends BOAbstractFactory implements IBOStyle, ITechF
       ByteObject text = figureFactory.getFigString(IMFont.FACE_SYSTEM, IMFont.STYLE_PLAIN, IMFont.SIZE_3_MEDIUM, 0);
       ByteObject anchor = anchorFac.getCenterCenter();
       //simple 2 border
-      ByteObject border = tblrFactory.getTBLR(2);
+      ByteObject border = tblrFactory.getTBLRCoded(2);
       ByteObject figBorder = figureFactory.getFigBorder(border, ColorUtils.FULLY_OPAQUE_GREY);
       //simple background gradient
-      ByteObject bg = figureFactory.getFigRect(horiz, pcolor, scolor, 0);
-      ByteObject pad = tblrFactory.getTBLR(2);
+      ByteObject bg = figureFactory.getFigRectGrad(horiz, pcolor, scolor, 0);
+      ByteObject pad = tblrFactory.getTBLRCoded(2);
       ByteObject[] bgs = new ByteObject[] { bg, figBorder };
       ByteObject style = styleFactory.getStyle(bgs, text, anchor, pad, border);
       return style;
@@ -126,11 +127,11 @@ public class DefaultStyles extends BOAbstractFactory implements IBOStyle, ITechF
       ByteObject anchor = anchorFac.getCenterCenter();
       //simple 2 border
       //simple background gradient
-      ByteObject bg = figureFactory.getFigRect(horiz, pcolor, scolor, 0);
-      ByteObject pad = tblrFactory.getTBLR(2);
-      ByteObject margin = tblrFactory.getTBLR(1);
+      ByteObject bg = figureFactory.getFigRectGrad(horiz, pcolor, scolor, 0);
+      ByteObject pad = tblrFactory.getTBLRCoded(2);
+      ByteObject margin = tblrFactory.getTBLRCoded(1);
       ByteObject figBorder = figureFactory.getFigBorder(5, pBrColor, sBrColor, 100);
-      ByteObject border = figBorder.getSubFirst(TYPE_060_TBLR);
+      ByteObject border = figBorder.getSubFirst(IBOTypesLayout.FTYPE_2_TBLR);
 
       ByteObject[] bgs = new ByteObject[] { bg, figBorder };
 
@@ -171,15 +172,15 @@ public class DefaultStyles extends BOAbstractFactory implements IBOStyle, ITechF
 
       ByteObject bg = figureFactory.getFigRect(ColorUtils.FULLY_OPAQUE_WHITE);
       ByteObject figBorder = figureFactory.getFigBorder(5, 0, 0, pcolor, scolor, 100);
-      ByteObject pad = tblrFactory.getTBLR(2);
-      ByteObject style = styleFactory.getStyle(new ByteObject[] { bg, figBorder }, null, null, pad, figBorder.getSubFirst(TYPE_060_TBLR));
+      ByteObject pad = tblrFactory.getTBLRCoded(2);
+      ByteObject style = styleFactory.getStyle(new ByteObject[] { bg, figBorder }, null, null, pad, figBorder.getSubFirst(IBOTypesLayout.FTYPE_2_TBLR));
       return style;
    }
 
    public ByteObject getStyleSelectedBgRed() {
       ByteObject bg = figureFactory.getFigRect(ColorUtils.getRGBInt(255, 255, 255, 255), true);
       ByteObject fg2 = figureFactory.getFigBorder(2, ColorUtils.getRGBInt(255, 255, 0, 0), true);
-      fg2.setFlag(IBOFigure.FIG__OFFSET_03_FLAGP, IBOFigure.FIG_FLAGP_8POSTPONE, true);
+      fg2.setFlag(IBOFigure.FIG__OFFSET_03_FLAGP, IBOFigure.FIG_FLAGP_8_POSTPONE, true);
       ByteObject style = styleFactory.getStyle(bg, STYLE_OFFSET_2_FLAGB, STYLE_FLAGB_4_BG);
       styleOp.setGAnchors(style, STYLE_FLAGB_4_BG, STYLE_ANC_3_PADDING);
 

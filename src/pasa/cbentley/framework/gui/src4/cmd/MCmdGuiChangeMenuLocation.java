@@ -10,7 +10,7 @@ import pasa.cbentley.framework.gui.src4.canvas.InputConfig;
 import pasa.cbentley.framework.gui.src4.core.StyleClass;
 import pasa.cbentley.framework.gui.src4.ctx.GuiCtx;
 import pasa.cbentley.framework.gui.src4.ctx.IBOTypesGui;
-import pasa.cbentley.framework.gui.src4.factories.CellPolicyFactory;
+import pasa.cbentley.framework.gui.src4.factories.TableCellPolicyFactory;
 import pasa.cbentley.framework.gui.src4.factories.TablePolicyFactory;
 import pasa.cbentley.framework.gui.src4.interfaces.ICmdsView;
 import pasa.cbentley.framework.gui.src4.interfaces.IUIView;
@@ -57,7 +57,7 @@ public class MCmdGuiChangeMenuLocation extends MCmdGui implements IEventConsumer
          }
       if (menuPosTable == null) {
          String[] data = new String[] { "Top", "Bottom", "Left", "Right" };
-         CellPolicyFactory cellFac = gc.getCellPolicyC();
+         TableCellPolicyFactory cellFac = gc.getTableCellPolicyFactory();
          TablePolicyFactory tabFac = gc.getTablePolicyC();
          ByteObject colPol = cellFac.getGeneric(2, 0);
          ByteObject rowPol = cellFac.getGeneric(0, 0);

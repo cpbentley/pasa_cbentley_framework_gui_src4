@@ -76,7 +76,7 @@ public interface ITechDrawable extends IByteObject {
     * Parent drawable dimensions are dependant on children.
     * <br>
     * When children have sizers with 
-    * <li> {@link ISizer#LINK_0_PARENT}
+    * <li> {@link ISizer#ET_LINK_0_PARENT}
     * <li> {@link ISizer#ET_TYPE_2_PARENT}
     * <br>
     * <br>
@@ -506,7 +506,7 @@ public interface ITechDrawable extends IByteObject {
    /**
     * When drawable is drawn outside its boundary.
     * <br>
-    * This usually happens with drawable having a postponed style layer. {@link IDrw#FIG_FLAGP_8POSTPONE}
+    * This usually happens with drawable having a postponed style layer. {@link IDrw#FIG_FLAGP_8_POSTPONE}
     * <br>
     * <br>
     * Special {@link Drawable} with style drawing outside regular dimension.
@@ -618,7 +618,7 @@ public interface ITechDrawable extends IByteObject {
     * Should not be set from the outside as the Drawable
     * computes this state internally.
     * <br>
-    * Content + aggregate of style layer figures' flag {@link IDrw#FIG_FLAGP_3OPAQUE}.
+    * Content + aggregate of style layer figures' flag {@link IDrw#FIG_FLAGP_3_OPAQUE}.
     */
    public static final int STATE_16_TRANSLUCENT                  = 1 << 15;
 

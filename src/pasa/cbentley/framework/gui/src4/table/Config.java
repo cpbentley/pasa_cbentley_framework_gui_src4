@@ -429,12 +429,12 @@ public class Config implements IStringable {
       workRowSizes = oldConfig.workRowSizes;
 
       switch (tr.type) {
-         case Transition.TRANSITION_0INSIDE_VIEWPORT:
+         case Transition.TRANSITION_0_INSIDE_VIEWPORT:
             doTransitionInside(oldConfig);
             break;
-         case Transition.TRANSITION_1INSIDE_TO_PARTIAL:
+         case Transition.TRANSITION_1_INSIDE_TO_PARTIAL:
             break;
-         case Transition.TRANSITION_2OUTSIDE:
+         case Transition.TRANSITION_2_OUTSIDE:
             doTransOutside(oldConfig, tr);
             break;
          default:

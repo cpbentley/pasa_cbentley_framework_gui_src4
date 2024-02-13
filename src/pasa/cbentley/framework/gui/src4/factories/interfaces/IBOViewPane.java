@@ -15,7 +15,11 @@ public interface IBOViewPane extends IByteObject {
     */
    public static final int VP_BASIC_SIZE                         = A_OBJECT_BASIC_SIZE + 14;
 
-   public static final int VP_FLAG_1                             = 1 << 0;
+   /**
+    * When set, the style class of scrollbars and holes are read from the viewdrawable
+    * style class.
+    */
+   public static final int VP_FLAG_1_DATA_FROM_VIEW              = 1 << 0;
 
    /**
     * Scrollbars are always visible, even when scrolling is not needed. of course 
@@ -44,7 +48,9 @@ public interface IBOViewPane extends IByteObject {
     * Both are drawn over the ViewPort
     * <br>
     */
-   public static final int VP_FLAG_4_MASTER_OVERLAY              = 8;
+   public static final int VP_FLAG_4_MASTER_OVERLAY              = 1 << 3;
+
+   public static final int VP_FLAG_5_                            = 1 << 4;
 
    /**
     * <b>Competion Overlay</b> is done for headers, master is defined by.
@@ -77,16 +83,19 @@ public interface IBOViewPane extends IByteObject {
 
    /**
     *  Switch for applying a style at the {@link ViewPane} x,y,w,h.
-    *  <br>
-    *  Margin,Padding,Border is applied around Headers and scrollbars.
-    *  <br>
-    *  The Style used is defined by
+    *  that is Margin,Padding,Border applied around Headers and scrollbars.
+    *  
+    * <p>
+    * The style used is defined by {@link IBOViewPane#VP_OFFSET_13_STYLE_VIEWPANE_MODE1}
+    * </p>
     */
    public static final int VP_FLAGX_1_STYLE_VIEWPANE             = 1 << 0;
 
    /**
-    * Switch for applying state.
-    * The style used is defined by
+    * Switch for applying a style on the Viewport area, i.e the area between content and headers/scrollbars
+    * <p>
+    * The style used is defined by {@link IBOViewPane#VP_OFFSET_14_STYLE_VIEWPORT_MODE1}
+    * </p>
     */
    public static final int VP_FLAGX_2_STYLE_VIEWPORT             = 1 << 1;
 
@@ -97,8 +106,14 @@ public interface IBOViewPane extends IByteObject {
     * The style used is always the ViewDrawable's style.
     * </p>
     * 
-    * No. Style is shown on first logic, then disappears.
-    * style is shown on last logic if possible TODO
+    * There are no style selectors as for ViewPane and ViewPort.
+    * 
+    * <p>
+    * TODO there might be an issue with logic scrolling. Investigate.
+    * tyle is shown on first logic, then disappears.
+    * style is shown on last logic if possible 
+    * 
+    * </p>
     */
    public static final int VP_FLAGX_3_STYLE_CONTENT              = 1 << 2;
 
@@ -113,13 +128,8 @@ public interface IBOViewPane extends IByteObject {
    public static final int VP_FLAGX_5_                           = 1 << 4;
 
    /**
-    * Dimensions are capped by Canvas Size. what ever things happen.
-    * <br>
-    * This flag should be set as a security for main {@link ViewDrawable}. 
-    * <br>
-    * This prevents scrollbar from being drawn outside the visible screen.
     */
-   public static final int VP_FLAGX_6_CANVAS_CAP                 = 32;
+   public static final int VP_FLAGX_6_                           = 1 << 5;
 
    /**
     * Moves several pixel increments smoothly.
@@ -135,7 +145,7 @@ public interface IBOViewPane extends IByteObject {
     * <br>
     * <br>
     */
-   public static final int VP_FLAGX_7_ANIMATED                   = 64;
+   public static final int VP_FLAGX_7_ANIMATED                   = 1 << 6;
 
    /**
     * Works when a {@link ViewDrawable} has a {@link ViewPane}
@@ -150,15 +160,17 @@ public interface IBOViewPane extends IByteObject {
     * <br>
     * For animations don't forget to remove the flag once the animation is finished.
     */
-   public static final int VP_FLAGX_8_COUPLED_CONTENT            = 128;
+   public static final int VP_FLAGX_8_COUPLED_CONTENT            = 1 << 7;
 
    /**
-    * When left or right header is in overlay mode and Horizontal Master mode, this flag will diminish top and botton headers's width
+    * When left or right header is in overlay mode and Horizontal Master mode, 
+    * this flag will diminish top and botton headers's width
     */
-   public static final int VP_FLAGY_1_SHORTEN_HEADER_WIDTH       = 1;
+   public static final int VP_FLAGY_1_SHORTEN_HEADER_WIDTH       = 1 << 0;
 
    /**
-    * When Bottom or Top header is in overlay mode and Horizontal Master mode, this flag will diminish Left and Right headers's height
+    * When Bottom or Top header is in overlay mode and Horizontal Master mode, 
+    * this flag will diminish Left and Right headers's height
     */
    public static final int VP_FLAGY_2_SHORTEN_HEADER_HEIGHT      = 1 << 1;
 
@@ -215,11 +227,11 @@ public interface IBOViewPane extends IByteObject {
    public static final int VP_OFFSET_03_FLAGY                    = A_OBJECT_BASIC_SIZE + 2;
 
    /**
-    * Planet Mode <br>
-    * <li>eat
-    * <li>expand
-    * <li>overlay
-    * <br>
+    * Planet Mode 
+    * <li>{@link ITechViewPane#PLANET_MODE_0_EAT}
+    * <li>{@link ITechViewPane#PLANET_MODE_1_EXPAND}
+    * <li>{@link ITechViewPane#PLANET_MODE_2_OVERLAY}
+    * <li>{@link ITechViewPane#PLANET_MODE_3_IMMATERIAL}
     * <br>
     * <b>2 bits 1</b> for Top mode <br>
     * <b>2 bits 2</b> for Bot mode <br>
@@ -230,22 +242,37 @@ public interface IBOViewPane extends IByteObject {
    public static final int VP_OFFSET_04_HEADER_PLANET_MODE1      = A_OBJECT_BASIC_SIZE + 3;
 
    /**
-    * Mode = eat/expand/overlay <br>
-    * <b>2 bits 1</b> decide for scrollbars' horizontal pixels mode X (eat/expand/overlay) <br>
-    * <b>2 bits 2</b> decide for scrollbars' vertical pixels mode Y (eat/expand/overlay) <br>
+    * Planetary Mode and Scroll Type data field.
+    * 
+    * <p>
+    * <li><b>2 bits 1</b> decide for scrollbars' horizontal pixels mode X (eat/expand/overlay) 
+    * <li><b>2 bits 2</b> decide for scrollbars' vertical pixels mode Y (eat/expand/overlay) 
+    * </p>
+    * 
+    * <p>
+    * 
     * ViewPane cannot know if horizontal scrollbar consumes pixels vertically or horizontally.
     * Thus mode applies axis of pixels
-    * <br>
-    * <br>
-    * Scrolling Type = pixel/unit/page  <br>
-    * <b>2 bits 3</b> for h scrolling type <br>
-    * <b>2 bits 4</b> for v scrolling type <br>
-    *  <br>
+    * </p>
+    * 
+    * <li>{@link ITechViewPane#PLANET_MODE_0_EAT}
+    * <li>{@link ITechViewPane#PLANET_MODE_1_EXPAND}
+    * <li>{@link ITechViewPane#PLANET_MODE_2_OVERLAY}
+    * <li>{@link ITechViewPane#PLANET_MODE_3_IMMATERIAL}
+    * 
+
+    * 
+    * <p>
+    * 
+    * Scrolling Type = pixel/unit/page  
+    * <li><b>2 bits 3</b> for h scrolling type 
+    * <li><b>2 bits 4</b> for v scrolling type 
+    *  
+    * </p>
     * <li>{@link ITechViewPane#SCROLL_TYPE_0_PIXEL_UNIT}
     * <li>{@link ITechViewPane#SCROLL_TYPE_1_LOGIC_UNIT}
     * <li>{@link ITechViewPane#SCROLL_TYPE_2_PAGE_UNIT}
-    * <br>
-   
+    * 
     */
    public static final int VP_OFFSET_05_SCROLLBAR_MODE1          = A_OBJECT_BASIC_SIZE + 4;
 
@@ -257,10 +284,10 @@ public interface IBOViewPane extends IByteObject {
     * <b>4 bits 2</b> for height<br>
     * <br>
     * Choice between:
-    * <li>{@link TECH_VISUAL_0LEAVE}
-    * <li>{@link TECH_VISUAL_1PARTIAL}
-    * <li>{@link TECH_VISUAL_2SHRINK}
-    * <li>{@link TECH_VISUAL_3FILL}
+    * <li>{@link ITechViewPane#VISUAL_0_LEAVE}
+    * <li>{@link ITechViewPane#VISUAL_1_PARTIAL}
+    * <li>{@link ITechViewPane#VISUAL_2_SHRINK}
+    * <li>{@link ITechViewPane#VISUAL_3_FILL}
     * <br>
     * <br>
     * This should not be confused with Shrinking flags {@link ITechViewDrawable#FLAG_GENE_29_SHRINKABLE_W}.
@@ -339,9 +366,8 @@ public interface IBOViewPane extends IByteObject {
    public static final int VP_OFFSET_12_INTERNAL_SIZING1         = A_OBJECT_BASIC_SIZE + 11;
 
    /**
-    * Decides which style to use for the {@link ViewPane} when flag is true
-    * {@link IBOViewPane#VP_FLAGX_1_STYLE_VIEWPANE}.
-    * <br>
+    * Decides which style to use for the {@link ViewPane} when flag {@link IBOViewPane#VP_FLAGX_1_STYLE_VIEWPANE} is true.
+    * 
     * <li>{@link ITechViewPane#DRW_STYLE_0_VIEWDRAWABLE}
     * <li>{@link ITechViewPane#DRW_STYLE_1_VIEWPANE}
     * <li>{@link ITechViewPane#DRW_STYLE_2_VIEWPORT}
@@ -349,8 +375,7 @@ public interface IBOViewPane extends IByteObject {
    public static final int VP_OFFSET_13_STYLE_VIEWPANE_MODE1     = A_OBJECT_BASIC_SIZE + 12;
 
    /**
-    * Decides which style to use for the {@link ViewPane} when flag is true
-    * {@link IBOViewPane#VP_FLAGX_1_STYLE_VIEWPANE}.
+    * Decides which style to use for the {@link ViewPane} when flag is true {@link IBOViewPane#VP_FLAGX_2_STYLE_VIEWPORT}.
     * <br>
     * <li>{@link ITechViewPane#DRW_STYLE_0_VIEWDRAWABLE}
     * <li>{@link ITechViewPane#DRW_STYLE_1_VIEWPANE}

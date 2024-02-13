@@ -6,6 +6,7 @@ import pasa.cbentley.core.src4.logging.IDLog;
 import pasa.cbentley.core.src4.logging.IStringable;
 import pasa.cbentley.framework.gui.src4.core.ScrollConfig;
 import pasa.cbentley.framework.gui.src4.ctx.GuiCtx;
+import pasa.cbentley.framework.gui.src4.ctx.ObjectGC;
 import pasa.cbentley.framework.gui.src4.table.interfaces.IBOCellPolicy;
 import pasa.cbentley.framework.gui.src4.table.interfaces.IBOTableView;
 
@@ -17,7 +18,7 @@ import pasa.cbentley.framework.gui.src4.table.interfaces.IBOTableView;
  * <br>
  * <b>Why?</b>: because grid structure may change depending on selection state.
  * If that's the case, the helper flag {@link TableView#H}.
- * {@link IBOCellPolicy#FLAGP_5_VARIABLE_SIZES}.
+ * {@link IBOCellPolicy#CELLP_FLAGP_5_VARIABLE_SIZES}.
  * <br>
  * <br>
  * <b>Properties</b> : <br>
@@ -35,36 +36,35 @@ import pasa.cbentley.framework.gui.src4.table.interfaces.IBOTableView;
  * @author Charles-Philip Bentley
  * 
  */
-public class Transition implements IStringable {
+public class Transition extends ObjectGC implements IStringable {
 
    /**
     * Focus to a fully visible cell.
     */
-   public static final int TRANSITION_0INSIDE_VIEWPORT   = 0;
+   public static final int TRANSITION_0_INSIDE_VIEWPORT   = 0;
 
    /**
     * Focus goes to a partially shown cell
     */
-   public static final int TRANSITION_1INSIDE_TO_PARTIAL = 1;
+   public static final int TRANSITION_1_INSIDE_TO_PARTIAL = 1;
 
    /**
     * Focus goes to an invisible cell.
     */
-   public static final int TRANSITION_2OUTSIDE           = 2;
+   public static final int TRANSITION_2_OUTSIDE           = 2;
 
-   protected final GuiCtx  gc;
 
    public Transition(GuiCtx gc) {
-      this.gc = gc;
+      super(gc);
    }
 
    public static String debugType(int type) {
       switch (type) {
-         case TRANSITION_0INSIDE_VIEWPORT:
+         case TRANSITION_0_INSIDE_VIEWPORT:
             return "INSIDE";
-         case TRANSITION_1INSIDE_TO_PARTIAL:
+         case TRANSITION_1_INSIDE_TO_PARTIAL:
             return "ToPartial";
-         case TRANSITION_2OUTSIDE:
+         case TRANSITION_2_OUTSIDE:
             return "OUTSIDE";
          default:
             return "UNKNOWN";
@@ -133,36 +133,24 @@ public class Transition implements IStringable {
    }
 
    //#mdebug
-   public IDLog toDLog() {
-      return toStringGetUCtx().toDLog();
-   }
-
-   public String toString() {
-      return Dctx.toString(this);
-   }
-
    public void toString(Dctx dc) {
-      dc.root(this, "Transition");
+      dc.root(this, Transition.class, 140);
       toStringPrivate(dc);
-   }
-
-   public String toString1Line() {
-      return Dctx.toString1Line(this);
+      super.toString(dc.sup());
    }
 
    private void toStringPrivate(Dctx dc) {
-
+      
    }
 
    public void toString1Line(Dctx dc) {
-      dc.root1Line(this, "Transition");
+      dc.root1Line(this, Transition.class);
       toStringPrivate(dc);
-   }
-
-   public UCtx toStringGetUCtx() {
-      return gc.getUCtx();
+      super.toString1Line(dc.sup1Line());
    }
 
    //#enddebug
+   
+
 
 }

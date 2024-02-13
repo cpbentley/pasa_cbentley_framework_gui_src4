@@ -3,7 +3,7 @@ package pasa.cbentley.framework.gui.src4.utils;
 import pasa.cbentley.byteobjects.src4.core.ByteObject;
 import pasa.cbentley.byteobjects.src4.ctx.IBOTypesDrw;
 import pasa.cbentley.core.src4.ctx.UCtx;
-import pasa.cbentley.core.src4.i8n.IString;
+import pasa.cbentley.core.src4.i8n.I8nString;
 import pasa.cbentley.core.src4.logging.Dctx;
 import pasa.cbentley.core.src4.logging.IStringable;
 import pasa.cbentley.framework.cmd.src4.engine.MCmd;
@@ -16,7 +16,8 @@ import pasa.cbentley.framework.gui.src4.core.FigDrawable;
 import pasa.cbentley.framework.gui.src4.core.ImageDrawable;
 import pasa.cbentley.framework.gui.src4.core.StyleClass;
 import pasa.cbentley.framework.gui.src4.ctx.GuiCtx;
-import pasa.cbentley.framework.gui.src4.ctx.IFlagsToStringGui;
+import pasa.cbentley.framework.gui.src4.ctx.IToStringFlagsGui;
+import pasa.cbentley.framework.gui.src4.ctx.ObjectGC;
 import pasa.cbentley.framework.gui.src4.interfaces.IDrawable;
 import pasa.cbentley.framework.gui.src4.interfaces.ITechDrawable;
 import pasa.cbentley.framework.gui.src4.string.StringDrawable;
@@ -37,7 +38,7 @@ import pasa.cbentley.framework.gui.src4.table.interfaces.ITableIconable;
  * @author Charles-Philip Bentley
  *
  */
-public class DrawableMapper implements IStringable {
+public class DrawableMapper extends ObjectGC implements IStringable {
 
    /**
     * Hosts the Drawable encapsulating the Model objects
@@ -53,14 +54,13 @@ public class DrawableMapper implements IStringable {
 
    public ByteObject[]    techSpecifics;
 
-   protected final GuiCtx gc;
 
    /**
     * 
     * @param init
     */
    public DrawableMapper(GuiCtx gc, int init) {
-      this.gc = gc;
+      super(gc);
       cache = new IDrawable[init];
    }
 
@@ -81,7 +81,6 @@ public class DrawableMapper implements IStringable {
       }
    }
 
-   //#enddebug
    /**
     * Specifically asks for an update of the cache at position index.
     * <br>
@@ -116,13 +115,16 @@ public class DrawableMapper implements IStringable {
       }
    }
 
+   public void setNullDrawable(IDrawable d) {
+      this.nullDrawable = d;
+   }
    /**
     * No caching.
     * Does the following mapping:
     * <li>
     * <li>when object is null, {@link StringDrawable} or 
     * <li> {@link DrawableMapper#nullDrawable}
-    * <li> {@link IString}
+    * <li> {@link I8nString}
     * <li> {@link MCmd}
     * 
     * <br>
@@ -130,7 +132,7 @@ public class DrawableMapper implements IStringable {
     * @param o
     * @return never null.
     */
-   public IDrawable getDrawable(Object o) {
+   public IDrawable createDrawable(Object o) {
       IDrawable d = null;
       if (o instanceof ITableIconable) {
          o = ((ITableIconable) o).getTableIcon();
@@ -142,10 +144,10 @@ public class DrawableMapper implements IStringable {
       } else if (o instanceof String) {
          d = new StringDrawable(gc, styleClass, (String) o);
          if (techSpecifics != null && techSpecifics[ITableModel.TECH_SPECIFIC_0_STRINGDRAWABLE] != null) {
-            ((StringDrawable) d).setTechDrawable(techSpecifics[ITableModel.TECH_SPECIFIC_0_STRINGDRAWABLE]);
+            ((StringDrawable) d).setBOStringData(techSpecifics[ITableModel.TECH_SPECIFIC_0_STRINGDRAWABLE]);
          }
-      } else if (o instanceof IString) {
-         d = new StringDrawable(gc, styleClass, (IString) o);
+      } else if (o instanceof I8nString) {
+         d = new StringDrawable(gc, styleClass, (I8nString) o);
       } else if (o instanceof ByteObject) {
          ByteObject drw = (ByteObject) o;
          if (drw.getType() == IBOTypesDrw.TYPE_050_FIGURE) {
@@ -200,7 +202,7 @@ public class DrawableMapper implements IStringable {
          cache = DrawableArrays.ensureCapacity(cache, index);
       }
       if (cache[index] == null) {
-         cache[index] = getDrawable(o);
+         cache[index] = createDrawable(o);
       }
       // update the Drawable if needed
       return cache[index];
@@ -219,21 +221,15 @@ public class DrawableMapper implements IStringable {
       }
    }
 
+
    //#mdebug
-
-   public String toString() {
-      return Dctx.toString(this);
-   }
-
-   public String toString1Line() {
-      return Dctx.toString1Line(this);
-   }
-
    public void toString(Dctx dc) {
-      dc.root(this, "DrawableMapper ");
-
+      dc.root(this, DrawableMapper.class, 230);
+      toStringPrivate(dc);
+      super.toString(dc.sup());
+      
       String sc = "StyleClass of Mapper";
-      if (styleClass != null && dc.hasFlagData(gc, IFlagsToStringGui.D_FLAG_02_STYLE_CLASS)) {
+      if (styleClass != null && dc.hasFlagData(gc, IToStringFlagsGui.D_FLAG_02_STYLE_CLASS)) {
          dc.nlLvl(sc, styleClass);
       } else {
          dc.nlLvl1Line(styleClass, sc);
@@ -242,12 +238,15 @@ public class DrawableMapper implements IStringable {
       dc.nlLvlArray("#Drawables", cache);
    }
 
-   public void toString1Line(Dctx dc) {
-      dc.root(this, "DrawableMapper");
+   private void toStringPrivate(Dctx dc) {
+      
    }
 
-   public UCtx toStringGetUCtx() {
-      return gc.getUCtx();
+   public void toString1Line(Dctx dc) {
+      dc.root1Line(this, DrawableMapper.class);
+      toStringPrivate(dc);
+      super.toString1Line(dc.sup1Line());
    }
+
    //#enddebug
 }

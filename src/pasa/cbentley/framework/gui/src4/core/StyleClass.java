@@ -10,7 +10,6 @@ import pasa.cbentley.core.src4.io.BAByteOS;
 import pasa.cbentley.core.src4.io.BADataIS;
 import pasa.cbentley.core.src4.io.BADataOS;
 import pasa.cbentley.core.src4.logging.Dctx;
-import pasa.cbentley.core.src4.logging.IDLog;
 import pasa.cbentley.core.src4.logging.IStringable;
 import pasa.cbentley.core.src4.stator.IStatorable;
 import pasa.cbentley.core.src4.stator.StatorReader;
@@ -21,6 +20,8 @@ import pasa.cbentley.core.src4.utils.BitUtils;
 import pasa.cbentley.core.src4.utils.IntUtils;
 import pasa.cbentley.framework.drawx.src4.style.IBOStyle;
 import pasa.cbentley.framework.gui.src4.ctx.GuiCtx;
+import pasa.cbentley.framework.gui.src4.ctx.IBOTypesGui;
+import pasa.cbentley.framework.gui.src4.ctx.ObjectGC;
 import pasa.cbentley.framework.gui.src4.ctx.ToStringStaticGui;
 import pasa.cbentley.framework.gui.src4.interfaces.IDrawable;
 import pasa.cbentley.framework.gui.src4.interfaces.ITechDrawable;
@@ -110,7 +111,7 @@ import pasa.cbentley.framework.gui.src4.table.interfaces.IBOTableView;
  * @author Charles-Philip Bentley
  *
  */
-public class StyleClass implements IStringable, IStatorable {
+public class StyleClass extends ObjectGC implements IStringable, IStatorable {
 
    public static final int SERIAL_TYPE_0_NULL       = 0;
 
@@ -145,8 +146,6 @@ public class StyleClass implements IStringable, IStatorable {
    private IntToObjects    ctypeStyles;
 
    public boolean          FLAG_CACHE_STYLE         = true;
-
-   protected final GuiCtx  gc;
 
    private int             initStyle;
 
@@ -221,19 +220,17 @@ public class StyleClass implements IStringable, IStatorable {
    protected final UCtx    uc;
 
    private StyleClass(GuiCtx gc) {
-      this.gc = gc;
+      super(gc);
       this.uc = gc.getUCtx();
    }
-   public ICtx getCtxOwner() {
-      return gc;
-   }
+
    /**
     * 
     * @param id
     * @param rootID the repository reference ID for the style
     */
    public StyleClass(GuiCtx gc, ByteObject rootStyle) {
-      this.gc = gc;
+      super(gc);
       this.uc = gc.getUCtx();
       if (rootStyle == null) {
          throw new NullPointerException("RootStyle is null");
@@ -241,9 +238,6 @@ public class StyleClass implements IStringable, IStatorable {
       rootMODs = new ByteObject[] { rootStyle };
       cacheStyleInit();
       FLAG_CACHE_STYLE = gc.getSettingsWrapper().hasStyleClassCache();
-   }
-   public int getStatorableClassID() {
-      throw new RuntimeException("Must be implemented by subclass");
    }
 
    /**
@@ -373,6 +367,18 @@ public class StyleClass implements IStringable, IStatorable {
       return bo;
    }
 
+   public ByteObject getByteObjectNullEx(int linkID) {
+      ByteObject bo = getByteObject(linkID);
+      if (bo == null) {
+         throw new NullPointerException("No ByteObject " + linkID + " for " + this.toString1Line());
+      }
+      return bo;
+   }
+
+   public ICtx getCtxOwner() {
+      return gc;
+   }
+
    public ByteObject getCTypeObject(int ctype) {
       if (ctypeObjects == null) {
          return null;
@@ -481,7 +487,17 @@ public class StyleClass implements IStringable, IStatorable {
    public ByteObject getRootStyle() {
       return rootMODs[0];
    }
-
+   
+   public StyleClass getStyleClassNullEx(int linkID) {
+      Object o = null;
+      if (classes != null) {
+         o = classes.findIntObject(linkID);
+      }
+      if (o == null) {
+         throw new NullPointerException("No StyleClass " + linkID + " for " + this.toString1Line());
+      }
+      return (StyleClass) o;
+   }
    /**
     * This method is used to in order to catch un linked style class.
     * <br>
@@ -528,6 +544,10 @@ public class StyleClass implements IStringable, IStatorable {
       } else {
          return null;
       }
+   }
+
+   public int getStatorableClassID() {
+      throw new RuntimeException("Must be implemented by subclass");
    }
 
    public ByteObject getStyle(int states) {
@@ -615,7 +635,10 @@ public class StyleClass implements IStringable, IStatorable {
     * Each ViewPane style class is independant of each other.
     * <br>
     * <br>
-    * 
+    * <li>{@link IBOTypesGui#LINK_65_STYLE_VIEWPANE}
+    * <li>{@link IBOTypesGui#LINK_84_STYLE_TABLE_OVERLAY_FIGURE}
+    * <li>{@link IBOTypesGui#LINK_86_STYLE_TABLE_TITLE_BOT}
+    * <li>{@link IBOTypesGui#LINK_85_STYLE_TABLE_TITLE_TOP}
     * @param linkID
     * @return
     */
@@ -679,6 +702,10 @@ public class StyleClass implements IStringable, IStatorable {
       throw new RuntimeException();
    }
 
+   public void linkBOViewPane(ByteObject bo) {
+      this.linkByteObject(bo, IBOTypesGui.LINK_66_BO_VIEWPANE);
+   }
+
    /**
     * Associates a given TechParam to its TechID for this style
     * @param techID
@@ -691,6 +718,29 @@ public class StyleClass implements IStringable, IStatorable {
       objects.add(bo, linkID);
    }
 
+   public void linkByteObjectReplace(ByteObject bo, int linkID) {
+      if (objects == null) {
+         objects = new IntToObjects(uc);
+      }
+      int index = objects.findInt(linkID);
+      if (index == -1) {
+         objects.add(bo, linkID);
+      } else {
+         objects.setObject(bo, index);
+      }
+   }
+
+   public void linkStyleClassReplace(StyleClass sc, int linkID) {
+      if (classes == null) {
+         classes = new IntToObjects(uc);
+      }
+      int index = classes.findInt(linkID);
+      if (index == -1) {
+         classes.add(sc, linkID);
+      } else {
+         classes.setObject(sc, index);
+      }
+   }
    /**
     * Recipient for linking a {@link ByteObject} other than styling. Usually a Tech paran.
     * <br>
@@ -1092,27 +1142,11 @@ public class StyleClass implements IStringable, IStatorable {
       serializeTo(ito, dataWriter);
    }
 
-   public int subStringWidth(int styleKey, String str, int offset, int len) {
-      ByteObject style = getStyleDrwP(styleKey);
-      return gc.getDC().getFxStringOperator().getStringSubStringWidth(style, str, offset, len);
-   }
-
    //#mdebug
-
-   public IDLog toDLog() {
-      return gc.toDLog();
-   }
-
-   public String toString() {
-      return Dctx.toString(this);
-   }
-
    public void toString(Dctx dc) {
-      dc.root(this, StyleClass.class);
-      if (name != null) {
-         dc.append(' ');
-         dc.append(name);
-      }
+      dc.root(this, StyleClass.class, 1100);
+      toStringPrivate(dc);
+      super.toString(dc.sup());
 
       ByteObject rootStyle = getRootStyle();
       if (dc.hasFlagData(uc, IToStringFlags.FLAG_DATA_01_SUCCINT)) {
@@ -1133,12 +1167,15 @@ public class StyleClass implements IStringable, IStatorable {
          }
       }
       ToStringStates stringableInt = new ToStringStates();
-      dc.nlLvl(stateStyles, "States Styles Linked", "State", stringableInt);
+      dc.nlLvl(stateStyles, "---> StyleClass Linked [States Styles] BOStyle", "[State] Link=", stringableInt);
 
       ToStringLinkIDs stringableLinks = new ToStringLinkIDs();
-      dc.nlLvl(objects, "ByteObjects Linked", "LinkID", stringableLinks);
-      dc.nlLvl(ctypeStyles, "CTypes Styles", "CType", null);
-      dc.nlLvl(classes, "Sub StyleClass", "SC #", stringableLinks);
+      dc.nlLvl(objects, "---> StyleClass Linked [ByteObjects]", "LinkID=", stringableLinks);
+      
+      dc.nlLvl(ctypeStyles, "---> StyleClass Linked [CTypes] BOStyle", "[CType] Link=", null);
+      
+      
+      dc.nlLvl(classes, "---> StyleClass Linked [StyleClass]", "[StyleClass] Link=", stringableLinks);
 
       dc.newLevel();
 
@@ -1147,20 +1184,19 @@ public class StyleClass implements IStringable, IStatorable {
       if (FLAG_CACHE_STYLE) {
          dc.nlLvl(classes, "Possibles cached", "", stringableLinks);
       }
+      dc.nl();
+      dc.append("       END StyleClass ");
+      if (name != null) {
+         dc.append(name);
+      }
 
-   }
-
-   public String toString1Line() {
-      return Dctx.toString1Line(this);
    }
 
    public void toString1Line(Dctx dc) {
-      dc.root1Line(this, "StyleClass");
-      if (name != null) {
-         dc.append("Name=");
-         dc.append(name);
-      }
-      //find if it is top class
+      dc.root1Line(this, StyleClass.class);
+      toStringPrivate(dc);
+      super.toString1Line(dc.sup1Line());
+
       int id = -1;
       StyleClass[] cc = gc.getClasses();
       for (int i = 0; i < cc.length; i++) {
@@ -1175,8 +1211,12 @@ public class StyleClass implements IStringable, IStatorable {
       dc.append(hashCode());
    }
 
-   public UCtx toStringGetUCtx() {
-      return gc.getUCtx();
+   private void toStringPrivate(Dctx dc) {
+      if (name != null) {
+         dc.appendVarWithSpace("Name", name);
+      }
    }
+
    //#enddebug
+
 }

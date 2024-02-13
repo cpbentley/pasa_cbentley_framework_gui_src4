@@ -1,6 +1,7 @@
 package pasa.cbentley.framework.gui.src4.canvas;
 
 import pasa.cbentley.byteobjects.src4.core.ByteObject;
+import pasa.cbentley.core.src4.ctx.ICtx;
 import pasa.cbentley.core.src4.event.BusEvent;
 import pasa.cbentley.core.src4.interfaces.C;
 import pasa.cbentley.core.src4.interfaces.IAInitable;
@@ -26,7 +27,7 @@ import pasa.cbentley.framework.coreui.src4.tech.ITechHostUI;
 import pasa.cbentley.framework.drawx.src4.engine.GraphicsX;
 import pasa.cbentley.framework.drawx.src4.engine.RgbImage;
 import pasa.cbentley.framework.drawx.src4.tech.ITechGraphicsX;
-import pasa.cbentley.framework.gui.src4.anim.AnimCreator;
+import pasa.cbentley.framework.gui.src4.anim.AnimManager;
 import pasa.cbentley.framework.gui.src4.cmd.CmdInstanceDrawable;
 import pasa.cbentley.framework.gui.src4.core.FigDrawable;
 import pasa.cbentley.framework.gui.src4.core.StyleClass;
@@ -34,6 +35,7 @@ import pasa.cbentley.framework.gui.src4.core.TopoViewDrawable;
 import pasa.cbentley.framework.gui.src4.ctx.CanvasGuiCtx;
 import pasa.cbentley.framework.gui.src4.ctx.GuiCtx;
 import pasa.cbentley.framework.gui.src4.ctx.ITechCtxSettingsAppGui;
+import pasa.cbentley.framework.gui.src4.ctx.ITechStatorableGui;
 import pasa.cbentley.framework.gui.src4.ctx.ToStringStaticGui;
 import pasa.cbentley.framework.gui.src4.interfaces.ICmdsView;
 import pasa.cbentley.framework.gui.src4.interfaces.IDrawable;
@@ -75,7 +77,7 @@ import pasa.cbentley.layouter.src4.engine.SizerFactory;
  */
 public class CanvasAppliInputGui extends CanvasAppliInput implements IDrawableListener, IAInitable {
 
-   private AnimCreator       animCreator;
+   private AnimManager       animCreator;
 
    /**
     * Clearing color at the start of each painting cycle. The clearing can be disabled
@@ -350,7 +352,14 @@ public class CanvasAppliInputGui extends CanvasAppliInput implements IDrawableLi
    public InputState createInputState() {
       return new InputStateDrawable(gc, this);
    }
-
+   public int getStatorableClassID() {
+      return ITechStatorableGui.CLASSID_01_CANVAS_DRAWABLE;
+   }
+   
+   public ICtx getCtxOwner() {
+      return gc;
+   }
+   
    protected RepaintCtrl createRepaintCtrl() {
       return new RepaintCtrlGui(gc, this);
 
@@ -627,9 +636,9 @@ public class CanvasAppliInputGui extends CanvasAppliInput implements IDrawableLi
       super.exitInputContext();
    }
 
-   public AnimCreator getAnimCreator() {
+   public AnimManager getAnimCreator() {
       if (animCreator == null) {
-         animCreator = new AnimCreator(gc, this);
+         animCreator = new AnimManager(gc, this);
       }
       return animCreator;
    }

@@ -1,7 +1,7 @@
 package pasa.cbentley.framework.gui.src4.forms;
 
 import pasa.cbentley.core.src4.ctx.UCtx;
-import pasa.cbentley.core.src4.i8n.IString;
+import pasa.cbentley.core.src4.i8n.I8nString;
 import pasa.cbentley.core.src4.logging.Dctx;
 import pasa.cbentley.core.src4.thread.IBProgessable;
 import pasa.cbentley.core.src4.thread.IBRunnable;
@@ -46,7 +46,7 @@ public class GaugeScreenS extends TableLayoutView implements IBProgessable {
       //#style libEntry
       gauge = new Gauge(gc,sc, "", true, 1, 0);
       //#style libEntryOne
-      info = new StringDrawable(gc,sc, "info:", ITechStringDrawable.TYPE_1_TITLE);
+      info = new StringDrawable(gc,sc, "info:", ITechStringDrawable.PRESET_CONFIG_1_TITLE);
 
       this.formAppend(info);
       this.formAppend(gauge);
@@ -84,7 +84,7 @@ public class GaugeScreenS extends TableLayoutView implements IBProgessable {
       //#style libEntry
       final Gauge childgauge = new Gauge(gc,getStyleClass(), "", true, 1, 0);
       //#style libEntryOne
-      final StringDrawable childinfo = new StringDrawable(gc,getStyleClass(), "info:", ITechStringDrawable.TYPE_1_TITLE);
+      final StringDrawable childinfo = new StringDrawable(gc,getStyleClass(), "info:", ITechStringDrawable.PRESET_CONFIG_1_TITLE);
       IBProgessable child = new IBProgessable() {
 
          private Runnable childCancelRunnable;
@@ -184,12 +184,12 @@ public class GaugeScreenS extends TableLayoutView implements IBProgessable {
          }
 
 
-         public void set(IString title, IString info, IString label, int maxValue, int level) {
+         public void set(I8nString title, I8nString info, I8nString label, int maxValue, int level) {
             // TODO Auto-generated method stub
 
          }
 
-         public void setLabel(IString s) {
+         public void setLabel(I8nString s) {
             // TODO Auto-generated method stub
 
          }
@@ -350,12 +350,12 @@ public class GaugeScreenS extends TableLayoutView implements IBProgessable {
       // TODO Auto-generated method stub
    }
 
-   public void set(IString title, IString info, IString label, int maxValue, int level) {
+   public void set(I8nString title, I8nString info, I8nString label, int maxValue, int level) {
       // TODO Auto-generated method stub
 
    }
 
-   public void setLabel(IString s) {
+   public void setLabel(I8nString s) {
       // TODO Auto-generated method stub
 
    }

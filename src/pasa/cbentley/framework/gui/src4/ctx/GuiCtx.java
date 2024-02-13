@@ -13,6 +13,7 @@ import pasa.cbentley.core.src4.event.IEventBus;
 import pasa.cbentley.core.src4.i8n.IStringProducer;
 import pasa.cbentley.core.src4.logging.Dctx;
 import pasa.cbentley.core.src4.stator.IStatorFactory;
+import pasa.cbentley.core.src4.utils.BitUtils;
 import pasa.cbentley.framework.cmd.src4.ctx.CmdCtx;
 import pasa.cbentley.framework.cmd.src4.ctx.IStaticIDsCmd;
 import pasa.cbentley.framework.core.src4.app.IAppli;
@@ -30,7 +31,6 @@ import pasa.cbentley.framework.gui.src4.canvas.CanvasDrawControl;
 import pasa.cbentley.framework.gui.src4.canvas.FocusCtrl;
 import pasa.cbentley.framework.gui.src4.canvas.IBOCanvasAppliGui;
 import pasa.cbentley.framework.gui.src4.canvas.InputConfig;
-import pasa.cbentley.framework.gui.src4.canvas.StatorFactoryDrawable;
 import pasa.cbentley.framework.gui.src4.canvas.TopLevelCtrl;
 import pasa.cbentley.framework.gui.src4.canvas.ViewContext;
 import pasa.cbentley.framework.gui.src4.cmd.CmdMapperGui;
@@ -44,11 +44,11 @@ import pasa.cbentley.framework.gui.src4.core.StyleManager;
 import pasa.cbentley.framework.gui.src4.core.UserInteraction;
 import pasa.cbentley.framework.gui.src4.core.UserInteractionCtrl;
 import pasa.cbentley.framework.gui.src4.ctx.config.IConfigAppGui;
-import pasa.cbentley.framework.gui.src4.factories.CellPolicyFactory;
 import pasa.cbentley.framework.gui.src4.factories.DrawableFactory;
 import pasa.cbentley.framework.gui.src4.factories.DrawableOperator;
+import pasa.cbentley.framework.gui.src4.factories.DrawableStringFactory;
 import pasa.cbentley.framework.gui.src4.factories.DrawableStringOperator;
-import pasa.cbentley.framework.gui.src4.factories.StringDrawableFactory;
+import pasa.cbentley.framework.gui.src4.factories.TableCellPolicyFactory;
 import pasa.cbentley.framework.gui.src4.factories.TableGeneticsFactory;
 import pasa.cbentley.framework.gui.src4.factories.TablePolicyFactory;
 import pasa.cbentley.framework.gui.src4.forms.FormFactory;
@@ -64,8 +64,6 @@ import pasa.cbentley.framework.gui.src4.string.StringEditControl;
 import pasa.cbentley.framework.gui.src4.table.CellPolicy;
 import pasa.cbentley.framework.gui.src4.table.TableOperator;
 import pasa.cbentley.framework.gui.src4.utils.StatusData;
-import pasa.cbentley.framework.input.src4.ctx.IBOCtxSettingsInput;
-import pasa.cbentley.framework.input.src4.ctx.IBOTypesInput;
 import pasa.cbentley.framework.input.src4.ctx.InputCtx;
 import pasa.cbentley.framework.input.src4.interfaces.IBOCanvasAppli;
 import pasa.cbentley.layouter.src4.ctx.LayouterCtx;
@@ -114,12 +112,11 @@ public class GuiCtx extends ABOCtx implements ITechCtxSettingsAppGui {
 
    private CanvasGuiCtx[]           canvasCtxs;
 
-
    protected final CmdCtx           cc;
 
    private CellPolicy               cellPolicy;
 
-   private CellPolicyFactory        cellPolicyFactory;
+   private TableCellPolicyFactory   cellPolicyFactory;
 
    protected final CoreFrameworkCtx cfc;
 
@@ -169,7 +166,7 @@ public class GuiCtx extends ABOCtx implements ITechCtxSettingsAppGui {
     */
    private StatusData               status;
 
-   private StringDrawableFactory    stringFactory;
+   private DrawableStringFactory    stringFactory;
 
    protected final IStringProducer  strings;
 
@@ -196,6 +193,8 @@ public class GuiCtx extends ABOCtx implements ITechCtxSettingsAppGui {
    private SettingsWrapperGui       wrapper;
 
    private StatorFactoryDrawable    statorFactory;
+
+   private int                      toStringFlagsDraw;
 
    public GuiCtx(IConfigAppGui config, CoreFrameworkCtx cfc, InputCtx ic, CmdCtx cc, BOCtx boc, DrwCtx dc, DataModelCtx dmc, IStringProducer strings) {
       super(config, boc);
@@ -235,6 +234,10 @@ public class GuiCtx extends ABOCtx implements ITechCtxSettingsAppGui {
       if (this.getClass() == GuiCtx.class) {
          a_Init();
       }
+
+      //#debug
+      toDLog().pInit("", this, GuiCtx.class, "Created@240", LVL_04_FINER, true);
+
    }
 
    public IStatorFactory getStatorFactory() {
@@ -352,9 +355,9 @@ public class GuiCtx extends ABOCtx implements ITechCtxSettingsAppGui {
       return cellPolicy;
    }
 
-   public CellPolicyFactory getCellPolicyC() {
+   public TableCellPolicyFactory getTableCellPolicyFactory() {
       if (cellPolicyFactory == null) {
-         cellPolicyFactory = new CellPolicyFactory(this);
+         cellPolicyFactory = new TableCellPolicyFactory(this);
       }
       return cellPolicyFactory;
    }
@@ -434,6 +437,10 @@ public class GuiCtx extends ABOCtx implements ITechCtxSettingsAppGui {
       return dc;
    }
 
+   public int getScrollbarBlockMinPixel() {
+      return 3;
+   }
+
    public StyleClass getDefaultSC() {
       return defaults;
    }
@@ -460,9 +467,9 @@ public class GuiCtx extends ABOCtx implements ITechCtxSettingsAppGui {
       return drawableOperator;
    }
 
-   public StringDrawableFactory getDrawableStringFactory() {
+   public DrawableStringFactory getDrawableStringFactory() {
       if (stringFactory == null) {
-         stringFactory = new StringDrawableFactory(this);
+         stringFactory = new DrawableStringFactory(this);
       }
       return stringFactory;
    }
@@ -488,7 +495,7 @@ public class GuiCtx extends ABOCtx implements ITechCtxSettingsAppGui {
    }
 
    public int getFontScreenRatio() {
-      return getSettingsBO().get1(CTX_GUI_OFFSET_10_FONT_SCREEN_RATIO1);
+      return getBOCtxSettings().get1(CTX_GUI_OFFSET_10_FONT_SCREEN_RATIO1);
    }
 
    public FormFactory getFormFactory() {
@@ -514,7 +521,7 @@ public class GuiCtx extends ABOCtx implements ITechCtxSettingsAppGui {
    }
 
    public int getPaintMode() {
-      return getSettingsBO().get1(CTX_GUI_OFFSET_09_PAINT_MODE1);
+      return getBOCtxSettings().get1(CTX_GUI_OFFSET_09_PAINT_MODE1);
    }
 
    public DrawableRepo getRepo() {
@@ -640,7 +647,7 @@ public class GuiCtx extends ABOCtx implements ITechCtxSettingsAppGui {
    }
 
    public boolean isOneThumb() {
-      return getSettingsBO().hasFlag(CTX_GUI_OFFSET_01_FLAG1, CTX_GUI_FLAG_3_ONE_THUMB);
+      return getBOCtxSettings().hasFlag(CTX_GUI_OFFSET_01_FLAG1, CTX_GUI_FLAG_3_ONE_THUMB);
    }
 
    protected void matchConfig(IConfigBO config, ByteObject settings) {
@@ -672,6 +679,15 @@ public class GuiCtx extends ABOCtx implements ITechCtxSettingsAppGui {
       this.canvasCtxRoot = canvasGC;
    }
 
+   public int getStaticKeyRegistrationID(int type, int key) {
+      if (type == IStaticIDs.SID_STRINGS) {
+         if (key <= IStringsGui.AZ_STR_VIEW_A && key >= IStringsGui.AZ_STR_VIEW_Z) {
+            return key - IStringsGui.AZ_STR_VIEW_A;
+         }
+      }
+      return -1;
+   }
+
    /**
     * This method must be called before
     * 
@@ -693,7 +709,7 @@ public class GuiCtx extends ABOCtx implements ITechCtxSettingsAppGui {
 
    public void setTechCanvasAppliDrawableDefault(ByteObject bo) {
 
-      ByteObject settingsBO = getSettingsBO();
+      ByteObject settingsBO = getBOCtxSettings();
       int debugBarPosition = settingsBO.get1(ITechCtxSettingsAppGui.CTX_GUI_OFFSET_05_DEBUG_BAR_POSITION1);
       bo.set1(IBOCanvasAppliGui.CANVAS_APP_DRW_OFFSET_05_DEBUG_BAR_POSITION1, debugBarPosition);
 
@@ -764,7 +780,7 @@ public class GuiCtx extends ABOCtx implements ITechCtxSettingsAppGui {
    }
 
    public void toStringCtxSettings(Dctx dc, ByteObject bo) {
-      dc.root(bo, "CtxSettingsGuiCtx");
+      dc.rootN(bo, "CtxSettingsGuiCtx", GuiCtx.class, 783);
       dc.appendVarWithSpace("viewthemeid", bo.get2(ITechCtxSettingsAppGui.CTX_GUI_OFFSET_02_VIEW_THEME_ID2));
       dc.appendVarWithSpace("DebugMode", ToStringStaticGui.toStringDebugMode(bo.get1(ITechCtxSettingsAppGui.CTX_GUI_OFFSET_07_DEBUG_MODE1)));
 
@@ -777,6 +793,14 @@ public class GuiCtx extends ABOCtx implements ITechCtxSettingsAppGui {
          dc.nlVar("ThemeID", bo.get2(CTX_GUI_OFFSET_02_VIEW_THEME_ID2));
          dc.nlVar("MenuBarPos", bo.get1(CTX_GUI_OFFSET_04_MENU_BAR_POSITION1));
       }
+   }
+
+   public boolean toStringHasFlagDraw(int flag) {
+      return BitUtils.hasFlag(toStringFlagsDraw, flag);
+   }
+
+   public void toStringSetFlagDraw(int flag, boolean b) {
+      toStringFlagsDraw = BitUtils.setFlag(toStringFlagsDraw, flag, b);
    }
 
    public void toStringGuiCtxTech1Line(Dctx dc, ByteObject bo) {

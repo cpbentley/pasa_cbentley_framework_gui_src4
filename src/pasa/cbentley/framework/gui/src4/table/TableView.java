@@ -30,7 +30,7 @@ import pasa.cbentley.framework.gui.src4.canvas.InputConfig;
 import pasa.cbentley.framework.gui.src4.cmd.CmdInstanceDrawable;
 import pasa.cbentley.framework.gui.src4.core.Drawable;
 import pasa.cbentley.framework.gui.src4.core.DrawableInjected;
-import pasa.cbentley.framework.gui.src4.core.LayEngineDrawable;
+import pasa.cbentley.framework.gui.src4.core.LayouterEngineDrawable;
 import pasa.cbentley.framework.gui.src4.core.ScrollBar;
 import pasa.cbentley.framework.gui.src4.core.ScrollConfig;
 import pasa.cbentley.framework.gui.src4.core.StyleClass;
@@ -38,7 +38,7 @@ import pasa.cbentley.framework.gui.src4.core.ViewDrawable;
 import pasa.cbentley.framework.gui.src4.core.ViewPane;
 import pasa.cbentley.framework.gui.src4.ctx.GuiCtx;
 import pasa.cbentley.framework.gui.src4.ctx.IBOTypesGui;
-import pasa.cbentley.framework.gui.src4.ctx.IFlagsToStringGui;
+import pasa.cbentley.framework.gui.src4.ctx.IToStringFlagsGui;
 import pasa.cbentley.framework.gui.src4.ctx.ToStringStaticGui;
 import pasa.cbentley.framework.gui.src4.factories.TablePolicyFactory;
 import pasa.cbentley.framework.gui.src4.factories.interfaces.IBOViewPane;
@@ -55,7 +55,9 @@ import pasa.cbentley.framework.gui.src4.string.StringDrawable;
 import pasa.cbentley.framework.gui.src4.table.interfaces.IBOCellPolicy;
 import pasa.cbentley.framework.gui.src4.table.interfaces.IBOGenetics;
 import pasa.cbentley.framework.gui.src4.table.interfaces.IBOTablePolicy;
+import pasa.cbentley.framework.gui.src4.table.interfaces.IBOTableSpan;
 import pasa.cbentley.framework.gui.src4.table.interfaces.IBOTableView;
+import pasa.cbentley.framework.gui.src4.table.interfaces.ITechCell;
 import pasa.cbentley.framework.gui.src4.table.interfaces.ITechTable;
 import pasa.cbentley.framework.gui.src4.tech.ITechStringDrawable;
 import pasa.cbentley.framework.gui.src4.tech.ITechViewPane;
@@ -138,7 +140,7 @@ import pasa.cbentley.framework.input.src4.gesture.GestureDetector;
  * policies ask cells to layout with method {@link Drawable#init(int, int)} 0,0
  * and take the drawn dimension into account. <br>
  * Some drawables like {@link StringDrawable} use pre-defined constraint types (
- * {@link ITechStringDrawable#TYPE_2_SCROLL_H}). Those types are defined at the
+ * {@link ITechStringDrawable#PRESET_CONFIG_2_SCROLL_H}). Those types are defined at the
  * Wrapper/Model level. The TableView is unaware of those. Pre-define types
  * usually override the init() method semantics. <br>
  * <br>
@@ -154,7 +156,7 @@ import pasa.cbentley.framework.input.src4.gesture.GestureDetector;
  * mode, TableView acts like a ViewPane.
  * </ol>
  * An etalon is defined at the row index for columns with
- * {@link IBOCellPolicy#OFFSET_08_ETALON1} <br>
+ * {@link IBOCellPolicy#CELLP_OFFSET_08_ETALON1} <br>
  * <br>
  * Setup sizes ({@link TableView#setupColSizes}) are computed each time a
  * reshape is called. <br>
@@ -162,9 +164,9 @@ import pasa.cbentley.framework.input.src4.gesture.GestureDetector;
  * TODO Should the Table disable ViewPane on cells? It may indeed do so when it
  * provides a way to further display. It cannot set false to scrolling
  * behavior. It must use its own special flag.
- * The {@link IBOTypesGui#LINK_66_TECH_VIEWPANE} and {@link IBOTypesGui#LINK_65_STYLE_VIEWPANE} must be
+ * The {@link IBOTypesGui#LINK_66_BO_VIEWPANE} and {@link IBOTypesGui#LINK_65_STYLE_VIEWPANE} must be
  * 
- * The ViewPort cap is decided by flag {@link IBOCellPolicy#FLAG_7_OVERSIZE}.
+ * The ViewPort cap is decided by flag {@link IBOCellPolicy#CELLP_FLAG_7_OVERSIZE}.
  * When this flag is set and at least one cell is bigger than viewport,
  * {@link TableView#capOverSized} boolean field is set true. <br>
  * Shrink Flags of Drawable inside the cell. <br>
@@ -176,8 +178,8 @@ import pasa.cbentley.framework.input.src4.gesture.GestureDetector;
  * {@link ITechDrawable#STATE_05_LAYOUTED} is not set <br>
  * <br>
  * <b>Structural Implicit</b> :<br>
- * Happens with {@link IBOCellPolicy#TYPE_0_GENERIC} policy when columns have
- * policy {@link IBOCellPolicy#CELL_5_FILL_WEAK}, {@link IBOCellPolicy#CELL_4_FILL_AVERAGE} {@link IBOCellPolicy#CELL_3_FILL_STRONG}
+ * Happens with {@link ITechCell#TYPE_0_GENERIC} policy when columns have
+ * policy {@link ITechCell#CELL_5_FILL_WEAK}, {@link ITechCell#CELL_4_FILL_AVERAGE} {@link ITechCell#CELL_3_FILL_STRONG}
  * Strucutral Implicit policy implies pixel value of column is computed last. 
  * It may also changes when selection changes and a non visible cell becomes visible. 
  * <br>
@@ -287,7 +289,7 @@ import pasa.cbentley.framework.input.src4.gesture.GestureDetector;
  * @see ViewDrawable
  * @see IBOCellPolicy
  */
-public class TableView extends ViewDrawable implements IDrawableListener, IEventConsumer, IDrawListener, IBOTypesDrw, IBOCellPolicy, IBOTableView, ICommandable {
+public class TableView extends ViewDrawable implements IDrawableListener, IEventConsumer, IDrawListener, ITechCell, IBOTypesDrw, IBOCellPolicy, IBOGenetics, IBOTableView, ICommandable, ITechTable {
 
    private static final int SETUP_WEAK              = Integer.MIN_VALUE;
 
@@ -319,6 +321,105 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
       return sizes[i];
    }
 
+   /**
+    * @param l
+    * @return -1 if none selected
+    */
+   public static int getFirstSelected(TableView l) {
+      boolean[] bs = new boolean[l.getSize()];
+      l.getSelectedFlags(bs);
+      for (int i = 0; i < bs.length; i++) {
+         if (bs[i])
+            return i;
+      }
+      return -1;
+   }
+
+   /**
+    * 
+    * @param l the List
+    * @return first selected index or -1 if none
+    */
+   public static int getSelectedIndex(TableView l) {
+      boolean[] b = new boolean[l.getSize()];
+      l.getSelectedFlags(b);
+      for (int i = 0; i < b.length; i++) {
+         if (b[i] == true) {
+            return i;
+         }
+      }
+      return -1;
+   }
+
+   /**
+    * 
+    * @param l the List
+    * @return first selected index or -1 if none
+    */
+   public static int[] getSelectedIndexes(TableView l) {
+      boolean[] b = new boolean[l.getSize()];
+      int si = l.getSelectedFlags(b);
+      int[] ints = new int[si];
+      int count = 0;
+      for (int i = 0; i < b.length; i++) {
+         if (b[i] == true) {
+            ints[count] = i;
+            count++;
+         }
+      }
+      return ints;
+   }
+
+   public static String getSelectedString(TableView list) {
+      return list.getString(getSelectedIndex(list));
+   }
+
+   public static String[] getSelectedStrings(TableView list) {
+      boolean[] selectedIDs = new boolean[list.getSize()];
+      int numSelected = list.getSelectedFlags(selectedIDs);
+      String[] langs = new String[numSelected];
+      int count = 0;
+      for (int i = 0; i < selectedIDs.length; i++) {
+         if (selectedIDs[i]) {
+            langs[count] = list.getString(i);
+         }
+      }
+      return langs;
+   }
+
+   /**
+    * indexing starts at 0
+    * @param l
+    * @param index visualIndex - 1
+    */
+   public static void setSelectedIndex(TableView l, int index) {
+      if (l.getSize() > index) {
+         boolean[] bols = new boolean[l.getSize()];
+         for (int i = 0; i < bols.length; i++) {
+            if (i == index) {
+               bols[i] = true;
+            } else
+               bols[i] = false;
+         }
+         l.setSelectedFlags(bols);
+      }
+   }
+
+   /**
+    * Attempts to select str in list. Deselects all others
+    * @param list
+    * @param str
+    */
+   public static void setSelectedString(TableView list, String str) {
+      int size = list.getSize();
+      for (int i = 0; i < size; i++) {
+         if (list.getString(i).equals(str)) {
+            setSelectedIndex(list, i);
+            return;
+         }
+      }
+   }
+
    private int[]            colPolicies;
 
    /**
@@ -327,6 +428,8 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
     * {@link IBOTableView#T_FLAGX_8_SELECT_EMPTY_CELLS} is set. <br>
     */
    private Drawable         emptyBluePrint;
+
+   private Object           eventParamO;
 
    /**
     * Horizontal separator
@@ -412,7 +515,7 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
    private int[]            pointed      = new int[2];
 
    /**
-    * Could be initialized to null. 
+    * {@link IBOTablePolicy} that cannot be null once constructor returns.
     */
    protected ByteObject     policyTable;
 
@@ -477,7 +580,7 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
    /**
     * Technical parameters for the {@link TableView}.
     */
-   protected ByteObject     techTable;
+   protected ByteObject     boTable;
 
    /**
     * Maps model index to grid index.<br>
@@ -505,6 +608,10 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
     */
    public TableView(GuiCtx gc, StyleClass sc, ByteObject policyTable) {
       this(gc, sc, policyTable, null);
+   }
+
+   public TableView(GuiCtx gc, StyleClass sc, ByteObject policyCol, ByteObject policyRow, ITableModel model) {
+      this(gc, sc, gc.getTablePolicyC().getTablePolicy(policyCol, policyRow), model);
    }
 
    /**
@@ -539,19 +646,26 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
       this(gc, sc, null, model);
    }
 
+   public void addEventListener(IEventConsumer listener, int eid) {
+      if (producerID == -1) {
+         producerID = gc.getEventsBusGui().createNewProducerID(EVENT_ID_MAX);
+      }
+      gc.getEventsBusGui().addConsumer(listener, producerID, eid);
+   }
+
    /**
     * When {@link TableView#span} is not null, modifies {@link CellModel} of columns
     * and rows to include spanning definitions
     */
    private void addSpanningToConfig() {
-      int addW = 0;
-      int addH = 0;
-      int gridIndex = 0;
-      int gridV = modelCol.sepSize;
-      int gridH = modelRow.sepSize;
-      int numTotalRows = modelRow.numCells;
-      int numTotalCols = modelCol.numCells;
       if (span != null) {
+         int addW = 0;
+         int addH = 0;
+         int gridIndex = 0;
+         int gridV = modelCol.sepSize;
+         int gridH = modelRow.sepSize;
+         int numTotalRows = modelRow.numCells;
+         int numTotalCols = modelCol.numCells;
          for (int rowAbs = 0; rowAbs < numTotalRows; rowAbs++) {
             for (int colAbs = 0; colAbs < numTotalCols; colAbs++) {
                gridIndex++;
@@ -583,15 +697,6 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
       }
    }
 
-   private Object eventParamO;
-
-   public void addEventListener(IEventConsumer listener, int eid) {
-      if (producerID == -1) {
-         producerID = gc.getEventsBusGui().createNewProducerID(ITechTable.EVENT_ID_MAX);
-      }
-      gc.getEventsBusGui().addConsumer(listener, producerID, eid);
-   }
-
    /**
     * From the {@link StyleClass} of the Table, extract Tech, Cell Style Class.
     */
@@ -602,7 +707,10 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
       //#debug
       emptyBluePrint.toStringSetName("Empty Table Cell");
       updateStyleClass();
+   }
 
+   public DrawableMapper getMapper() {
+      return mapperObjectDrawable;
    }
 
    /**
@@ -628,9 +736,9 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
          if (modelTech != null && !hasTechF(T_FLAGF_5_IGNORE_MODEL_TECH)) {
             if (hasTechF(T_FLAGF_6_MERGE_MODEL_TECH) || modelTech.hasFlag(T_OFFSET_04_FLAGF, T_FLAGF_6_MERGE_MODEL_TECH)) {
                //merge the policies
-               this.techTable = gc.getBOC().getBOModuleManager().mergeByteObject(techTable, modelTech);
+               this.boTable = gc.getBOC().getBOModuleManager().mergeByteObject(boTable, modelTech);
             } else {
-               this.techTable = modelTech;
+               this.boTable = modelTech;
             }
          }
 
@@ -655,15 +763,15 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
 
          modelGenetics = modelAux.getModelGenetics();
          if (modelGenetics != null) {
-            setHelperFlag(ITechTable.HELPER_FLAG_21_MODEL_STYLE, modelGenetics.hasFlag(IBOGenetics.GENE_OFFSET_02_FLAGX, IBOGenetics.GENE_FLAGX_7_MODEL_STYLE));
-            if (modelGenetics.hasFlag(IBOGenetics.GENE_OFFSET_01_FLAG, IBOGenetics.GENE_FLAG_5_MAPPERINT_TYPE)) {
+            setHelperFlag(HELPER_FLAG_21_MODEL_STYLE, modelGenetics.hasFlag(GENE_OFFSET_02_FLAGX, GENE_FLAGX_7_MODEL_STYLE));
+            if (modelGenetics.hasFlag(GENE_OFFSET_01_FLAG, GENE_FLAG_5_MAPPERINT_TYPE)) {
                //modifies String Tech
                //mapperObjectDrawable.setType(modelGenetics.get2(IGenetics.GENE_OFFSET_5INT_MAPPER_TYPE2));
             }
-            if (modelGenetics.hasFlag(IBOGenetics.GENE_OFFSET_01_FLAG, IBOGenetics.GENE_FLAG_6_SELECTABILITY_DRAWABLE)) {
-               setHelperFlag(ITechTable.HELPER_FLAG_29_UNSELECTABLE_STUFF, true);
+            if (modelGenetics.hasFlag(GENE_OFFSET_01_FLAG, GENE_FLAG_6_SELECTABILITY_DRAWABLE)) {
+               setHelperFlag(HELPER_FLAG_29_UNSELECTABLE_STUFF, true);
             }
-            if (modelGenetics.hasFlag(IBOGenetics.GENE_OFFSET_02_FLAGX, IBOGenetics.GENE_FLAGX_8_DRAWABLES)) {
+            if (modelGenetics.hasFlag(GENE_OFFSET_02_FLAGX, GENE_FLAGX_8_DRAWABLES)) {
                //NO MAPPER IS NEEDED
                mapperObjectDrawable = null;
             }
@@ -672,8 +780,8 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
                mapperObjectDrawable.techSpecifics = modelAux.getTechSpecifics();
             }
 
-            boolean hasCtypes = modelGenetics.hasFlag(IBOGenetics.GENE_OFFSET_02_FLAGX, IBOGenetics.GENE_FLAGX_6_MODEL_CTYPES);
-            setHelperFlag(ITechTable.HELPER_FLAG_30_DO_CTYPES, hasCtypes);
+            boolean hasCtypes = modelGenetics.hasFlag(GENE_OFFSET_02_FLAGX, GENE_FLAGX_6_MODEL_CTYPES);
+            setHelperFlag(HELPER_FLAG_30_DO_CTYPES, hasCtypes);
          }
          //check for policy titles,styles etc.
 
@@ -720,10 +828,10 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
    private void buildGridIndexModel() {
       int numTotalCols = modelCol.numCells;
       int numTotalRows = modelRow.numCells;
-      if (techTable.get1(T_OFFSET_09_MODEL_FILL_TYPE1) != 0) {
+      if (boTable.get1(T_OFFSET_09_MODEL_FILL_TYPE1) != 0) {
          visualIndex = new int[numTotalCols * numTotalRows];
-         int val = techTable.get2Bits1(T_OFFSET_09_MODEL_FILL_TYPE1);
-         boolean isColFil = techTable.hasFlag(T_OFFSET_09_MODEL_FILL_TYPE1, T_OFFSET_09_FLAG_3FILL_COL);
+         int val = boTable.get2Bits1(T_OFFSET_09_MODEL_FILL_TYPE1);
+         boolean isColFil = boTable.hasFlag(T_OFFSET_09_MODEL_FILL_TYPE1, T_OFFSET_09_FLAG_3_FILL_COL);
          if (span == null) {
             buildNoSpan(val, isColFil);
          } else {
@@ -876,10 +984,10 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
          ByteObject[] p = policyTable.getSubs();
          for (int i = 2; i < p.length; i++) {
             ByteObject spanDrw = p[i];
-            int colAbs = spanDrw.get2(IBOTablePolicy.SPAN_OFFSET_2COL2);
-            int rowAbs = spanDrw.get2(IBOTablePolicy.SPAN_OFFSET_4ROW2);
-            int colV = spanDrw.get2(IBOTablePolicy.SPAN_OFFSET_3COL_VALUE2);
-            int rowV = spanDrw.get2(IBOTablePolicy.SPAN_OFFSET_5ROW_VALUE2);
+            int colAbs = spanDrw.get2(IBOTableSpan.SPAN_OFFSET_2_COL2);
+            int rowAbs = spanDrw.get2(IBOTableSpan.SPAN_OFFSET_4_ROW2);
+            int colV = spanDrw.get2(IBOTableSpan.SPAN_OFFSET_3_COL_VALUE2);
+            int rowV = spanDrw.get2(IBOTableSpan.SPAN_OFFSET_5_ROW_VALUE2);
             int indexGridRoot = getGridIndexFromAbs(colAbs, rowAbs);
             int indexGrid = 0;
             int endCol = 1;
@@ -919,6 +1027,12 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
       } else {
          spannedCount = 0;
          span = null;
+      }
+   }
+
+   private void checkInit() {
+      if (modelRow == null) {
+         throw new RuntimeException("No init");
       }
    }
 
@@ -1011,7 +1125,9 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
       int cellY = y + modelRow.getOffsetCellAbs(rowAbs);
       int[] r = new int[2];
       getCellsDim(r, colAbs, rowAbs);
-      //System.out.println("TableView#Drawing Cell [" + colAbs + "," + rowAbs + "] cellX=" + cellX + " cellY=" + cellY + " width=" + r[0] + " height=" + r[1]);
+
+      //#debug
+      toDLog().pDraw("Cell [" + colAbs + "," + rowAbs + "] cellX=" + cellX + " cellY=" + cellY + " width=" + r[0] + " height=" + r[1], this, TableView.class, "drawCell", LVL_05_FINE, true);
       // the draw drawn in this cell
       drawModelDrawable(g, cellX, cellY, r[0], r[1], colAbs, rowAbs);
    }
@@ -1057,26 +1173,30 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
          } else {
             d.setStateStyle(ITechDrawable.STYLE_05_SELECTED, false);
          }
-         d.setXY(cellX, cellY);
-         d.init(cellWidth, cellHeight);
+         d.setSizePixelsInitSize(cellWidth, cellHeight);
+         d.setXYInitPosition(cellX, cellY);
          d.draw(g);
       }
    }
 
    /**
+    * 
+    * <p>
+    * 
     * Override this method to draw what you like.
-    * <br>
+    * 
+    * </p>
+    * 
+    * 
     * Calls the {@link IDrawable#draw(GraphicsX)} via the {@link IDrawable#show(GraphicsX)}.
-    * <br>
     * Style and Layout the Drawable.
-    * <br>
     * When 
     * <li> First time drawn, animation entry is fired.
     * <li> redrawn, only the {@link IDrawable#draw(GraphicsX)} method is called.
-    * <br>
+    * 
+    * <p>
     * When redrawn, optimization can be made. No more styling, no more layouting.
-    * <br>
-    * <br>
+    * </p>
     * @param g
     * @param x
     * @param y
@@ -1095,7 +1215,7 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
       } else {
          //style the cell with TableView structural style and cell style.
          //check if override drawable root style key
-         if (!hasHelperFlag(ITechTable.HELPER_FLAG_21_MODEL_STYLE)) {
+         if (!hasHelperFlag(HELPER_FLAG_21_MODEL_STYLE)) {
             // System.out.println(Presentation.debugStyleKey(drawableStyleKey));
             d.setStyleClass(tableCellStyleClass);
          }
@@ -1104,8 +1224,10 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
          //         }
          //TODO do a selection model
 
+         d.setSizePixels(w, h);
+         d.initSize();
          d.setXY(x, y);
-         d.init(w, h);
+         d.initPosition();
          //d.setParent(this);
          //2 cases. redrawn
          //generates the animations calls
@@ -1140,7 +1262,7 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
       int dx = getContentX(); //force it to be there
       int dy = d.getY();
       if (viewPane != null) {
-         if (viewPane.getTech().get1(IBOViewPane.VP_OFFSET_14_STYLE_VIEWPORT_MODE1) == ITechViewPane.DRW_STYLE_0_VIEWDRAWABLE) {
+         if (viewPane.getBOViewPane().get1(IBOViewPane.VP_OFFSET_14_STYLE_VIEWPORT_MODE1) == DRW_STYLE_0_VIEWDRAWABLE) {
             dx += getStyleWLeftConsumed();
          }
       }
@@ -1157,12 +1279,14 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
       for (int j = firstColAbs; j <= lastColAbs; j++) {
          if (cols[j] == null) {
             String title = modelCol.titles[j];
-            cols[j] = new StringDrawable(gc, titleColStyleClass, title, ITechStringDrawable.TYPE_1_TITLE);
+            cols[j] = new StringDrawable(gc, titleColStyleClass, title, ITechStringDrawable.PRESET_CONFIG_1_TITLE);
             cols[j].setParent(this);
             cols[j].setBehaviorFlag(ITechDrawable.BEHAVIOR_23_PARENT_EVENT_CONTROL, true);
          }
-         cols[j].init(modelCol.workCellSizes[j], -1);
-         cols[j].setXY(dx, dy);
+         int width = modelCol.workCellSizes[j];
+         cols[j].setSizersPreset_1LineAtWidth(width);
+         cols[j].initSize();
+         cols[j].setXYInitPosition(dx, dy);
          DrawableUtilz.aboutToShow(cols[j]);
          cols[j].draw(g);
          dx += cols[j].getDrawnWidth();
@@ -1181,7 +1305,7 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
       //content of this TableView
       int dy = getContentY() - modelRow.undrawnTopLeft;
       if (viewPane != null) {
-         if (viewPane.getTech().get1(IBOViewPane.VP_OFFSET_14_STYLE_VIEWPORT_MODE1) == ITechViewPane.DRW_STYLE_0_VIEWDRAWABLE) {
+         if (viewPane.getBOViewPane().get1(IBOViewPane.VP_OFFSET_14_STYLE_VIEWPORT_MODE1) == DRW_STYLE_0_VIEWDRAWABLE) {
             dy += getStyleHTopConsumed();
          }
       }
@@ -1199,14 +1323,15 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
       for (int j = firstRowAbs; j <= lastRowAbs; j++) {
          if (rows[j] == null) {
             String title = modelRow.titles[j];
-            rows[j] = new StringDrawable(gc, titleRowStyleClass, title, ITechStringDrawable.TYPE_1_TITLE);
+            rows[j] = new StringDrawable(gc, titleRowStyleClass, title, ITechStringDrawable.PRESET_CONFIG_1_TITLE);
             rows[j].setParent(this);
             //we don't want the default shrinking title behavior
             rows[j].setFlagGene(FLAG_GENE_30_SHRINKABLE_H, false);
             rows[j].setBehaviorFlag(ITechDrawable.BEHAVIOR_23_PARENT_EVENT_CONTROL, true);
          }
-         rows[j].init(width, modelRow.workCellSizes[j]);
-         rows[j].setXY(dx, dy);
+         int height = modelRow.workCellSizes[j];
+         rows[j].setSizePixelsInitSize(width, height);
+         rows[j].setXYInitPosition(dx, dy);
          DrawableUtilz.aboutToShow(rows[j]);
          rows[j].draw(g);
          dy += rows[j].getDrawnHeight();
@@ -1431,6 +1556,63 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
    }
 
    /**
+    * Match a temporary {@link Config} to {@link ScrollConfig} X and Y. Then
+    * draw that config at x,y on {@link GraphicsX}. <br>
+    * <br>
+    * Case when cell sizes are variable, depending on start increment and
+    * number of visible increments in the {@link Config}<br>
+    * <br>
+    * If the {@link ScrollConfig} are the root ones used by ViewPane, draw
+    * using the current {@link Config}.
+    * 
+    * @param g
+    * @param x
+    * @param y
+    * @param scX
+    * @param scY
+    */
+   //   void drawViewDrawableContentVar(GraphicsX g, int x, int y, ScrollConfig scX, ScrollConfig scY) {
+   //      Config scroll = null;
+   //      if (scX != null) {
+   //         // convert situation to the Config using the
+   //         switch (scX.getTypeUnit()) {
+   //            case IViewPane.SCROLL_TYPE_0_PIXEL_UNIT:
+   //               //
+   //               x -= scX.getSIStart();
+   //               break;
+   //            case IViewPane.SCROLL_TYPE_1_LOGIC_UNIT:
+   //               break;
+   //            case IViewPane.SCROLL_TYPE_2_PAGE_UNIT:
+   //               break;
+   //            default:
+   //               throw new IllegalArgumentException();
+   //         }
+   //      }
+   //      if (scY != null) {
+   //         switch (scY.getTypeUnit()) {
+   //            case IViewPane.SCROLL_TYPE_0_PIXEL_UNIT:
+   //               y -= scY.getSIStart();
+   //               break;
+   //            case IViewPane.SCROLL_TYPE_1_LOGIC_UNIT:
+   //               break;
+   //            case IViewPane.SCROLL_TYPE_2_PAGE_UNIT:
+   //               break;
+   //            default:
+   //               throw new IllegalArgumentException();
+   //         }
+   //      }
+   //      if (scroll != null) {
+   //         def = scroll;
+   //      }
+   //      computeCoordinatesColumns(def);
+   //      computeCoordinatesRows(def);
+   //      // matches the configurations to the Table config
+   //      // System.out.println("TableView.drawViewDrawableContent " + x + "," +
+   //      // y);
+   //      drawViewDrawableContent(g, def, x, y);
+   //   }
+
+   /**
     * In All cases generates a {@link ITechTable#EVENT_ID_00_SELECT} .
     * <br>
     * May also generate a {@link ITechTable#EVENT_ID_01_SELECTION_CHANGE} before it if it was not already so
@@ -1460,7 +1642,7 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
          int i = pointed[0];
          int j = pointed[1];
          //check if the element at this index is 'selected'. In case of drawable less
-         if (hasHelperFlag(ITechTable.HELPER_FLAG_20_SPECIAL_REPAINT)) {
+         if (hasHelperFlag(HELPER_FLAG_20_SPECIAL_REPAINT)) {
             if (hasPointState(getGridIndexFromAbs(i, j), ITechDrawable.STYLE_05_SELECTED)) {
                selectionSelectEvent(ic);
             } else {
@@ -1550,6 +1732,39 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
    }
 
    /**
+    * Throws an exception if call is made while TableView is not initialized
+    * 
+    */
+   public IDrawable getDrawableViewPort(int x, int y, ExecutionContextGui ex) {
+      checkInit();
+      int firstRowAbs = modelRow.firstCellAbs;
+      int lastRowAbs = modelRow.lastCellAbs;
+      int firstColAbs = modelCol.firstCellAbs;
+      int lastColAbs = modelCol.lastCellAbs;
+      int dx = getContentX();
+      int dy = getContentY();
+      //toLog().printState("#TableView#getPointerDrawableCoordinates  [" + dx + "," + dy + "]" + " firstRow=" + firstRowAbs + "," + lastRowAbs + " col=" + firstColAbs + "," + lastColAbs);
+      int[] r = new int[2];
+      for (int j = firstRowAbs; j <= lastRowAbs; j++) {
+         for (int i = firstColAbs; i <= lastColAbs; i++) {
+            int cellX = dx + modelCol.positions[i];
+            int cellY = dy + modelRow.positions[j];
+            //System.out.println("[" + i + "," + j + "] = (" + cellX + ", " + cellY + ")");
+            getCellsDim(r, i, j);
+            if (DrawableUtilz.isInside(x, y, cellX, cellY, r[0], r[1])) {
+               //toLog().printEvent("#TableView#getPointerDrawableCoordinates ----[" + i + "," + j + "] = Point(" + ic.x + ", " + ic.y + ") isInside [" + cellX + "," + cellY + " " + (cellX + r[0])
+               //      + ", " + (cellY + r[1]));
+               IDrawable d = getModelDrawable(i, j);
+               ex.addressX = i;
+               ex.addressY = j;
+               return d;
+            }
+         }
+      }
+      return null;
+   }
+
+   /**
     * Get the best etalon {@link IDrawable} for that policy.
     * <br>
     * <br>
@@ -1559,11 +1774,14 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
     */
    private IDrawable getEtalon(ByteObject policy) {
       // get etalon cell. initialize
-      int etalonIndex = policy.get1(OFFSET_08_ETALON1);
+      int etalonIndex = policy.get1(CELLP_OFFSET_08_ETALON1);
       IDrawable d = getFirstNonNull(etalonIndex);
       int colIndex = getAbsColFromIndex(etalonIndex);
       int rowIndex = getAbsRowFromIndex(etalonIndex);
-      d.init(modelCol.setupSizes[colIndex], modelRow.setupSizes[rowIndex]);
+      int width = modelCol.setupSizes[colIndex];
+      int height = modelRow.setupSizes[rowIndex];
+      d.setSizePixels(width, height);
+      d.initSize();
       return d;
    }
 
@@ -1589,67 +1807,10 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
    }
 
    private int getGeneticSize(boolean isRow) {
-      int index = (!isRow) ? IBOGenetics.GENE_OFFSET_03_WIDTH2 : IBOGenetics.GENE_OFFSET_04_HEIGHT2;
+      int index = (!isRow) ? GENE_OFFSET_03_WIDTH2 : GENE_OFFSET_04_HEIGHT2;
       int size = modelGenetics.get2(index);
       return size;
    }
-
-   /**
-    * Match a temporary {@link Config} to {@link ScrollConfig} X and Y. Then
-    * draw that config at x,y on {@link GraphicsX}. <br>
-    * <br>
-    * Case when cell sizes are variable, depending on start increment and
-    * number of visible increments in the {@link Config}<br>
-    * <br>
-    * If the {@link ScrollConfig} are the root ones used by ViewPane, draw
-    * using the current {@link Config}.
-    * 
-    * @param g
-    * @param x
-    * @param y
-    * @param scX
-    * @param scY
-    */
-   //   void drawViewDrawableContentVar(GraphicsX g, int x, int y, ScrollConfig scX, ScrollConfig scY) {
-   //      Config scroll = null;
-   //      if (scX != null) {
-   //         // convert situation to the Config using the
-   //         switch (scX.getTypeUnit()) {
-   //            case IViewPane.SCROLL_TYPE_0_PIXEL_UNIT:
-   //               //
-   //               x -= scX.getSIStart();
-   //               break;
-   //            case IViewPane.SCROLL_TYPE_1_LOGIC_UNIT:
-   //               break;
-   //            case IViewPane.SCROLL_TYPE_2_PAGE_UNIT:
-   //               break;
-   //            default:
-   //               throw new IllegalArgumentException();
-   //         }
-   //      }
-   //      if (scY != null) {
-   //         switch (scY.getTypeUnit()) {
-   //            case IViewPane.SCROLL_TYPE_0_PIXEL_UNIT:
-   //               y -= scY.getSIStart();
-   //               break;
-   //            case IViewPane.SCROLL_TYPE_1_LOGIC_UNIT:
-   //               break;
-   //            case IViewPane.SCROLL_TYPE_2_PAGE_UNIT:
-   //               break;
-   //            default:
-   //               throw new IllegalArgumentException();
-   //         }
-   //      }
-   //      if (scroll != null) {
-   //         def = scroll;
-   //      }
-   //      computeCoordinatesColumns(def);
-   //      computeCoordinatesRows(def);
-   //      // matches the configurations to the Table config
-   //      // System.out.println("TableView.drawViewDrawableContent " + x + "," +
-   //      // y);
-   //      drawViewDrawableContent(g, def, x, y);
-   //   }
 
    /**
     * Grid visual index from cell coordinate (colAbs,rowAbs).
@@ -1668,9 +1829,10 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
    }
 
    /**
-    * Policy based initialization method. <br>
-    * Computes pixels needed to draw x number of cells from that position. <br>
-    * <br>
+    * Policy based initialization method. 
+    * Computes pixels needed to draw x number of cells from that position. 
+    * 
+    * 
     * Policies with cell sizes function of first col/row have to call this
     * method everytime that duo of values changes. <br>
     * 
@@ -1726,7 +1888,7 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
     */
    public IDrawable getModelDrawable(int index) {
       if (model != null) {
-         if (hasHelperFlag(ITechTable.HELPER_FLAG_06_MODEL_MASK)) {
+         if (hasHelperFlag(HELPER_FLAG_06_MODEL_MASK)) {
             index += modelOffset;
          }
          Object o = model.getObject(index);
@@ -1739,7 +1901,6 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
          if (d != null) {
             d.setParent(this);
             d.setBehaviorFlag(ITechDrawable.BEHAVIOR_23_PARENT_EVENT_CONTROL, true);
-            //System.out.println("#TableView setParentEventControl");
          }
          return d;
       }
@@ -1768,9 +1929,9 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
    private int getModelDrawablesMaxSizeFlow(boolean isHeight) {
       if (modelGenetics != null) {
          //no need to test them all if genetics gives it to you.
-         int flag = (isHeight) ? IBOGenetics.GENE_FLAG_4_SAME_SIZE_H : IBOGenetics.GENE_FLAG_3_SAME_SIZE_W;
-         if (modelGenetics.hasFlag(IBOGenetics.GENE_OFFSET_01_FLAG, flag)) {
-            int index = (isHeight) ? IBOGenetics.GENE_OFFSET_04_HEIGHT2 : IBOGenetics.GENE_OFFSET_03_WIDTH2;
+         int flag = (isHeight) ? GENE_FLAG_4_SAME_SIZE_H : GENE_FLAG_3_SAME_SIZE_W;
+         if (modelGenetics.hasFlag(GENE_OFFSET_01_FLAG, flag)) {
+            int index = (isHeight) ? GENE_OFFSET_04_HEIGHT2 : GENE_OFFSET_03_WIDTH2;
             return modelGenetics.get2(index);
          }
       }
@@ -1803,7 +1964,7 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
    public IDrawable getModelDrawableStyled(int index) {
       IDrawable d = getModelDrawable(index);
       if (d != null) {
-         if (!hasHelperFlag(ITechTable.HELPER_FLAG_21_MODEL_STYLE)) {
+         if (!hasHelperFlag(HELPER_FLAG_21_MODEL_STYLE)) {
             // System.out.println(Presentation.debugStyleKey(drawableStyleKey));
             d.setStyleClass(tableCellStyleClass);
          }
@@ -1812,7 +1973,7 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
             int ctype = model.getPropertyInt(ITableModel.PROPERTY_0_CTYPE, index);
             d.setCType(ctype);
          }
-         if (hasHelperFlag(ITechTable.HELPER_FLAG_25_STRUCT_STYLES)) {
+         if (hasHelperFlag(HELPER_FLAG_25_STRUCT_STYLES)) {
             setStructuralStyleKey(d, index);
          }
          //
@@ -1837,45 +1998,6 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
       return modelRow;
    }
 
-   private void checkInit() {
-      if (modelRow == null) {
-         throw new RuntimeException("No init");
-      }
-   }
-
-   /**
-    * Throws an exception if call is made while TableView is not initialized
-    * 
-    */
-   public IDrawable getDrawableViewPort(int x, int y, ExecutionContextGui ex) {
-      checkInit();
-      int firstRowAbs = modelRow.firstCellAbs;
-      int lastRowAbs = modelRow.lastCellAbs;
-      int firstColAbs = modelCol.firstCellAbs;
-      int lastColAbs = modelCol.lastCellAbs;
-      int dx = getContentX();
-      int dy = getContentY();
-      //toLog().printState("#TableView#getPointerDrawableCoordinates  [" + dx + "," + dy + "]" + " firstRow=" + firstRowAbs + "," + lastRowAbs + " col=" + firstColAbs + "," + lastColAbs);
-      int[] r = new int[2];
-      for (int j = firstRowAbs; j <= lastRowAbs; j++) {
-         for (int i = firstColAbs; i <= lastColAbs; i++) {
-            int cellX = dx + modelCol.positions[i];
-            int cellY = dy + modelRow.positions[j];
-            //System.out.println("[" + i + "," + j + "] = (" + cellX + ", " + cellY + ")");
-            getCellsDim(r, i, j);
-            if (DrawableUtilz.isInside(x, y, cellX, cellY, r[0], r[1])) {
-               //toLog().printEvent("#TableView#getPointerDrawableCoordinates ----[" + i + "," + j + "] = Point(" + ic.x + ", " + ic.y + ") isInside [" + cellX + "," + cellY + " " + (cellX + r[0])
-               //      + ", " + (cellY + r[1]));
-               IDrawable d = getModelDrawable(i, j);
-               ex.addressX = i;
-               ex.addressY = j;
-               return d;
-            }
-         }
-      }
-      return null;
-   }
-
    /**
     * Iterates over the index starting at currently selected index and returns the next index selected.
     * <br>
@@ -1886,7 +2008,7 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
       int selIndex = getSelectedIndex();
       int numTotalCols = modelCol.numCells;
       int numTotalRows = modelRow.numCells;
-      if (hasHelperFlag(ITechTable.HELPER_FLAG_29_UNSELECTABLE_STUFF)) {
+      if (hasHelperFlag(HELPER_FLAG_29_UNSELECTABLE_STUFF)) {
          for (int i = selIndex + 1; i < model.getSizeModel(); i++) {
             int col = getAbsColFromIndex(i);
             int row = getAbsRowFromIndex(i);
@@ -1916,7 +2038,7 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
    public int getNextSelectableDown() {
       int row = modelRow.selectedCellAbs;
       int numTotalRows = modelRow.numCells;
-      if (hasHelperFlag(ITechTable.HELPER_FLAG_29_UNSELECTABLE_STUFF)) {
+      if (hasHelperFlag(HELPER_FLAG_29_UNSELECTABLE_STUFF)) {
          int count = 1;
          //is it defined on column or cell wise?
          int col = modelCol.selectedCellAbs;
@@ -1961,7 +2083,7 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
       int col = modelCol.selectedCellAbs;
       int numTotalCols = modelCol.numCells;
       int numTotalRows = modelRow.numCells;
-      if (hasHelperFlag(ITechTable.HELPER_FLAG_29_UNSELECTABLE_STUFF)) {
+      if (hasHelperFlag(HELPER_FLAG_29_UNSELECTABLE_STUFF)) {
          int count = 1;
          //is it defined on column or cell wise?
          int row = modelRow.selectedCellAbs;
@@ -2006,7 +2128,7 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
       int numTotalCols = modelCol.numCells;
       int numTotalRows = modelRow.numCells;
 
-      if (hasHelperFlag(ITechTable.HELPER_FLAG_29_UNSELECTABLE_STUFF)) {
+      if (hasHelperFlag(HELPER_FLAG_29_UNSELECTABLE_STUFF)) {
          int count = 1;
          //is it defined on column or cell wise?
          int row = modelRow.selectedCellAbs;
@@ -2055,7 +2177,7 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
       int row = modelRow.selectedCellAbs;
       int numTotalCols = modelCol.numCells;
       int numTotalRows = modelRow.numCells;
-      if (hasHelperFlag(ITechTable.HELPER_FLAG_29_UNSELECTABLE_STUFF)) {
+      if (hasHelperFlag(HELPER_FLAG_29_UNSELECTABLE_STUFF)) {
          int count = 1;
          //is it defined on column or cell wise?
          int col = modelCol.selectedCellAbs;
@@ -2198,105 +2320,6 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
    }
 
    /**
-    * @param l
-    * @return -1 if none selected
-    */
-   public static int getFirstSelected(TableView l) {
-      boolean[] bs = new boolean[l.getSize()];
-      l.getSelectedFlags(bs);
-      for (int i = 0; i < bs.length; i++) {
-         if (bs[i])
-            return i;
-      }
-      return -1;
-   }
-
-   /**
-    * 
-    * @param l the List
-    * @return first selected index or -1 if none
-    */
-   public static int getSelectedIndex(TableView l) {
-      boolean[] b = new boolean[l.getSize()];
-      l.getSelectedFlags(b);
-      for (int i = 0; i < b.length; i++) {
-         if (b[i] == true) {
-            return i;
-         }
-      }
-      return -1;
-   }
-
-   /**
-    * 
-    * @param l the List
-    * @return first selected index or -1 if none
-    */
-   public static int[] getSelectedIndexes(TableView l) {
-      boolean[] b = new boolean[l.getSize()];
-      int si = l.getSelectedFlags(b);
-      int[] ints = new int[si];
-      int count = 0;
-      for (int i = 0; i < b.length; i++) {
-         if (b[i] == true) {
-            ints[count] = i;
-            count++;
-         }
-      }
-      return ints;
-   }
-
-   public static String getSelectedString(TableView list) {
-      return list.getString(getSelectedIndex(list));
-   }
-
-   public static String[] getSelectedStrings(TableView list) {
-      boolean[] selectedIDs = new boolean[list.getSize()];
-      int numSelected = list.getSelectedFlags(selectedIDs);
-      String[] langs = new String[numSelected];
-      int count = 0;
-      for (int i = 0; i < selectedIDs.length; i++) {
-         if (selectedIDs[i]) {
-            langs[count] = list.getString(i);
-         }
-      }
-      return langs;
-   }
-
-   /**
-    * indexing starts at 0
-    * @param l
-    * @param index visualIndex - 1
-    */
-   public static void setSelectedIndex(TableView l, int index) {
-      if (l.getSize() > index) {
-         boolean[] bols = new boolean[l.getSize()];
-         for (int i = 0; i < bols.length; i++) {
-            if (i == index) {
-               bols[i] = true;
-            } else
-               bols[i] = false;
-         }
-         l.setSelectedFlags(bols);
-      }
-   }
-
-   /**
-    * Attempts to select str in list. Deselects all others
-    * @param list
-    * @param str
-    */
-   public static void setSelectedString(TableView list, String str) {
-      int size = list.getSize();
-      for (int i = 0; i < size; i++) {
-         if (list.getString(i).equals(str)) {
-            setSelectedIndex(list, i);
-            return;
-         }
-      }
-   }
-
-   /**
     * Reads the cells and set to true/false if they are selected
     * @param b
     * @return the number of trues
@@ -2350,7 +2373,7 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
       if (model != null) {
          val = model.getSizeModel();
       }
-      if (hasHelperFlag(ITechTable.HELPER_FLAG_06_MODEL_MASK) && modelLen != 0) {
+      if (hasHelperFlag(HELPER_FLAG_06_MODEL_MASK) && modelLen != 0) {
          val = Math.min(val, modelLen);
       }
       return val;
@@ -2362,7 +2385,7 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
     */
    private int getSizeGridH() {
       if (hasTech(T_FLAG_7_DRAW_GRID)) {
-         return techTable.getValue(T_OFFSET_05_HGRID_SIZE1, 1);
+         return boTable.getValue(T_OFFSET_05_HGRID_SIZE1, 1);
       }
       return 0;
    }
@@ -2373,7 +2396,7 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
     */
    private int getSizeGridV() {
       if (hasTech(T_FLAG_7_DRAW_GRID)) {
-         return techTable.getValue(T_OFFSET_06_VGRID_SIZE1, 1);
+         return boTable.getValue(T_OFFSET_06_VGRID_SIZE1, 1);
       }
       return 0;
    }
@@ -2453,9 +2476,23 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
     * @return
     */
    private boolean hasCTypes() {
-      return hasHelperFlag(ITechTable.HELPER_FLAG_30_DO_CTYPES);
+      return hasHelperFlag(HELPER_FLAG_30_DO_CTYPES);
    }
 
+   /**
+    * Check table helper flags
+    * 
+    * <li> {@link ITechTable#HELPER_FLAG_01_STRONG_ROWS}
+    * <li> {@link ITechTable#HELPER_FLAG_02_SINGLE_CONFIG}
+    * <li> {@link ITechTable#HELPER_FLAG_03_CAP_OVERSIZE}
+    * <li> {@link ITechTable#HELPER_FLAG_05_YCOORDS_ONLY}
+    * <li> {@link ITechTable#HELPER_FLAG_06_MODEL_MASK}
+    * <li> {@link ITechTable#HELPER_FLAG_17_OVERSIZE_WIDTH}
+    * <li> {@link ITechTable#HELPER_FLAG_18_OVERSIZE_HEIGHT}
+    * <li> {@link ITechTable#HELPER_FLAG_20_SPECIAL_REPAINT}
+    * @param flag
+    * @return
+    */
    public boolean hasHelperFlag(int flag) {
       return BitUtils.hasFlag(helpers, flag);
    }
@@ -2481,24 +2518,94 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
       return !hasTech(T_FLAGX_1_NO_SELECTION);
    }
 
+   /**
+    * Checks flags from {@link IBOTableView#T_OFFSET_01_FLAG}
+    * 
+    * <li>{@link IBOTableView#T_FLAG_1_}
+    * <li>{@link IBOTableView#T_FLAG_2_}
+    * <li>{@link IBOTableView#T_FLAG_3_SHOW_ROW_TITLE}
+    * <li>{@link IBOTableView#T_FLAG_4_SHOW_COL_TITLE}
+    * <li>{@link IBOTableView#T_FLAG_5_REAL_TITLE}
+    * <li>{@link IBOTableView#T_FLAG_6_APPEND_REAL_TITLE}
+    * <li>{@link IBOTableView#T_FLAG_7_DRAW_GRID}
+    * <li>{@link IBOTableView#T_FLAG_8_STYLE_ANIMATION}
+    * @param flag
+    * @return
+    */
    protected boolean hasTech(int flag) {
-      return techTable.hasFlag(T_OFFSET_01_FLAG, flag);
+      return boTable.hasFlag(T_OFFSET_01_FLAG, flag);
    }
 
+   /**
+    * Checks flags from {@link IBOTableView#T_OFFSET_04_FLAGF}
+    * 
+    * <li>{@link IBOTableView#T_FLAGF_1_SELECT_KEPT_WITHOUT_FOCUS_KEY}
+    * <li>{@link IBOTableView#T_FLAGF_2_SELECT_MOVE_NOT_GIVES_FOCUS}
+    * <li>{@link IBOTableView#T_FLAGF_3_FOCUS_DOESNOT_GIVES_CELL_SELECT}
+    * <li>{@link IBOTableView#T_FLAGF_4_NOSTYLE}
+    * <li>{@link IBOTableView#T_FLAGF_5_IGNORE_MODEL_TECH}
+    * <li>{@link IBOTableView#T_FLAGF_6_MERGE_MODEL_TECH}
+    * <li>{@link IBOTableView#T_FLAGF_7_IGNORE_MODEL_POLICY}
+    * <li>{@link IBOTableView#T_FLAGF_8_MERGE_MODEL_POLICY}
+    * @param flag
+    * @return
+    */
    protected boolean hasTechF(int flag) {
-      return techTable.hasFlag(T_OFFSET_04_FLAGF, flag);
+      return boTable.hasFlag(T_OFFSET_04_FLAGF, flag);
    }
 
+   /**
+    * Checks flags from {@link IBOTableView#T_OFFSET_11_FLAGM}
+    * 
+    * <li>{@link IBOTableView#T_FLAGM_1_}
+    * <li>{@link IBOTableView#T_FLAGM_2_MULTIPLE_SELECTION}
+    * <li>{@link IBOTableView#T_FLAGM_3_MULTIPLE_SELECTION_CHECKBOX}
+    * <li>{@link IBOTableView#T_FLAGM_4_}
+    * <li>{@link IBOTableView#T_FLAGM_5_CLOCK_FULL_H_LOOP}
+    * <li>{@link IBOTableView#T_FLAGM_6_CLOCK_HORIZ}
+    * <li>{@link IBOTableView#T_FLAGM_7_CLOCK_VERTICAL}
+    * <li>{@link IBOTableView#T_FLAGM_8_}
+    * @param flag
+    * @return
+    */
    protected boolean hasTechM(int flag) {
-      return techTable.hasFlag(T_OFFSET_11_FLAGM, flag);
+      return boTable.hasFlag(T_OFFSET_11_FLAGM, flag);
    }
 
+   /**
+    * Checks flags from {@link IBOTableView#T_OFFSET_02_FLAGX}
+    * 
+    * <li>{@link IBOTableView#T_FLAGX_1_NO_SELECTION}
+    * <li>{@link IBOTableView#T_FLAGX_2_}
+    * <li>{@link IBOTableView#T_FLAGX_3_ROW_SELECTION}
+    * <li>{@link IBOTableView#T_FLAGX_4_ROW_SELECTION_STYLE_STATES}
+    * <li>{@link IBOTableView#T_FLAGX_5_ROW_SELECTION_NO_OVERLAY}
+    * <li>{@link IBOTableView#T_FLAGX_6_SELECTION_ASAP}
+    * <li>{@link IBOTableView#T_FLAGX_7_VIEW_PORT_BLIND}
+    * <li>{@link IBOTableView#T_FLAGX_8_SELECT_EMPTY_CELLS}
+    * @param flag
+    * @return
+    */
    protected boolean hasTechX(int flag) {
-      return techTable.hasFlag(T_OFFSET_02_FLAGX, flag);
+      return boTable.hasFlag(T_OFFSET_02_FLAGX, flag);
    }
 
+   /**
+    * Checks flags from {@link IBOTableView#T_OFFSET_03_FLAGY}
+    * 
+    * <li>{@link IBOTableView#T_FLAGY_1_GIVE_KEY_FOCUS}
+    * <li>{@link IBOTableView#T_FLAGY_2_LIST_UP_DOWN}
+    * <li>{@link IBOTableView#T_FLAGY_3_POINTER_SCROLLS_SELECTION}
+    * <li>{@link IBOTableView#T_FLAGY_4_ROOT_FOLLOWS_SCROLLING}
+    * <li>{@link IBOTableView#T_FLAGY_5_VARIABLE_WIDTH}
+    * <li>{@link IBOTableView#T_FLAGY_6_VARIABLE_HEIGHT}
+    * <li>{@link IBOTableView#T_FLAGY_7_}
+    * <li>{@link IBOTableView#T_FLAGY_8_POINTER_PRESS_SELECTION}
+    * @param flag
+    * @return
+    */
    protected boolean hasTechY(int flag) {
-      return techTable.hasFlag(T_OFFSET_03_FLAGY, flag);
+      return boTable.hasFlag(T_OFFSET_03_FLAGY, flag);
    }
 
    private void initConfigWorkSizes() {
@@ -2596,7 +2703,8 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
          if (d != null) {
             // they might not have been layout before
             int height = getArrayFirstValOrIndex(rowSizes, j);
-            d.init(width, height);
+            d.setSizePixels(width, height);
+            d.initSize();
             // maximum height is available room
             if (d.getDrawnWidth() > max) {
                max = d.getDrawnWidth();
@@ -2606,13 +2714,13 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
       }
 
       //
-      if (!modelCol.policy.hasFlag(IBOCellPolicy.OFFSET_02_FLAG, IBOCellPolicy.FLAG_7_OVERSIZE)) {
+      if (!modelCol.policy.hasFlag(CELLP_OFFSET_02_FLAG, CELLP_FLAG_7_OVERSIZE)) {
          //oversized cells are not allowed. check against ViewPort's width.
          if (!layEngine.isContextualW()) {
             //implicit init width gives 0 or negative contentWidth.
             int c = getContentW();
             if (max > c) {
-               setHelperFlag(ITechTable.HELPER_FLAG_03_CAP_OVERSIZE, true);
+               setHelperFlag(HELPER_FLAG_03_CAP_OVERSIZE, true);
                max = c;
             }
          }
@@ -2653,18 +2761,20 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
 
    /**
     * Iterate over columns inside a row and initialize drawables with height and setupColSizes that have been pre-computed. 
-    * <br>
-    * <br>
+    * 
+    * <p>
+    * 
     * <b>Why</b>? : what is the row height? needed when row size is implicit. code has to init all cells in that row
     * and get the maximum height and apply it to all.
-    * <br>
-    * <br>
+    * </p>
+    * 
+    * <p>
     * Returned value may be bigger than ViewPort's height. <br>
-    * Caller applies {@link IBOCellPolicy#FLAG_7_OVERSIZE} policy. <br>
+    * Caller applies {@link IBOCellPolicy#CELLP_FLAG_7_OVERSIZE} policy. 
+    * </p>
     * 
     * Calling this method is not necessary when model genetics says all cells have the same height
-    * <br>
-    * <br>
+    * 
     * @param rowAbs
     * @param height variable height such as implicit(0) or logical (<0)
     * @param colSizes setup column sizes. Must not bel null.
@@ -2678,7 +2788,8 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
          IDrawable d = getModelDrawableStyled(colAbs, rowAbs);
          if (d != null) {
             int width = getArrayFirstValOrIndex(colSizes, j);
-            d.init(width, height);
+            d.setSizePixels(width, height);
+            d.initSize();
             // maximum height is available room
             if (d.getDrawnHeight() > max) {
                max = d.getDrawnHeight();
@@ -2686,11 +2797,11 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
          }
          colAbs++;
       }
-      if (!modelRow.policy.hasFlag(IBOCellPolicy.OFFSET_02_FLAG, IBOCellPolicy.FLAG_7_OVERSIZE)) {
+      if (!modelRow.policy.hasFlag(CELLP_OFFSET_02_FLAG, CELLP_FLAG_7_OVERSIZE)) {
          if (!layEngine.isContextualH()) {
             int ch = getContentH();
             if (max > ch) {
-               setHelperFlag(ITechTable.HELPER_FLAG_03_CAP_OVERSIZE, true);
+               setHelperFlag(HELPER_FLAG_03_CAP_OVERSIZE, true);
                max = ch;
             }
          }
@@ -2700,12 +2811,14 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
 
    /**
     * Compute as many rows possible to fit inside totalSize.
-    * <br>
-    * <br>
+    * 
+    * <p>
+    * 
     * Return the array of those computed heights.
     * <b>Why</b>?: Flow must know the number of rows
-    * <br>
-    * <br>
+    * 
+    * </p>
+    * 
     * @param w
     * @param h
     * @param total
@@ -2721,13 +2834,15 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
          IDrawable d = getModelDrawableStyled(i);
          if (d != null) {
             // the number of columns must be known before that method is called.
-            d.init(w, h);
+            d.setSizePixels(w, h);
+            d.initSize();
             mw = (isRow) ? d.getDrawnHeight() : d.getDrawnWidth();
             if (mw + currTotal < total) {
                count++;
                currTotal += mw;
                currTotal += sepSize;
-               //System.out.println("initModelDrawablesDimension :  count=" + count + " currTotal=" + currTotal + " mw=" + mw + " totalSize=" + total);
+               //#debug
+               toDLog().pInit("count=" + count + " currTotal=" + currTotal + " mw=" + mw + " totalSize=" + total, this, TableView.class, "initModelDrawablesDimension", LVL_05_FINE, true);
             } else {
                break;
             }
@@ -2760,7 +2875,8 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
          IDrawable d = getModelDrawableStyled(i);
          if (d != null) {
             // the number of columns must be known before that method is called.
-            d.init(w, h);
+            d.setSizePixels(w, h);
+            d.initSize();
          }
       }
    }
@@ -2786,7 +2902,7 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
          throw new NullPointerException("policy Col");
       }
       LitteralStringOperator lsf = gc.getBOC().getLitteralStringOperator();
-      if (policyCol.hasFlag(IBOCellPolicy.OFFSET_03_FLAGP, IBOCellPolicy.FLAGP_7_TITLE_STRING_DEF)) {
+      if (policyCol.hasFlag(CELLP_OFFSET_03_FLAGP, CELLP_FLAGP_7_TITLE_STRING_DEF)) {
          modelCol.setTitles(lsf.getLitteralArrayString(policyCol.getSubFirst(TYPE_008_LIT_ARRAY_STRING)));
       }
       modelCol.policy = policyCol;
@@ -2796,7 +2912,7 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
          throw new NullPointerException("policy Row");
       }
 
-      if (policyRow.hasFlag(IBOCellPolicy.OFFSET_03_FLAGP, IBOCellPolicy.FLAGP_7_TITLE_STRING_DEF)) {
+      if (policyRow.hasFlag(CELLP_OFFSET_03_FLAGP, CELLP_FLAGP_7_TITLE_STRING_DEF)) {
          modelRow.setTitles(lsf.getLitteralArrayString(policyRow.getSubFirst(TYPE_008_LIT_ARRAY_STRING)));
       }
       modelRow.policy = policyRow;
@@ -2859,6 +2975,8 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
       ph += getSizeGridH() * (modelRow.numCells - 1);
       layEngine.setPh(ph);
       layEngine.setPw(pw);
+      
+      layEngine.layoutInvalidateSize();
    }
 
    /**
@@ -2867,7 +2985,7 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
     * What mechanism does not break the UI?
     * <br>
     * <br>
-    * {@link TableView#getContentH()} is computed because {@link ViewDrawable#initViewDrawable(int, int)} has been called
+    * {@link TableView#getContentH()} is computed because {@link ViewDrawable#initViewDrawable(LayouterEngineDrawable)} has been called
     * to know if a ViewPane was needed.
     * <br>
     * <br>
@@ -2878,7 +2996,7 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
     * 
     * Variable Frame give SET,AVERAGE - AVERAGE - STRONG
     * <br>
-    * Variable size frames for example with {@link IBOCellPolicy#CELL_4_FILL_AVERAGE}
+    * Variable size frames for example with {@link ITechCell#CELL_4_FILL_AVERAGE}
     * <br>
     * <br>
     * Fixed Frames is for all pratical purposes equal to {@link ITechViewPane#SCROLL_TYPE_2_PAGE_UNIT}
@@ -2886,16 +3004,16 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
    public void initScrollingConfig(ScrollConfig scX, ScrollConfig scY) {
       if (scX != null) {
          if (modelCol.frames != null) {
-            scX.setScrollUnit(ITechViewPane.SCROLL_TYPE_2_PAGE_UNIT);
+            scX.setScrollUnit(SCROLL_TYPE_2_PAGE_UNIT);
             int sizeTotal = getContentW();
             int siTotal = modelCol.getScrollTotal();
             siTotal = modelCol.frames.length / 2;
             scX.initConfigLogic(sizeTotal, sizeTotal, siTotal, modelCol.sepSize);
-         } else if (scX.getTypeUnit() == ITechViewPane.SCROLL_TYPE_1_LOGIC_UNIT) {
+         } else if (scX.getTypeUnit() == SCROLL_TYPE_1_LOGIC_UNIT) {
             int sizeTotal = getContentW();
             int siTotal = modelCol.getScrollTotal();
             int sepSize = modelCol.sepSize;
-            if (modelCol.hasHelperFlag(CellModel.HELPER_FLAG_08_ALL_CELLS_SAME_SIZE)) {
+            if (modelCol.hasHelperFlag(CELL_H_FLAG_08_ALL_CELLS_SAME_SIZE)) {
                scX.initConfigLogic(modelCol.workCellSizes[0], sizeTotal, siTotal, sepSize);
             } else {
                scX.initConfigLogic(modelCol.workCellSizes, sizeTotal, siTotal, sepSize);
@@ -2906,16 +3024,16 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
       }
       if (scY != null) {
          if (modelRow.frames != null) {
-            scY.setScrollUnit(ITechViewPane.SCROLL_TYPE_2_PAGE_UNIT);
+            scY.setScrollUnit(SCROLL_TYPE_2_PAGE_UNIT);
             int sizeTotal = getContentH();
             int siTotal = modelRow.getScrollTotal();
             siTotal = modelRow.frames.length / 2;
             scY.initConfigLogic(sizeTotal, sizeTotal, siTotal, modelRow.sepSize);
-         } else if (scY.getTypeUnit() == ITechViewPane.SCROLL_TYPE_1_LOGIC_UNIT) {
+         } else if (scY.getTypeUnit() == SCROLL_TYPE_1_LOGIC_UNIT) {
             int sizeTotal = getContentH();
             int siTotal = modelRow.getScrollTotal();
             int sepSize = modelRow.sepSize;
-            if (modelRow.hasHelperFlag(CellModel.HELPER_FLAG_08_ALL_CELLS_SAME_SIZE)) {
+            if (modelRow.hasHelperFlag(CELL_H_FLAG_08_ALL_CELLS_SAME_SIZE)) {
                scY.initConfigLogic(modelRow.workCellSizes[0], sizeTotal, siTotal, sepSize);
             } else {
                scY.initConfigLogic(modelRow.workCellSizes, sizeTotal, siTotal, sepSize);
@@ -2927,10 +3045,9 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
       //DrawableUtilz.debugScrollConfigs("TableView#initScrollingConfig", scX, scY);
    }
 
-   protected void initViewDrawable(LayEngineDrawable ds) {
-      //System.out.println("$TableView#initViewDrawable w=" + width + " h=" + height);
+   protected void initViewDrawable(LayouterEngineDrawable ds) {
       checkNullities();
-      setHelperFlags();
+      setHelperCellFlags();
 
       int width = ds.getW();
       int height = ds.getH();
@@ -3071,20 +3188,20 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
     * @return
     */
    public boolean isCellDrawableSelectable(IDrawable d, int colAbs, int rowAbs) {
-      if (hasHelperFlag(ITechTable.HELPER_FLAG_29_UNSELECTABLE_STUFF)) {
+      if (hasHelperFlag(HELPER_FLAG_29_UNSELECTABLE_STUFF)) {
          if (d != null) {
             if (d.hasBehavior(ITechDrawable.BEHAVIOR_01_NOT_SELECTABLE)) {
                return false;
             }
          }
-         if (hasHelperFlag(ITechTable.HELPER_FLAG_26_UNSELECTABLE_CELLS)) {
+         if (hasHelperFlag(HELPER_FLAG_26_UNSELECTABLE_CELLS)) {
             return model.getPropertyInt(ITableModel.PROPERTY_1_SELECTABLE, getGridIndexFromAbs(colAbs, rowAbs)) == 1;
          }
-         if (modelCol.hasHelperFlag(CellModel.HELPER_FLAG_27_UNSELECTABLE)) {
+         if (modelCol.hasHelperFlag(CELL_H_FLAG_27_UNSELECTABLE)) {
             //column model
             return modelCol.flags[colAbs] == 1;
          }
-         if (modelRow.hasHelperFlag(CellModel.HELPER_FLAG_27_UNSELECTABLE)) {
+         if (modelRow.hasHelperFlag(CELL_H_FLAG_27_UNSELECTABLE)) {
             return modelRow.flags[rowAbs] == 1;
          }
       }
@@ -3108,7 +3225,7 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
    }
 
    protected boolean isFullInsideTransition() {
-      return modelCol.transitionType == Transition.TRANSITION_0INSIDE_VIEWPORT && modelRow.transitionType == Transition.TRANSITION_0INSIDE_VIEWPORT;
+      return modelCol.transitionType == Transition.TRANSITION_0_INSIDE_VIEWPORT && modelRow.transitionType == Transition.TRANSITION_0_INSIDE_VIEWPORT;
    }
 
    public boolean isSelectedCell(int colAbs, int rowAbs) {
@@ -3120,6 +3237,14 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
    }
 
    /**
+    * We don't invalidate our children?
+    * 
+    */
+   public void layoutInvalidate(boolean topDown) {
+      super.layoutInvalidate(topDown);
+   }
+
+   /**
     * Manages Navigational keys itself via the {@link Controller}.
     * <br>
     * <br>
@@ -3127,6 +3252,14 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
     */
    public void manageKeyInput(InputConfig ic) {
       super.manageKeyInput(ic);
+   }
+
+   public void manageNavigate(CmdInstanceDrawable cd, int navEvent) {
+      if (navEvent == INavTech.NAV_1_UP) {
+         navigateUp(cd.getIC());
+      } else if (navEvent == INavTech.NAV_5_SELECT) {
+
+      }
    }
 
    public void managePointerEvent(IDrawable slave, InputConfig ic) {
@@ -3192,14 +3325,6 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
       //      
    }
 
-   public void manageNavigate(CmdInstanceDrawable cd, int navEvent) {
-      if (navEvent == INavTech.NAV_1_UP) {
-         navigateUp(cd.getIC());
-      } else if (navEvent == INavTech.NAV_5_SELECT) {
-
-      }
-   }
-
    /**
     * Called by {@link ViewPane} when pointer event is inside the ViewPort area.
     * <br>
@@ -3209,7 +3334,7 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
     * <li>2nd time, if the slave is not null, calls {@link TableView#managePointerInputSlave(InputConfig)}
     */
    public void managePointerInputViewPort(InputConfig ic) {
-      if (techTable.hasFlag(IBOTableView.T_OFFSET_02_FLAGX, IBOTableView.T_FLAGX_7_VIEW_PORT_BLIND)) {
+      if (boTable.hasFlag(T_OFFSET_02_FLAGX, T_FLAGX_7_VIEW_PORT_BLIND)) {
          return;
       }
       //#debug
@@ -3317,24 +3442,24 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
     */
    protected void managePointerViewPressed(InputConfig ic) {
       //#debug
-      toDLog().pFlow("", techTable, TableView.class, "managePointerViewPressed", LVL_05_FINE, true);
+      toDLog().pFlow("", boTable, TableView.class, "managePointerViewPressed", LVL_05_FINE, true);
 
-      int type = techTable.get1(T_OFFSET_12_PSELECTION_MODE1);
-      if (type == ITechTable.PSELECT_0_NONE) {
+      int type = boTable.get1(T_OFFSET_12_PSELECTION_MODE1);
+      if (type == PSELECT_0_NONE) {
          forwardPointerEvent(ic);
-      } else if (type == ITechTable.PSELECT_1_PRESS) {
+      } else if (type == PSELECT_1_PRESS) {
          forwardPointerSelectEvent(ic);
-      } else if (type == ITechTable.PSELECT_2_PRESS_RELEASE) {
+      } else if (type == PSELECT_2_PRESS_RELEASE) {
          forwardPointerEvent(ic);
-      } else if (type == ITechTable.PSELECT_3_SELECTED_PRESS) {
+      } else if (type == PSELECT_3_SELECTED_PRESS) {
          forwardPointerSelectPress(ic);
-      } else if (type == ITechTable.PSELECT_4_PRESS_DOUBLE) {
+      } else if (type == PSELECT_4_PRESS_DOUBLE) {
          if (ic.isPressedDouble()) {
             forwardPointerSelectEvent(ic);
          } else {
             forwardPointerEvent(ic);
          }
-      } else if (type == ITechTable.PSELECT_5_PRESS_RELEASE_DOUBLE) {
+      } else if (type == PSELECT_5_PRESS_RELEASE_DOUBLE) {
          if (ic.isPressedReleasedDouble()) {
             forwardPointerSelectEvent(ic);
          } else {
@@ -3345,12 +3470,12 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
 
    public void managePointerViewReleased(InputConfig ic) {
 
-      int type = techTable.get1(T_OFFSET_12_PSELECTION_MODE1);
-      if (type == ITechTable.PSELECT_0_NONE) {
+      int type = boTable.get1(T_OFFSET_12_PSELECTION_MODE1);
+      if (type == PSELECT_0_NONE) {
          forwardPointerEvent(ic);
-      } else if (type == ITechTable.PSELECT_1_PRESS) {
+      } else if (type == PSELECT_1_PRESS) {
          //dealt with in the other method
-      } else if (type == ITechTable.PSELECT_2_PRESS_RELEASE) {
+      } else if (type == PSELECT_2_PRESS_RELEASE) {
          //finds which drawable is located under the release event
          int[] pointed = getPointerDrawableCoordinates(ic);
          if (pointed != null) {
@@ -3370,9 +3495,9 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
             // pointer event as slave. manage the internal drawable states.
             d.managePointerInput(ic);
          }
-      } else if (type == ITechTable.PSELECT_3_SELECTED_PRESS) {
-      } else if (type == ITechTable.PSELECT_4_PRESS_DOUBLE) {
-      } else if (type == ITechTable.PSELECT_5_PRESS_RELEASE_DOUBLE) {
+      } else if (type == PSELECT_3_SELECTED_PRESS) {
+      } else if (type == PSELECT_4_PRESS_DOUBLE) {
+      } else if (type == PSELECT_5_PRESS_RELEASE_DOUBLE) {
          if (ic.isPressedReleasedDouble()) {
             forwardPointerSelectEvent(ic);
          }
@@ -3396,10 +3521,27 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
    }
 
    /**
+    * Tries to navigate. it may fail because
+    * <li> No navi
+    * <li> reached the end of table and no circle flag
+    * 
+    * @param cd
+    */
+   public void navigateDown(CmdInstanceDrawable cd) {
+      // table has its own navigation
+      if (modelRow.hasHelperFlag(CELL_H_FLAG_10_OWN_NAVIGATION)) {
+         int nextRow = getNextSelectableDown();
+         if (nextRow != modelRow.selectedCellAbs) {
+            selectionMove(cd.getIC(), modelCol.selectedCellAbs, nextRow);
+         }
+      }
+   }
+
+   /**
     * In most configurations, the {@link TableView} navigates key Navs on its own.
     * <br>
     * <br>
-    * This is decided by {@link CellModel#HELPER_FLAG_10_OWN_NAVIGATION}.
+    * This is decided by {@link CellModel#CELL_H_FLAG_10_OWN_NAVIGATION}.
     * <br>
     * Apply selectability
     * <br> 
@@ -3411,7 +3553,7 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
    public void navigateDown(InputConfig ic) {
       if (ic.isPressed() || ic.isWheeled()) {
          // table has its own navigation
-         if (modelRow.hasHelperFlag(CellModel.HELPER_FLAG_10_OWN_NAVIGATION)) {
+         if (modelRow.hasHelperFlag(CELL_H_FLAG_10_OWN_NAVIGATION)) {
             int nextRow = getNextSelectableDown();
             if (nextRow != modelRow.selectedCellAbs) {
                selectionMove(ic, modelCol.selectedCellAbs, nextRow);
@@ -3420,19 +3562,11 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
       }
    }
 
-   /**
-    * Tries to navigate. it may fail because
-    * <li> No navi
-    * <li> reached the end of table and no circle flag
-    * 
-    * @param cd
-    */
-   public void navigateDown(CmdInstanceDrawable cd) {
-      // table has its own navigation
-      if (modelRow.hasHelperFlag(CellModel.HELPER_FLAG_10_OWN_NAVIGATION)) {
-         int nextRow = getNextSelectableDown();
-         if (nextRow != modelRow.selectedCellAbs) {
-            selectionMove(cd.getIC(), modelCol.selectedCellAbs, nextRow);
+   public void navigateLeft(CmdInstanceDrawable cd) {
+      if (modelCol.hasHelperFlag(CELL_H_FLAG_10_OWN_NAVIGATION)) {
+         int nextCol = getNextSelectableLeft();
+         if (nextCol != modelCol.selectedCellAbs) {
+            selectionMove(cd.getIC(), nextCol, modelRow.selectedCellAbs);
          }
       }
    }
@@ -3443,7 +3577,7 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
     */
    public void navigateLeft(InputConfig ic) {
       if (ic.isPressed()) {
-         if (modelCol.hasHelperFlag(CellModel.HELPER_FLAG_10_OWN_NAVIGATION)) {
+         if (modelCol.hasHelperFlag(CELL_H_FLAG_10_OWN_NAVIGATION)) {
             int nextCol = getNextSelectableLeft();
             if (nextCol != modelCol.selectedCellAbs) {
                selectionMove(ic, nextCol, modelRow.selectedCellAbs);
@@ -3452,17 +3586,8 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
       }
    }
 
-   public void navigateLeft(CmdInstanceDrawable cd) {
-      if (modelCol.hasHelperFlag(CellModel.HELPER_FLAG_10_OWN_NAVIGATION)) {
-         int nextCol = getNextSelectableLeft();
-         if (nextCol != modelCol.selectedCellAbs) {
-            selectionMove(cd.getIC(), nextCol, modelRow.selectedCellAbs);
-         }
-      }
-   }
-
    public void navigateRight(CmdInstanceDrawable cd) {
-      if (modelCol.hasHelperFlag(CellModel.HELPER_FLAG_10_OWN_NAVIGATION)) {
+      if (modelCol.hasHelperFlag(CELL_H_FLAG_10_OWN_NAVIGATION)) {
          int nextCol = getNextSelectableRight();
          if (nextCol != modelCol.selectedCellAbs) {
             selectionMove(cd.getIC(), nextCol, modelRow.selectedCellAbs);
@@ -3475,7 +3600,7 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
     */
    public void navigateRight(InputConfig ic) {
       if (ic.isPressed()) {
-         if (modelCol.hasHelperFlag(CellModel.HELPER_FLAG_10_OWN_NAVIGATION)) {
+         if (modelCol.hasHelperFlag(CELL_H_FLAG_10_OWN_NAVIGATION)) {
             int nextCol = getNextSelectableRight();
             if (nextCol != modelCol.selectedCellAbs) {
                selectionMove(ic, nextCol, modelRow.selectedCellAbs);
@@ -3503,6 +3628,16 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
       }
    }
 
+   public void navigateUp(CmdInstanceDrawable cd) {
+      if (modelRow.hasHelperFlag(CELL_H_FLAG_10_OWN_NAVIGATION)) {
+         int nextRow = getNextSelectableUp();
+         if (nextRow != modelRow.selectedCellAbs) {
+            InputConfig ic = cd.getIC();
+            selectionMove(ic, modelCol.selectedCellAbs, nextRow);
+         }
+      }
+   }
+
    /**
     * Navigates on step up if possible.
     * <br>
@@ -3510,21 +3645,11 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
     */
    public void navigateUp(InputConfig ic) {
       if (ic.isPressed() || ic.isWheeled()) {
-         if (modelRow.hasHelperFlag(CellModel.HELPER_FLAG_10_OWN_NAVIGATION)) {
+         if (modelRow.hasHelperFlag(CELL_H_FLAG_10_OWN_NAVIGATION)) {
             int nextRow = getNextSelectableUp();
             if (nextRow != modelRow.selectedCellAbs) {
                selectionMove(ic, modelCol.selectedCellAbs, nextRow);
             }
-         }
-      }
-   }
-
-   public void navigateUp(CmdInstanceDrawable cd) {
-      if (modelRow.hasHelperFlag(CellModel.HELPER_FLAG_10_OWN_NAVIGATION)) {
-         int nextRow = getNextSelectableUp();
-         if (nextRow != modelRow.selectedCellAbs) {
-            InputConfig ic = cd.getIC();
-            selectionMove(ic, modelCol.selectedCellAbs, nextRow);
          }
       }
    }
@@ -3704,7 +3829,7 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
 
       //tabledrawindex set full repaint, but not stupid. 
       //helper flag to do a index based repaint.
-      if (hasHelperFlag(ITechTable.HELPER_FLAG_20_SPECIAL_REPAINT)) {
+      if (hasHelperFlag(HELPER_FLAG_20_SPECIAL_REPAINT)) {
          if (isFullInsideTransition()) {
             int visualIndex1 = getVisualIndex(modelCol.oldSelectedCellAbs, modelRow.oldSelectedCellAbs);
             int visualIndex2 = getVisualIndex(modelCol.selectedCellAbs, modelRow.selectedCellAbs);
@@ -3760,15 +3885,15 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
          //variable cells
          int changeX = 0;
          int changeY = 0;
-         if (modelCol.transitionType != CellModel.TRANSITION_0INSIDE_VIEWPORT) {
-            changeX = modelCol.doUpdate(viewPane.getSChorizontal(), getContentW());
+         if (modelCol.transitionType != TRANSITION_0_INSIDE_VIEWPORT) {
+            changeX = modelCol.doUpdate(viewPane.getScrollConfigHorizontal(), getContentW());
             if (changeX != 0) {
                //move the scroll config vx increments
                viewPane.moveX(ic, changeX);
             }
          }
-         if (modelRow.transitionType != CellModel.TRANSITION_0INSIDE_VIEWPORT) {
-            changeY = modelRow.doUpdate(viewPane.getSCvertical(), getContentH());
+         if (modelRow.transitionType != TRANSITION_0_INSIDE_VIEWPORT) {
+            changeY = modelRow.doUpdate(viewPane.getScrollConfigVertical(), getContentH());
             if (changeY != 0) {
                //move the scroll config vx increments
                viewPane.moveY(ic, changeY);
@@ -3780,14 +3905,14 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
       }
 
       //TODO animate transition of the FG layer
-      if (techTable.hasFlag(IBOTableView.T_OFFSET_01_FLAG, IBOTableView.T_FLAG_8_STYLE_ANIMATION)) {
+      if (boTable.hasFlag(T_OFFSET_01_FLAG, T_FLAG_8_STYLE_ANIMATION)) {
 
       }
       selectionMoveEvent(ic);
    }
 
    protected void selectionMoveEvent(InputConfig ic) {
-      gc.getEventsBusGui().sendNewEvent(producerID, ITechTable.EVENT_ID_01_SELECTION_CHANGE, this);
+      gc.getEventsBusGui().sendNewEvent(producerID, EVENT_ID_01_SELECTION_CHANGE, this);
    }
 
    /**
@@ -3802,7 +3927,7 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
    protected void selectionSelectEvent(InputConfig ic) {
       //#debug
       toDLog().pEvent("SelectedCell=[" + getSelectedCol() + "," + getSelectedRow() + "] =" + toStringSelectedDrawable(), this, TableView.class, "selectionSelectEvent");
-      BusEvent be = gc.getEventsBusGui().createEvent(producerID, ITechTable.EVENT_ID_00_SELECT, this);
+      BusEvent be = gc.getEventsBusGui().createEvent(producerID, EVENT_ID_00_SELECT, this);
       be.setParamO1(eventParamO);
       be.putOnBus();
    }
@@ -3828,14 +3953,13 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
       }
       cm.numCells = numTotalCells;
       cm.setupSizes = new int[] { size };
-      cm.policies = new int[] { CELL_1_EXPLICIT_SET };
+      cm.policies = new int[] { ITechCell.CELL_1_EXPLICIT_SET };
    }
 
    /**
     * <li> {@link ITechTable#HELPER_FLAG_01_STRONG_ROWS}
     * <li> {@link ITechTable#HELPER_FLAG_02_SINGLE_CONFIG}
     * <li> {@link ITechTable#HELPER_FLAG_03_CAP_OVERSIZE}
-    * <li> {@link ITechTable#HELPER_FLAG_04_TOTAL_SET}
     * <li> {@link ITechTable#HELPER_FLAG_05_YCOORDS_ONLY}
     * <li> {@link ITechTable#HELPER_FLAG_06_MODEL_MASK}
     * @param flag
@@ -3848,7 +3972,7 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
    /**
    * 
    */
-   public void setHelperFlags() {
+   public void setHelperCellFlags() {
       //      if (viewPane != null) {
       //         if (viewPane.getSChorizontal() != null) {
       //            if (policyTable.get1(TP_OFFSET_05WDRAW1) == TP_DRAW_3FILL || policyTable.hasFlag(TP_OFFSET_03FLAGP1, TP_FLAGP_5VARIABLE_COLSIZES)) {
@@ -3862,12 +3986,12 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
       //         }
       //      }
       if (hasTechX(T_FLAGX_1_NO_SELECTION)) {
-         modelRow.setHelperFlag(CellModel.HELPER_FLAG_10_OWN_NAVIGATION, false);
-         modelCol.setHelperFlag(CellModel.HELPER_FLAG_10_OWN_NAVIGATION, false);
+         modelRow.setHelperFlag(CELL_H_FLAG_10_OWN_NAVIGATION, false);
+         modelCol.setHelperFlag(CELL_H_FLAG_10_OWN_NAVIGATION, false);
       } else {
-         modelRow.setHelperFlag(CellModel.HELPER_FLAG_10_OWN_NAVIGATION, true);
-         boolean isRowSelection = hasTechX(IBOTableView.T_FLAGX_3_ROW_SELECTION);
-         modelCol.setHelperFlag(CellModel.HELPER_FLAG_10_OWN_NAVIGATION, !isRowSelection);
+         modelRow.setHelperFlag(CELL_H_FLAG_10_OWN_NAVIGATION, true);
+         boolean isRowSelection = hasTechX(T_FLAGX_3_ROW_SELECTION);
+         modelCol.setHelperFlag(CELL_H_FLAG_10_OWN_NAVIGATION, !isRowSelection);
       }
       // this.setViewFlag(ViewDrawable.VIEWSTATE_1_CONTENT_WIDTH_FOLLOWS_VIEWPORT,
       // hasHelperFlag(HELPER_FLAG_01VARIABLE_COLSIZES));
@@ -3885,9 +4009,9 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
    public void setModelLength(int modelLength) {
       modelLen = modelLength;
       if (modelLen != 0 || modelOffset != 0) {
-         setHelperFlag(ITechTable.HELPER_FLAG_06_MODEL_MASK, true);
+         setHelperFlag(HELPER_FLAG_06_MODEL_MASK, true);
       } else {
-         setHelperFlag(ITechTable.HELPER_FLAG_06_MODEL_MASK, false);
+         setHelperFlag(HELPER_FLAG_06_MODEL_MASK, false);
       }
 
    }
@@ -3901,9 +4025,9 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
    public void setModelOffset(int i) {
       modelOffset = i;
       if (modelLen != 0 || modelOffset != 0) {
-         setHelperFlag(ITechTable.HELPER_FLAG_06_MODEL_MASK, true);
+         setHelperFlag(HELPER_FLAG_06_MODEL_MASK, true);
       } else {
-         setHelperFlag(ITechTable.HELPER_FLAG_06_MODEL_MASK, false);
+         setHelperFlag(HELPER_FLAG_06_MODEL_MASK, false);
       }
    }
 
@@ -4094,15 +4218,15 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
     */
    private int setupImplicitCell(boolean isRow, ByteObject policy, int index, int[] coSetupSize, int value) {
       if (modelGenetics != null) {
-         int flag = (!isRow) ? IBOGenetics.GENE_FLAG_3_SAME_SIZE_W : IBOGenetics.GENE_FLAG_4_SAME_SIZE_H;
-         if (modelGenetics.hasFlag(IBOGenetics.GENE_OFFSET_01_FLAG, flag)) {
-            int indexv = (!isRow) ? IBOGenetics.GENE_OFFSET_03_WIDTH2 : IBOGenetics.GENE_OFFSET_04_HEIGHT2;
+         int flag = (!isRow) ? GENE_FLAG_3_SAME_SIZE_W : GENE_FLAG_4_SAME_SIZE_H;
+         if (modelGenetics.hasFlag(GENE_OFFSET_01_FLAG, flag)) {
+            int indexv = (!isRow) ? GENE_OFFSET_03_WIDTH2 : GENE_OFFSET_04_HEIGHT2;
             int size = modelGenetics.get2(indexv);
             return size;
          }
       }
       // cell value is negative or 0
-      if (policy.hasFlag(OFFSET_02_FLAG, FLAG_2_ETALON)) {
+      if (policy.hasFlag(CELLP_OFFSET_02_FLAG, CELLP_FLAG_2_ETALON)) {
          // use the etalon for computing the implicit size
          if (isRow) {
             return getEtalon(policy).getDrawnHeight();
@@ -4126,7 +4250,7 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
     * <br>
     * <br>
     * Happens to
-    * <li> {@link IBOCellPolicy#CELL_0_IMPLICIT_SET}
+    * <li> {@link ITechCell#CELL_0_IMPLICIT_SET}
     * <br>
     * <br>
     * 
@@ -4145,15 +4269,15 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
    private void setupImplicitFlow(boolean isRow, CellModel cm, int totalSize, int sepSize, int[] coSizeSetup) {
       //check implicit for modelGenetics that may speed up
       if (modelGenetics != null) {
-         int flag = (!isRow) ? IBOGenetics.GENE_FLAG_3_SAME_SIZE_W : IBOGenetics.GENE_FLAG_4_SAME_SIZE_H;
-         if (modelGenetics.hasFlag(IBOGenetics.GENE_OFFSET_01_FLAG, flag)) {
-            int index = (!isRow) ? IBOGenetics.GENE_OFFSET_03_WIDTH2 : IBOGenetics.GENE_OFFSET_04_HEIGHT2;
+         int flag = (!isRow) ? GENE_FLAG_3_SAME_SIZE_W : GENE_FLAG_4_SAME_SIZE_H;
+         if (modelGenetics.hasFlag(GENE_OFFSET_01_FLAG, flag)) {
+            int index = (!isRow) ? GENE_OFFSET_03_WIDTH2 : GENE_OFFSET_04_HEIGHT2;
             int size = modelGenetics.get2(index);
             setFlowSingleSize(cm, totalSize, sepSize, size);
             return;
          }
       }
-      int size = cm.policy.get4(OFFSET_09_SIZE4);
+      int size = cm.policy.get4(CELLP_OFFSET_09_SIZE4);
       // implicit case, it needs the other cosize values to be computed
       int wsize = 0;
       int hsize = 0;
@@ -4166,14 +4290,14 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
          wsize = coSizeSetup[0];
       }
       // implicit size. we must init the etalon with that opposite cosize value
-      if (cm.policy.hasFlag(OFFSET_02_FLAG, FLAG_2_ETALON)) {
+      if (cm.policy.hasFlag(CELLP_OFFSET_02_FLAG, CELLP_FLAG_2_ETALON)) {
          if (!isRow) {
             size = getEtalon(cm.policy).getDrawnWidth();
          } else {
             size = getEtalon(cm.policy).getDrawnHeight();
          }
          setFlowSingleSize(cm, totalSize, sepSize, size);
-      } else if (cm.policy.hasFlag(IBOCellPolicy.OFFSET_02_FLAG, IBOCellPolicy.FLAG_3_MAX)) {
+      } else if (cm.policy.hasFlag(CELLP_OFFSET_02_FLAG, CELLP_FLAG_3_MAX)) {
          //get the maximum size on the whole set: init all the drawables and take the maximum value
          initModelDrawablesDimensionAll(wsize, hsize);
          size = getModelDrawablesMaxSizeFlow(isRow);
@@ -4202,10 +4326,10 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
     * @param coSetupSize
     */
    private void setupMinMaxCells(ByteObject policy, int[] setupSizes, int totalSize, int[] coSetupSize) {
-      int max = policy.get2(IBOCellPolicy.OFFSET_11_SIZE_MAX2);
-      int min = policy.get2(IBOCellPolicy.OFFSET_10_SIZE_MIN2);
-      int[] rowMinSizes = policy.getValuesFlag(CELLP_BASIC_SIZE, OFFSET_04_FLAGZ, FLAGZ_3_MIN_SIZES);
-      int[] rowMaxSizes = policy.getValuesFlag(CELLP_BASIC_SIZE, OFFSET_04_FLAGZ, FLAGZ_4_MAX_SIZES);
+      int max = policy.get2(CELLP_OFFSET_11_SIZE_MAX2);
+      int min = policy.get2(CELLP_OFFSET_10_SIZE_MIN2);
+      int[] rowMinSizes = policy.getValuesFlag(CELLP_BASIC_SIZE, CELLP_OFFSET_04_FLAGZ, CELLP_FLAGZ_3_MIN_SIZES);
+      int[] rowMaxSizes = policy.getValuesFlag(CELLP_BASIC_SIZE, CELLP_OFFSET_04_FLAGZ, CELLP_FLAGZ_4_MAX_SIZES);
       boolean isMinMax = rowMinSizes != null || rowMaxSizes != null;
       if (isMinMax) {
          for (int i = 0; i < setupSizes.length; i++) {
@@ -4215,14 +4339,14 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
    }
 
    private void setupNumColRows() {
-      int numTotalCols = modelCol.policy.get2(OFFSET_05_CELL_NUM2);
-      int numTotalRows = modelRow.policy.get2(OFFSET_05_CELL_NUM2);
+      int numTotalCols = modelCol.policy.get2(CELLP_OFFSET_05_CELL_NUM2);
+      int numTotalRows = modelRow.policy.get2(CELLP_OFFSET_05_CELL_NUM2);
 
       if (numTotalCols == 0 && numTotalRows == 0) {
          // check policyCol to know which is the strongest.
-         if (modelRow.policy.hasFlag(OFFSET_02_FLAG, FLAG_5_STRONG_FLOW)) {
+         if (modelRow.policy.hasFlag(CELLP_OFFSET_02_FLAG, CELLP_FLAG_5_STRONG_FLOW)) {
             tableType = IBOTablePolicy.TABLE_TYPE_4FLOW_ROW; //strong rows
-            setHelperFlag(ITechTable.HELPER_FLAG_01_STRONG_ROWS, true);
+            setHelperFlag(HELPER_FLAG_01_STRONG_ROWS, true);
          } else {
             tableType = IBOTablePolicy.TABLE_TYPE_3FLOW_COL; //strong columns
          }
@@ -4233,7 +4357,7 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
          tableType = IBOTablePolicy.TABLE_TYPE_1GENERIC_COL; // strong columns
          numTotalRows = updateTotalColRows(numTotalCols);
       } else if (numTotalRows != 0 && numTotalCols == 0) {
-         setHelperFlag(ITechTable.HELPER_FLAG_01_STRONG_ROWS, true);
+         setHelperFlag(HELPER_FLAG_01_STRONG_ROWS, true);
          tableType = IBOTablePolicy.TABLE_TYPE_2GENERIC_ROW; // strong row
          numTotalCols = updateTotalColRows(numTotalRows);
       } else {
@@ -4247,16 +4371,16 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
 
    private void setupPolicyType(boolean isRow, CellModel cm, int sepSize, int totalSize) {
       // check the cell type
-      int typer = cm.policy.get1(IBOCellPolicy.OFFSET_01_TYPE1);
+      int typer = cm.policy.get1(CELLP_OFFSET_01_TYPE1);
       switch (typer) {
-         case TYPE_0_GENERIC:
+         case ITechCell.TYPE_0_GENERIC:
             setupTypeGeneric(isRow, cm, totalSize, sepSize);
             break;
-         case TYPE_2_RATIO:
+         case ITechCell.TYPE_2_RATIO:
             setupTypeRatio(cm, totalSize, sepSize);
             break;
          default:
-         case TYPE_1_FLOW:
+         case ITechCell.TYPE_1_FLOW:
             setupTypeFlow(isRow, cm, totalSize, sepSize);
             break;
       }
@@ -4317,14 +4441,6 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
       }
    }
 
-   public void stateReadFrom(StatorReader state) {
-      super.stateReadFrom(state);
-   }
-
-   public void stateWriteTo(StatorWriter state) {
-      super.stateWriteTo(state);
-   }
-
    /**
     * Finalize setup by computing implicit setup size to implict. <br>
     * <br>
@@ -4338,16 +4454,16 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
     */
    private void setupPolicyTypeImplicit(boolean isRow, CellModel cm, CellModel coModel, int sepSize, int totalSize) {
       // check the cell type
-      int typer = cm.policy.get1(IBOCellPolicy.OFFSET_01_TYPE1);
+      int typer = cm.policy.get1(CELLP_OFFSET_01_TYPE1);
       switch (typer) {
-         case TYPE_0_GENERIC:
+         case ITechCell.TYPE_0_GENERIC:
             setupImplicitCells(isRow, cm.policy, cm.setupSizes, coModel.setupSizes);
             break;
-         case TYPE_2_RATIO:
+         case ITechCell.TYPE_2_RATIO:
             break;
          default:
-         case TYPE_1_FLOW:
-            int size = cm.policy.get4(OFFSET_09_SIZE4);
+         case ITechCell.TYPE_1_FLOW:
+            int size = cm.policy.get4(CELLP_OFFSET_09_SIZE4);
             if (size <= 0) {
                setupImplicitFlow(isRow, cm, totalSize, sepSize, coModel.setupSizes);
                // we must update the number of columns and row
@@ -4402,7 +4518,7 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
             DrawableInjected titlesView = new DrawableInjected(gc, titleRowStyleClass, this, this);
             titlesView.toStringSetName("TitleRowsContainer");
             titlesView.setBehaviorFlag(ITechDrawable.BEHAVIOR_23_PARENT_EVENT_CONTROL, true);
-            setHeader(titlesView, C.POS_2_LEFT, ITechViewPane.PLANET_MODE_0_EAT);
+            setHeader(titlesView, C.POS_2_LEFT, PLANET_MODE_0_EAT);
             modelRow.titlesView = titlesView;
          }
       }
@@ -4412,7 +4528,7 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
       // when size is zero or negative, take each, min, maximum or etalon. no
       // other choice
       // when size is zero, take maximum
-      int size = cm.policy.get4(OFFSET_09_SIZE4);
+      int size = cm.policy.get4(CELLP_OFFSET_09_SIZE4);
       if (size > 0) {
          int divisor = size + sepSize;
          // when divisor is small, the number of column may be too much
@@ -4422,13 +4538,13 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
          }
          cm.setNumCells(numPossibleTotalCells);
          cm.setupSizes = new int[] { size };
-         cm.policies = new int[] { CELL_1_EXPLICIT_SET };
+         cm.policies = new int[] { ITechCell.CELL_1_EXPLICIT_SET };
       } else {
          //will have to setup later but yet put data
          cm.setupSizes = new int[] { size };
-         cm.policies = new int[] { CELL_1_EXPLICIT_SET };
+         cm.policies = new int[] { ITechCell.CELL_1_EXPLICIT_SET };
       }
-      cm.setHelperFlag(CellModel.HELPER_FLAG_08_ALL_CELLS_SAME_SIZE, true);
+      cm.setHelperFlag(CELL_H_FLAG_08_ALL_CELLS_SAME_SIZE, true);
       if (isRow) {
          setFlagView(ITechViewDrawable.FLAG_VSTATE_11_CONTENT_PH_VIEWPORT_DH, true);
          setFlagView(ITechViewDrawable.FLAG_VSTATE_13_CONTENT_H_DEPENDS_VIEWPORT, true);
@@ -4444,31 +4560,31 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
       cm.setupSizes = setupSizes;
       // extract policy values
       int[] policies = null;
-      if (policy.hasFlag(OFFSET_04_FLAGZ, FLAGZ_1_POLICIES)) {
-         policies = policy.getValuesFlag(CELLP_BASIC_SIZE, OFFSET_04_FLAGZ, FLAGZ_1_POLICIES);
+      if (policy.hasFlag(CELLP_OFFSET_04_FLAGZ, CELLP_FLAGZ_1_POLICIES)) {
+         policies = policy.getValuesFlag(CELLP_BASIC_SIZE, CELLP_OFFSET_04_FLAGZ, CELLP_FLAGZ_1_POLICIES);
       } else {
          // no special policies thus either defined built them based on
          // setupColSizes
-         policies = new int[] { policy.get1(OFFSET_07_POLICY1) };
+         policies = new int[] { policy.get1(CELLP_OFFSET_07_POLICY1) };
       }
       cm.policies = policies;
       if (policies.length == 1) {
-         cm.setHelperFlag(CellModel.HELPER_FLAG_08_ALL_CELLS_SAME_SIZE, true);
+         cm.setHelperFlag(CELL_H_FLAG_08_ALL_CELLS_SAME_SIZE, true);
       }
       // extract size values
       int[] sizes = null;
-      if (policy.hasFlag(OFFSET_04_FLAGZ, FLAGZ_2_SIZES)) {
-         sizes = policy.getValuesFlag(CELLP_BASIC_SIZE, OFFSET_04_FLAGZ, FLAGZ_2_SIZES);
+      if (policy.hasFlag(CELLP_OFFSET_04_FLAGZ, CELLP_FLAGZ_2_SIZES)) {
+         sizes = policy.getValuesFlag(CELLP_BASIC_SIZE, CELLP_OFFSET_04_FLAGZ, CELLP_FLAGZ_2_SIZES);
       } else {
-         int size = policy.get4(OFFSET_09_SIZE4);
+         int size = policy.get4(CELLP_OFFSET_09_SIZE4);
          if (modelGenetics != null) {
             size = getGeneticSize(isRow);
          }
          sizes = new int[] { size };
       }
       int[] frames = null;
-      if (policy.hasFlag(OFFSET_04_FLAGZ, FLAGZ_5_FRAMES)) {
-         frames = policy.getValuesFlag(CELLP_BASIC_SIZE, OFFSET_04_FLAGZ, FLAGZ_5_FRAMES);
+      if (policy.hasFlag(CELLP_OFFSET_04_FLAGZ, CELLP_FLAGZ_5_FRAMES)) {
+         frames = policy.getValuesFlag(CELLP_BASIC_SIZE, CELLP_OFFSET_04_FLAGZ, CELLP_FLAGZ_5_FRAMES);
       }
       cm.frames = frames;
 
@@ -4476,28 +4592,28 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
          int val = getArrayFirstValOrIndex(policies, i);
          int size = getArrayFirstValOrIndex(sizes, i);
          switch (val) {
-            case CELL_3_FILL_STRONG:
+            case ITechCell.CELL_3_FILL_STRONG:
                // that might change
                size = totalSize;
                setViewPortFlag(isRow);
                break;
-            case CELL_0_IMPLICIT_SET:
+            case ITechCell.CELL_0_IMPLICIT_SET:
                size = 0;
                break;
-            case CELL_4_FILL_AVERAGE:
-            case CELL_5_FILL_WEAK:
+            case ITechCell.CELL_4_FILL_AVERAGE:
+            case ITechCell.CELL_5_FILL_WEAK:
                //will be computed in variable
                size = SETUP_WEAK;
                if (isRow) {
                   setFlagView(ITechViewDrawable.FLAG_VSTATE_13_CONTENT_H_DEPENDS_VIEWPORT, true);
-                  cm.setHelperFlag(CellModel.HELPER_FLAG_14_VARIABLE_SETUP_SIZE, true);
+                  cm.setHelperFlag(CELL_H_FLAG_14_VARIABLE_SETUP_SIZE, true);
                } else {
                   setFlagView(ITechViewDrawable.FLAG_VSTATE_12_CONTENT_W_DEPENDS_VIEWPORT, true);
-                  cm.setHelperFlag(CellModel.HELPER_FLAG_14_VARIABLE_SETUP_SIZE, true);
+                  cm.setHelperFlag(CELL_H_FLAG_14_VARIABLE_SETUP_SIZE, true);
                }
                //
                break;
-            case CELL_2_RATIO:
+            case ITechCell.CELL_2_RATIO:
                // variable
                setViewPortFlag(isRow);
                break;
@@ -4509,16 +4625,14 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
       }
    }
 
-   //#mdebug
-
    private void setupTypeRatio(CellModel cm, int totalSize, int sepSize) {
       int[] setupSizes = new int[cm.numCells];
       int[] values = new int[cm.numCells];
-      if (cm.policy.hasFlag(OFFSET_02_FLAG, FLAG_4_RATIO_EVEN)) {
+      if (cm.policy.hasFlag(CELLP_OFFSET_02_FLAG, CELLP_FLAG_4_RATIO_EVEN)) {
          IntUtils.fill(values, 10);
-         cm.setHelperFlag(CellModel.HELPER_FLAG_08_ALL_CELLS_SAME_SIZE, true);
+         cm.setHelperFlag(CELL_H_FLAG_08_ALL_CELLS_SAME_SIZE, true);
       } else {
-         values = cm.policy.getValuesFlag(CELLP_BASIC_SIZE, OFFSET_04_FLAGZ, FLAGZ_2_SIZES);
+         values = cm.policy.getValuesFlag(CELLP_BASIC_SIZE, CELLP_OFFSET_04_FLAGZ, CELLP_FLAGZ_2_SIZES);
       }
       int hroom = totalSize - ((cm.numCells - 1) * sepSize);
       double total = IntUtils.sum(values);
@@ -4534,8 +4648,10 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
          setupSizes[i]++;
       }
       cm.setupSizes = setupSizes;
-      cm.policies = new int[] { CELL_1_EXPLICIT_SET };
+      cm.policies = new int[] { ITechCell.CELL_1_EXPLICIT_SET };
    }
+
+   //#mdebug
 
    protected void setViewPortFlag(boolean isRow) {
       if (isRow) {
@@ -4615,6 +4731,14 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
       //currentConfig.shiftXY(dx, dy);
    }
 
+   public void stateReadFrom(StatorReader state) {
+      super.stateReadFrom(state);
+   }
+
+   public void stateWriteTo(StatorWriter state) {
+      super.stateWriteTo(state);
+   }
+
    public void toString(Dctx sb) {
       sb.root(this, TableView.class, 4600);
       toStringPrivate(sb);
@@ -4680,33 +4804,29 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
       }
 
       sb.nl();
-      gc.getTableOperator().toStringTableTech(techTable, sb.newLevel());
+      gc.getTableOperator().toStringTableTech(boTable, sb.newLevel());
 
       sb.nlLvlIgnoreNull("#Titles COLUMN", modelCol.titlesView);
 
       sb.nlLvlIgnoreNull("#Titles ROW", modelRow.titlesView);
 
-      if (sb.hasFlagData(gc, IFlagsToStringGui.D_FLAG_01_STYLE)) {
+      if (sb.hasFlagData(gc, IToStringFlagsGui.D_FLAG_01_STYLE)) {
          sb.nlLvl("Cell StyleKey", tableCellStyleClass);
       }
 
-      if (sb.hasFlagData(gc, IFlagsToStringGui.D_FLAG_10_TABLE_SELECTED_DRAWABLE)) {
+      if (sb.hasFlagData(gc, IToStringFlagsGui.D_FLAG_10_TABLE_SELECTED_DRAWABLE)) {
          if (getSize() > 0) {
             int selectedIndex = getGridIndexFromAbs(modelCol.selectedCellAbs, modelRow.selectedCellAbs);
             IDrawable d = getModelDrawable(selectedIndex);
             sb.nlLvl("#Selected Drawable", d);
          }
       }
-      if (sb.hasFlagData(gc, IFlagsToStringGui.D_FLAG_06_TABLE_MODEL)) {
+      if (sb.hasFlagData(gc, IToStringFlagsGui.D_FLAG_06_TABLE_MODEL)) {
          sb.nlLvl("TableModel", model);
       }
-      if (sb.hasFlagData(gc, IFlagsToStringGui.D_FLAG_07_TABLE_MAPPER)) {
+      if (sb.hasFlagData(gc, IToStringFlagsGui.D_FLAG_07_TABLE_MAPPER)) {
          sb.nlLvl("Mapper", mapperObjectDrawable);
       }
-   }
-
-   private void toStringPrivate(Dctx sb) {
-      sb.append(ToStringStaticGui.toStringTableType(tableType) + " modelSize=" + getSize() + " spanCount=" + spannedCount);
    }
 
    //#enddebug
@@ -4732,15 +4852,15 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
 
    public void toStringHelperFlags(Dctx sb) {
       sb.append("HelperFlags =");
-      toStringHelperFlag(sb, ITechTable.HELPER_FLAG_01_STRONG_ROWS, "StrongRows");
-      toStringHelperFlag(sb, ITechTable.HELPER_FLAG_02_SINGLE_CONFIG, "SingleConfig");
-      toStringHelperFlag(sb, ITechTable.HELPER_FLAG_03_CAP_OVERSIZE, "CapOverSize");
-      toStringHelperFlag(sb, ITechTable.HELPER_FLAG_04_TOTAL_SET, "TotalSet");
-      toStringHelperFlag(sb, ITechTable.HELPER_FLAG_05_YCOORDS_ONLY, "YCoordOnly");
-      toStringHelperFlag(sb, ITechTable.HELPER_FLAG_16_SPANNING, "Spanning");
-      toStringHelperFlag(sb, ITechTable.HELPER_FLAG_17_OVERSIZE_WIDTH, "OversizeW");
-      toStringHelperFlag(sb, ITechTable.HELPER_FLAG_18_OVERSIZE_HEIGHT, "OversizeH");
-      toStringHelperFlag(sb, ITechTable.HELPER_FLAG_19_SPECIAL_FILL, "SpecialFill");
+      toStringHelperFlag(sb, HELPER_FLAG_01_STRONG_ROWS, "StrongRows");
+      toStringHelperFlag(sb, HELPER_FLAG_02_SINGLE_CONFIG, "SingleConfig");
+      toStringHelperFlag(sb, HELPER_FLAG_03_CAP_OVERSIZE, "CapOverSize");
+      toStringHelperFlag(sb, CELL_H_FLAG_04_TOTAL_SET, "TotalSet");
+      toStringHelperFlag(sb, HELPER_FLAG_05_YCOORDS_ONLY, "YCoordOnly");
+      toStringHelperFlag(sb, HELPER_FLAG_16_SPANNING, "Spanning");
+      toStringHelperFlag(sb, HELPER_FLAG_17_OVERSIZE_WIDTH, "OversizeW");
+      toStringHelperFlag(sb, HELPER_FLAG_18_OVERSIZE_HEIGHT, "OversizeH");
+      toStringHelperFlag(sb, HELPER_FLAG_19_SPECIAL_FILL, "SpecialFill");
 
    }
 
@@ -4777,6 +4897,10 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
       sb.append("undrawnWLeft=" + modelCol.undrawnTopLeft + " undrawnHTop=" + modelRow.undrawnTopLeft + " undrawnWRight=" + modelCol.undrawnBotRight + " undrawnHBottom=" + modelRow.undrawnBotRight);
       sb.nlFrontTitle(modelCol.positions, "X Coordinates");
       sb.nlFrontTitle(modelRow.positions, "Y Coordinates");
+   }
+
+   private void toStringPrivate(Dctx sb) {
+      sb.append(ToStringStaticGui.toStringTableType(tableType) + " modelSize=" + getSize() + " spanCount=" + spannedCount);
    }
 
    private String toStringSelectedDrawable() {
@@ -4823,10 +4947,10 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
    protected void updateStyleClass() {
       //TODO ATTENTION. Model provides a TECH. in which case the tech from the styleClass is never
       // used
-      techTable = styleClass.getByteObject(IBOTypesGui.LINK_80_TECH_TABLE);
+      boTable = styleClass.getByteObject(IBOTypesGui.LINK_80_TECH_TABLE);
       // take default Tech
-      if (techTable == null) {
-         techTable = gc.getTablePolicyC().getTableTechDef();
+      if (boTable == null) {
+         boTable = gc.getTablePolicyC().getBOTableDefault();
       }
       if (hasTechM(T_FLAGM_7_CLOCK_VERTICAL)) {
          setBehaviorFlag(ITechDrawable.BEHAVIOR_29_NAV_CLOCK_VERTICAL, true);
@@ -4840,14 +4964,6 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
 
       figureOverlay = styleClass.getByteObject(IBOTypesGui.LINK_84_STYLE_TABLE_OVERLAY_FIGURE);
       emptyBluePrint.setStyleClass(styleClass);
-   }
-
-   /**
-    * We don't invalidate our children?
-    * 
-    */
-   public void layoutInvalidate(boolean topDown) {
-      super.layoutInvalidate(topDown);
    }
 
    protected void updateTablePolicy(ByteObject policyTable) {

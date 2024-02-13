@@ -22,31 +22,27 @@ import pasa.cbentley.framework.gui.src4.interfaces.IDrawable;
 
 /**
  * Animation that changes the value of a target {@link ByteObject} using a function.
- * <br>
- * <br.
+ * <p>
  * An {@link IDrawable} is given most of the time. When no {@link IDrawable} is given animation is not able to know where
  * are the {@link IDrawable} using the target {@link ByteObject}. Therefore a full repaint is done.
+ * </p>
  * 
+ * <p>
  * When the Animation Page has finished
+ * </p>
  * 
- * <br>
  * The Target may be obtained from the {@link IDrawable}
  * <li> {@link IDrawable#getStyle()}
- * <br>
- * <br>
  * 
- * Action : <br>
+ * 
+ * 
+ * <p>
+ * Action : 
  * <li>start {@link IAction#ACTION_TIME_4_ANIM_START}
  * <li>end {@link IAction#ACTION_TIME_4_ANIM_START}
  * <li>reset {@link IAction#ACTION_TIME_3_RESET}
  * <li>step {@link IAction#ACTION_TIME_2_STEP}
- * <br>
- * <br>
- * <br>
- * <br>
- * <br>
- * <br>
- * <br>
+ * </p>
  * 
  * @author Charles-Philip Bentley
  *

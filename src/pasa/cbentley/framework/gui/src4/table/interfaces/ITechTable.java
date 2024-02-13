@@ -56,13 +56,13 @@ public interface ITechTable extends ITech {
 
    /**
     * Helper flag set by code when both conditions are met : <br>
-    * <li>cells widths or heights are allowed to be bigger than ViewPort by cell policy flag {@link IBOCellPolicy#FLAG_7_OVERSIZE}. 
+    * <li>cells widths or heights are allowed to be bigger than ViewPort by cell policy flag {@link IBOCellPolicy#CELLP_FLAG_7_OVERSIZE}. 
     * <li>at least one such a cell has been computed in the model. 
     * <br>
     * <br>
     * It will happen when cells are initialized with
-    * <li> {@link IBOCellPolicy#CELL_0_IMPLICIT_SET} or
-    * <li> {@link IBOCellPolicy#CELL_1_EXPLICIT_SET}.
+    * <li> {@link ITechCell#CELL_0_IMPLICIT_SET} or
+    * <li> {@link ITechCell#CELL_1_EXPLICIT_SET}.
     * <br>
     * <br>
     * 
@@ -70,11 +70,6 @@ public interface ITechTable extends ITech {
     * {@link TableView#initScrollingConfig(ScrollConfig, ScrollConfig)} compute a logical unit(s) for the hidden cell part(s).
     */
    public static final int HELPER_FLAG_03_CAP_OVERSIZE              = 1 << 2;
-
-   /**
-    * When {@link CellModel#rootCellAbs}  for   never changes. All cells are visible inside the ViewPort.
-    */
-   public static final int HELPER_FLAG_04_TOTAL_SET                 = 1 << 3;
 
    /**
     * When only the y cell coordinates change
@@ -156,7 +151,7 @@ public interface ITechTable extends ITech {
     * When selectability needs to be checked using one of the following methods check in that order
     * <li> {@link ITechDrawable#BEHAVIOR_01_NOT_SELECTABLE}
     * <li> {@link ITableModel#getPropertyInt(int, int)}
-    * <li> {@link CellModel#HELPER_FLAG_27_UNSELECTABLE}
+    * <li> {@link CellModel#CELL_H_FLAG_27_UNSELECTABLE}
     */
    public static final int HELPER_FLAG_29_UNSELECTABLE_STUFF        = 1 << 28;
 

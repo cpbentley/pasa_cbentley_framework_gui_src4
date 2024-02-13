@@ -84,7 +84,7 @@ public class CommanderGui extends CommanderAbstract implements ICmdsView, ITechI
          int oldMode = cmd.getParamInt(0);
          canvas.setDebugMode(oldMode);
       } else {
-         int mod = gc.getSettingsBO().get1(ITechCtxSettingsAppGui.CTX_GUI_OFFSET_07_DEBUG_MODE1);
+         int mod = gc.getBOCtxSettings().get1(ITechCtxSettingsAppGui.CTX_GUI_OFFSET_07_DEBUG_MODE1);
          cmd.setParamUndoInt(mod);
          if (mod == ITechCanvasDrawable.DEBUG_0_NONE) {
             mod++;
@@ -234,7 +234,7 @@ public class CommanderGui extends CommanderAbstract implements ICmdsView, ITechI
       AppliGui am = gc.getAppli();
 
       //check if  view state
-      ByteObject bo = gc.getSettingsBO();
+      ByteObject bo = gc.getBOCtxSettings();
       if (bo.hasFlag(ITechCtxSettingsAppGui.CTX_GUI_OFFSET_01_FLAG1, ITechCtxSettingsAppGui.CTX_GUI_FLAG_1_USE_VIEW_STATE)) {
          //save the view state
 
@@ -275,7 +275,7 @@ public class CommanderGui extends CommanderAbstract implements ICmdsView, ITechI
     * The currently active canvas
     */
    protected void cmdToggleDebug() {
-      int mode = gc.getSettingsBO().get1(ITechCtxSettingsAppGui.CTX_GUI_OFFSET_07_DEBUG_MODE1);
+      int mode = gc.getBOCtxSettings().get1(ITechCtxSettingsAppGui.CTX_GUI_OFFSET_07_DEBUG_MODE1);
       CanvasAppliInputGui canvas = gc.getCanvasGCRoot().getCanvas();
       if (mode == ITechCanvasDrawable.DEBUG_2_COMPLETE) {
          canvas.setDebugMode(ITechCanvasDrawable.DEBUG_0_NONE);

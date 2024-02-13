@@ -21,11 +21,11 @@ import pasa.cbentley.framework.gui.src4.canvas.TopologyDLayer;
 import pasa.cbentley.framework.gui.src4.canvas.ViewContext;
 import pasa.cbentley.framework.gui.src4.cmd.CmdInstanceDrawable;
 import pasa.cbentley.framework.gui.src4.core.Drawable;
-import pasa.cbentley.framework.gui.src4.core.LayEngineDrawable;
+import pasa.cbentley.framework.gui.src4.core.LayouterEngineDrawable;
 import pasa.cbentley.framework.gui.src4.core.StyleClass;
-import pasa.cbentley.layouter.src4.engine.LayEngine;
+import pasa.cbentley.layouter.src4.engine.LayouterEngine;
 import pasa.cbentley.layouter.src4.interfaces.ILayoutable;
-import pasa.cbentley.layouter.src4.tech.ITechSizer;
+import pasa.cbentley.layouter.src4.tech.ITechLayout;
 
 /**
  * Main Interface to any drawable components which supports the {@link IAnimable} framework.
@@ -236,7 +236,7 @@ public interface IDrawable extends IStringable, ITechDrawable, IStatorable, IBen
     */
    public int[] getHoles();
 
-   public LayEngineDrawable getLayEngine();
+   public LayouterEngineDrawable getLayEngine();
 
    /**
     * 
@@ -350,15 +350,15 @@ public interface IDrawable extends IStringable, ITechDrawable, IStatorable, IBen
    /**
     * Returns the sizing value based on the styling
     * 
-    * <li> {@link ITechSizer#SIZER_PROP_05_CONTENT} Width without pad/border/margin values
-    * <li> {@link ITechSizer#SIZER_PROP_06_CONTENT_PAD}
-    * <li> {@link ITechSizer#SIZER_PROP_07_CONTENT_PAD_BORDER}
-    * <li> {@link ITechSizer#SIZER_PROP_10_PAD}
-    * <li> {@link ITechSizer#SIZER_PROP_11_PAD_BORDER}
-    * <li> {@link ITechSizer#SIZER_PROP_12_PAD_BORDER_MARGIN}
-    * <li> {@link ITechSizer#SIZER_PROP_13_BORDER}
-    * <li> {@link ITechSizer#SIZER_PROP_14_BORDER_MARGIN}
-    * <li> {@link ITechSizer#SIZER_PROP_15_MARGIN}
+    * <li> {@link ITechLayout#SIZER_PROP_05_CONTENT} Width without pad/border/margin values
+    * <li> {@link ITechLayout#SIZER_PROP_06_CONTENT_PAD}
+    * <li> {@link ITechLayout#SIZER_PROP_07_CONTENT_PAD_BORDER}
+    * <li> {@link ITechLayout#SIZER_PROP_10_PAD}
+    * <li> {@link ITechLayout#SIZER_PROP_11_PAD_BORDER}
+    * <li> {@link ITechLayout#SIZER_PROP_12_PAD_BORDER_MARGIN}
+    * <li> {@link ITechLayout#SIZER_PROP_13_BORDER}
+    * <li> {@link ITechLayout#SIZER_PROP_14_BORDER_MARGIN}
+    * <li> {@link ITechLayout#SIZER_PROP_15_MARGIN}
     * 
     * Sub class must implement other sizes.
     * 
@@ -369,7 +369,7 @@ public interface IDrawable extends IStringable, ITechDrawable, IStatorable, IBen
 
    /**
     * Similar to {@link IDrawable#getSizeW(int)} but for the X coordinate.
-    * <li> {@link ITechSizer#SIZER_PROP_07_CONTENT_PAD_BORDER} would compute the X coord with padding and border
+    * <li> {@link ITechLayout#SIZER_PROP_07_CONTENT_PAD_BORDER} would compute the X coord with padding and border
     * @param sizeType
     * @return
     */
@@ -461,6 +461,8 @@ public interface IDrawable extends IStringable, ITechDrawable, IStatorable, IBen
     * Init with the defaults sizer or the sizers set by {@link IDrawable#setSizers(ByteObject, ByteObject)}
     */
    public void initSize();
+
+   public void initPosition();
 
    /**
     * Initialize the drawable width and height of the {@link IDrawable} using {@link ITechDrawable#DIMENSION_API} semantics.
@@ -586,7 +588,6 @@ public interface IDrawable extends IStringable, ITechDrawable, IStatorable, IBen
     */
    public void manageRepeatInput(InputConfig ic);
 
-
    /**
     * See {@link IDrawable#notifyEvent(int, Object)}  with a null Object
     * @param event
@@ -633,6 +634,8 @@ public interface IDrawable extends IStringable, ITechDrawable, IStatorable, IBen
     */
    public void setCacheType(int type);
 
+   public void rebuild();
+
    /**
     * Sets the bit numberal state 16 bits by default
     * <br>
@@ -656,6 +659,13 @@ public interface IDrawable extends IStringable, ITechDrawable, IStatorable, IBen
     * @param h
     */
    public void setSizers(ByteObject w, ByteObject h);
+
+   /**
+    * Shortcut for creating pixel sizers
+    * @param w
+    * @param h
+    */
+   public void setSizePixels(int w, int h);
 
    /**
     * @param flag
@@ -722,7 +732,7 @@ public interface IDrawable extends IStringable, ITechDrawable, IStatorable, IBen
    /**
     * Activate Functional Positioning relative to the Parent, and if null the ViewContext.
     * <br>
-    * Its a shortcut to {@link LayEngine}
+    * Its a shortcut to {@link LayouterEngineDrawable} pozer definition
     * 
     * <li> {@link C#LOGIC_1_TOP_LEFT}
     * <li> {@link C#LOGIC_2_CENTER}

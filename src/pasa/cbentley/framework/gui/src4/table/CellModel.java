@@ -95,24 +95,24 @@ public class CellModel implements IStringable, ITechCell, IBOCellPolicy, ITableU
     * Array cannot be null.? if null only explicit? TODO <br>
     * <br>
     * Useful for variable sized rows. Valid values are : <br>
-    * <li>{@link IBOCellPolicy#CELL_1_EXPLICIT_SET}. <br>
+    * <li>{@link ITechCell#CELL_1_EXPLICIT_SET}. <br>
     * This is the usual value telling row heights are explicitely defined in
     * {@link TableView#setupRowSizes} Concerning policies, Row heights do not
     * depend on ScrollConfig start increment. <br>
     * When <br>
     * <br>
     * In the case of variable cell sizes, we have <li>
-    * {@link IBOCellPolicy#CELL_5_FILL_WEAK} <li>
-    * {@link IBOCellPolicy#CELL_4_FILL_AVERAGE} <li>
-    * {@link IBOCellPolicy#CELL_2_RATIO} when ratio pixel size could not be set in
+    * {@link ITechCell#CELL_5_FILL_WEAK} <li>
+    * {@link ITechCell#CELL_4_FILL_AVERAGE} <li>
+    * {@link ITechCell#CELL_2_RATIO} when ratio pixel size could not be set in
     * stone during the setup
     * 
     * <br>
     * <br>
     * <br>
-    * {@link IBOCellPolicy#CELL_0_IMPLICIT_SET} has been converted to
-    * {@link IBOCellPolicy#CELL_1_EXPLICIT_SET} with value computed. <br>
-    * {@link IBOCellPolicy#CELL_3_FILL_STRONG} has been converted to ViewPort's
+    * {@link ITechCell#CELL_0_IMPLICIT_SET} has been converted to
+    * {@link ITechCell#CELL_1_EXPLICIT_SET} with value computed. <br>
+    * {@link ITechCell#CELL_3_FILL_STRONG} has been converted to ViewPort's
     * pixel height
     */
    int[]                  policies;
@@ -152,13 +152,13 @@ public class CellModel implements IStringable, ITechCell, IBOCellPolicy, ITableU
     * <br>
     * Selection changes possibly modifies a column's width when <li>not all
     * columns are visible <li>one or more columns have a policy like
-    * {@link IBOCellPolicy#CELL_4_FILL_AVERAGE} or
-    * {@link IBOCellPolicy#CELL_5_FILL_WEAK} <br>
+    * {@link ITechCell#CELL_4_FILL_AVERAGE} or
+    * {@link ITechCell#CELL_5_FILL_WEAK} <br>
     * 
     * <br>
-    * For {@link IBOCellPolicy#TYPE_0_GENERIC} policies, {@link TableView#setupColSizes} have the values of {@link IBOCellPolicy#FLAGZ_2_SIZES}.
+    * For {@link ITechCell#TYPE_0_GENERIC} policies, {@link TableView#setupColSizes} have the values of {@link IBOCellPolicy#CELLP_FLAGZ_2_SIZES}.
     * <br>
-    * For a column with policy {@link IBOCellPolicy#CELL_4_FILL_AVERAGE}, the setupSize is computed according to the root selected position. If not
+    * For a column with policy {@link ITechCell#CELL_4_FILL_AVERAGE}, the setupSize is computed according to the root selected position. If not
     * visible, it is kept to 0
     */
    int[]                  setupSizes;
@@ -276,7 +276,7 @@ public class CellModel implements IStringable, ITechCell, IBOCellPolicy, ITableU
                incrementChange = -undrawnTopLeft;
             } else if (partiallyVisibleCellAbs2 == selectedCellAbs) {
                incrementChange = undrawnBotRight;
-            } else if (transitionType == TRANSITION_2OUTSIDE) {
+            } else if (transitionType == TRANSITION_2_OUTSIDE) {
                //assume difference of one
                incrementChange = workCellSizes[selectedCellAbs];
                incrementChange += sepSize;
@@ -413,9 +413,9 @@ public class CellModel implements IStringable, ITechCell, IBOCellPolicy, ITableU
     * <br>
     * <br>
     * That means <br>
-    * <li> {@link IBOCellPolicy#CELL_3_FILL_STRONG} will allow only 1 cell maximum.
-    * <li> {@link IBOCellPolicy#CELL_4_FILL_AVERAGE} will allow only 2 cells maximum. 
-    * <li> {@link IBOCellPolicy#CELL_5_FILL_WEAK} will allow only 3 cells maximum.
+    * <li> {@link ITechCell#CELL_3_FILL_STRONG} will allow only 1 cell maximum.
+    * <li> {@link ITechCell#CELL_4_FILL_AVERAGE} will allow only 2 cells maximum. 
+    * <li> {@link ITechCell#CELL_5_FILL_WEAK} will allow only 3 cells maximum.
     * <br>
     * <br>
     * For policy configuration with no FILL type, return the number of columns/rows. 
@@ -499,7 +499,7 @@ public class CellModel implements IStringable, ITechCell, IBOCellPolicy, ITableU
     * @return
     */
    public int computeMaxSemanticsCellsNumCheck() {
-      if (policies.length == 1 || IntUtils.isOnly(policies, IBOCellPolicy.CELL_1_EXPLICIT_SET)) {
+      if (policies.length == 1 || IntUtils.isOnly(policies, ITechCell.CELL_1_EXPLICIT_SET)) {
          if (useMaster) {
             // the maximum number of columns
             return numCells - rootCellAbs;
@@ -534,7 +534,7 @@ public class CellModel implements IStringable, ITechCell, IBOCellPolicy, ITableU
     */
    public int computeMaxSemanticsCellsNumCheck(int rootAbs, boolean drawMaster, int[] policies, int numTotal) {
 
-      if (policies.length == 1 || IntUtils.containsOnly(policies, CELL_1_EXPLICIT_SET)) {
+      if (policies.length == 1 || IntUtils.containsOnly(policies, ITechCell.CELL_1_EXPLICIT_SET)) {
          if (drawMaster) {
             // the maximum number of columns
             return numTotal - rootAbs;
@@ -584,15 +584,15 @@ public class CellModel implements IStringable, ITechCell, IBOCellPolicy, ITableU
     * <br>
     * <br>
     * That means <br>
-    * <li> {@link IBOCellPolicy#CELL_3_FILL_STRONG} will allow only 1 cell maximum.
-    * <li> {@link IBOCellPolicy#CELL_4_FILL_AVERAGE} will allow only 2 cells maximum. 
-    * <li> {@link IBOCellPolicy#CELL_5_FILL_WEAK} will allow only 3 cells maximum. 
+    * <li> {@link ITechCell#CELL_3_FILL_STRONG} will allow only 1 cell maximum.
+    * <li> {@link ITechCell#CELL_4_FILL_AVERAGE} will allow only 2 cells maximum. 
+    * <li> {@link ITechCell#CELL_5_FILL_WEAK} will allow only 3 cells maximum. 
     * <br>
     * <br>
     * For policy configuration without types mentioned above, returns the number of columns/rows. 
     * <br>
     * <br>
-    * Implements the special cases, see the specifications of {@link IBOCellPolicy#CELL_4_FILL_AVERAGE},{@link IBOCellPolicy#CELL_5_FILL_WEAK}
+    * Implements the special cases, see the specifications of {@link ITechCell#CELL_4_FILL_AVERAGE},{@link ITechCell#CELL_5_FILL_WEAK}
     * <br>
     * <br>
     * @param u {@link TableView.Config}
@@ -625,7 +625,7 @@ public class CellModel implements IStringable, ITechCell, IBOCellPolicy, ITableU
     * @param c The new Configuration on which to update work sizes
     */
    public void computeMoveVariableCellSizes(int totalSize) {
-      if (hasHelperFlag(HELPER_FLAG_06_VARIABLE_MOVE_SIZE)) {
+      if (hasHelperFlag(CELL_H_FLAG_06_VARIABLE_MOVE_SIZE)) {
          //computeVariableColSizes(c);
          computeVariableCellSizes(totalSize);
       }
@@ -669,7 +669,7 @@ public class CellModel implements IStringable, ITechCell, IBOCellPolicy, ITableU
    }
 
    public void computeSetupFillCells(int total) {
-      if (hasHelperFlag(HELPER_FLAG_14_VARIABLE_SETUP_SIZE)) {
+      if (hasHelperFlag(CELL_H_FLAG_14_VARIABLE_SETUP_SIZE)) {
          //computeVariableColSizes(c);
          computeVariableCellSizes(total);
       }
@@ -683,7 +683,7 @@ public class CellModel implements IStringable, ITechCell, IBOCellPolicy, ITableU
     * @param totalSize
     */
    public void computeSetupVariableCellSizes(int totalSize) {
-      if (hasHelperFlag(HELPER_FLAG_14_VARIABLE_SETUP_SIZE)) {
+      if (hasHelperFlag(CELL_H_FLAG_14_VARIABLE_SETUP_SIZE)) {
          //computeVariableColSizes(c);
          computeVariableCellSizes(totalSize);
       }
@@ -693,8 +693,8 @@ public class CellModel implements IStringable, ITechCell, IBOCellPolicy, ITableU
     * Method deals when cell column sizes change depending on {@link ScrollConfig}.
     * <br>
     * <br>
-    * <li> {@link IBOCellPolicy#CELL_4_FILL_AVERAGE}
-    * <li> {@link IBOCellPolicy#CELL_5_FILL_WEAK}
+    * <li> {@link ITechCell#CELL_4_FILL_AVERAGE}
+    * <li> {@link ITechCell#CELL_5_FILL_WEAK}
     * <br>
     * <br>
     * 
@@ -768,7 +768,7 @@ public class CellModel implements IStringable, ITechCell, IBOCellPolicy, ITableU
    public int doUpdate(ScrollConfig sc, int size) {
       callMatchingReverse(sc);
       computeMoveVariableCellSizes(size); //only happens if there is a ViewPane
-      if (incrementChange != 0 && transitionType != TRANSITION_0INSIDE_VIEWPORT) {
+      if (incrementChange != 0 && transitionType != TRANSITION_0_INSIDE_VIEWPORT) {
          //move the scroll config vx increments
          return incrementChange;
       }
@@ -866,6 +866,11 @@ public class CellModel implements IStringable, ITechCell, IBOCellPolicy, ITableU
       return null;
    }
 
+   /**
+    * Cell Helper Flags
+    * @param flag
+    * @return
+    */
    public boolean hasHelperFlag(int flag) {
       return BitUtils.hasFlag(helperFlags, flag);
    }
@@ -883,9 +888,9 @@ public class CellModel implements IStringable, ITechCell, IBOCellPolicy, ITableU
 
    /**
     * Inspect column policies to deal policies : 
-    * <li>{@link IBOCellPolicy#CELL_4_FILL_AVERAGE}, 
-    * <li>{@link IBOCellPolicy#CELL_5_FILL_WEAK}
-    * <li>{@link IBOCellPolicy#CELL_3_FILL_STRONG} 
+    * <li>{@link ITechCell#CELL_4_FILL_AVERAGE}, 
+    * <li>{@link ITechCell#CELL_5_FILL_WEAK}
+    * <li>{@link ITechCell#CELL_3_FILL_STRONG} 
     * <br>
     * Only one fill is accepted in a slate. 
     * <br>
@@ -893,16 +898,16 @@ public class CellModel implements IStringable, ITechCell, IBOCellPolicy, ITableU
     */
    public void inspect(int[] cp, int rowAbs, int[] policies) {
       int pol = policies[rowAbs];
-      if (pol == CELL_1_EXPLICIT_SET || pol == CELL_0_IMPLICIT_SET) {
+      if (pol == ITechCell.CELL_1_EXPLICIT_SET || pol == ITechCell.CELL_0_IMPLICIT_SET) {
          //semantically, they can always be added unless
          cp[TRACK_0COUNT]++;
-      } else if (pol == CELL_3_FILL_STRONG) {
+      } else if (pol == ITechCell.CELL_3_FILL_STRONG) {
          //fill strongs are always 1 frame
          if (cp[TRACK_0COUNT] == 0) {
             cp[TRACK_0COUNT] = 1;
          }
          cp[TRACK_1END] = 1;
-      } else if (pol == CELL_4_FILL_AVERAGE) {
+      } else if (pol == ITechCell.CELL_4_FILL_AVERAGE) {
          if (cp[TRACK_2FILL_ALREADY] == 1) {
             cp[TRACK_1END] = 1;
          } else {
@@ -914,7 +919,7 @@ public class CellModel implements IStringable, ITechCell, IBOCellPolicy, ITableU
             cp[TRACK_0COUNT]++;
          }
 
-      } else if (pol == CELL_5_FILL_WEAK) {
+      } else if (pol == ITechCell.CELL_5_FILL_WEAK) {
          // continue until no more
          if (cp[TRACK_2FILL_ALREADY] == 1) {
             cp[TRACK_1END] = 1;
@@ -923,7 +928,7 @@ public class CellModel implements IStringable, ITechCell, IBOCellPolicy, ITableU
             cp[TRACK_0COUNT]++;
             // continue until we meet another fill
          }
-      } else if (pol == CELL_2_RATIO) {
+      } else if (pol == ITechCell.CELL_2_RATIO) {
          cp[TRACK_0COUNT]++;
       } else {
          throw new RuntimeException();
@@ -945,13 +950,13 @@ public class CellModel implements IStringable, ITechCell, IBOCellPolicy, ITableU
    public void inspectFill(int[] ts, int index, int totalSize, int[] policies, int[] sizes, int sepSize) {
       int pol = TableView.getArrayFirstValOrIndex(policies, index);
       int mySize = TableView.getArrayFirstValOrIndex(sizes, index);
-      if (pol == CELL_3_FILL_STRONG) {
+      if (pol == ITechCell.CELL_3_FILL_STRONG) {
          ts[TRACK_1END] = 1;
          if (ts[TRACK_0COUNT] == 0) {
             ts[TRACK_3FILL_INDEX] = index;
             ts[TRACK_0COUNT]++;
          }
-      } else if (pol == CELL_5_FILL_WEAK || pol == CELL_4_FILL_AVERAGE) {
+      } else if (pol == ITechCell.CELL_5_FILL_WEAK || pol == ITechCell.CELL_4_FILL_AVERAGE) {
          ts[TRACK_3FILL_INDEX] = index;
          // final size is still unknown but already had size of separator
          ts[TRACK_2SIZE_USED] += sepSize;
@@ -1129,11 +1134,11 @@ public class CellModel implements IStringable, ITechCell, IBOCellPolicy, ITableU
 
       // if vx is positive, we have a move right
       selectionCellVectorChange = selectedCellAbs - oldSelectedCellAbs;
-      int transType = TRANSITION_0INSIDE_VIEWPORT;
+      int transType = TRANSITION_0_INSIDE_VIEWPORT;
       if (selectedAbs < firstCellAbs || selectedAbs > lastCellAbs) {
-         transType = TRANSITION_2OUTSIDE;
+         transType = TRANSITION_2_OUTSIDE;
       } else if (partiallyVisibleCellAbs == selectedAbs || partiallyVisibleCellAbs2 == selectedAbs) {
-         transType = TRANSITION_1INSIDE_TO_PARTIAL;
+         transType = TRANSITION_1_INSIDE_TO_PARTIAL;
       }
       transitionType = transType;
    }
@@ -1146,7 +1151,7 @@ public class CellModel implements IStringable, ITechCell, IBOCellPolicy, ITableU
 
    public void setSelectable(int index, boolean v) {
       flags[index] = BitUtils.setFlag(flags[index], CELL_FLAG_1_UNSELECTABLE, v);
-      setHelperFlag(HELPER_FLAG_27_UNSELECTABLE, true);
+      setHelperFlag(CELL_H_FLAG_27_UNSELECTABLE, true);
    }
 
    public void setStyles(ByteObject[] styles) {
@@ -1227,13 +1232,13 @@ public class CellModel implements IStringable, ITechCell, IBOCellPolicy, ITableU
    }
 
    public void toStringHelperFlags(Dctx sb) {
-      debugHelperFlag(sb, HELPER_FLAG_04_TOTAL_SET, "TotalSet");
-      debugHelperFlag(sb, HELPER_FLAG_06_VARIABLE_MOVE_SIZE, "VariableMoveSize");
-      debugHelperFlag(sb, HELPER_FLAG_08_ALL_CELLS_SAME_SIZE, "CellsSameSize");
-      debugHelperFlag(sb, HELPER_FLAG_10_OWN_NAVIGATION, "OwnNav");
-      debugHelperFlag(sb, HELPER_FLAG_12_EFFECTIVE_VARIABLE_SIZE, "EffectVariable");
-      debugHelperFlag(sb, HELPER_FLAG_14_VARIABLE_SETUP_SIZE, "VariableSetup");
-      debugHelperFlag(sb, HELPER_FLAG_17_OVERSIZE, "Oversize");
+      debugHelperFlag(sb, CELL_H_FLAG_04_TOTAL_SET, "TotalSet");
+      debugHelperFlag(sb, CELL_H_FLAG_06_VARIABLE_MOVE_SIZE, "VariableMoveSize");
+      debugHelperFlag(sb, CELL_H_FLAG_08_ALL_CELLS_SAME_SIZE, "CellsSameSize");
+      debugHelperFlag(sb, CELL_H_FLAG_10_OWN_NAVIGATION, "OwnNav");
+      debugHelperFlag(sb, CELL_H_FLAG_12_EFFECTIVE_VARIABLE_SIZE, "EffectVariable");
+      debugHelperFlag(sb, CELL_H_FLAG_14_VARIABLE_SETUP_SIZE, "VariableSetup");
+      debugHelperFlag(sb, CELL_H_FLAG_17_OVERSIZE, "Oversize");
 
    }
 

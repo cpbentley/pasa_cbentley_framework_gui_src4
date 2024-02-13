@@ -4,10 +4,7 @@ import pasa.cbentley.byteobjects.src4.core.interfaces.IByteObject;
 
 /**
  * Descriptive definition of an animation.
- * <br>
- * <br>
- * <br>
- * <br>
+ * 
  * 
  * @author Charles-Philip Bentley
  *
@@ -58,7 +55,7 @@ public interface IBOAnim extends IByteObject {
    public static final int ANIM_FLAG_8_CUSTOM            = 128;
 
    /**
-    * Type of animation. Used by {@link AnimCreator} as a Class identifier.
+    * Type of animation. Used by {@link AnimManager} as a Class identifier.
     * <br>
     * <br>
     * <li> {@link ITechAnim#ANIM_TYPE_01_VALUE}

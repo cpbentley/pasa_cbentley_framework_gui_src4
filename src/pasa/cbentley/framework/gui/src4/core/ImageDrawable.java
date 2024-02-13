@@ -9,6 +9,7 @@ import pasa.cbentley.framework.drawx.src4.engine.GraphicsX;
 import pasa.cbentley.framework.drawx.src4.engine.RgbImage;
 import pasa.cbentley.framework.drawx.src4.utils.AnchorUtils;
 import pasa.cbentley.framework.gui.src4.ctx.GuiCtx;
+import pasa.cbentley.framework.gui.src4.ctx.IToStringFlagsDraw;
 import pasa.cbentley.framework.gui.src4.interfaces.ITechDrawable;
 import pasa.cbentley.framework.gui.src4.interfaces.ITechViewDrawable;
 import pasa.cbentley.framework.gui.src4.tech.ITechViewPane;
@@ -114,6 +115,18 @@ public class ImageDrawable extends ViewDrawable {
       int w = getContentW();
       int h = getContentH();
 
+      //#mdebug
+      if (gc.toStringHasFlagDraw(IToStringFlagsDraw.FLAG_DRAW_05_IMAGE_DRAWABLE_BOUNDARY)) {
+         g.setColor(255, 120, 20);
+         g.drawRect(getX()-1, getY()-1, getDrawnWidth()+1, getDrawnHeight()+1);
+         g.setColor(255, 200, 200);
+         g.drawRect(x, y, w, h);
+      }
+      //#enddebug
+
+      //#debug
+      toDLog().pDraw("x,y=" + y + "," + y + " contentWH=" + w + "," + h, this, ImageDrawable.class, "drawViewDrawableContent@118", LVL_05_FINE, true);
+
       //what happens if there is a super clip that wants to be inforced? Like for the PinBoard?
       //we must take the intersection or not?
       g.clipSet(x, y, w, h, GraphicsX.CLIP_DIRECTIVE_0_INTERSECTION);
@@ -130,8 +143,15 @@ public class ImageDrawable extends ViewDrawable {
             y += AnchorUtils.getYAlign(anchor, 0, getContentH(), img.getHeight());
          }
       }
-
       g.drawRgbImage(img, x, y);
+      //#mdebug
+      if (gc.toStringHasFlagDraw(IToStringFlagsDraw.FLAG_DRAW_07_IMAGE_BOUNDARY)) {
+         g.setColor(255, 120, 20);
+         g.drawRect(x-1, y-1, img.getWidth()+1, img.getHeight()+1);
+         g.setColor(255, 200, 200);
+         g.drawRect(x, y, w, h);
+      }
+      //#enddebug
       g.clipReset();
    }
 
@@ -200,10 +220,13 @@ public class ImageDrawable extends ViewDrawable {
       toDLog().pFlow("", this, ImageDrawable.class, "initViewPortSub@200", LVL_05_FINE, true);
    }
 
-   public void initViewDrawable(LayEngineDrawable engine) {
+   public void initViewDrawable(LayouterEngineDrawable engine) {
+      //#debug
+      toDLog().pFlow("", this, ImageDrawable.class, "initViewDrawable@220", LVL_05_FINE, true);
+      
       //image drawable just draws itself
-      int ph = img.getHeight() + getStyleHConsumed();
-      int pw = img.getWidth() + getStyleWConsumed();
+      int ph = img.getHeight();
+      int pw = img.getWidth();
       layEngine.setPh(ph);
       layEngine.setPw(pw);
    }
@@ -233,6 +256,8 @@ public class ImageDrawable extends ViewDrawable {
       toStringPrivate(dc);
       super.toString1Line(dc.sup1Line());
    }
+
+  
 
    //#enddebug
 

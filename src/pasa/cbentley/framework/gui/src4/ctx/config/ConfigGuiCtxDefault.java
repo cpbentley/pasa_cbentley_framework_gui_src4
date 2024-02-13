@@ -7,7 +7,7 @@ import pasa.cbentley.core.src4.utils.BitUtils;
 import pasa.cbentley.framework.core.src4.app.ConfigAppAbstract;
 import pasa.cbentley.framework.core.src4.app.IConfigApp;
 import pasa.cbentley.framework.drawx.src4.tech.ITechGraphicsX;
-import pasa.cbentley.framework.gui.src4.ctx.IFlagsToStringGui;
+import pasa.cbentley.framework.gui.src4.ctx.IToStringFlagsGui;
 import pasa.cbentley.framework.gui.src4.interfaces.ITechCanvasDrawable;
 
 public class ConfigGuiCtxDefault extends ConfigAppAbstract implements IConfigAppGui {
@@ -44,9 +44,9 @@ public class ConfigGuiCtxDefault extends ConfigAppAbstract implements IConfigApp
 
    public int getFlagsGui() {
       int flags = 0;
-      flags = BitUtils.setFlag(flags, IFlagsToStringGui.D_FLAG_11_VP_HEADERS, false);
-      flags = BitUtils.setFlag(flags, IFlagsToStringGui.D_FLAG_17_VIEW_PANE, true);
-      flags = BitUtils.setFlag(flags, IFlagsToStringGui.D_FLAG_01_STYLE, false);
+      flags = BitUtils.setFlag(flags, IToStringFlagsGui.D_FLAG_11_VP_HEADERS, false);
+      flags = BitUtils.setFlag(flags, IToStringFlagsGui.D_FLAG_17_VIEW_PANE, true);
+      flags = BitUtils.setFlag(flags, IToStringFlagsGui.D_FLAG_01_STYLE, false);
       return flags;
    }
 

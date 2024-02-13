@@ -172,9 +172,9 @@ public class NestedMenus extends TableView implements IEventConsumer, ICmdsView,
          //
          
          //max size is ViewContext area from position. size depends on position...
-         ByteObject sizerWRoomOnTheLeft = sizerFac.getSizerPozers(posXEndOfVC);
+         ByteObject sizerWRoomOnTheLeft = sizerFac.getSizerFromPozer1Pozer2Implicit(posXEndOfVC);
 
-         ByteObject maxH = sizerFac.getSizerFun(ITechLayout.ET_FUN_6_DIFF, sizerVc, null);
+         ByteObject maxH = sizerFac.getSizerFromFunctionOfSizer1Sizer2(sizerVc, null, ITechLayout.ET_FUN_6_DIFF);
          
          ByteObject sizerW = sizerFac.getSizerPref(sizerWRoomOnTheLeft);
          ByteObject sizerH = sizerFac.getSizerPref(maxH);

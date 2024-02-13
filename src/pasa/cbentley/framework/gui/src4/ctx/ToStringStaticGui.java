@@ -9,8 +9,8 @@ import pasa.cbentley.framework.gui.src4.interfaces.ITechCanvasDrawable;
 import pasa.cbentley.framework.gui.src4.interfaces.IDrawable;
 import pasa.cbentley.framework.gui.src4.interfaces.ITechDrawable;
 import pasa.cbentley.framework.gui.src4.interfaces.ITechViewDrawable;
-import pasa.cbentley.framework.gui.src4.table.interfaces.IBOCellPolicy;
 import pasa.cbentley.framework.gui.src4.table.interfaces.IBOTablePolicy;
+import pasa.cbentley.framework.gui.src4.table.interfaces.ITechCell;
 import pasa.cbentley.framework.gui.src4.table.interfaces.ITechTable;
 import pasa.cbentley.framework.gui.src4.tech.ITechStringDrawable;
 import pasa.cbentley.framework.gui.src4.tech.ITechViewPane;
@@ -73,17 +73,17 @@ public class ToStringStaticGui extends ToStringStaticBase {
 
    public static String toStringPolicyType(final int type) {
       switch (type) {
-         case IBOCellPolicy.CELL_3_FILL_STRONG:
+         case ITechCell.CELL_3_FILL_STRONG:
             return "FILL_STRONG";
-         case IBOCellPolicy.CELL_4_FILL_AVERAGE:
+         case ITechCell.CELL_4_FILL_AVERAGE:
             return "FILL_AVERAGE";
-         case IBOCellPolicy.CELL_5_FILL_WEAK:
+         case ITechCell.CELL_5_FILL_WEAK:
             return "FILL_WEAK";
-         case IBOCellPolicy.CELL_1_EXPLICIT_SET:
+         case ITechCell.CELL_1_EXPLICIT_SET:
             return "EXPLICIT";
-         case IBOCellPolicy.CELL_2_RATIO:
+         case ITechCell.CELL_2_RATIO:
             return "RATIO";
-         case IBOCellPolicy.CELL_0_IMPLICIT_SET:
+         case ITechCell.CELL_0_IMPLICIT_SET:
             return "IMPLICIT";
          default:
             return "UNKNOWN" + type;
@@ -92,11 +92,11 @@ public class ToStringStaticGui extends ToStringStaticBase {
 
    public static String toStringType(final int type) {
       switch (type) {
-         case IBOCellPolicy.TYPE_0_GENERIC:
+         case ITechCell.TYPE_0_GENERIC:
             return "GENERIC";
-         case IBOCellPolicy.TYPE_2_RATIO:
+         case ITechCell.TYPE_2_RATIO:
             return "RATIO";
-         case IBOCellPolicy.TYPE_1_FLOW:
+         case ITechCell.TYPE_1_FLOW:
             return "FLOW";
          default:
             return "UNKNOWN " + type;
@@ -130,40 +130,64 @@ public class ToStringStaticGui extends ToStringStaticBase {
     */
    public static String toStringLinkStatic(int link) {
       switch (link) {
+         case IBOTypesGui.LINK_10_BASE_TECH:
+            return "BaseTech";
          case IBOTypesGui.LINK_40_TECH_STRING_EDIT:
-            return "TechStringEdit";
-         case IBOTypesGui.LINK_41_TECH_STRING:
-            return "TechString";
+            return "BO_StringEdit";
+         case IBOTypesGui.LINK_41_BO_STRING_DRAWABLE:
+            return "BO_String";
+         case IBOTypesGui.LINK_42_CARET_FIGURE:
+            return "Figure_Caret";
+         case IBOTypesGui.LINK_45_STRING_LIST_VIEW:
+            return "StringListView";
+         case IBOTypesGui.LINK_49_FIG_SCROLLBAR_WRAPPER:
+            return "ScrollBar_FigureWrapper";
          case IBOTypesGui.LINK_50_STYLE_SCROLLBAR_BLOCK_BG:
-            return "ScrollBar BlockBg";
+            return "StyleClass_Scrollbar_BlockBg";
          case IBOTypesGui.LINK_51_STYLE_SCROLLBAR_BLOCK_FIG:
-            return "ScrollBar BlockFig";
+            return "StyleClass_Scrollbar_BlockFig";
          case IBOTypesGui.LINK_52_STYLE_SCROLLBAR_TOP_LEFT_WRAPPER:
-            return "ScrollBar TopLeftWrapper";
+            return "StyleClass_Scrollbar_TopLeft_Wrapper";
          case IBOTypesGui.LINK_53_STYLE_SCROLLBAR_BOT_RIGHT_WRAPPER:
-            return "ScrollBar BotRightWrapper";
+            return "StyleClass_Scrollbar_BotRight_Wrapper";
+         case IBOTypesGui.LINK_58_STYLE_VIEWPANE_HOLE_HEADER:
+            return "StyleClass_Hole_Headers";
+         case IBOTypesGui.LINK_59_STYLE_VIEWPANE_HOLE_SB:
+            return "StyleClass_Hole_Scrollbars";
+         case IBOTypesGui.LINK_64_STYLE_VIEWPORT:
+            return "StyleClass_ViewPort";
          case IBOTypesGui.LINK_65_STYLE_VIEWPANE:
-            return "ViewPaneStyle";
-         case IBOTypesGui.LINK_66_TECH_VIEWPANE:
-            return "ViewPaneStyle";
-         case IBOTypesGui.LINK_67_STYLE_VIEWPANE_HOLE:
-            return "ViewPaneStyle";
-         case IBOTypesGui.LINK_68_TECH_V_SCROLLBAR:
-            return "SBVTech";
-         case IBOTypesGui.LINK_69_TECH_H_SCROLLBAR:
-            return "SBHTech";
+            return "StyleClass_ViewPane";
+         case IBOTypesGui.LINK_66_BO_VIEWPANE:
+            return "BO_ViewPane";
+         case IBOTypesGui.LINK_68_BO_V_SCROLLBAR:
+            return "BO_Scrollbar_Vertical";
+         case IBOTypesGui.LINK_69_BO_H_SCROLLBAR:
+            return "BO_Scrollbar_Horizontal";
          case IBOTypesGui.LINK_71_STYLE_VIEWPANE_H_SCROLLBAR:
-            return "ViewPaneHSBStyle";
+            return "StyleClass_Scrollbar_Horizontal";
          case IBOTypesGui.LINK_72_STYLE_VIEWPANE_V_SCROLLBAR:
-            return "ViewPaneVSBStyle";
+            return "StyleClass_Scrollbar_Vertical";
+         case IBOTypesGui.LINK_74_STYLE_CLASS_MENU:
+            return "StyleClass_menubar";
+         case IBOTypesGui.LINK_75_MENU_BAR_TECH:
+            return "BO_MenuBar";
          case IBOTypesGui.LINK_80_TECH_TABLE:
-            return "Table Tech";
+            return "BO_Table";
          case IBOTypesGui.LINK_81_STYLE_CLASS_TABLE_CELL:
-            return "Table CellStyle";
+            return "StyleClass_Table_Cell";
          case IBOTypesGui.LINK_82_STYLE_TABLE_COL_TITLE:
-            return "Table ColStyle";
+            return "StyleClass_Table_Column";
          case IBOTypesGui.LINK_83_STYLE_TABLE_ROW_TITLE:
-            return "Table RowStyle";
+            return "StyleClass_Table_Row";
+         case IBOTypesGui.LINK_84_STYLE_TABLE_OVERLAY_FIGURE:
+            return "StyleClass_Table_Overlay_Figure";
+         case IBOTypesGui.LINK_85_STYLE_TABLE_TITLE_TOP:
+            return "Table Title Top";
+         case IBOTypesGui.LINK_86_STYLE_TABLE_TITLE_BOT:
+            return "Table Title Bottom";
+         case IBOTypesGui.LINK_90_STRING_EDIT_CONTROL:
+            return "BO_StringEditControl";
          default:
             return "UnknownLink " + link;
       }
@@ -252,7 +276,7 @@ public class ToStringStaticGui extends ToStringStaticBase {
       }
    }
 
-   public static String debugCompetType(int value) {
+   public static String toStringCompetitionType(int value) {
       switch (value) {
          case ITechViewPane.COMPET_HEADER_0_NEUTRAL:
             return "Neutral";
@@ -284,7 +308,7 @@ public class ToStringStaticGui extends ToStringStaticBase {
       }
    }
 
-   public static String debugScrollMove(int t) {
+   public static String toStringScrollMove(int t) {
       switch (t) {
          case ITechViewPane.SB_MOVE_TYPE_0_FIXED:
             return "Fixed";
@@ -297,7 +321,7 @@ public class ToStringStaticGui extends ToStringStaticBase {
       }
    }
 
-   public static String debugScrollPartial(int t) {
+   public static String toStringScrollPartial(int t) {
       switch (t) {
          case ITechViewPane.PARTIAL_TYPE_0_BOTH:
             return "Both";
@@ -310,7 +334,7 @@ public class ToStringStaticGui extends ToStringStaticBase {
       }
    }
 
-   public static String debugScrollType(int t) {
+   public static String toStringScrollbarMode(int t) {
       switch (t) {
          case ITechViewPane.SCROLL_TYPE_0_PIXEL_UNIT:
             return "Pixel";
@@ -323,7 +347,7 @@ public class ToStringStaticGui extends ToStringStaticBase {
       }
    }
 
-   public static String debugScrollVisual(int t) {
+   public static String toStringScrollVisual(int t) {
       switch (t) {
          case ITechViewPane.VISUAL_0_LEAVE:
             return "Leave";
@@ -340,17 +364,17 @@ public class ToStringStaticGui extends ToStringStaticBase {
 
    public static String debugStringType(int type) {
       switch (type) {
-         case ITechStringDrawable.TYPE_0_NONE:
+         case ITechStringDrawable.PRESET_CONFIG_0_NONE:
             return "BASIC";
-         case ITechStringDrawable.TYPE_1_TITLE:
+         case ITechStringDrawable.PRESET_CONFIG_1_TITLE:
             return "TITLE";
-         case ITechStringDrawable.TYPE_3_SCROLL_V:
+         case ITechStringDrawable.PRESET_CONFIG_3_SCROLL_V:
             return "STRING_TYPE_XLINES_V_SCROLL";
-         case ITechStringDrawable.TYPE_2_SCROLL_H:
+         case ITechStringDrawable.PRESET_CONFIG_2_SCROLL_H:
             return "STRING_TYPE_TEXT_H_SCROLL";
-         case ITechStringDrawable.TYPE_4_NATURAL_NO_WRAP:
+         case ITechStringDrawable.PRESET_CONFIG_4_NATURAL_NO_WRAP:
             return "STRING_TYPE_NATURAL_NO_WRAP";
-         case ITechStringDrawable.TYPE_5_CHAR:
+         case ITechStringDrawable.PRESET_CONFIG_5_CHAR:
             return "STRING_TYPE_CHAR";
          default:
             throw new IllegalArgumentException("" + type);

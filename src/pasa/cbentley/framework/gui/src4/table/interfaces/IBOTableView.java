@@ -14,31 +14,44 @@ import pasa.cbentley.framework.gui.src4.table.TableView;
 import pasa.cbentley.framework.gui.src4.tech.ITechViewPane;
 
 /**
+ * {@link IBOTableView} defines common display/usage parameters of tables.
+ * 
+ * <p>
+ * 
  * <b>Technical parameters</b> : <br>
- * <li>Show columns title or row numbers
+ * <li>Hide/Show columns title <-> Hide/Show row numbers
  * <li>Allow around the clock selection. Overrides parameters of the {@link ViewPane}. Eventually goes to {@link ScrollConfig}.
- * <li>Row selection. The whole row is selected. Horizontal move is impossible.
- * <li>Reverse order.
+ * <li> <b>Selection parameters</b>
+ * <ol>
+ * <li> Row selection. The whole row is selected. Horizontal move is impossible.
+ * <li> Overlay
+ * <li> Pointer types of selection
+ * </ol>
+ * <li>Reverse order.  {@link IBOTableView}
  * <li>Draw a grid separation between cells. <br>
+ * </p>
  * <br>
- * <br>
+ * <p>
  * <b>Fill order</b> : <br>
  * Depends on level 
  * <li>Col : one grid row at a time
  * <li>Row : one grid col at a time
- * <br>
+ * </p>
+ * 
+ * <p>
+ * 
  * Then 
  * <li>Reverse H
  * <li>Reverse W
  * <br>
  * That gives 8 possibilities.
- * <br>
+ * </p>
  * @author Charles-Philip Bentley
  *
  */
 public interface IBOTableView extends IByteObject {
 
-  public static final int T_BASE_OFFSET                             = A_OBJECT_BASIC_SIZE;
+   public static final int T_BASE_OFFSET                             = A_OBJECT_BASIC_SIZE;
 
    /**
     * Tech size for Table
@@ -49,6 +62,10 @@ public interface IBOTableView extends IByteObject {
     * <li> 3 bytes for modes
     */
    public static final int T_BASIC_SIZE                              = A_OBJECT_BASIC_SIZE + 15;
+
+   public static final int T_FLAG_1_                                 = 1 << 0;
+
+   public static final int T_FLAG_2_                                 = 1 << 1;
 
    /**
     * Switch for showing Row Titles/Numbers
@@ -65,7 +82,7 @@ public interface IBOTableView extends IByteObject {
     * <br>
     * They are provided by {@link ITableModel}
     */
-   public static final int T_FLAG_5_REAL_TITLE                       = 16;
+   public static final int T_FLAG_5_REAL_TITLE                       = 1 << 4;
 
    /**
     * Appends the real title to the column/row number.
@@ -75,7 +92,7 @@ public interface IBOTableView extends IByteObject {
    /**
     * if set, separator of size given in the tech is applied
     */
-   public static final int T_FLAG_7_DRAW_GRID                        = 64;
+   public static final int T_FLAG_7_DRAW_GRID                        = 1 << 6;
 
    /**
     * Animated the transition of style from selected cells when transition is inside
@@ -88,7 +105,7 @@ public interface IBOTableView extends IByteObject {
     * <br>
     * Must also synchronize with any {@link ViewPane} animations {@link IBOViewPane#VP_FLAGX_7_ANIMATED}
     */
-   public static final int T_FLAG_8_STYLE_ANIMATION                  = 128;
+   public static final int T_FLAG_8_STYLE_ANIMATION                  = 1 << 7;
 
    /**
     * When this flag is set, Cells keeps their {@link ITechDrawable#STYLE_05_SELECTED} state style when {@link TableView} 
@@ -166,6 +183,10 @@ public interface IBOTableView extends IByteObject {
 
    public static final int T_FLAGM_3_MULTIPLE_SELECTION_CHECKBOX     = 1 << 2;
 
+   public static final int T_FLAGM_1_                                = 1 << 0;
+
+   public static final int T_FLAGM_4_                                = 1 << 3;
+
    /**
     * When going around the clock horizontally, next cell is on next line Once
     * the end is reached. next cell is the first cell.
@@ -188,6 +209,8 @@ public interface IBOTableView extends IByteObject {
     */
    public static final int T_FLAGM_7_CLOCK_VERTICAL                  = 1 << 6;
 
+   public static final int T_FLAGM_8_                                = 1 << 7;
+
    /**
     * Set to false for selection mechanism to work.
     * <br>
@@ -201,7 +224,9 @@ public interface IBOTableView extends IByteObject {
     * <br>
     * Scrolling still occurs.
     */
-   public static final int T_FLAGX_1_NO_SELECTION                    = 1;
+   public static final int T_FLAGX_1_NO_SELECTION                    = 1 << 0;
+
+   public static final int T_FLAGX_2_                                = 1 << 1;
 
    /**
     * Switch for selection to behave as if all cells on a row are selected.
@@ -320,6 +345,8 @@ public interface IBOTableView extends IByteObject {
     */
    public static final int T_FLAGY_6_VARIABLE_HEIGHT                 = 1 << 5;
 
+   public static final int T_FLAGY_7_                                = 1 << 6;
+
    /**
     * When pointer is pressed on a cell, it directly sends a selection event.
     * <br>
@@ -384,7 +411,7 @@ public interface IBOTableView extends IByteObject {
     * When it is set (true), model objects are filled column by columns. 
     * <br>
     */
-   public static final int T_OFFSET_09_FLAG_3FILL_COL                = 4;
+   public static final int T_OFFSET_09_FLAG_3_FILL_COL                = 4;
 
    /**
     * Model filling mode : how does the model index relate to the visible index.
@@ -394,20 +421,24 @@ public interface IBOTableView extends IByteObject {
     * <br>
     * <br>
     * Row fill : fill one row at a time. 
+    * <pre>
     * <li> a b c | d e  : TopLeft Start.
     * <li> c b a |   e d: TopRight start.
     * <li> d e   | a b c: BottomLeft
     * <li>   e d | c b a: BottomRight
-    * <br>
-    * <br>
-    * Col fill <br>
+    * </pre>
+    * <p>
+    * 
+    * Col fill
+    * <pre>
     * <li> a c e | b d  : TopLeft Start
     * <li> e c a |   d b: TopRight Start
     * <li> b d   | a c e: BotLeft Start
     * <li>   d b | e c a: BotRight Start
-    * 
+    * </pre>
+    * </p>
     * <br>
-    * <br>
+    * <p>
     * 1 bit for col/row fill.   
     * <br>
     * 2 bits for start 
@@ -415,8 +446,7 @@ public interface IBOTableView extends IByteObject {
     * <li>{@link C#DIAG_DIR_1_TOP_RIGHT}
     * <li>{@link C#DIAG_DIR_2_BOT_LEFT}
     * <li>{@link C#DIAG_DIR_3_BOT_RIGHT}
-    * 
-    * <br>
+    * </p>
     */
    public static final int T_OFFSET_09_MODEL_FILL_TYPE1              = T_BASE_OFFSET + 8;
 

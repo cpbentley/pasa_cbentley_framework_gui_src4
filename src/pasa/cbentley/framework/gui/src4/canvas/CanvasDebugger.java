@@ -6,11 +6,11 @@ import pasa.cbentley.framework.coredraw.src4.interfaces.IMFont;
 import pasa.cbentley.framework.coreui.src4.ctx.ToStringStaticCoreUi;
 import pasa.cbentley.framework.drawx.src4.engine.GraphicsX;
 import pasa.cbentley.framework.drawx.src4.string.CharOpt;
-import pasa.cbentley.framework.gui.src4.anim.AnimCreator;
+import pasa.cbentley.framework.gui.src4.anim.AnimManager;
 import pasa.cbentley.framework.gui.src4.core.Drawable;
-import pasa.cbentley.framework.gui.src4.core.LayEngineDrawable;
+import pasa.cbentley.framework.gui.src4.core.LayouterEngineDrawable;
 import pasa.cbentley.framework.gui.src4.ctx.GuiCtx;
-import pasa.cbentley.framework.gui.src4.ctx.IFlagsToStringGui;
+import pasa.cbentley.framework.gui.src4.ctx.IToStringFlagsGui;
 import pasa.cbentley.framework.gui.src4.ctx.ITechCtxSettingsAppGui;
 import pasa.cbentley.framework.gui.src4.ctx.ToStringStaticGui;
 import pasa.cbentley.framework.gui.src4.interfaces.ITechCanvasDrawable;
@@ -75,7 +75,7 @@ public class CanvasDebugger extends Drawable {
       paintDebugLight(g, renderMetrics.getLastDuration());
 
       //#mdebug
-      if (gc.toStringHasToStringFlag(IFlagsToStringGui.D_FLAG_28_MASTER_CANVAS)) {
+      if (gc.toStringHasToStringFlag(IToStringFlagsGui.D_FLAG_28_MASTER_CANVAS)) {
       }
       //#enddebug      
    }
@@ -184,7 +184,7 @@ public class CanvasDebugger extends Drawable {
          dx += CharOpt.draw(g, " ", dx, dy, f);
          dx += CharOpt.draw(g, key, dx, dy, f);
       }
-      AnimCreator ac = this.getAnimCreator();
+      AnimManager ac = this.getAnimCreator();
       if (ac.getRealisator() != null) {
          int rs = ac.getRealisator().getSize();
          dx += CharOpt.draw(g, " ", dx, dy, f);
@@ -248,7 +248,7 @@ public class CanvasDebugger extends Drawable {
 
    }
 
-   public void initDrawable(LayEngineDrawable ds) {
+   public void initDrawable(LayouterEngineDrawable ds) {
       //we don't touch width. we set our height
       IMFont f = gc.getCDC().getFontFactory().getFontDebug();
       setDh(f.getHeight() * 2);

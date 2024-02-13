@@ -9,6 +9,7 @@ import pasa.cbentley.framework.gui.src4.ctx.GuiCtx;
 import pasa.cbentley.framework.gui.src4.ctx.ToStringStaticGui;
 import pasa.cbentley.framework.gui.src4.table.interfaces.IBOGenetics;
 import pasa.cbentley.framework.gui.src4.table.interfaces.IBOTablePolicy;
+import pasa.cbentley.framework.gui.src4.table.interfaces.IBOTableSpan;
 import pasa.cbentley.framework.gui.src4.table.interfaces.IBOTableView;
 
 public class TableOperator extends BOAbstractOperator implements IBOTablePolicy, IBOTableView {
@@ -41,7 +42,7 @@ public class TableOperator extends BOAbstractOperator implements IBOTablePolicy,
       sb.nl();
       sb.append(" Hclock=" + tech.hasFlag(T_OFFSET_02_FLAGX, T_FLAGM_6_CLOCK_HORIZ));
       sb.append(" Vclock=" + tech.hasFlag(T_OFFSET_02_FLAGX, T_FLAGM_7_CLOCK_VERTICAL));
-      sb.append(" isColFill=" + tech.hasFlag(T_OFFSET_09_MODEL_FILL_TYPE1, T_OFFSET_09_FLAG_3FILL_COL));
+      sb.append(" isColFill=" + tech.hasFlag(T_OFFSET_09_MODEL_FILL_TYPE1, T_OFFSET_09_FLAG_3_FILL_COL));
       sb.append(" StartCount=" + ToStringStaticUc.toStringDiagDir(tech.get2Bits1(T_OFFSET_09_MODEL_FILL_TYPE1)));
 
       sb.nl();
@@ -76,13 +77,13 @@ public class TableOperator extends BOAbstractOperator implements IBOTablePolicy,
    public void toStringSpanning(ByteObject span, Dctx sb) {
       sb.root(span, "Span");
       sb.append(" root = ");
-      sb.append(span.get2(SPAN_OFFSET_2COL2));
+      sb.append(span.get2(IBOTableSpan.SPAN_OFFSET_2_COL2));
       sb.append(',');
-      sb.append(span.get2(SPAN_OFFSET_4ROW2));
+      sb.append(span.get2(IBOTableSpan.SPAN_OFFSET_4_ROW2));
       sb.append(" - ");
-      sb.append(span.get2(SPAN_OFFSET_3COL_VALUE2));
+      sb.append(span.get2(IBOTableSpan.SPAN_OFFSET_3_COL_VALUE2));
       sb.append(',');
-      sb.append(span.get2(SPAN_OFFSET_5ROW_VALUE2));
+      sb.append(span.get2(IBOTableSpan.SPAN_OFFSET_5_ROW_VALUE2));
    }
 
    public void toStringTablePolicy(ByteObject policy, Dctx sb) {

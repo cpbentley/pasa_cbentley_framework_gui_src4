@@ -116,7 +116,7 @@ public class CanvasExtras extends ObjectGC {
    public void applySettingsCanvas() {
       CanvasBOHelper settingsHelper = canvas.getCanvasBOHelper();
       boolean useMenuBar = settingsHelper.isUsingMenuBar();
-      ByteObject settingsGuiCtx = gc.getSettingsBO();
+      ByteObject settingsGuiCtx = gc.getBOCtxSettings();
       //define which menu bar to use
       //if only root canvas
       if (useMenuBar) {

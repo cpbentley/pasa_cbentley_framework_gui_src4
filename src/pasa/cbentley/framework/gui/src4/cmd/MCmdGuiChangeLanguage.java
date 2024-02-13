@@ -13,7 +13,7 @@ import pasa.cbentley.framework.gui.src4.canvas.InputConfig;
 import pasa.cbentley.framework.gui.src4.core.StyleClass;
 import pasa.cbentley.framework.gui.src4.ctx.GuiCtx;
 import pasa.cbentley.framework.gui.src4.ctx.IBOTypesGui;
-import pasa.cbentley.framework.gui.src4.factories.CellPolicyFactory;
+import pasa.cbentley.framework.gui.src4.factories.TableCellPolicyFactory;
 import pasa.cbentley.framework.gui.src4.interfaces.ICmdsView;
 import pasa.cbentley.framework.gui.src4.interfaces.IUIView;
 import pasa.cbentley.framework.gui.src4.table.TableView;
@@ -80,7 +80,7 @@ public class MCmdGuiChangeLanguage extends MCmdGui implements IEventConsumer {
             langTable = null;
          }
          //generates an event
-         gc.getUCtx().getEventBusRoot().sendNewEvent(IEventsCore.PID_1_FRAMEWORK, IEventsCore.PID_1_FRAMEWORK_2_LANGUAGE_CHANGED, cmd);
+         gc.getUCtx().getEventBusRoot().sendNewEvent(IEventsCore.PID_01_FRAMEWORK, IEventsCore.PID_01_FRAMEWORK_2_LANGUAGE_CHANGED, cmd);
          //set the action feedback on the command. flag it  as processed
          cmd.actionDone(null, responseType);
       } else {
@@ -88,7 +88,7 @@ public class MCmdGuiChangeLanguage extends MCmdGui implements IEventConsumer {
          IStringProducer strLoader = gc.getStrings();
          //show the table
          if (langTable == null) {
-            CellPolicyFactory cellFac = gc.getCellPolicyC();
+            TableCellPolicyFactory cellFac = gc.getTableCellPolicyFactory();
             LocaleID[] data = strLoader.getLocaleIDs();
             ByteObject colPol = cellFac.getGeneric(2, 0);
             ByteObject rowPol = cellFac.getGeneric(0, 0);

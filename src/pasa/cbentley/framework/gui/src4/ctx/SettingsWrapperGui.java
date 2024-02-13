@@ -12,6 +12,6 @@ public class SettingsWrapperGui extends SettingsWrapperAbstract implements ITech
    }
    
    public boolean hasStyleClassCache() {
-      return gc.getSettingsBO().hasFlag(CTX_GUI_OFFSET_02_FLAGS1, CTX_GUI_FLAGS_1_USE_STYLECLASS_CACHE);
+      return gc.getBOCtxSettings().hasFlag(CTX_GUI_OFFSET_02_FLAGS1, CTX_GUI_FLAGS_1_USE_STYLECLASS_CACHE);
    }
 }

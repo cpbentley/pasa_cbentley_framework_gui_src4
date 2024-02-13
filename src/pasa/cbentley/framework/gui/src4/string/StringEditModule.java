@@ -18,7 +18,7 @@ import pasa.cbentley.framework.gui.src4.core.DrawableInjected;
 import pasa.cbentley.framework.gui.src4.core.StyleClass;
 import pasa.cbentley.framework.gui.src4.ctx.GuiCtx;
 import pasa.cbentley.framework.gui.src4.ctx.IEventsGui;
-import pasa.cbentley.framework.gui.src4.factories.interfaces.IBOStringDrawable;
+import pasa.cbentley.framework.gui.src4.factories.interfaces.IBOStringData;
 import pasa.cbentley.framework.gui.src4.factories.interfaces.IBOStringEdit;
 import pasa.cbentley.framework.gui.src4.ctx.IBOTypesGui;
 import pasa.cbentley.framework.gui.src4.interfaces.IDrawListener;
@@ -42,8 +42,8 @@ import pasa.cbentley.powerdata.spec.src4.guicontrols.TrieTranslationSearch;
  * Caret may select more than 
  * <br>
  * <br>
- * The editing may be forced on one line. Usually this means a type {@link ITechStringDrawable#TYPE_2_SCROLL_H} with no scrollbars.
- * {@link ITechStringDrawable#TYPE_3_SCROLL_V} means editing on several lines, class uses {@link StringDrawable#breakText}
+ * The editing may be forced on one line. Usually this means a type {@link ITechStringDrawable#PRESET_CONFIG_2_SCROLL_H} with no scrollbars.
+ * {@link ITechStringDrawable#PRESET_CONFIG_3_SCROLL_V} means editing on several lines, class uses {@link StringDrawable#breakText}
  * But if only one line is needed, shrink flag show only one line.
  * <br>
  * <br>
@@ -84,7 +84,7 @@ import pasa.cbentley.powerdata.spec.src4.guicontrols.TrieTranslationSearch;
  * @author Charles-Philip Bentley
  *
  */
-public class EditModule implements IDrawListener, IBOStringDrawable, IStringable, IEventsGui {
+public class StringEditModule implements IDrawListener, IBOStringData, IStringable, IEventsGui {
 
    public static long            caretBlinkMillisOff = 600;
 
@@ -210,9 +210,9 @@ public class EditModule implements IDrawListener, IBOStringDrawable, IStringable
    /**
     * 
     */
-   public EditModule(GuiCtx gc) {
+   public StringEditModule(GuiCtx gc) {
       this.gc = gc;
-      editTech = gc.getDrawableStringFactory().getDefaultStringEditTech();
+      editTech = gc.getDrawableStringFactory().getBOEditNormal();
       CMD_SET_EDIT = new MCmd(gc.getCC(), "Edit Mode True");
    }
 
@@ -243,7 +243,7 @@ public class EditModule implements IDrawListener, IBOStringDrawable, IStringable
       } else {
          c = StringUtils.toLowerCase(c);
       }
-      int maxChar = stringDrawable.getTechDrawable().get1(IBOStringDrawable.INPUT_OFFSET_05_MAX_SIZE1);
+      int maxChar = stringDrawable.getBOStringData().get1(IBOStringData.SDATA_OFFSET_05_MAX_SIZE1);
       //
       if (maxChar == 0 || stringDrawable.getLen() < maxChar) {
          stringDrawable.addChar(caretIndex, c);
@@ -254,7 +254,7 @@ public class EditModule implements IDrawListener, IBOStringDrawable, IStringable
          positionCaret();
 
          //#debug
-         toDLog().pFlow("char " + c + " inserted in ", stringDrawable, EditModule.class, "caretAtInsertChar", LVL_05_FINE, true);
+         toDLog().pFlow("char " + c + " inserted in ", stringDrawable, StringEditModule.class, "caretAtInsertChar", LVL_05_FINE, true);
 
          gc.getEventsBusGui().sendNewEvent(CHAR_EVENT_PROD_ID, CHAR_EVENT_0_ADDED, this);
       }
@@ -318,7 +318,7 @@ public class EditModule implements IDrawListener, IBOStringDrawable, IStringable
       //#debug
       String msg = "Drawing Caret " + x + "," + y + " " + w + "," + h + " cw=" + cw + " ch=" + ch + " caretIndex=" + caretIndex;
       //#debug
-      toDLog().pDraw(msg, this, EditModule.class, "drawCaretFromContentListener", LVL_05_FINE, true);
+      toDLog().pDraw(msg, this, StringEditModule.class, "drawCaretFromContentListener", LVL_05_FINE, true);
 
       //for simplicity do a clipping
       boolean isClipping = true;
@@ -424,7 +424,7 @@ public class EditModule implements IDrawListener, IBOStringDrawable, IStringable
    public void forceCaretRepaint(boolean isVisible) {
       isCaretOn = isVisible;
       //#debug
-      toDLog().pFlow("Caret Blinking " + isCaretOn + " Position " + caretIndex, this, EditModule.class, "forceCaretRepaint", LVL_05_FINE, true);
+      toDLog().pFlow("Caret Blinking " + isCaretOn + " Position " + caretIndex, this, StringEditModule.class, "forceCaretRepaint", LVL_05_FINE, true);
 
       //ask the controller to initiate a repaint 
       caret.getCanvas().getRepaintCtrlDraw().repaintDrawableCycleBusiness(caret);
@@ -613,7 +613,7 @@ public class EditModule implements IDrawListener, IBOStringDrawable, IStringable
          StringMetrics sm = stringDrawable.getStringer().getMetrics();
 
          //#debug
-         toDLog().pFlow("Pointer @ " + ic.is.getX() + "," + ic.is.getY(), this, EditModule.class, "managePointerInput", LVL_05_FINE, true);
+         toDLog().pFlow("Pointer @ " + ic.is.getX() + "," + ic.is.getY(), this, StringEditModule.class, "managePointerInput", LVL_05_FINE, true);
 
          int lh = sm.getLineHeight();
          int lineid = ic.is.getY();
@@ -774,7 +774,7 @@ public class EditModule implements IDrawListener, IBOStringDrawable, IStringable
       //#debug
       String msg = "[" + finalX + "," + finalY + "] dxdy=" + +dx + "," + dy + "]" + " size=" + dw + "," + dh;
       //#debug
-      toDLog().pInit(msg, this, EditModule.class, "positionCaret", LVL_05_FINE, true);
+      toDLog().pInit(msg, this, StringEditModule.class, "positionCaret", LVL_05_FINE, true);
    }
 
    /**
@@ -808,7 +808,7 @@ public class EditModule implements IDrawListener, IBOStringDrawable, IStringable
       if (editTech != null) {
          this.editTech = editTech;
       } else {
-         this.editTech = gc.getDrawableStringFactory().getDefaultStringEditTech();
+         this.editTech = gc.getDrawableStringFactory().getBOEditNormal();
       }
       caretFigure = sc.getByteObject(IBOTypesGui.LINK_42_CARET_FIGURE);
       if (caretFigure == null) {
@@ -827,7 +827,7 @@ public class EditModule implements IDrawListener, IBOStringDrawable, IStringable
       positionCaret();
 
       //#debug
-      toDLog().pInit("Caret Init", caret, EditModule.class, "setStringDrawable", LVL_05_FINE, false);
+      toDLog().pInit("Caret Init", caret, StringEditModule.class, "setStringDrawable", LVL_05_FINE, false);
 
    }
 

@@ -56,14 +56,14 @@ public class DrawableOperator extends BOAbstractOperator implements IBOScrollBar
       int typeSB = tech.getValue(IBOViewPane.VP_OFFSET_10_COMPETITION_SB_TYPE1, 1);
       sb.nl();
       sb.append("CompetSb:");
-      sb.append(ToStringStaticGui.debugCompetType(typeSB));
+      sb.append(ToStringStaticGui.toStringCompetitionType(typeSB));
       if (tech.hasFlag(IBOViewPane.VP_OFFSET_01_FLAG, IBOViewPane.VP_FLAG_7_COMPET_OVERLAY_SB)) {
          sb.append(" Overlay");
       }
       sb.nl();
       int typeH = tech.getValue(IBOViewPane.VP_OFFSET_11_COMPETITION_HEADER_TYPE1, 1);
       sb.append("CompetHeader:");
-      sb.append(ToStringStaticGui.debugCompetType(typeH));
+      sb.append(ToStringStaticGui.toStringCompetitionType(typeH));
       if (tech.hasFlag(IBOViewPane.VP_OFFSET_01_FLAG, IBOViewPane.VP_FLAG_6_COMPET_OVERLAY_HEADER)) {
          sb.append(" Overlay");
       }
@@ -84,14 +84,14 @@ public class DrawableOperator extends BOAbstractOperator implements IBOScrollBar
       }
       sb.nl();
 
-      sb.append("[H,V] type=" + ToStringStaticGui.debugScrollType(tech.get2Bits3(IBOViewPane.VP_OFFSET_05_SCROLLBAR_MODE1)));
-      sb.append("," + ToStringStaticGui.debugScrollType(tech.get2Bits4(IBOViewPane.VP_OFFSET_05_SCROLLBAR_MODE1)));
-      sb.append(" visual=" + ToStringStaticGui.debugScrollVisual(tech.get4Bits1(IBOViewPane.VP_OFFSET_06_VISUAL_LEFT_OVER1)));
-      sb.append("," + ToStringStaticGui.debugScrollVisual(tech.get4Bits2(IBOViewPane.VP_OFFSET_06_VISUAL_LEFT_OVER1)));
-      sb.append(" move=" + ToStringStaticGui.debugScrollMove(tech.get2Bits1(IBOViewPane.VP_OFFSET_08_MOVE_TYPE1)));
-      sb.append("," + ToStringStaticGui.debugScrollMove(tech.get2Bits3(IBOViewPane.VP_OFFSET_08_MOVE_TYPE1)));
-      sb.append(" partial=" + ToStringStaticGui.debugScrollPartial(tech.get2Bits2(IBOViewPane.VP_OFFSET_08_MOVE_TYPE1)));
-      sb.append("," + ToStringStaticGui.debugScrollPartial(tech.get2Bits4(IBOViewPane.VP_OFFSET_08_MOVE_TYPE1)));
+      sb.append("[H,V] type=" + ToStringStaticGui.toStringScrollbarMode(tech.get2Bits3(IBOViewPane.VP_OFFSET_05_SCROLLBAR_MODE1)));
+      sb.append("," + ToStringStaticGui.toStringScrollbarMode(tech.get2Bits4(IBOViewPane.VP_OFFSET_05_SCROLLBAR_MODE1)));
+      sb.append(" visual=" + ToStringStaticGui.toStringScrollVisual(tech.get4Bits1(IBOViewPane.VP_OFFSET_06_VISUAL_LEFT_OVER1)));
+      sb.append("," + ToStringStaticGui.toStringScrollVisual(tech.get4Bits2(IBOViewPane.VP_OFFSET_06_VISUAL_LEFT_OVER1)));
+      sb.append(" move=" + ToStringStaticGui.toStringScrollMove(tech.get2Bits1(IBOViewPane.VP_OFFSET_08_MOVE_TYPE1)));
+      sb.append("," + ToStringStaticGui.toStringScrollMove(tech.get2Bits3(IBOViewPane.VP_OFFSET_08_MOVE_TYPE1)));
+      sb.append(" partial=" + ToStringStaticGui.toStringScrollPartial(tech.get2Bits2(IBOViewPane.VP_OFFSET_08_MOVE_TYPE1)));
+      sb.append("," + ToStringStaticGui.toStringScrollPartial(tech.get2Bits4(IBOViewPane.VP_OFFSET_08_MOVE_TYPE1)));
 
    }
 
@@ -101,9 +101,9 @@ public class DrawableOperator extends BOAbstractOperator implements IBOScrollBar
     * @param tech
     */
    public void linkTech(StyleClass sc, ByteObject tech) {
-      int techid = IBOTypesGui.LINK_69_TECH_H_SCROLLBAR;
+      int techid = IBOTypesGui.LINK_69_BO_H_SCROLLBAR;
       if (tech.hasFlag(SB_OFFSET_01_FLAG, SB_FLAG_1_VERT)) {
-         techid = IBOTypesGui.LINK_68_TECH_V_SCROLLBAR;
+         techid = IBOTypesGui.LINK_68_BO_V_SCROLLBAR;
       }
       sc.linkByteObject(tech, techid);
    }

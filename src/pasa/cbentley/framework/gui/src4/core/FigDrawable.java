@@ -13,6 +13,7 @@ import pasa.cbentley.framework.gui.src4.anim.ITechAnim;
 import pasa.cbentley.framework.gui.src4.canvas.InputConfig;
 import pasa.cbentley.framework.gui.src4.ctx.GuiCtx;
 import pasa.cbentley.framework.gui.src4.ctx.IBOTypesGui;
+import pasa.cbentley.framework.gui.src4.ctx.IToStringFlagsDraw;
 import pasa.cbentley.framework.gui.src4.interfaces.IAnimable;
 import pasa.cbentley.framework.gui.src4.interfaces.ITechDrawable;
 import pasa.cbentley.framework.gui.src4.utils.SourceCache;
@@ -43,7 +44,7 @@ import pasa.cbentley.framework.gui.src4.utils.SourceCache;
  * <br>
  * <b>Direction Parameter</b> : <br>
  * Add directional bias to the style figures.<br>
- * Any figure with {@link IDrw#FIG_FLAG_8_TBLR_DIR} Dir support in the style will be drawn using the parameter of this class.
+ * Any figure with {@link IDrw#FIG_FLAGZ_8_DIRECTION} Dir support in the style will be drawn using the parameter of this class.
  * <br>
  * <br>
  * The {@link Drawable} class already support automatic figure drawing via the style G layers. 
@@ -108,6 +109,12 @@ public class FigDrawable extends Drawable implements ITechFigure {
     * Figure is a DrwParam.
     */
    public void drawDrawable(GraphicsX g) {
+      //#mdebug
+      if (gc.toStringHasFlagDraw(IToStringFlagsDraw.FLAG_DRAW_02_FIG_DRAWABLE_BOUNDARY)) {
+         g.setColor(255, 20, 20);
+         g.drawRect(getX(), getY(), getDrawnWidth(), getDrawnHeight());
+      }
+      //#enddebug
       if (getDw() >= 0 && getDh() >= 0) {
          super.drawDrawableBg(g);
          //fetch the figure for the style
@@ -152,7 +159,7 @@ public class FigDrawable extends Drawable implements ITechFigure {
     * <br>
     * When a Figure has internal sizers and anchors, it will draw relative to dh and dw.
     */
-   public void initDrawable(LayEngineDrawable ds) {
+   public void initDrawable(LayouterEngineDrawable ds) {
    }
 
    public void managePointerInput(InputConfig ic) {
@@ -177,7 +184,7 @@ public class FigDrawable extends Drawable implements ITechFigure {
          this.figure = p;
       }
       //based on Figure Flag, enables caching
-      if (figure.hasFlag(IBOFigure.FIG__OFFSET_03_FLAGP, IBOFigure.FIG_FLAGP_1RGB) || figure.hasFlag(IBOFigure.FIG__OFFSET_02_FLAG, IBOFigure.FIG_FLAG_5_FILTER)) {
+      if (figure.hasFlag(IBOFigure.FIG__OFFSET_03_FLAGP, IBOFigure.FIG_FLAGP_1_RGB) || figure.hasFlag(IBOFigure.FIG__OFFSET_02_FLAG, IBOFigure.FIG_FLAG_5_FILTER)) {
          //the figure is using rgb pixel manipulation, so it is wise to cache content. tip the mother class.
          setBehaviorFlag(ITechDrawable.BEHAVIOR_22_TIP_HEAVY_CONTENT, true);
       } else {

@@ -11,7 +11,7 @@ import pasa.cbentley.framework.gui.src4.canvas.InputConfig;
 import pasa.cbentley.framework.gui.src4.cmd.CmdInstanceDrawable;
 import pasa.cbentley.framework.gui.src4.core.StyleClass;
 import pasa.cbentley.framework.gui.src4.ctx.GuiCtx;
-import pasa.cbentley.framework.gui.src4.factories.interfaces.IBOStringDrawable;
+import pasa.cbentley.framework.gui.src4.factories.interfaces.IBOStringData;
 import pasa.cbentley.framework.gui.src4.interfaces.ITechCanvasDrawable;
 import pasa.cbentley.framework.gui.src4.interfaces.ICmdsView;
 import pasa.cbentley.framework.gui.src4.interfaces.IDrawable;
@@ -42,7 +42,7 @@ import pasa.cbentley.framework.gui.src4.tech.ITechViewPane;
  * @author Charles-Philip
  *
  */
-public class TableLayoutView extends TableView implements IBOStringDrawable, ICommandable, ICmdsView {
+public class TableLayoutView extends TableView implements IBOStringData, ICommandable, ICmdsView {
 
    public static final int SC_TITLE_LINK_43 = 43;
 

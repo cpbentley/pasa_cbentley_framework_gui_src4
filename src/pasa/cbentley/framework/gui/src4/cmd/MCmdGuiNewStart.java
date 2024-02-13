@@ -24,7 +24,7 @@ public class MCmdGuiNewStart extends MCmdGui implements IEventConsumer {
       AppliGui appliGui = gc.getAppli();
       IDrawable firstDrawable = null;
       //check if  view state
-      ByteObject bo = gc.getSettingsBO();
+      ByteObject bo = gc.getBOCtxSettings();
       //#debug
       toDLog().pCmd("", bo, ViewCommandListener.class, "cmdNewLogin");
 

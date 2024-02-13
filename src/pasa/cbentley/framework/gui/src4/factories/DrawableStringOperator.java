@@ -6,10 +6,10 @@ import pasa.cbentley.core.src4.logging.Dctx;
 import pasa.cbentley.framework.gui.src4.core.StyleClass;
 import pasa.cbentley.framework.gui.src4.ctx.GuiCtx;
 import pasa.cbentley.framework.gui.src4.ctx.IBOTypesGui;
-import pasa.cbentley.framework.gui.src4.factories.interfaces.IBOStringDrawable;
+import pasa.cbentley.framework.gui.src4.factories.interfaces.IBOStringData;
 import pasa.cbentley.framework.gui.src4.factories.interfaces.IBOStringEdit;
 
-public class DrawableStringOperator extends BOAbstractOperator implements IBOStringDrawable {
+public class DrawableStringOperator extends BOAbstractOperator implements IBOStringData {
 
    protected final GuiCtx gc;
 
@@ -21,9 +21,9 @@ public class DrawableStringOperator extends BOAbstractOperator implements IBOStr
    public void linkStringTechs(StyleClass sc) {
 
       ByteObject strTech = gc.getDrawableStringFactory().getStringTech();
-      sc.linkByteObject(strTech, IBOTypesGui.LINK_41_TECH_STRING);
+      sc.linkByteObject(strTech, IBOTypesGui.LINK_41_BO_STRING_DRAWABLE);
 
-      ByteObject strTechEdit = gc.getDrawableStringFactory().getStringEditTech();
+      ByteObject strTechEdit = gc.getDrawableStringFactory().getBOEditEmpty();
       sc.linkByteObject(strTechEdit, IBOTypesGui.LINK_40_TECH_STRING_EDIT);
 
    }
@@ -48,19 +48,19 @@ public class DrawableStringOperator extends BOAbstractOperator implements IBOStr
 
    public void toStringTech(ByteObject tech, Dctx sb) {
       sb.append("#StringTech ");
-      int states = tech.get1(INPUT_OFFSET_01_FLAG);
+      int states = tech.get1(SDATA_OFFSET_01_FLAG);
       if (states != 0) {
          sb.append("States");
-         if (tech.hasFlag(INPUT_OFFSET_01_FLAG, INPUT_FLAG_1_PASSWORD)) {
+         if (tech.hasFlag(SDATA_OFFSET_01_FLAG, SDATA_FLAG_1_PASSWORD)) {
             sb.append("Password");
          }
       }
-      sb.append(" StringType:" + tech.get1(INPUT_OFFSET_02_STRING_TYPE1));
-      sb.append(" CharSetID:" + tech.get1(INPUT_OFFSET_03_CHARSET_ID1));
-      sb.append(" InputType:" + tech.get1(INPUT_OFFSET_04_INPUT_TYPE1));
-      sb.append(" MaxSize:" + tech.get1(INPUT_OFFSET_05_MAX_SIZE1));
-      sb.append(" Mode:" + tech.get1(INPUT_OFFSET_06_MODE1));
-      sb.append(" InitStyle:" + tech.get4(INPUT_OFFSET_07_INIT_STYLE_FLAGS4));
+      sb.append(" StringType:" + tech.get1(SDATA_OFFSET_02_PRESET_CONFIG1));
+      sb.append(" CharSetID:" + tech.get1(SDATA_OFFSET_03_CHARSET_ID1));
+      sb.append(" InputType:" + tech.get1(SDATA_OFFSET_04_DATA_TYPE1));
+      sb.append(" MaxSize:" + tech.get1(SDATA_OFFSET_05_MAX_SIZE1));
+      sb.append(" Mode:" + tech.get1(SDATA_OFFSET_06_ACTION_MODE1));
+      sb.append(" InitStyle:" + tech.get4(SDATA_OFFSET_07_INIT_STYLE_FLAGS4));
 
    }
 

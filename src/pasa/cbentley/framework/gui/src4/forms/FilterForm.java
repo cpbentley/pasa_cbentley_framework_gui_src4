@@ -19,8 +19,8 @@ import pasa.cbentley.framework.datamodel.src4.filter.MFilterSet;
 import pasa.cbentley.framework.datamodel.src4.table.ITableModel;
 import pasa.cbentley.framework.gui.src4.core.StyleClass;
 import pasa.cbentley.framework.gui.src4.ctx.GuiCtx;
-import pasa.cbentley.framework.gui.src4.factories.StringDrawableFactory;
-import pasa.cbentley.framework.gui.src4.factories.interfaces.IBOStringDrawable;
+import pasa.cbentley.framework.gui.src4.factories.DrawableStringFactory;
+import pasa.cbentley.framework.gui.src4.factories.interfaces.IBOStringData;
 import pasa.cbentley.framework.gui.src4.interfaces.IDrawable;
 import pasa.cbentley.framework.gui.src4.string.StringDrawable;
 import pasa.cbentley.framework.gui.src4.table.TableLayoutView;
@@ -32,7 +32,7 @@ import pasa.cbentley.framework.gui.src4.tech.ITechStringDrawable;
  * @author cbentley
  * 
  */
-public class FilterForm extends TableLayoutView implements ICommandable, IBOStringDrawable, ITechAcceptor {
+public class FilterForm extends TableLayoutView implements ICommandable, IBOStringData, ITechAcceptor {
 
    private static final String MAIN_LIST_TITLE = "Filters";
 
@@ -84,7 +84,7 @@ public class FilterForm extends TableLayoutView implements ICommandable, IBOStri
       filterRoot = new ListRoot(gc, sc, MAIN_LIST_TITLE, db);
       filterRoot.getCmdNode().addMenuCmd(CMD_SHOW_LIST);
 
-      ByteObject tech = gc.getDrawableStringFactory().getStringTech(ITechStringDrawable.TYPE_1_TITLE, ITechStringDrawable.MODE_0_READ, 15, ITechStringDrawable.INPUT_TYPE_0_ANY);
+      ByteObject tech = gc.getDrawableStringFactory().getStringTech(ITechStringDrawable.PRESET_CONFIG_1_TITLE, ITechStringDrawable.S_ACTION_MODE_0_READ, 15, ITechStringDrawable.S_DATA_0_ANY);
       settingName = new StringDrawable(gc, sc, "Name", tech);
       _fieldValue = new StringDrawable(gc, sc, "Name", tech);
 
@@ -228,7 +228,7 @@ public class FilterForm extends TableLayoutView implements ICommandable, IBOStri
             int filterId = filterable.getTypes().ints[visualIndex];
             String selString = filterable.getTypes().strings[visualIndex];
             int condition = filterable.getFilterType(filterId);
-            StringDrawableFactory drawableStringFactory = gc.getDrawableStringFactory();
+            DrawableStringFactory drawableStringFactory = gc.getDrawableStringFactory();
             if (j == dfields.size() - 1) {
                //last filter, we have to add small op and field value
                //_insertIndex points to the next
@@ -237,21 +237,21 @@ public class FilterForm extends TableLayoutView implements ICommandable, IBOStri
                   case ITechAcceptor.ACC_TYPE_4_INT_DATE:
                      this.insert(insertIndex, getSmallOp(ACC_TYPE_4_INT_DATE));
                      insertIndex++;
-                     ByteObject techDate = drawableStringFactory.getStringTech(ITechStringDrawable.TYPE_1_TITLE, ITechStringDrawable.MODE_2_EDIT, 30, ITechStringDrawable.INPUT_TYPE_5_DATE);
+                     ByteObject techDate = drawableStringFactory.getStringTech(ITechStringDrawable.PRESET_CONFIG_1_TITLE, ITechStringDrawable.S_ACTION_MODE_2_EDIT, 30, ITechStringDrawable.S_DATA_5_DATE);
                      StringDrawable sdDate = new StringDrawable(gc, sc, "", techDate);
                      this.insert(insertIndex, sdDate);
                      break;
                   case ACC_TYPE_0_INT:
                      this.insert(insertIndex, getSmallOp(ACC_TYPE_0_INT));
                      insertIndex++;
-                     ByteObject tech = drawableStringFactory.getStringTech(ITechStringDrawable.TYPE_1_TITLE, ITechStringDrawable.MODE_2_EDIT, 30, ITechStringDrawable.INPUT_TYPE_3_DECIMAL);
+                     ByteObject tech = drawableStringFactory.getStringTech(ITechStringDrawable.PRESET_CONFIG_1_TITLE, ITechStringDrawable.S_ACTION_MODE_2_EDIT, 30, ITechStringDrawable.S_DATA_3_DECIMAL);
                      StringDrawable sd = new StringDrawable(gc, sc, "", tech);
                      this.insert(insertIndex, sd);
                      break;
                   case ACC_TYPE_3_STRING:
                      this.insert(insertIndex, getSmallOp(ACC_TYPE_3_STRING));
                      insertIndex++;
-                     ByteObject tech2 = drawableStringFactory.getStringTech(ITechStringDrawable.TYPE_1_TITLE, ITechStringDrawable.MODE_2_EDIT, 30, ITechStringDrawable.INPUT_TYPE_0_ANY);
+                     ByteObject tech2 = drawableStringFactory.getStringTech(ITechStringDrawable.PRESET_CONFIG_1_TITLE, ITechStringDrawable.S_ACTION_MODE_2_EDIT, 30, ITechStringDrawable.S_DATA_0_ANY);
                      StringDrawable sd2 = new StringDrawable(gc, sc, "", tech2);
                      this.insert(insertIndex, sd2);
                      break;

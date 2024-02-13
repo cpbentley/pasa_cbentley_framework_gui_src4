@@ -15,6 +15,20 @@ import pasa.cbentley.framework.gui.src4.table.TableView;
  * Drawables are spaced together with the padding value.
  * <br>
  * 
+ * 
+ * 
+ * 
+ * 
+ * 
+ * 
+ * 
+ * 
+ * 
+ * 
+ * 
+ * 
+ *
+ * 
  * {@link CmdCtx} are still separate. 
  * <br>
  * This class only merge the visual styles.

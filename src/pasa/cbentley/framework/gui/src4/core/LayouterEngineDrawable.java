@@ -12,8 +12,8 @@ import pasa.cbentley.framework.gui.src4.canvas.ViewContext;
 import pasa.cbentley.framework.gui.src4.ctx.GuiCtx;
 import pasa.cbentley.framework.gui.src4.interfaces.IDrawable;
 import pasa.cbentley.framework.gui.src4.interfaces.ITechDrawable;
-import pasa.cbentley.layouter.src4.engine.LayEngineRead;
 import pasa.cbentley.layouter.src4.engine.LayoutOperator;
+import pasa.cbentley.layouter.src4.engine.LayouterEngineRead;
 import pasa.cbentley.layouter.src4.engine.Zer2DRect;
 import pasa.cbentley.layouter.src4.tech.IBOSizer;
 import pasa.cbentley.layouter.src4.tech.ITechLayout;
@@ -37,7 +37,7 @@ import pasa.cbentley.layouter.src4.tech.ITechLayout;
  * @author Charles-Philip Bentley
  *
  */
-public class LayEngineDrawable extends LayEngineRead implements ITechLayout, IStringable, IBOStyle, IByteObject, ITechDrawable {
+public class LayouterEngineDrawable extends LayouterEngineRead implements ITechLayout, IStringable, IBOStyle, IByteObject, ITechDrawable {
 
    private Drawable       drawable;
 
@@ -62,7 +62,7 @@ public class LayEngineDrawable extends LayEngineRead implements ITechLayout, ISt
 
    protected int          styleW;
 
-   public LayEngineDrawable(GuiCtx gc, Drawable drawable) {
+   public LayouterEngineDrawable(GuiCtx gc, Drawable drawable) {
       super(gc.getDC().getLAC(), drawable);
       this.gc = gc;
       this.drawable = drawable;
@@ -165,12 +165,12 @@ public class LayEngineDrawable extends LayEngineRead implements ITechLayout, ISt
     */
    public IDrawable getLink(IDrawable d, int type, int param) {
       IDrawable drw = null;
-      if (type == LINK_1_NAV) {
+      if (type == ET_LINK_1_NAV) {
          drw = d.getNavigate(param);
-      } else if (type == LINK_2_UIID) {
+      } else if (type == ET_LINK_2_UIID) {
          drw = gc.getRepo().getDrawable(param);
       }
-      if (type == LINK_0_PARENT || drw == null) {
+      if (type == ET_LINK_0_PARENT || drw == null) {
          drw = d.getParentNotNull();
       }
       return drw;
@@ -233,6 +233,14 @@ public class LayEngineDrawable extends LayEngineRead implements ITechLayout, ISt
       return hasFlagSizer(sizer, flag);
    }
 
+   public void incrDh(int incr) {
+      rect.incrH(incr);
+   }
+
+   public void incrDw(int incr) {
+      rect.incrW(incr);
+   }
+
    public void incrPh(int ph) {
       rect.incrPh(ph);
    }
@@ -257,8 +265,16 @@ public class LayEngineDrawable extends LayEngineRead implements ITechLayout, ISt
       rect.setPh(ph);
    }
 
+   public void setPhAsDh() {
+      rect.setPhAsDh();
+   }
+
    public void setPw(int pw) {
       rect.setPw(pw);
+   }
+
+   public void setPwAsDw() {
+      rect.setPwAsDw();
    }
 
    public void setX(int x) {
@@ -291,6 +307,11 @@ public class LayEngineDrawable extends LayEngineRead implements ITechLayout, ISt
          default:
             throw new IllegalArgumentException();
       }
+   }
+
+   public void setXY(int x, int y) {
+      setX(x);
+      setY(y);
    }
 
    public void setXYInvalidate(int x, int y) {
@@ -333,7 +354,7 @@ public class LayEngineDrawable extends LayEngineRead implements ITechLayout, ISt
 
    //#mdebug
    public void toString(Dctx dc) {
-      dc.root(this, LayEngineDrawable.class);
+      dc.root(this, LayouterEngineDrawable.class);
       toStringPrivate(dc);
       dc.appendVarWithSpace("isContextualW", isContextualW());
       dc.appendVarWithSpace("isContextualH", isContextualH());
@@ -347,7 +368,7 @@ public class LayEngineDrawable extends LayEngineRead implements ITechLayout, ISt
    }
 
    public void toString1Line(Dctx dc) {
-      dc.root1Line(this, LayEngineDrawable.class);
+      dc.root1Line(this, LayouterEngineDrawable.class);
       toStringPrivate(dc);
 
       super.toString1Line(dc.sup1Line());
@@ -357,12 +378,4 @@ public class LayEngineDrawable extends LayEngineRead implements ITechLayout, ISt
 
    }
    //#enddebug
-
-   public void setPwAsDw() {
-      rect.setPwAsDw();
-   }
-
-   public void setPhAsDh() {
-      rect.setPhAsDh();      
-   }
 }

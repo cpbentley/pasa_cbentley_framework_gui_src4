@@ -137,7 +137,9 @@ public abstract class AppliGui extends AppliAbstract {
    }
 
    /**
-    * Populate the {@link StyleClass} with {@link StyleClass#setClasses(StyleClass[])}.
+    * Creates the style classes used by the application.
+    * 
+    *  the {@link StyleClass} with {@link StyleClass#setClasses(StyleClass[])}.
     * <br>
     * <br>
     * This must be done for
@@ -228,6 +230,16 @@ public abstract class AppliGui extends AppliAbstract {
       //called when the app is launched first 
    }
 
+   protected void subAppLoadPostCtxSettings() {
+      //theme needs device to compute device specific
+      //what is theme needs size of canvas?. theme is invaliadated and reloaded 
+      StyleClass[] roots = this.getClasses();
+      if (roots == null) {
+         throw new NullPointerException("Implementation must define a set of Styles");
+      }
+      gc.setClasses(roots);
+   }
+
    /**
     * Loads {@link StyleClass}.
     * 
@@ -236,13 +248,7 @@ public abstract class AppliGui extends AppliAbstract {
     * <li>
     */
    protected void subAppLoad() {
-      //theme needs device to compute device specific
-      //what is theme needs size of canvas?. theme is invaliadated and reloaded 
-      StyleClass[] roots = this.getClasses();
-      if (roots == null) {
-         throw new NullPointerException("Implementation must define a set of Styles");
-      }
-      gc.setClasses(roots);
+
    }
 
    /**
@@ -283,8 +289,6 @@ public abstract class AppliGui extends AppliAbstract {
       //gc.getViewCommandListener().processCmd(ICmdsView.VCMD_00_LAST_LOGIN);
 
    }
-
-
 
    //#mdebug
    public void toString(Dctx dc) {

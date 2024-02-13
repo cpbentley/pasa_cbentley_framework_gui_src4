@@ -326,7 +326,7 @@ public interface IAnimable extends IStringable, ITechAnimable {
    /**
     * Sets the repeat value for the animation.
     * <br>
-    * Ignored when step function is looping {@link ByteObject#FUN_FLAG_3LOOPING}.
+    * Ignored when step function is looping {@link ByteObject#FUN_FLAG_3_LOOPING}.
     * <br>
     * @param repeat {@link IAnimable#REPEAT_INFINITE}
     */

@@ -11,6 +11,7 @@ import pasa.cbentley.framework.datamodel.src4.table.ObjectTableModel;
 import pasa.cbentley.framework.drawx.src4.engine.GraphicsX;
 import pasa.cbentley.framework.drawx.src4.string.Stringer;
 import pasa.cbentley.framework.gui.src4.canvas.InputConfig;
+import pasa.cbentley.framework.gui.src4.core.LayouterEngineDrawable;
 import pasa.cbentley.framework.gui.src4.core.ScrollConfig;
 import pasa.cbentley.framework.gui.src4.core.StyleClass;
 import pasa.cbentley.framework.gui.src4.ctx.GuiCtx;
@@ -46,7 +47,7 @@ import pasa.cbentley.framework.gui.src4.tech.ITechStringDrawable;
  * <br>
  * For the String draw, {@link Stringer} does it. This class only modifies its specific text effect index range
  * <br>
- * We want the virtual caret to show at least 2 letters in front. Same behavior as {@link ITechStringDrawable#TYPE_1_TITLE} in edit mode.
+ * We want the virtual caret to show at least 2 letters in front. Same behavior as {@link ITechStringDrawable#PRESET_CONFIG_1_TITLE} in edit mode.
  * <br>
  * <br>
  *  Therefore
@@ -118,12 +119,9 @@ public class StringListInput extends StringDrawable implements IEventConsumer {
          }
       }
    }
-
-   public void initViewDrawable(int width, int height) {
-      updateString(null);
-      super.initViewDrawable(width, height);
+   public void initViewDrawable(LayouterEngineDrawable ds) {
+      super.initViewDrawable(ds);
    }
-
    public void updateString(InputConfig ic) {
       if (model != null) {
          int selectedIndex = selectedModelIndex;
@@ -192,7 +190,7 @@ public class StringListInput extends StringDrawable implements IEventConsumer {
    }
 
    /**
-    * Forwards to the {@link EditModule}.
+    * Forwards to the {@link StringEditModule}.
     * <br>
     * <br>
     * When Enter/Fire is done, an INavigational Forward is done. 

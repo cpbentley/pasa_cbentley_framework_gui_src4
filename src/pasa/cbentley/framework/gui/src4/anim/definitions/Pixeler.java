@@ -12,19 +12,16 @@ import pasa.cbentley.framework.gui.src4.interfaces.IDrawable;
 import pasa.cbentley.framework.gui.src4.interfaces.ITechDrawable;
 
 /**
- * Draws an image buffer.
- * <br>
- * Copy of original whose alpha values are changed.
- * <br>
+ * <li>Draws an image buffer.
+ * 
+ * <li>Copy of original whose alpha values are changed.
+ * 
+ * 
  * In appearing mode, buffer starts with 0 alpha and each turn some pixels are given their original alpha.
- * <br>
  * Could be a function.
- * <br>
  * Must work on a fixed copy. Is not compatible with {@link SizeMod}.
- * <br>
  * Compatible with {@link Move}.
- * <br>
- * <br>
+ * 
  * @author Charles-Philip Bentley
  *
  */

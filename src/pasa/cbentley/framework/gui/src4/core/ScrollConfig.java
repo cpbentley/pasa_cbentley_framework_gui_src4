@@ -8,6 +8,7 @@ import pasa.cbentley.core.src4.utils.IntUtils;
 import pasa.cbentley.framework.drawx.src4.engine.GraphicsX;
 import pasa.cbentley.framework.drawx.src4.engine.RgbImage;
 import pasa.cbentley.framework.gui.src4.ctx.GuiCtx;
+import pasa.cbentley.framework.gui.src4.ctx.ObjectGC;
 import pasa.cbentley.framework.gui.src4.ctx.ToStringStaticGui;
 import pasa.cbentley.framework.gui.src4.factories.interfaces.IBOScrollBar;
 import pasa.cbentley.framework.gui.src4.factories.interfaces.IBOViewPane;
@@ -18,10 +19,12 @@ import pasa.cbentley.framework.gui.src4.tech.ITechViewPane;
 
 /**
  * Encapsulates data describing a scrolling state and behavior. Links {@link ViewDrawable} to a {@link ScrollBar}. 
- * <br>
- * <br>
+ * 
+ * <p>
+ * 
  * An implementation does not have to implement anything. Links {@link ViewDrawable} via
  * 
+ * </p>
  * <li>{@link ViewDrawable#initScrollingConfig(ScrollConfig, ScrollConfig)}
  * <li>{@link ViewDrawable#drawViewDrawableContent(GraphicsX, int, int, ScrollConfig, ScrollConfig)} 
  * <br>
@@ -92,47 +95,40 @@ import pasa.cbentley.framework.gui.src4.tech.ITechViewPane;
  * @see ViewPane
  *
  */
-public class ScrollConfig implements IStringable {
+public class ScrollConfig extends ObjectGC implements IStringable {
 
-   public static final int FLAG_1UPDATED           = 1;
+   public static final int FLAG_1_UPDATED           = 1;
 
    /**
     * Decides the root
     */
-   public static final int FLAG_3TOP_LEFT_DIR      = 4;
+   public static final int FLAG_3_TOP_LEFT_DIR      = 4;
 
    /**
     * Only relevant in Logic unit mode.
     */
-   public static final int FLAG_4PARTIAL_REMOVED   = 8;
+   public static final int FLAG_4_PARTIAL_REMOVED   = 8;
 
    /**
     * when set, partial increment is always bottom/right
     */
-   public static final int FLAG_7ALWAYS_TOP        = 64;
+   public static final int FLAG_7_ALWAYS_TOP        = 64;
 
    /**
     * when set, the partial increment is always top/left
     */
-   public static final int FLAG_8ALWAYS_BOTTOM     = 128;
+   public static final int FLAG_8_ALWAYS_BOTTOM     = 128;
 
-   public static final int STATE_0START            = 0;
+   public static final int STATE_0_START            = 0;
 
-   public static final int STATE_1JUST_AFTER_START = 1;
+   public static final int STATE_1_JUST_AFTER_START = 1;
 
-   public static final int STATE_2MIDDLE           = 2;
+   public static final int STATE_2_MIDDLE           = 2;
 
-   public static final int STATE_3END              = 3;
+   public static final int STATE_3_END              = 3;
 
-   public static final int STATE_4JUST_BEFORE_END  = 4;
+   public static final int STATE_4_JUST_BEFORE_END  = 4;
 
-   public static String debug(ScrollConfig sc) {
-      if (sc == null) {
-         return "null";
-      } else {
-         return sc.toString();
-      }
-   }
 
    /**
     * When siSize is zero, return zero.
@@ -199,12 +195,13 @@ public class ScrollConfig implements IStringable {
    int               scrollPartialType;
 
    /**
-    * Unit of scrolling used on this {@link ScrollConfig}. <br>
-    * <br>
+    * Unit of scrolling used on this {@link ScrollConfig}. 
+    * <p>
     * Decided by ViewPane's Tech Param {@link IBOViewPane#VP_OFFSET_05_SCROLLBAR_MODE1}. <br>
     * <li>{@link ITechViewPane#SCROLL_TYPE_0_PIXEL_UNIT}
     * <li>{@link ITechViewPane#SCROLL_TYPE_1_LOGIC_UNIT}
     * <li>{@link ITechViewPane#SCROLL_TYPE_2_PAGE_UNIT}
+    * </p>
     */
    int               scrollUnitType;
 
@@ -277,7 +274,7 @@ public class ScrollConfig implements IStringable {
     * <br>
     * <br>
     * 
-    * If flag {@link ScrollConfig#FLAG_8ALWAYS_BOTTOM}
+    * If flag {@link ScrollConfig#FLAG_8_ALWAYS_BOTTOM}
     * when press down, makes first partial increment fully visible. root becomes this increment
     */
    int               siRoot;
@@ -326,14 +323,13 @@ public class ScrollConfig implements IStringable {
 
    int               state;
 
-   protected final GuiCtx ui;
 
-   public ScrollConfig(GuiCtx ui) {
-      this.ui = ui;
+   public ScrollConfig(GuiCtx gc) {
+      super(gc);
    }
 
-   public ScrollConfig(GuiCtx ui, int start, int visible, int total) {
-      this.ui = ui;
+   public ScrollConfig(GuiCtx gc, int start, int visible, int total) {
+      super(gc);
       this.siStart = start;
       this.siVisible = visible;
       this.siTotal = total;
@@ -347,7 +343,7 @@ public class ScrollConfig implements IStringable {
    void checkStart() {
       if (siStart + siVisible > siTotal) {
          //#debug
-         ui.toDLog().pNull("Overflow", this, ScrollConfig.class, "checkStart", LVL_05_FINE, true);
+         gc.toDLog().pNull("Overflow", this, ScrollConfig.class, "checkStart", LVL_05_FINE, true);
          
          int diff = siStart + siVisible - siTotal;
          siStart = siStart - diff;
@@ -358,7 +354,7 @@ public class ScrollConfig implements IStringable {
    }
 
    public Object clone() {
-      ScrollConfig sc = new ScrollConfig(ui);
+      ScrollConfig sc = new ScrollConfig(gc);
       sc.cacheData = cacheData;
       sc.isSiDecreasing = isSiDecreasing;
       sc.scrollMoveType = scrollMoveType;
@@ -383,9 +379,11 @@ public class ScrollConfig implements IStringable {
 
    /**
     * Create a new {@link ScrollConfig} object cloned but with 
+    * 
     * <li>SiStart incremented
     * <li>siVisible incremented 
-    * <br>
+    * 
+    * 
     * @param startMod sistart inc
     * @param visibleMod 
     * @return
@@ -847,7 +845,9 @@ public class ScrollConfig implements IStringable {
     * @param siTotal
     */
    public void initConfigPixel(int siPixelSize, int siVisible, int siTotal) {
-      //System.out.println("ScrollConfig#initConfigPixel = siPixelSize=" + siPixelSize + " siVisible=" + siVisible + " siTotal=" + siTotal);
+      //#debug
+      toDLog().pFlow("siPixelSize=" + siPixelSize + " siVisible=" + siVisible + " siTotal=" + siTotal, this, ScrollConfig.class, "initConfigPixel", LVL_05_FINE, true);
+      
       this.siPixelSize = siPixelSize;
       this.siVisible = siVisible;
       this.siTotal = siTotal;
@@ -1029,6 +1029,16 @@ public class ScrollConfig implements IStringable {
       maxAmplitude = ma;
    }
 
+   /**
+    * Sets the Unit of scrolling used on this {@link ScrollConfig}. 
+    * <p>
+    * Decided by ViewPane's Tech Param {@link IBOViewPane#VP_OFFSET_05_SCROLLBAR_MODE1}. <br>
+    * <li>{@link ITechViewPane#SCROLL_TYPE_0_PIXEL_UNIT}
+    * <li>{@link ITechViewPane#SCROLL_TYPE_1_LOGIC_UNIT}
+    * <li>{@link ITechViewPane#SCROLL_TYPE_2_PAGE_UNIT}
+    * </p>
+    * @param unit
+    */
    public void setScrollUnit(int unit) {
       scrollUnitType = unit;
    }
@@ -1041,14 +1051,6 @@ public class ScrollConfig implements IStringable {
       siPartial = partialincr;
    }
 
-   /**
-    * Sets the increment that MUST be visible. <br>
-    * Depending on the {@link ScrollConfig}, computes start and visible
-    * @param s
-    */
-   public void setSIRoot(int s) {
-
-   }
 
    public void setSISizes(int[] sizes) {
       siPixelSizes = sizes;
@@ -1135,10 +1137,10 @@ public class ScrollConfig implements IStringable {
                //middle case
                nextChange = i;
             }
-            if (isEnd() && hasFlag(FLAG_7ALWAYS_TOP)) {
+            if (isEnd() && hasFlag(FLAG_7_ALWAYS_TOP)) {
                siPartial = siTotal - nextChange;
                siVisible++;
-               setFlag(FLAG_7ALWAYS_TOP, false);
+               setFlag(FLAG_7_ALWAYS_TOP, false);
             } else {
                siPartial -= nextChange;
             }
@@ -1200,7 +1202,7 @@ public class ScrollConfig implements IStringable {
                siPartial = -1;
                siStart = siTotal - siVisible;//the new siVisible
                siLastChange = nextChange;
-               setFlag(FLAG_7ALWAYS_TOP, true);
+               setFlag(FLAG_7_ALWAYS_TOP, true);
             } else {
                siStart += nextChange;
                siPartial += nextChange;
@@ -1218,19 +1220,13 @@ public class ScrollConfig implements IStringable {
       }
    }
 
+
    //#mdebug
-   public String toString() {
-      return Dctx.toString(this);
-   }
-
-   public String toString1Line() {
-      return Dctx.toString1Line(this);
-   }
-
-   
-   
    public void toString(Dctx dc) {
-      dc.root(this, "ScrollConfig");
+      dc.root(this, ScrollConfig.class, 1220);
+      toStringPrivate(dc);
+      super.toString(dc.sup());
+      
       dc.append("start=" + siStart);
       dc.append('(');
       dc.append(getStartFirstFullyVisible());
@@ -1255,23 +1251,26 @@ public class ScrollConfig implements IStringable {
       dc.append(" isDecreasing=" + isSiDecreasing);
       dc.append(" siLastChange=" + siLastChange);
       dc.nl();
-      dc.append(" move=" + ToStringStaticGui.debugScrollMove(scrollMoveType));
-      dc.append(" type=" + ToStringStaticGui.debugScrollType(scrollUnitType));
-      dc.append(" visual=" + ToStringStaticGui.debugScrollVisual(scrollVisualType));
+      dc.append(" move=" + ToStringStaticGui.toStringScrollMove(scrollMoveType));
+      dc.append(" type=" + ToStringStaticGui.toStringScrollbarMode(scrollUnitType));
+      dc.append(" visual=" + ToStringStaticGui.toStringScrollVisual(scrollVisualType));
       if (isPartial()) {
-         dc.append(" partial=" + ToStringStaticGui.debugScrollPartial(scrollPartialType));
+         dc.append(" partial=" + ToStringStaticGui.toStringScrollPartial(scrollPartialType));
          dc.append(" siPartial=" + siPartial);
       }
       dc.append(" isEnd=" + isEnd());
    }
 
-   
-   public void toString1Line(Dctx dc) {
-      dc.root(this, "ScrollConfig");
+   private void toStringPrivate(Dctx dc) {
+      
    }
 
-   public UCtx toStringGetUCtx() {
-      return ui.getUCtx();
+   public void toString1Line(Dctx dc) {
+      dc.root1Line(this, ScrollConfig.class);
+      toStringPrivate(dc);
+      super.toString1Line(dc.sup1Line());
    }
+
    //#enddebug
+   
 }

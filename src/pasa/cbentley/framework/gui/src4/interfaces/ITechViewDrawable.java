@@ -8,7 +8,7 @@ import pasa.cbentley.framework.gui.src4.core.ViewDrawable;
 import pasa.cbentley.framework.gui.src4.core.ViewPane;
 import pasa.cbentley.framework.gui.src4.factories.interfaces.IBOViewPane;
 import pasa.cbentley.framework.gui.src4.table.TableView;
-import pasa.cbentley.framework.gui.src4.table.interfaces.IBOCellPolicy;
+import pasa.cbentley.framework.gui.src4.table.interfaces.ITechCell;
 import pasa.cbentley.framework.gui.src4.tech.ITechViewPane;
 
 /**
@@ -112,7 +112,7 @@ public interface ITechViewDrawable extends ITech {
     * Makes {@link ViewDrawable} malleable with {@link ViewDrawable#isMalleable()}.
     * <br>
     * <br>
-    * Case of a {@link TableView} with {@link IBOCellPolicy#TYPE_1_FLOW}.
+    * Case of a {@link TableView} with {@link ITechCell#TYPE_1_FLOW}.
     * <br>
     */
    public static final int FLAG_VSTATE_10_CONTENT_PW_VIEWPORT_DW     = 1 << 9;
@@ -134,10 +134,10 @@ public interface ITechViewDrawable extends ITech {
     * <br>
     * <br>
     * Case of a {@link TableView} policy:
-    * <li> {@link IBOCellPolicy#CELL_2_RATIO}
-    * <li> {@link IBOCellPolicy#CELL_3_FILL_STRONG}
-    * <li> {@link IBOCellPolicy#CELL_4_FILL_AVERAGE}
-    * <li> {@link IBOCellPolicy#CELL_5_FILL_WEAK}
+    * <li> {@link ITechCell#CELL_2_RATIO}
+    * <li> {@link ITechCell#CELL_3_FILL_STRONG}
+    * <li> {@link ITechCell#CELL_4_FILL_AVERAGE}
+    * <li> {@link ITechCell#CELL_5_FILL_WEAK}
     * <br>
     * <br>
     * Make {@link ViewDrawable} malleable with {@link ViewDrawable#isMalleable()}.

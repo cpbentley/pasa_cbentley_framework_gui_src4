@@ -23,14 +23,14 @@ import pasa.cbentley.framework.gui.src4.interfaces.IAnimable;
  * @author Charles-Philip Bentley
  *
  */
-public class AnimCreator extends ObjectGC implements IBOAnim {
+public class AnimManager extends ObjectGC implements IBOAnim {
 
 
    private Realisator         realisator;
 
    protected final CanvasAppliInputGui canvas;
 
-   public AnimCreator(GuiCtx gc, CanvasAppliInputGui canvas) {
+   public AnimManager(GuiCtx gc, CanvasAppliInputGui canvas) {
       super(gc);
       this.canvas = canvas;
    }
@@ -116,7 +116,7 @@ public class AnimCreator extends ObjectGC implements IBOAnim {
 
    //#mdebug
    public void toString(Dctx dc) {
-      dc.root(this, AnimCreator.class, "@line5");
+      dc.root(this, AnimManager.class, "@line5");
       toStringPrivate(dc);
       super.toString(dc.sup());
    }
@@ -126,7 +126,7 @@ public class AnimCreator extends ObjectGC implements IBOAnim {
    }
 
    public void toString1Line(Dctx dc) {
-      dc.root1Line(this, AnimCreator.class);
+      dc.root1Line(this, AnimManager.class);
       toStringPrivate(dc);
       super.toString1Line(dc.sup1Line());
    }

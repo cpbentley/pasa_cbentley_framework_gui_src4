@@ -199,7 +199,7 @@ public class MenuBar extends Drawable {
       super(gc, styleKey);
       //the table is only an organizer
       tv = new TableView(gc, styleKey, gc.getTablePolicyC().getMenuPolicy());
-      int type = ITechStringDrawable.TYPE_1_TITLE;
+      int type = ITechStringDrawable.PRESET_CONFIG_1_TITLE;
       mRight = new StringDrawable(gc, styleClass.getStyleClass(CHILD_LINK_RIGHT_DRAWABLE), "Right", type);
       mRight.setStateFlag(ITechDrawable.STATE_06_STYLED, true);
       mMiddle = new StringDrawable(gc, styleClass.getStyleClass(CHILD_LINK_MIDDLE_DRAWABLE), "M", type);

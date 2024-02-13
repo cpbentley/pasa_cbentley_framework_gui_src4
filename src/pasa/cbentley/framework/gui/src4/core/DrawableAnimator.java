@@ -7,7 +7,7 @@ import pasa.cbentley.core.src4.logging.IDLog;
 import pasa.cbentley.core.src4.logging.IStringable;
 import pasa.cbentley.core.src4.utils.BitUtils;
 import pasa.cbentley.framework.drawx.src4.engine.GraphicsX;
-import pasa.cbentley.framework.gui.src4.anim.AnimCreator;
+import pasa.cbentley.framework.gui.src4.anim.AnimManager;
 import pasa.cbentley.framework.gui.src4.anim.IBOAnim;
 import pasa.cbentley.framework.gui.src4.anim.ITechAnim;
 import pasa.cbentley.framework.gui.src4.anim.base.AnimAggregate;
@@ -404,7 +404,7 @@ public class DrawableAnimator implements IStringable, ITechAnimable {
       }
    }
 
-   public AnimCreator getAnimCreator() {
+   public AnimManager getAnimCreator() {
       return d.getAnimCreator();
    }
 

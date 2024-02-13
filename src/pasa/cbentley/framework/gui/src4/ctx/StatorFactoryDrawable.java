@@ -1,12 +1,13 @@
-package pasa.cbentley.framework.gui.src4.canvas;
+package pasa.cbentley.framework.gui.src4.ctx;
 
 import pasa.cbentley.byteobjects.src4.core.ByteObject;
 import pasa.cbentley.byteobjects.src4.stator.StatorReaderBO;
 import pasa.cbentley.core.src4.ctx.ICtx;
 import pasa.cbentley.core.src4.stator.IStatorFactory;
 import pasa.cbentley.core.src4.stator.IStatorable;
+import pasa.cbentley.core.src4.stator.ITechStator;
 import pasa.cbentley.core.src4.stator.StatorReader;
-import pasa.cbentley.framework.gui.src4.ctx.GuiCtx;
+import pasa.cbentley.framework.gui.src4.canvas.CanvasAppliInputGui;
 
 public class StatorFactoryDrawable implements ITechStatorableGui, IStatorFactory {
 
@@ -49,6 +50,7 @@ public class StatorFactoryDrawable implements ITechStatorableGui, IStatorFactory
 
    private Object createCanvasDrawable(StatorReader reader) {
       StatorReaderBO srbo = (StatorReaderBO)reader;
+      srbo.checkInt(ITechStator.MAGIC_WORD_OBJECT_PARAM);
       ByteObject boCanvasHost = srbo.readByteObject();
       ByteObject boCanvasAppli = srbo.readByteObject();
       return new CanvasAppliInputGui(gc,boCanvasAppli,boCanvasHost);

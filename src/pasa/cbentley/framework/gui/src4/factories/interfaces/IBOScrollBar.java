@@ -7,8 +7,6 @@ import pasa.cbentley.framework.gui.src4.tech.ITechViewPane;
 
 public interface IBOScrollBar extends IByteObject {
 
-   public static final int MINIMUM_BLOCK_PIXEL_SIZE         = 5;
-
    /**
     * if set, this scrollbar is vertical
     */

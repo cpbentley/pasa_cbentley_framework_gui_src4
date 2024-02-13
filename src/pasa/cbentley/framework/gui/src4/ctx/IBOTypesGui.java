@@ -4,7 +4,9 @@ import pasa.cbentley.byteobjects.src4.core.ByteObject;
 import pasa.cbentley.byteobjects.src4.ctx.IBOTypesBOC;
 import pasa.cbentley.framework.gui.src4.core.StyleClass;
 import pasa.cbentley.framework.gui.src4.core.ViewPane;
-import pasa.cbentley.framework.gui.src4.string.EditModule;
+import pasa.cbentley.framework.gui.src4.factories.interfaces.IBOStringData;
+import pasa.cbentley.framework.gui.src4.factories.interfaces.IBOViewPane;
+import pasa.cbentley.framework.gui.src4.string.StringEditModule;
 import pasa.cbentley.framework.gui.src4.string.StringDrawable;
 import pasa.cbentley.framework.gui.src4.string.StringEditControl;
 import pasa.cbentley.framework.gui.src4.table.TableView;
@@ -43,8 +45,6 @@ public interface IBOTypesGui extends IBOTypesBOC {
     */
    public static final int  LINK_53_STYLE_SCROLLBAR_BOT_RIGHT_WRAPPER = 53;
 
-   public static final int  LINK_54_STYLE_CLASS_WRAPPER               = 54;
-
    /**
     * Style creator links Drawable and ViewPane styleKeys with this ID. 
     * <br>
@@ -60,8 +60,10 @@ public interface IBOTypesGui extends IBOTypesBOC {
 
    /**
     * ID linked to {@link StyleClass#linkByteObject(ByteObject, int)}
+    * 
+    * {@link IBOViewPane}
     */
-   public static final int  LINK_66_TECH_VIEWPANE                     = 66;
+   public static final int  LINK_66_BO_VIEWPANE                       = 66;
 
    /**
     * Link to {@link ViewPane}'s {@link StyleClass} for holes.
@@ -69,11 +71,13 @@ public interface IBOTypesGui extends IBOTypesBOC {
     * <br>
     * Style is used when a specific Drawable (Special Button) is put into the hole.
     */
-   public static final int  LINK_67_STYLE_VIEWPANE_HOLE               = 67;
+   public static final int  LINK_58_STYLE_VIEWPANE_HOLE_HEADER        = 58;
 
-   public static final int  LINK_68_TECH_V_SCROLLBAR                  = 68;
+   public static final int  LINK_59_STYLE_VIEWPANE_HOLE_SB            = 59;
 
-   public static final int  LINK_69_TECH_H_SCROLLBAR                  = 69;
+   public static final int  LINK_68_BO_V_SCROLLBAR                    = 68;
+
+   public static final int  LINK_69_BO_H_SCROLLBAR                    = 69;
 
    public static final int  LINK_71_STYLE_VIEWPANE_H_SCROLLBAR        = 71;
 
@@ -128,16 +132,16 @@ public interface IBOTypesGui extends IBOTypesBOC {
    /**
     * Linked to StyleClass of {@link StringDrawable}.
     * <br>
-    * Reads by {@link StringDrawable} edit module {@link EditModule}.
+    * Reads by {@link StringDrawable} edit module {@link StringEditModule}.
     */
    public static final int  LINK_40_TECH_STRING_EDIT                  = 40;
 
    /**
+    * {@link IBOStringData}
     * Linked to StyleClass.
-    * <br>
     * Reads by {@link StringDrawable}.
     */
-   public static final int  LINK_41_TECH_STRING                       = 41;
+   public static final int  LINK_41_BO_STRING_DRAWABLE                = 41;
 
    public static final int  LINK_42_CARET_FIGURE                      = 42;
 

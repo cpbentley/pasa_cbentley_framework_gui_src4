@@ -4,7 +4,7 @@ import pasa.cbentley.core.src4.interfaces.ITech;
 import pasa.cbentley.framework.gui.src4.core.ViewDrawable;
 import pasa.cbentley.framework.gui.src4.interfaces.ITechDrawable;
 import pasa.cbentley.framework.gui.src4.interfaces.ITechViewDrawable;
-import pasa.cbentley.framework.gui.src4.string.EditModule;
+import pasa.cbentley.framework.gui.src4.string.StringEditModule;
 import pasa.cbentley.framework.gui.src4.string.StringDrawable;
 
 public interface ITechStringDrawable extends ITech {
@@ -18,51 +18,53 @@ public interface ITechStringDrawable extends ITech {
    public static final int  DEFAULT_DELAY_MULTIPLIER        = 5;
 
    /**
-    * Any character
+    * Any types of characters is valid.
     */
-   public static final int  INPUT_TYPE_0_ANY                = 0;
+   public static final int  S_DATA_0_ANY                    = 0;
 
    /**
     * alpha numeric + @ and . and _
     */
-   public static final int  INPUT_TYPE_1_EMAIL              = 1;
+   public static final int  S_DATA_1_EMAIL                  = 1;
 
    /**
     * only integer
     */
-   public static final int  INPUT_TYPE_2_NUMERIC            = 2;
+   public static final int  S_DATA_2_NUMERIC                = 2;
 
    /**
     * integer with . for decimals
     */
-   public static final int  INPUT_TYPE_3_DECIMAL            = 3;
+   public static final int  S_DATA_3_DECIMAL                = 3;
 
    /**
     * alpha numeric + may start with http[s]://
     */
-   public static final int  INPUT_TYPE_4_URL                = 4;
+   public static final int  S_DATA_4_URL                    = 4;
 
    /**
     * Date format
     */
-   public static final int  INPUT_TYPE_5_DATE               = 5;
+   public static final int  S_DATA_5_DATE                   = 5;
 
-   public static final int  INPUT_TYPE_CK_MAX               = 5;
+   public static final int  S_DATA_MAX_CK                   = 5;
+
+   public static final int  S_DATA_MAX_MODULO               = 6;
 
    /**
     * {@link StringDrawable}'s content cannot be edited or selected
     */
-   public static final int  MODE_0_READ                     = 0;
+   public static final int  S_ACTION_MODE_0_READ            = 0;
 
    /**
-    * {@link StringDrawable}'s {@link EditModule} only allows selection.
+    * {@link StringDrawable}'s {@link StringEditModule} only allows selection.
     */
-   public static final int  MODE_1_SELECT                   = 1;
+   public static final int  S_ACTION_MODE_1_SELECT          = 1;
 
    /**
-    * {@link StringDrawable}'s {@link EditModule} only allows both selection and edition.
+    * {@link StringDrawable}'s {@link StringEditModule} only allows both selection and edition.
     */
-   public static final int  MODE_2_EDIT                     = 2;
+   public static final int  S_ACTION_MODE_2_EDIT            = 2;
 
    public static final int  SEDIT_CONTROL_0_CANVAS          = 0;
 
@@ -93,34 +95,35 @@ public interface ITechStringDrawable extends ITech {
    public static final int  STRING_FLAG_2_IMPLICIT_EDITABLE = 2;
 
    /**
-    * No explicit type, recipient decides how to handle the String. width/height.
-    * <br>
-    * <br>
-    * No overrides. Reads {@link ViewDrawable#initViewDrawable(int, int)} semantics and apply dimension constraint.
-    * <li> <b>init(x,-1)</b> One line trimmed at width
-    * <li> <b>init(-1,x)</b> X lines with only 1 characters
-    * <li> <b>init(0,0)</b> Free
-    * <li> <b>init(0,x)</b> Supports new lines
-    * <li> <b>init(x,0)</b> Trim on width, show as many lines. not scrollable
-    * <li> <b>init(0,-1)</b> One line as long as it needs to be
-    * <br>
+    * Sizer type for width and height.
+    * 
+    * Sizing of {@link StringDrawable} will depend on sizers.
+    * <li> {@link StringDrawable#setSizersPreset_1LineLong()}
+    * <li> {@link StringDrawable#setSizersPreset_Free()}
+    * <li> {@link StringDrawable#setSizersPreset_1LineAtWidth(int)}
+    * <li> {@link StringDrawable#setSizersPreset_1CharPerLines(int)}
+    * <li> {@link StringDrawable#setSizersPreset_TrimOnWidth(int)}
+    * <li> {@link StringDrawable#setSizersPreset_FreeWidthYLines(int)}
+    * 
+    * <p>
+    * This mode does not 
     * <li>No preset Shrinking flags set.
+    * </p>
     */
-   public static final int  TYPE_0_NONE                     = 0;
+   public static final int  PRESET_CONFIG_0_NONE            = 0;
 
    /**
-    * Title string: one line of text trimmed at width.
-    * <br>
+    * Preset for titles.  one line of text trimmed at sizer width.
+    * 
     * <li>No Scrolling {@link ITechViewDrawable#FLAG_GENE_28_NOT_SCROLLABLE}.
-    * <li>When negative width, only shows X letters. Ignores the rest.
     * <li>When 0 width, shows the whole title
     * <li>In all cases, only show 1 line, thus ignores new lines
-    * <li>Preset shrink
+    * <li>Preset shrinks both w and H.
     * <br>
     * <br>
     * In EditMode draws letters while keeping caret visible with a small scrolling.
     */
-   public static final int  TYPE_1_TITLE                    = 1;
+   public static final int  PRESET_CONFIG_1_TITLE           = 1;
 
    /**
     * Force the arrangement of characters on a single line, this ignoring new lines characters.
@@ -136,7 +139,7 @@ public interface ITechStringDrawable extends ITech {
     * <li>Ignores new lines.
     * <li>top,bottom and vertical scrollbar pixels must be in expand mode
     */
-   public static final int  TYPE_2_SCROLL_H                 = 2;
+   public static final int  PRESET_CONFIG_2_SCROLL_H        = 2;
 
    /**
     * String type that
@@ -157,7 +160,7 @@ public interface ITechStringDrawable extends ITech {
     * ViewContext Drawn Size as preferred size.
     * Final backup size is ViewPort's width. That's the outer bound.
     */
-   public static final int  TYPE_3_SCROLL_V                 = 3;
+   public static final int  PRESET_CONFIG_3_SCROLL_V        = 3;
 
    /**
     * Draws text like an Image. Scrolling Increments are pixels
@@ -166,7 +169,7 @@ public interface ITechStringDrawable extends ITech {
     * When drawing, clipping is done at padding.
     * No Trim.
     */
-   public static final int  TYPE_4_NATURAL_NO_WRAP          = 4;
+   public static final int  PRESET_CONFIG_4_NATURAL_NO_WRAP = 4;
 
    /**
     * Fast char drawing. no messing with breaking code or anything else.
@@ -178,10 +181,10 @@ public interface ITechStringDrawable extends ITech {
     * <li>Height of Drawable is decided by Font.
     * <li>Width is decided an etalon letter?
     */
-   public static final int  TYPE_5_CHAR                     = 5;
+   public static final int  PRESET_CONFIG_5_CHAR            = 5;
 
-   public static final int  TYPE_CK_MAX                     = 5;
+   public static final int  PRESET_CONFIG_MAX_CK            = 5;
 
-   public static final int  TYPE_MODULO_MAX                 = 6;
+   public static final int  PRESET_CONFIG_MAX_MODULO        = 6;
 
 }

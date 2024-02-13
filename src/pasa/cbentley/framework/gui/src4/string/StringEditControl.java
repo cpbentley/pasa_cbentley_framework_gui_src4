@@ -35,7 +35,7 @@ import pasa.cbentley.framework.gui.src4.core.DrawableInjected;
 import pasa.cbentley.framework.gui.src4.core.StyleClass;
 import pasa.cbentley.framework.gui.src4.ctx.GuiCtx;
 import pasa.cbentley.framework.gui.src4.ctx.IBOTypesGui;
-import pasa.cbentley.framework.gui.src4.factories.interfaces.IBOStringDrawable;
+import pasa.cbentley.framework.gui.src4.factories.interfaces.IBOStringData;
 import pasa.cbentley.framework.gui.src4.factories.interfaces.IBOStringEdit;
 import pasa.cbentley.framework.gui.src4.interfaces.IDrawListener;
 import pasa.cbentley.framework.gui.src4.interfaces.IDrawable;
@@ -115,8 +115,8 @@ import pasa.cbentley.powerdata.spec.src4.spec.CharTrieUtilz;
  * <br>
  * They also have a contextual menu appearing.
  * <br>
- * When a key is pressed in the {@link StringDrawable} and then {@link EditModule}, it first forwards it to the {@link StringEditControl}. 
- * If the Control match a command to the {@link InputConfig}, {@link EditModule} drops control flow.
+ * When a key is pressed in the {@link StringDrawable} and then {@link StringEditModule}, it first forwards it to the {@link StringEditControl}. 
+ * If the Control match a command to the {@link InputConfig}, {@link StringEditModule} drops control flow.
  * <br>
  * <br>
  * Control updates the state of the key.
@@ -124,7 +124,7 @@ import pasa.cbentley.powerdata.spec.src4.spec.CharTrieUtilz;
  * <br>
  * The current key step is managed here.
  * <br>
- * CharSet ID may be changed. It modifies InputState {@link IBOStringDrawable#INPUT_OFFSET_03_CHARSET_ID1} of the root {@link ByteObject}.
+ * CharSet ID may be changed. It modifies InputState {@link IBOStringData#SDATA_OFFSET_03_CHARSET_ID1} of the root {@link ByteObject}.
  * <br>
  * <br>
  * <b>Structure</b> :
@@ -140,7 +140,7 @@ import pasa.cbentley.powerdata.spec.src4.spec.CharTrieUtilz;
  * @author Charles-Philip Bentley
  *
  */
-public class StringEditControl extends TableView implements IDrawListener, IBOStringDrawable, IEventConsumer {
+public class StringEditControl extends TableView implements IDrawListener, IBOStringData, IEventConsumer {
 
    public static final char   etalonChar             = 'z';
 
@@ -207,7 +207,7 @@ public class StringEditControl extends TableView implements IDrawListener, IBOSt
    /**
     * Style depends if MAJ lock is activated or not.
     * <br>
-    * In lowercase only {@link IBOStringDrawable#INPUT_FLAG_3_MAJ} , this item is not shown.
+    * In lowercase only {@link IBOStringData#SDATA_FLAG_3_MAJ} , this item is not shown.
     * <br>
     * Not shown on platform/devices that have a built-in MAJ (J2SE)
     * <br.
@@ -236,7 +236,7 @@ public class StringEditControl extends TableView implements IDrawListener, IBOSt
     */
    private StringDrawable     drawableT9;
 
-   private EditModule         editModule             = null;
+   private StringEditModule         editModule             = null;
 
    private int                indexCharSet           = 4;
 
@@ -343,24 +343,24 @@ public class StringEditControl extends TableView implements IDrawListener, IBOSt
          toDLog().pInit("Letter Style Class", letterSK, StringEditControl.class, "StringEditControl", LVL_05_FINE, false);
       }
 
-      editModule = new EditModule(gc);
+      editModule = new StringEditModule(gc);
       //check about the tech strings.. we want total control over those here.
 
-      techStr = gc.getDrawableStringFactory().getStringTech(ITechStringDrawable.TYPE_1_TITLE);
+      techStr = gc.getDrawableStringFactory().getStringTech(ITechStringDrawable.PRESET_CONFIG_1_TITLE);
 
-      drawableSpecial = new StringDrawable(gc, normalSK, "#", ITechStringDrawable.TYPE_1_TITLE);
+      drawableSpecial = new StringDrawable(gc, normalSK, "#", ITechStringDrawable.PRESET_CONFIG_1_TITLE);
 
-      drawablePhoneMode = new StringDrawable(gc, normalSK, "@", ITechStringDrawable.TYPE_1_TITLE);
+      drawablePhoneMode = new StringDrawable(gc, normalSK, "@", ITechStringDrawable.PRESET_CONFIG_1_TITLE);
 
-      drawableT9 = new StringDrawable(gc, t9SK, "T9", ITechStringDrawable.TYPE_1_TITLE);
+      drawableT9 = new StringDrawable(gc, t9SK, "T9", ITechStringDrawable.PRESET_CONFIG_1_TITLE);
 
       //create a style Red/Green
-      drawableMAJ = new StringDrawable(gc, t9SK, "MAJ", ITechStringDrawable.TYPE_1_TITLE);
+      drawableMAJ = new StringDrawable(gc, t9SK, "MAJ", ITechStringDrawable.PRESET_CONFIG_1_TITLE);
 
-      drawableSpeed = new StringDrawable(gc, normalSK, "S", ITechStringDrawable.TYPE_1_TITLE);
+      drawableSpeed = new StringDrawable(gc, normalSK, "S", ITechStringDrawable.PRESET_CONFIG_1_TITLE);
 
       //list root of data
-      drawableCharSet = new StringList(gc, normalSK, "En", ITechStringDrawable.TYPE_1_TITLE);
+      drawableCharSet = new StringList(gc, normalSK, "En", ITechStringDrawable.PRESET_CONFIG_1_TITLE);
 
       //uses draw injection
       drawableLetterChoices = new DrawableInjected(gc, letterSK, this, this);
@@ -582,7 +582,7 @@ public class StringEditControl extends TableView implements IDrawListener, IBOSt
       e.setFlag(BusEvent.FLAG_1_ACTED, true);
    }
 
-   public EditModule getEditModule() {
+   public StringEditModule getEditModule() {
       return editModule;
    }
 
@@ -747,7 +747,7 @@ public class StringEditControl extends TableView implements IDrawListener, IBOSt
     * TODO Selection.
     * 
     * <br>
-    * Called by {@link EditModule#manageKeyInput(InputConfig)} before anything else is done.
+    * Called by {@link StringEditModule#manageKeyInput(InputConfig)} before anything else is done.
     * <br>
     * <br>
     * Must be noticed when it moves horizontally to make sure the popup is hidden.
@@ -887,7 +887,7 @@ public class StringEditControl extends TableView implements IDrawListener, IBOSt
     */
    public void removeControl() {
       if (getKeyboardType() == IBOHost.KB_TYPE_2_FULL_VIRTUAL) {
-         produceCoreUIEvent(IEventsCoreUI.DEVICE_VIRT_KEYB_OFF);
+         produceCoreUIEvent(IEventsCoreUI.PID_01_DEVICE_02_VIRT_KEYB_OFF);
       }
       if (pulseThread.isPulseRunning()) {
          pulseThread.setPulseState(PulseThread.STATE_3_PAUSED);
@@ -900,7 +900,7 @@ public class StringEditControl extends TableView implements IDrawListener, IBOSt
    }
 
    private void produceCoreUIEvent(int eid) {
-      gc.getCUC().getEventBus().sendNewEvent(IEventsCoreUI.PID_1_DEVICE, eid, this);
+      gc.getCUC().getEventBus().sendNewEvent(IEventsCoreUI.PID_01_DEVICE, eid, this);
 
    }
 
@@ -1013,11 +1013,11 @@ public class StringEditControl extends TableView implements IDrawListener, IBOSt
     * @param sid
     */
    private void setInputState(ByteObject inputState) {
-      int charSetID = inputState.get1(INPUT_OFFSET_03_CHARSET_ID1);
+      int charSetID = inputState.get1(SDATA_OFFSET_03_CHARSET_ID1);
 
       drawableCharSet.setStringNoUpdate(Symbs.getCharSetName(charSetID));
       charSets = Symbs.getCharSet(charSetID);
-      boolean isMaj = inputState.hasFlag(IBOStringDrawable.INPUT_OFFSET_01_FLAG, IBOStringDrawable.INPUT_FLAG_3_MAJ);
+      boolean isMaj = inputState.hasFlag(IBOStringData.SDATA_OFFSET_01_FLAG, IBOStringData.SDATA_FLAG_3_MAJ);
       drawableMAJ.setStateStyle(ITechDrawable.STYLE_03_MARKED, isMaj);
 
       ByteObject editTech = editModule.getEditTech();
@@ -1036,7 +1036,7 @@ public class StringEditControl extends TableView implements IDrawListener, IBOSt
     * Insert itself in the {@link IDrawable} navigational topoly, just above the {@link StringDrawable}.
     * <br>
     * <br>
-    * Controls the {@link EditModule} and {@link PulseThread} for the caret repaints.
+    * Controls the {@link StringEditModule} and {@link PulseThread} for the caret repaints.
     * <br>
     * <br>
     * Checks if {@link StringDrawable} is editable.
@@ -1051,8 +1051,8 @@ public class StringEditControl extends TableView implements IDrawListener, IBOSt
       if (controlledSD == sd) {
          return;
       }
-      ByteObject tech = sd.getTechDrawable();
-      if (tech.get1(INPUT_OFFSET_06_MODE1) != ITechStringDrawable.MODE_2_EDIT) {
+      ByteObject tech = sd.getBOStringData();
+      if (tech.get1(SDATA_OFFSET_06_ACTION_MODE1) != ITechStringDrawable.S_ACTION_MODE_2_EDIT) {
 
          //#debug
          toDLog().pFlow("InputMode is not EDIT. Not taking control of", sd, StringEditControl.class, "takeControl", LVL_05_FINE, true);
@@ -1097,7 +1097,7 @@ public class StringEditControl extends TableView implements IDrawListener, IBOSt
          if (pulseThread.isPulseRunning()) {
             pulseThread.resetToOn();
          } else {
-            pulseThread.addEventConsumer(this, IEventsCore.PID_5_THREAD_0_ANY);
+            pulseThread.addEventConsumer(this, IEventsCore.PID_05_THREAD_0_ANY);
             pulseThread.setPulseState(PulseThread.STATE_0_ON);
             pulseThread.start();
          }
@@ -1111,7 +1111,7 @@ public class StringEditControl extends TableView implements IDrawListener, IBOSt
 
       //asks the device virtual keyboard to appear
       if (getKeyboardType() == IBOHost.KB_TYPE_2_FULL_VIRTUAL) {
-         produceCoreUIEvent(IEventsCoreUI.DEVICE_VIRT_KEYB_REQUEST);
+         produceCoreUIEvent(IEventsCoreUI.PID_01_DEVICE_01_VIRT_KEYB_REQUEST);
       }
       //Controller.getMe().getTopologyNav().positionToplogy(this, C.POS_0_TOP, sd);
       //request a repaint

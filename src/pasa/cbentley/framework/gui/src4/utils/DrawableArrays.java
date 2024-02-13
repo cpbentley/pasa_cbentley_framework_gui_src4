@@ -1,8 +1,20 @@
 package pasa.cbentley.framework.gui.src4.utils;
 
 import pasa.cbentley.framework.gui.src4.interfaces.IDrawable;
+import pasa.cbentley.framework.gui.src4.string.StringDrawable;
 
 public class DrawableArrays {
+   
+   
+   public static StringDrawable[] ensureCapacity(StringDrawable[] ar, int index) {
+      if (index < ar.length)
+         return ar;
+      StringDrawable[] nar = new StringDrawable[index + 1];
+      for (int i = 0; i < ar.length; i++) {
+         nar[i] = ar[i];
+      }
+      return nar;
+   }
 
    /**
     * Returns the new nextempty

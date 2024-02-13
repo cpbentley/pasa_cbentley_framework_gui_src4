@@ -128,6 +128,11 @@ public class ViewContext extends LayoutableAbstract implements IStringable, ILay
       return getPozeY();
    }
 
+   /**
+    * 
+    * @param nw
+    * @param nh
+    */
    public void setNewSize(int nw, int nh) {
       engine.setOverrideW(nw);
       engine.setOverrideH(nh);

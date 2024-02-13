@@ -18,7 +18,7 @@ public class KeyboardCharProducer implements ICharProducer {
    /**
     * Called when input config hasn't generated a command. tries to find the letter associated with it.
     */
-   public void produce(InputConfig ic, EditModule editmodule) {
+   public void produce(InputConfig ic, StringEditModule editmodule) {
       speed = editmodule.getEditTech().get1(IBOStringEdit.SEDIT_OFFSET_06_SPEED_NUMPAD1);
       if (ic.isPressed()) {
          int key = ic.getIdKeyBut();

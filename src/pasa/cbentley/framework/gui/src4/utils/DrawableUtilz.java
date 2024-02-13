@@ -315,4 +315,12 @@ public class DrawableUtilz {
       ar[3] = h;
    }
 
+   public static void shiftXY(IDrawable dr, int xd, int yd) {
+      if (dr != null) {
+         int nx = dr.getX() + xd;
+         int ny = dr.getY() + yd;
+         dr.setXY(nx, ny);
+      }
+   }
+
 }

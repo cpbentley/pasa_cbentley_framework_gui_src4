@@ -10,17 +10,14 @@ import pasa.cbentley.framework.gui.src4.interfaces.ITechExecutionContextGui;
 
 /**
  * Execution context of a GUI event in the Drawable Bentley framework.
- * <br>
  * It collects {@link IDrawable} and pages page IDs.
- * <br>
  * A Page is like a Screen in Android or a form in J2ME. It replaces everything that 
  * was drawn previously.
- * <br>
  * 
  * Events {@link IEventsKernel} that modify UI state, add modifications on this context.
- * <br>
+ * 
+ * 
  * As described by {@link ExecutionContext}.
- * <br>
  * 
  * @author Charles Bentley
  *

@@ -72,52 +72,100 @@ public class DrawableFactory extends BOAbstractFactory implements IBOScrollBar, 
       return p;
    }
 
-   public void toStringViewPaneTech(ByteObject tech, Dctx sb) {
-      sb.append("#Tech ");
-      if (tech.hasFlag(IBOViewPane.VP_OFFSET_01_FLAG, IBOViewPane.VP_FLAG_3_SCROLLBAR_MASTER)) {
-         sb.append("Master:Header Slave:Sb");
-      } else {
-         sb.append("Slave:Header Master:Sb");
-      }
-      int typeSB = tech.getValue(IBOViewPane.VP_OFFSET_10_COMPETITION_SB_TYPE1, 1);
+   public void toStringViewPaneTech(ByteObject boViewPane, Dctx sb) {
+      sb.rootN(boViewPane, "boViewPane", DrawableFactory.class, 76);
+
       sb.nl();
-      sb.append("CompetSb:");
-      sb.append(ToStringStaticGui.debugCompetType(typeSB));
-      if (tech.hasFlag(IBOViewPane.VP_OFFSET_01_FLAG, IBOViewPane.VP_FLAG_7_COMPET_OVERLAY_SB)) {
-         sb.append(" Overlay");
-      }
-      sb.nl();
-      int typeH = tech.getValue(IBOViewPane.VP_OFFSET_11_COMPETITION_HEADER_TYPE1, 1);
-      sb.append("CompetHeader:");
-      sb.append(ToStringStaticGui.debugCompetType(typeH));
-      if (tech.hasFlag(IBOViewPane.VP_OFFSET_01_FLAG, IBOViewPane.VP_FLAG_6_COMPET_OVERLAY_HEADER)) {
-         sb.append(" Overlay");
-      }
       sb.append("Header");
       sb.append(' ');
       sb.append("[TBLR=");
-      sb.append(ToStringStaticGui.debugPlanetStruct(tech.get2Bits1(IBOViewPane.VP_OFFSET_04_HEADER_PLANET_MODE1)));
-      sb.append("," + ToStringStaticGui.debugPlanetStruct(tech.get2Bits2(IBOViewPane.VP_OFFSET_04_HEADER_PLANET_MODE1)));
-      sb.append(" " + ToStringStaticGui.debugPlanetStruct(tech.get2Bits3(IBOViewPane.VP_OFFSET_04_HEADER_PLANET_MODE1)));
-      sb.append("," + ToStringStaticGui.debugPlanetStruct(tech.get2Bits4(IBOViewPane.VP_OFFSET_04_HEADER_PLANET_MODE1)));
-
-      sb.append(" sbW=" + ToStringStaticGui.debugPlanetStruct(tech.get2Bits1(IBOViewPane.VP_OFFSET_05_SCROLLBAR_MODE1)));
-      sb.append(" sbH=" + ToStringStaticGui.debugPlanetStruct(tech.get2Bits2(IBOViewPane.VP_OFFSET_05_SCROLLBAR_MODE1)));
+      sb.append(ToStringStaticGui.debugPlanetStruct(boViewPane.get2Bits1(IBOViewPane.VP_OFFSET_04_HEADER_PLANET_MODE1)));
+      sb.append("," + ToStringStaticGui.debugPlanetStruct(boViewPane.get2Bits2(IBOViewPane.VP_OFFSET_04_HEADER_PLANET_MODE1)));
+      sb.append(" " + ToStringStaticGui.debugPlanetStruct(boViewPane.get2Bits3(IBOViewPane.VP_OFFSET_04_HEADER_PLANET_MODE1)));
+      sb.append("," + ToStringStaticGui.debugPlanetStruct(boViewPane.get2Bits4(IBOViewPane.VP_OFFSET_04_HEADER_PLANET_MODE1)));
+      sb.append("] ");
+      sb.append(" [");
+      sb.append(" sbW=" + ToStringStaticGui.debugPlanetStruct(boViewPane.get2Bits1(IBOViewPane.VP_OFFSET_05_SCROLLBAR_MODE1)));
+      sb.append(" sbH=" + ToStringStaticGui.debugPlanetStruct(boViewPane.get2Bits2(IBOViewPane.VP_OFFSET_05_SCROLLBAR_MODE1)));
       sb.append("]");
 
-      if (tech.hasFlag(IBOViewPane.VP_OFFSET_01_FLAG, IBOViewPane.VP_FLAGX_1_STYLE_VIEWPANE)) {
-         sb.append(" ViewPane Style Applied");
+      sb.nl();
+      if (boViewPane.hasFlag(IBOViewPane.VP_OFFSET_02_FLAGX, IBOViewPane.VP_FLAGX_1_STYLE_VIEWPANE)) {
+         sb.append("ViewPane Style Turned On = ");
+         ToStringStaticGui.toStringViewPaneStyleType(boViewPane.get1(IBOViewPane.VP_OFFSET_14_STYLE_VIEWPORT_MODE1));
+      } else {
+         sb.append("ViewPane Style Turned Off");
       }
       sb.nl();
+      if (boViewPane.hasFlag(IBOViewPane.VP_OFFSET_02_FLAGX, IBOViewPane.VP_FLAGX_2_STYLE_VIEWPORT)) {
+         sb.append("ViewPort Style Turned On = ");
+         ToStringStaticGui.toStringViewPaneStyleType(boViewPane.get1(IBOViewPane.VP_OFFSET_14_STYLE_VIEWPORT_MODE1));
+      } else {
+         sb.append("ViewPort Style Turned Off");
+      }
+      sb.nl();
+      if (boViewPane.hasFlag(IBOViewPane.VP_OFFSET_02_FLAGX, IBOViewPane.VP_FLAGX_3_STYLE_CONTENT)) {
+         sb.append("ViewContent Style = On");
+      } else {
+         sb.append("ViewContent Style = Off");
+      }
 
-      sb.append("[H,V] type=" + ToStringStaticGui.debugScrollType(tech.get2Bits3(IBOViewPane.VP_OFFSET_05_SCROLLBAR_MODE1)));
-      sb.append("," + ToStringStaticGui.debugScrollType(tech.get2Bits4(IBOViewPane.VP_OFFSET_05_SCROLLBAR_MODE1)));
-      sb.append(" visual=" + ToStringStaticGui.debugScrollVisual(tech.get4Bits1(IBOViewPane.VP_OFFSET_06_VISUAL_LEFT_OVER1)));
-      sb.append("," + ToStringStaticGui.debugScrollVisual(tech.get4Bits2(IBOViewPane.VP_OFFSET_06_VISUAL_LEFT_OVER1)));
-      sb.append(" move=" + ToStringStaticGui.debugScrollMove(tech.get2Bits1(IBOViewPane.VP_OFFSET_08_MOVE_TYPE1)));
-      sb.append("," + ToStringStaticGui.debugScrollMove(tech.get2Bits3(IBOViewPane.VP_OFFSET_08_MOVE_TYPE1)));
-      sb.append(" partial=" + ToStringStaticGui.debugScrollPartial(tech.get2Bits2(IBOViewPane.VP_OFFSET_08_MOVE_TYPE1)));
-      sb.append("," + ToStringStaticGui.debugScrollPartial(tech.get2Bits4(IBOViewPane.VP_OFFSET_08_MOVE_TYPE1)));
+      sb.nl();
+      String master = "Header";
+      String slave = "Scrollbar";
+      if (boViewPane.hasFlag(IBOViewPane.VP_OFFSET_01_FLAG, IBOViewPane.VP_FLAG_3_SCROLLBAR_MASTER)) {
+         master = "Scrollbar";
+         slave = "Header";
+      }
+      sb.appendVar("Master", master);
+      sb.appendVarWithSpace("Slave", slave);
+
+      sb.nl();
+      /////////////
+      int typeSB = boViewPane.getValue(IBOViewPane.VP_OFFSET_10_COMPETITION_SB_TYPE1, 1);
+      sb.append("CompetitionTypeForScrollbars=");
+      sb.append(ToStringStaticGui.toStringCompetitionType(typeSB));
+      if (boViewPane.hasFlag(IBOViewPane.VP_OFFSET_01_FLAG, IBOViewPane.VP_FLAG_7_COMPET_OVERLAY_SB)) {
+         sb.append(" Overlay");
+      }
+
+      sb.nl();
+      int typeH = boViewPane.getValue(IBOViewPane.VP_OFFSET_11_COMPETITION_HEADER_TYPE1, 1);
+      sb.append("CompetitionTypeForHeaders=");
+      sb.append(ToStringStaticGui.toStringCompetitionType(typeH));
+      if (boViewPane.hasFlag(IBOViewPane.VP_OFFSET_01_FLAG, IBOViewPane.VP_FLAG_6_COMPET_OVERLAY_HEADER)) {
+         sb.append(" Overlay");
+      }
+
+      /////////////////////////////////////
+
+      sb.nl();
+      sb.append("Scrollbars [Horiz,Vert] ---> ScrollType=");
+      sb.append('[');
+      sb.append(ToStringStaticGui.toStringScrollbarMode(boViewPane.get2Bits3(IBOViewPane.VP_OFFSET_05_SCROLLBAR_MODE1)));
+      sb.append(",");
+      sb.append(ToStringStaticGui.toStringScrollbarMode(boViewPane.get2Bits4(IBOViewPane.VP_OFFSET_05_SCROLLBAR_MODE1)));
+      sb.append(']');
+
+      sb.append(" Visual=");
+      sb.append('[');
+      sb.append(ToStringStaticGui.toStringScrollVisual(boViewPane.get4Bits1(IBOViewPane.VP_OFFSET_06_VISUAL_LEFT_OVER1)));
+      sb.append("," + ToStringStaticGui.toStringScrollVisual(boViewPane.get4Bits2(IBOViewPane.VP_OFFSET_06_VISUAL_LEFT_OVER1)));
+      sb.append(']');
+      
+      sb.append(" Move=");
+      sb.append('[');
+      sb.append(ToStringStaticGui.toStringScrollMove(boViewPane.get2Bits1(IBOViewPane.VP_OFFSET_08_MOVE_TYPE1)));
+      sb.append(",");
+      sb.append(ToStringStaticGui.toStringScrollMove(boViewPane.get2Bits3(IBOViewPane.VP_OFFSET_08_MOVE_TYPE1)));
+      sb.append(']');
+      
+      sb.append(" Partial=");
+      sb.append('[');
+      sb.append(ToStringStaticGui.toStringScrollPartial(boViewPane.get2Bits2(IBOViewPane.VP_OFFSET_08_MOVE_TYPE1)));
+      sb.append(",");
+      sb.append(ToStringStaticGui.toStringScrollPartial(boViewPane.get2Bits4(IBOViewPane.VP_OFFSET_08_MOVE_TYPE1)));
+      sb.append(']');
 
    }
 
@@ -152,9 +200,9 @@ public class DrawableFactory extends BOAbstractFactory implements IBOScrollBar, 
     * @param tech
     */
    public void linkTech(StyleClass sc, ByteObject tech) {
-      int techid = IBOTypesGui.LINK_69_TECH_H_SCROLLBAR;
+      int techid = IBOTypesGui.LINK_69_BO_H_SCROLLBAR;
       if (tech.hasFlag(SB_OFFSET_01_FLAG, SB_FLAG_1_VERT)) {
-         techid = IBOTypesGui.LINK_68_TECH_V_SCROLLBAR;
+         techid = IBOTypesGui.LINK_68_BO_V_SCROLLBAR;
       }
       sc.linkByteObject(tech, techid);
    }

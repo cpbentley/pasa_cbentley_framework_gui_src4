@@ -30,13 +30,13 @@ public class HelperStringDrawable extends StringDrawable implements IDrawableLis
    }
 
    public HelperStringDrawable(GuiCtx gc, StyleClass sc) {
-      super(gc, sc, "No Help Data Yet", ITechStringDrawable.TYPE_3_SCROLL_V);
+      super(gc, sc, "No Help Data Yet", ITechStringDrawable.PRESET_CONFIG_3_SCROLL_V);
 
       this.setBehaviorFlag(ITechDrawable.BEHAVIOR_15_CANVAS_POSITIONING, true);
       this.setXYLogic(C.LOGIC_2_CENTER, C.LOGIC_2_CENTER);
 
       StyleClass scTitle = gc.getClass(IUIView.SC_2_TITLE);
-      titleHelp = new StringDrawable(gc, scTitle, "Help!", ITechStringDrawable.TYPE_1_TITLE);
+      titleHelp = new StringDrawable(gc, scTitle, "Help!", ITechStringDrawable.PRESET_CONFIG_1_TITLE);
       //set drag controller on title for the help data string
 
       titleHelp.addDrawableListener(this);

@@ -66,7 +66,7 @@ public class TopoViewDrawable extends ViewDrawable {
 
    }
 
-   protected void initViewDrawable(LayEngineDrawable ds) {
+   protected void initViewDrawable(LayouterEngineDrawable ds) {
       //we are not scrollable
       setFlagGene(ITechViewDrawable.FLAG_GENE_28_NOT_SCROLLABLE, true);
       setFlagView(ITechViewDrawable.FLAG_VSTATE_10_CONTENT_PW_VIEWPORT_DW, true);

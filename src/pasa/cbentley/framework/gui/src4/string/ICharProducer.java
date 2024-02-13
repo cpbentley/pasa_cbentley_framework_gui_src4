@@ -4,5 +4,5 @@ import pasa.cbentley.framework.gui.src4.canvas.InputConfig;
 
 public interface ICharProducer {
 
-   public void produce(InputConfig ic, EditModule editmodule);
+   public void produce(InputConfig ic, StringEditModule editmodule);
 }

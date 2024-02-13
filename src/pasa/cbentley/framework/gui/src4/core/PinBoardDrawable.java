@@ -40,40 +40,40 @@ import pasa.cbentley.framework.input.src4.gesture.GestureDetector;
  */
 public class PinBoardDrawable extends ViewDrawable {
 
-   public static int DRAG_MODE_0_RESIZE   = 0;
+   public static final int DRAG_MODE_0_RESIZE   = 0;
 
-   public static int DRAG_MODE_1_PINBOARD = 1;
+   public static final int DRAG_MODE_1_PINBOARD = 1;
 
-   public static int DRAG_MODE_2_DRAWABLE = 2;
+   public static final int DRAG_MODE_2_DRAWABLE = 2;
 
-   private boolean   allowH               = true;
+   private boolean         allowH               = true;
 
-   private boolean   allowW               = true;
+   private boolean         allowW               = true;
 
-   private int       draggingMode         = 0;
+   private int             draggingMode         = 0;
 
-   IDrawable[]       ds                   = new IDrawable[5];
+   IDrawable[]             drawables                   = new IDrawable[5];
 
-   private int       keyFocusZIndex       = -1;
+   private int             keyFocusZIndex       = -1;
 
-   private int       nextempty;
+   private int             nextempty;
 
-   private int       pointerFocusZIndex   = -1;
+   private int             pointerFocusZIndex   = -1;
 
-   private int       pointerPressedZIndex = -1;
-
-   /**
-    * Stores x offset coordinates of {@link IDrawable}.
-    */
-   int[]             xs;
+   private int             pointerPressedZIndex = -1;
 
    /**
     * Stores x offset coordinates of {@link IDrawable}.
     */
-   int[]             ys;
+   int[]                   xs;
+
+   /**
+    * Stores x offset coordinates of {@link IDrawable}.
+    */
+   int[]                   ys;
 
    public PinBoardDrawable(GuiCtx gc, StyleClass sc) {
-      super(gc,sc);
+      super(gc, sc);
       setBehaviorFlag(ITechDrawable.BEHAVIOR_25_CONTAINER, true);
    }
 
@@ -89,19 +89,25 @@ public class PinBoardDrawable extends ViewDrawable {
     */
    public void addDrawable(IDrawable d, int rx, int ry) {
       int nn = nextempty + 1;
-      ds = DrawableArrays.ensureCapacity(ds, nn);
+      drawables = DrawableArrays.ensureCapacity(drawables, nn);
       xs = gc.getUCtx().getMem().ensureCapacity(xs, nn);
       ys = gc.getUCtx().getMem().ensureCapacity(ys, nn);
-      ds[nextempty] = d;
+      drawables[nextempty] = d;
       xs[nextempty] = rx;
       ys[nextempty] = ry;
+      
+      d.initSize();
       //update every time the style changes
       d.setXY(this.getContentX() + rx, this.getContentY() + ry);
+      d.initPosition();
       d.setBehaviorFlag(ITechDrawable.BEHAVIOR_23_PARENT_EVENT_CONTROL, true);
       d.setParent(this);
       nextempty++;
    }
 
+   public int getNumDrawables() {
+      return nextempty;
+   }
    /**
     * Drags according to 3 modes
     * <li> {@link PinBoardDrawable#DRAG_MODE_0_RESIZE}
@@ -178,16 +184,16 @@ public class PinBoardDrawable extends ViewDrawable {
       //sets the clip directive to intersection. do not allow overriding
       g.clipSet(x, y, w, h);
       for (int i = 0; i < nextempty; i++) {
-         if (ds[i] != null) {
+         if (drawables[i] != null) {
             //DrawableUtilz.aboutToShow(ds[i]);
-            ds[i].draw(g);
+            drawables[i].draw(g);
          }
       }
       g.clipReset();
    }
 
    public IDrawable getPointerFocusDrawable() {
-      return ds[pointerFocusZIndex];
+      return drawables[pointerFocusZIndex];
    }
 
    /**
@@ -203,16 +209,13 @@ public class PinBoardDrawable extends ViewDrawable {
       //DrawableUtilz.debugScrollConfigs("TableView#initScrollingConfig", scX, scY);
    }
 
-   /**
-    * 
-    */
-   public void initViewDrawable(int w, int h) {
+   protected void initViewDrawable(LayouterEngineDrawable ls) {
       //compute span of Drawable
       int ph = 0;
       int pw = 0;
       for (int i = 0; i < nextempty; i++) {
-         if (ds[i] != null) {
-            IDrawable d = ds[i];
+         if (drawables[i] != null) {
+            IDrawable d = drawables[i];
             int val = (d.getX() - this.getX()) + d.getDrawnWidth();
             if (val > pw) {
                pw = val;
@@ -233,14 +236,14 @@ public class PinBoardDrawable extends ViewDrawable {
       }
       layEngine.setPw(pw);
       layEngine.setPh(ph);
-      
+
       addStyleToPrefSize();
 
       //update positions
       for (int i = 0; i < nextempty; i++) {
-         if (ds[i] != null) {
+         if (drawables[i] != null) {
             //update every time the style changes
-            ds[i].setXY(this.getContentX() + xs[i], this.getContentY() + ys[i]);
+            drawables[i].setXY(this.getContentX() + xs[i], this.getContentY() + ys[i]);
          }
       }
    }
@@ -286,27 +289,27 @@ public class PinBoardDrawable extends ViewDrawable {
 
       if (ic.isSequencedPressed(ITechCodes.KEY_STAR, ITechCodes.KEY_UP)) {
          //cycle front to back most
-         ArrayUtils.rotateRight(ds, 0, nextempty);
+         ArrayUtils.rotateRight(drawables, 0, nextempty);
          ic.srActionDoneRepaint(this);
          return;
       }
       if (ic.isSequencedPressed(ITechCodes.KEY_STAR, ITechCodes.KEY_DOWN)) {
          //cycle front to -1
-         ArrayUtils.rotateLeft(ds, 0, nextempty);
+         ArrayUtils.rotateLeft(drawables, 0, nextempty);
          ic.srActionDoneRepaint(this);
          return;
 
       }
 
       //event amont
-      if (keyFocusZIndex >= 0 && ds[keyFocusZIndex] != null) {
-         ds[keyFocusZIndex].manageKeyInput(ic);
+      if (keyFocusZIndex >= 0 && drawables[keyFocusZIndex] != null) {
+         drawables[keyFocusZIndex].manageKeyInput(ic);
       }
       //iterate over
       for (int i = 0; i < nextempty; i++) {
-         if (ds[i] != null) {
-            if (ds[i].hasStateStyle(ITechDrawable.STYLE_06_FOCUSED_KEY)) {
-               ds[i].manageKeyInput(ic);
+         if (drawables[i] != null) {
+            if (drawables[i].hasStateStyle(ITechDrawable.STYLE_06_FOCUSED_KEY)) {
+               drawables[i].manageKeyInput(ic);
                break;
             }
          }
@@ -338,7 +341,7 @@ public class PinBoardDrawable extends ViewDrawable {
          //resize drawable
          draggingMode = DRAG_MODE_0_RESIZE;
          GestureDetector pg = ic.is.getOrCreateGesture(this);
-         pg.simplePress( getDw(), getDh(), ic.is);
+         pg.simplePress(getDw(), getDh(), ic.is);
          ic.srActionDoneRepaint();
          return;
       }
@@ -346,8 +349,8 @@ public class PinBoardDrawable extends ViewDrawable {
       pointerFocusZIndex = -1;
       //top down approach to see what drawable is pointed
       for (int i = nextempty - 1; i >= 0; i--) {
-         if (ds[i] != null) {
-            IDrawable d = ds[i];
+         if (drawables[i] != null) {
+            IDrawable d = drawables[i];
             if (DrawableUtilz.isInside(ic, d)) {
                d.managePointerInput(ic);
 
@@ -388,7 +391,7 @@ public class PinBoardDrawable extends ViewDrawable {
    public void notifyEventKeyFocusGain(BusEvent e) {
       super.notifyEventKeyFocusGain(e);
       if (keyFocusZIndex >= 0) {
-         ds[keyFocusZIndex].notifyEvent(ITechDrawable.EVENT_03_KEY_FOCUS_GAIN);
+         drawables[keyFocusZIndex].notifyEvent(ITechDrawable.EVENT_03_KEY_FOCUS_GAIN);
       }
    }
 
@@ -398,7 +401,7 @@ public class PinBoardDrawable extends ViewDrawable {
    public void notifyEventKeyFocusLost(BusEvent e) {
       super.notifyEventKeyFocusLost(e);
       if (keyFocusZIndex >= 0) {
-         ds[keyFocusZIndex].notifyEvent(ITechDrawable.EVENT_04_KEY_FOCUS_LOSS);
+         drawables[keyFocusZIndex].notifyEvent(ITechDrawable.EVENT_04_KEY_FOCUS_LOSS);
       }
    }
 
@@ -406,8 +409,8 @@ public class PinBoardDrawable extends ViewDrawable {
       int xd = x - this.getX();
       int yd = y - this.getY();
       for (int i = 0; i < nextempty; i++) {
-         if (ds[i] != null) {
-            ds[i].shiftXY(xd, yd);
+         if (drawables[i] != null) {
+            drawables[i].shiftXY(xd, yd);
          }
       }
       super.setXY(x, y);
@@ -415,17 +418,23 @@ public class PinBoardDrawable extends ViewDrawable {
 
    //#mdebug
    public void toString(Dctx dc) {
-      dc.root(this, "PinBoardDrawable");
+      dc.root(this, PinBoardDrawable.class, 450);
       toStringPrivate(dc);
       super.toString(dc.sup());
-      dc.append(" number=" + nextempty);
+      
+      
+      dc.nl();
+      dc.appendVarWithSpace("draggingMode", draggingMode);
+      dc.appendVarWithSpace("pointerFocusZIndex", pointerFocusZIndex);
+      
+      
       for (int i = 0; i < nextempty; i++) {
          if (i != nextempty - 1) {
             dc.nl();
          }
-         if (ds[i] != null) {
+         if (drawables[i] != null) {
             dc.append(xs[i] + "," + ys[i] + " : \t");
-            dc.append(ds[i].toString1Line());
+            dc.append(drawables[i].toString1Line());
          } else {
             dc.append("null");
          }
@@ -434,18 +443,17 @@ public class PinBoardDrawable extends ViewDrawable {
    }
 
    private void toStringPrivate(Dctx dc) {
-      
+      dc.appendVarWithSpace("nextempty", nextempty);
+      dc.appendVarWithSpace("allowW", allowW);
+      dc.appendVarWithSpace("allowH", allowH);
    }
 
    public void toString1Line(Dctx dc) {
-      dc.root1Line(this, "PinBoardDrawable");
+      dc.root1Line(this, PinBoardDrawable.class);
       toStringPrivate(dc);
       super.toString1Line(dc.sup1Line());
    }
 
    //#enddebug
-   
- 
-   
 
 }

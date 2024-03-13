@@ -155,7 +155,7 @@ public class CommanderGui extends CommanderAbstract implements ICmdsView, ITechI
 
    protected void cmdHelp(CmdInstance cmd) {
       if (strDrawableHelpData == null) {
-         StyleClass scMenu = gc.getClass(IUIView.SC_0_BASE_TABLE);
+         StyleClass scMenu = gc.getStyleClass(IUIView.SC_0_BASE_TABLE);
          strDrawableHelpData = new HelperStringDrawable(gc, scMenu);
       }
 
@@ -260,7 +260,7 @@ public class CommanderGui extends CommanderAbstract implements ICmdsView, ITechI
       CanvasAppliInputGui canvas = gc.getCanvasGCRoot().getCanvas();
       final RgbImage img = canvas.getSSVirtualCanvasAsImage(bgColor);
       RgbImageSaveTask task = new RgbImageSaveTask(gc, canvas.getRepaintCtrlDraw(), img);
-      gc.getUCtx().getWorkerThread().addToQueue(task);
+      gc.getUC().getWorkerThread().addToQueue(task);
       cmd.actionDone();
    }
 
@@ -308,7 +308,7 @@ public class CommanderGui extends CommanderAbstract implements ICmdsView, ITechI
       //TODO command options to detach/attach 
       if (gc.getCtxLogViewer() == null) {
          //create one
-         MLogViewer log = new MLogViewer(gc, gc.getClass(1));
+         MLogViewer log = new MLogViewer(gc, gc.getStyleClass(1));
          log.getLay().layFullViewContext();
          log.setViewContext(gc.getCanvasGCRoot().getCanvas().getVCAppli());
          gc.setCtxLogViewer(log);

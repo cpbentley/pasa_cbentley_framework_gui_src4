@@ -59,7 +59,7 @@ public class ObjectGC implements IStringable {
    }
 
    public UCtx toStringGetUCtx() {
-      return gc.getUCtx();
+      return gc.getUC();
    }
 
    public String toStringName() {

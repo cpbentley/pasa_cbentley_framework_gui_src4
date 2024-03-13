@@ -12,7 +12,7 @@ import pasa.cbentley.framework.gui.src4.table.TableView;
  * 
  * <p>
  * Others
- * <li> A {@link ByteObject} of type {@link IBOTypesGui#TYPE_120_TABLE_POLICY} acts like a modeling power on {@link ITableModel}.
+ * <li> A {@link ByteObject} of type {@link IBOTypesGui#TYPE_GUI_04_TABLE_POLICY} acts like a modeling power on {@link ITableModel}.
  * <li> {@link IBOGenetics}
  * <li> {@link IBOTablePolicy}
  * <li> {@link IBOTableView}
@@ -227,7 +227,7 @@ public interface IBOCellPolicy extends IByteObject {
    /**
     * Defines array of structural styles
     */
-   public static final int CELLP_FLAGZ_8                  = 1 << 7;
+   public static final int CELLP_FLAGZ_8_SIZER                  = 1 << 7;
    public static final int CELLP_FLAGZ_6                  = 1 << 5;
    public static final int CELLP_FLAGZ_7                  = 1 << 6;
 

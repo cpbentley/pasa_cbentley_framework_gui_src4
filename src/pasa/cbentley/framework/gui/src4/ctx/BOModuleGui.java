@@ -44,10 +44,10 @@ public class BOModuleGui extends BOModuleAbstract implements IBOTypesGui, IBOCan
    public ByteObject merge(ByteObject root, ByteObject merge) {
       int type = merge.getType();
       switch (type) {
-         case TYPE_121_SPANNING:
+         case TYPE_GUI_05_CELL_SPANNING:
 
             break;
-         case TYPE_120_TABLE_POLICY:
+         case TYPE_GUI_04_TABLE_POLICY:
 
             break;
       }
@@ -63,7 +63,7 @@ public class BOModuleGui extends BOModuleAbstract implements IBOTypesGui, IBOCan
    public String subToStringOffset(ByteObject o, int offset) {
       int type = o.getType();
       switch (type) {
-         case TYPE_121_SPANNING:
+         case TYPE_GUI_05_CELL_SPANNING:
             switch (offset) {
                default:
                   return null;
@@ -75,11 +75,11 @@ public class BOModuleGui extends BOModuleAbstract implements IBOTypesGui, IBOCan
 
    public String subToStringType(int type) {
       switch (type) {
-         case TYPE_121_SPANNING:
+         case TYPE_GUI_05_CELL_SPANNING:
             return "SPAN";
-         case TYPE_120_TABLE_POLICY:
+         case TYPE_GUI_04_TABLE_POLICY:
             return "TablePolicy";
-         case TYPE_122_CELL_POLICY:
+         case TYPE_GUI_06_CELL_POLICY:
             return "CellPolicy";
          default:
             return null;
@@ -100,28 +100,31 @@ public class BOModuleGui extends BOModuleAbstract implements IBOTypesGui, IBOCan
             //check if our sub type else drop it
             gc.toStringGuiCtxTech(dc, bo);
             break;
-         case TYPE_101_VIEWPANE_TECH:
+         case TYPE_GUI_00_VIEWPANE:
             gc.getDrawableCoreFactory().toStringViewPaneTech(bo, dc);
             break;
-         case TYPE_121_SPANNING:
+         case TYPE_GUI_05_CELL_SPANNING:
             gc.getTableOperator().toStringSpanning(bo, dc);
             break;
-         case TYPE_120_TABLE_POLICY:
+         case TYPE_GUI_03_TABLE_GENETICS:
+            gc.getTableOperator().toStringModelGenetics(bo, dc);
+            break;
+         case TYPE_GUI_04_TABLE_POLICY:
             gc.getTableOperator().toStringTablePolicy(bo, dc);
             break;
-         case TYPE_103_TABLE_TECH:
+         case TYPE_GUI_02_TABLE:
             gc.getTableOperator().toStringTableTech(bo, dc);
             break;
-         case TYPE_122_CELL_POLICY:
+         case TYPE_GUI_06_CELL_POLICY:
             gc.getCellPolicy().toString(bo, dc, "Cell");
             break;
-         case TYPE_102_SCROLLBAR_TECH:
+         case TYPE_GUI_01_SCROLLBAR:
             gc.getDrawableOperator().toStringTech(bo, dc);
             break;
-         case TYPE_130_ANIMATION:
+         case TYPE_GUI_11_ANIMATION:
             gc.getAnimOperator().toStringAnim(bo, dc);
             break;
-         case TYPE_124_STRING_TECH:
+         case TYPE_124_STRING_DATA:
             gc.getDrawableStringOperator().toStringTech(bo, dc);
             break;
          case TYPE_125_STRING_EDIT_TECH:
@@ -147,28 +150,28 @@ public class BOModuleGui extends BOModuleAbstract implements IBOTypesGui, IBOCan
          case TYPE_012_CTX_SETTINGS:
             gc.toStringGuiCtxTech1Line(dc, bo);
             break;
-         case TYPE_101_VIEWPANE_TECH:
+         case TYPE_GUI_00_VIEWPANE:
             gc.getDrawableCoreFactory().toStringViewPaneTech(bo, dc);
             break;
-         case TYPE_121_SPANNING:
+         case TYPE_GUI_05_CELL_SPANNING:
             gc.getTableOperator().toStringSpanning(bo, dc);
             break;
-         case TYPE_120_TABLE_POLICY:
+         case TYPE_GUI_04_TABLE_POLICY:
             gc.getTableOperator().toStringTablePolicy(bo, dc);
             break;
-         case TYPE_103_TABLE_TECH:
+         case TYPE_GUI_02_TABLE:
             gc.getTableOperator().toStringTableTech(bo, dc);
             break;
-         case TYPE_122_CELL_POLICY:
+         case TYPE_GUI_06_CELL_POLICY:
             gc.getCellPolicy().toString(bo, dc, "Cell");
             break;
-         case TYPE_102_SCROLLBAR_TECH:
+         case TYPE_GUI_01_SCROLLBAR:
             gc.getDrawableOperator().toStringTech(bo, dc);
             break;
-         case TYPE_130_ANIMATION:
+         case TYPE_GUI_11_ANIMATION:
             gc.getAnimOperator().toStringAnim1Line(bo, dc);
             break;
-         case TYPE_124_STRING_TECH:
+         case TYPE_124_STRING_DATA:
             gc.getDrawableStringOperator().toStringTech(bo, dc);
             break;
          case TYPE_125_STRING_EDIT_TECH:
@@ -193,7 +196,7 @@ public class BOModuleGui extends BOModuleAbstract implements IBOTypesGui, IBOCan
          case DID_11_VIEWPANE_STYLE_TYPE:
             return ToStringStaticGui.toStringViewPaneStyleType(value);
          case DID_05_STRING_DRAWABLE_TYPE:
-            return ToStringStaticGui.debugStringType(value);
+            return ToStringStaticGui.toStringStringPreset(value);
          case DID_09_CELL_POLICIES:
             return ToStringStaticGui.toStringPolicyType(value);
          case DID_12_DRAWABLE_CACHE_TYPE:
@@ -221,7 +224,7 @@ public class BOModuleGui extends BOModuleAbstract implements IBOTypesGui, IBOCan
    public String toStringOffset(ByteObject bo, int offset) {
       int type = bo.getType();
       switch (type) {
-         case TYPE_122_CELL_POLICY:
+         case TYPE_GUI_06_CELL_POLICY:
             if (offset == IBOCellPolicy.CELLP_OFFSET_01_TYPE1) {
                return "CellType";
             }

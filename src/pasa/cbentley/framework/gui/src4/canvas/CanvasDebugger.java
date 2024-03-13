@@ -56,8 +56,8 @@ public class CanvasDebugger extends Drawable {
    protected int               totalPaintTime = 0;
 
    public CanvasDebugger(GuiCtx gc) {
-      super(gc, gc.getClass(0));
-      sb = new StringBBuilder(gc.getUCtx());
+      super(gc, gc.getStyleClass(0));
+      sb = new StringBBuilder(gc.getUC());
       toStringSetName("CanvasDebugger");
    }
 

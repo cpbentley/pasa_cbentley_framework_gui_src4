@@ -4,9 +4,11 @@ import pasa.cbentley.byteobjects.src4.core.ByteObject;
 import pasa.cbentley.byteobjects.src4.objects.color.ColorRepo;
 import pasa.cbentley.byteobjects.src4.objects.color.ColorSet;
 import pasa.cbentley.byteobjects.src4.objects.color.ITechGradient;
+import pasa.cbentley.byteobjects.src4.objects.pointer.MergeMaskFactory;
 import pasa.cbentley.core.src4.utils.ColorUtils;
 import pasa.cbentley.framework.coredraw.src4.interfaces.ITechFont;
-import pasa.cbentley.framework.gui.src4.ctx.GuiCtx;
+import pasa.cbentley.framework.drawx.src4.string.interfaces.IBOFigString;
+import pasa.cbentley.framework.drawx.src4.style.IBOStyle;
 import pasa.cbentley.layouter.src4.ctx.IBOTypesLayout;
 import pasa.cbentley.layouter.src4.tech.ITechLayout;
 
@@ -382,6 +384,114 @@ public class CreatorBOStyleSimple extends CreatorAbstractBOStyle {
       ByteObject anchor = null;
       ByteObject sbBlockStyle = styleFac.getStyle(new ByteObject[] { bgWrapper, borderWrapper }, anchor, pad, borderSize, margin);
       return sbBlockStyle;
+   }
+
+   public ByteObject getStyleSelected() {
+      
+      ColorRepo colorRepo = getRepo();
+      int pcolor = colorRepo.getBg2();
+      int ccolor = colorRepo.getContent2();
+
+      MergeMaskFactory mmop = boc.getMergeMaskFactory();
+      ByteObject content = figureFactory.getFigStringTColor(ccolor);
+      mmop.addOpaque(content, FIG_STRING_OFFSET_04_STYLE1, 1, STYLE_BOLD, MERGE_MASK_OFFSET_6VALUES1, MERGE_MASK_FLAG6_2);
+      mmop.addOpaque(content, FIG_STRING_OFFSET_05_SIZE1, 1, SIZE_4_LARGE, MERGE_MASK_OFFSET_6VALUES1, MERGE_MASK_FLAG6_3);
+      
+      
+      ByteObject anchor = anchorFac.getLeftTop();
+
+      ByteObject margin = null;
+      ByteObject pad = null;
+
+      ByteObject bg = figureFactory.getFigRect(pcolor);
+
+      int borderColor1 = colorRepo.getBorder2();
+      ByteObject rectT = figureFac.getRect(borderColor1);
+      ByteObject figBorder = figureFactory.getFigBorder(3, borderColor1);
+      ByteObject border = figBorder.getSubFirst(IBOTypesLayout.FTYPE_2_TBLR);
+
+      ByteObject[] bgs = new ByteObject[] { bg, figBorder };
+
+      ByteObject style = styleFactory.getStyle(bgs, content, anchor, pad, border, margin);
+      
+      style.setFlag(IBOStyle.STYLE_OFFSET_4_FLAG_PERF, IBOStyle.STYLE_FLAG_PERF_7_INCOMPLETE, true);
+      
+      return style;
+   }
+
+   public ByteObject getStyleTextReader() {
+      ColorRepo colorRepo = getRepo();
+      int pcolor = colorRepo.getBg1();
+      int ccolor = colorRepo.getContent1();
+
+      ByteObject content = figureFactory.getFigString(FACE_PROPORTIONAL, STYLE_PLAIN, ITechFont.SIZE_3_MEDIUM, ccolor);
+      ByteObject anchor = anchorFac.getLeftTop();
+
+      ByteObject margin = null;
+      ByteObject pad = tblrFactory.getTBLRPixel(2);
+
+      ByteObject bg = figureFactory.getFigRect(pcolor);
+
+      int borderColor1 = colorRepo.getBorder1();
+      ByteObject figBorder = figureFactory.getFigBorder(3, borderColor1);
+      ByteObject border = figBorder.getSubFirst(IBOTypesLayout.FTYPE_2_TBLR);
+
+      ByteObject[] bgs = new ByteObject[] { bg, figBorder };
+
+      ByteObject style = styleFactory.getStyle(bgs, content, anchor, pad, border, margin);
+      return style;
+   }
+
+   public ByteObject getStyleTitle() {
+      ColorRepo colorRepo = getRepo();
+      int pcolor = colorRepo.getBg1();
+      int scolor = colorRepo.getBg2();
+
+      int ccolor = colorRepo.getContent1();
+
+      ByteObject text = figureFactory.getFigString(FACE_MONOSPACE, STYLE_BOLD, SIZE_4_LARGE, ccolor);
+      ByteObject anchor = anchorFac.getCenterCenter();
+
+      ByteObject margin = null;
+      ByteObject pad = tblrFactory.getTBLRPixel(2);
+
+      ByteObject bg = figureFactory.getFigRect(pcolor);
+
+      int borderColor1 = colorRepo.getBorder1();
+      int borderColor2 = colorRepo.getBorder2();
+      ByteObject figBorder = figureFactory.getFigBorder(7, borderColor1, borderColor2, 100);
+      ByteObject border = figBorder.getSubFirst(IBOTypesLayout.FTYPE_2_TBLR);
+
+      ByteObject[] bgs = new ByteObject[] { bg, figBorder };
+
+      ByteObject style = styleFactory.getStyle(bgs, text, anchor, pad, border, margin);
+      return style;
+   }
+
+   public ByteObject getStyleFigureLosange() {
+      ColorRepo colorRepo = getRepo();
+      int pcolor = colorRepo.getBg3();
+      int scolor = colorRepo.getBg2();
+
+      int ccolor = colorRepo.getContent1();
+
+      ByteObject text = figureFactory.getFigString(FACE_MONOSPACE, STYLE_BOLD, SIZE_4_LARGE, ccolor);
+      ByteObject anchor = anchorFac.getCenterCenter();
+
+      ByteObject margin = null;
+      ByteObject pad = tblrFactory.getTBLRPixel(1);
+
+      ByteObject bgRect = figureFactory.getFigRect(pcolor);
+
+      int borderColor1 = colorRepo.getBorder1();
+      int borderColor2 = colorRepo.getBorder2();
+      ByteObject bgBorder = figureFactory.getFigBorder(2, borderColor1);
+      ByteObject border = bgBorder.getSubFirst(IBOTypesLayout.FTYPE_2_TBLR);
+
+      ByteObject[] bgs = new ByteObject[] { bgRect, bgBorder };
+
+      ByteObject style = styleFactory.getStyle(bgs, text, anchor, pad, border, margin);
+      return style;
    }
 
 }

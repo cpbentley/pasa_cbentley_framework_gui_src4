@@ -85,8 +85,8 @@ public class TopLevelCtrl implements IStringable {
 
    public TopLevelCtrl(GuiCtx gc) {
       this.gc = gc;
-      pageForward = new IntBuffer(gc.getUCtx());
-      pageHistory = new IntBuffer(gc.getUCtx());
+      pageForward = new IntBuffer(gc.getUC());
+      pageHistory = new IntBuffer(gc.getUC());
    }
 
    /**
@@ -438,7 +438,7 @@ public class TopLevelCtrl implements IStringable {
    }
 
    public UCtx toStringGetUCtx() {
-      return gc.getUCtx();
+      return gc.getUC();
    }
 
    //#enddebug

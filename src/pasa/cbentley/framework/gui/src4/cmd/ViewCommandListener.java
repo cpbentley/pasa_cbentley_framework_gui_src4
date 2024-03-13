@@ -232,7 +232,7 @@ public class ViewCommandListener extends ObjectGC implements ICmdsView, ICommand
       if (is.isModReleased()) {
          int value = CmdTrigger.getIntTriggerUnitDev(key1, key2, IInput.MOD_0_PRESSED, deviceType, IInput.TYPE_1_DEVICE);
          int[] units = patternTrigger.getUnits();
-         units = gc.getUCtx().getIU().remove(units, value);
+         units = gc.getUC().getIU().remove(units, value);
          patternTrigger = new CmdTrigger(cc, units);
       } else if (is.isModPressed()) {
          patternTrigger.addDevice(key1, key2, IInput.MOD_0_PRESSED, deviceType);

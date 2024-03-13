@@ -1,7 +1,6 @@
 package pasa.cbentley.framework.gui.src4.utils;
 
 import pasa.cbentley.byteobjects.src4.core.ByteObject;
-import pasa.cbentley.byteobjects.src4.ctx.IBOTypesDrw;
 import pasa.cbentley.core.src4.ctx.UCtx;
 import pasa.cbentley.core.src4.i8n.I8nString;
 import pasa.cbentley.core.src4.logging.Dctx;
@@ -10,6 +9,7 @@ import pasa.cbentley.framework.cmd.src4.engine.MCmd;
 import pasa.cbentley.framework.datamodel.src4.mbo.MBOByteObject;
 import pasa.cbentley.framework.datamodel.src4.old.objects.MObject;
 import pasa.cbentley.framework.datamodel.src4.table.ITableModel;
+import pasa.cbentley.framework.drawx.src4.ctx.IBOTypesDrawX;
 import pasa.cbentley.framework.drawx.src4.engine.RgbImage;
 import pasa.cbentley.framework.gui.src4.core.Drawable;
 import pasa.cbentley.framework.gui.src4.core.FigDrawable;
@@ -150,7 +150,7 @@ public class DrawableMapper extends ObjectGC implements IStringable {
          d = new StringDrawable(gc, styleClass, (I8nString) o);
       } else if (o instanceof ByteObject) {
          ByteObject drw = (ByteObject) o;
-         if (drw.getType() == IBOTypesDrw.TYPE_050_FIGURE) {
+         if (drw.getType() == IBOTypesDrawX.TYPE_DRWX_00_FIGURE) {
             d = new FigDrawable(gc, styleClass, drw);
          } else {
             throw new RuntimeException();

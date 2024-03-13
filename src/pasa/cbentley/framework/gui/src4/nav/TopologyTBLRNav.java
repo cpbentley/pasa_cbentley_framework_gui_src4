@@ -119,7 +119,7 @@ public class TopologyTBLRNav {
       int newSize = d1.length + 1;
       d1 = DrawableArrays.ensureCapacity(d1, newSize);
       d2 = DrawableArrays.ensureCapacity(d2, newSize);
-      pos = gc.getUCtx().getMem().ensureCapacity(pos, newSize);
+      pos = gc.getUC().getMem().ensureCapacity(pos, newSize);
       return newSize - 1;
    }
 

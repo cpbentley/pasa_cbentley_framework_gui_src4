@@ -1,33 +1,84 @@
 package pasa.cbentley.framework.gui.src4.creator;
 
 import pasa.cbentley.byteobjects.src4.core.ByteObject;
+import pasa.cbentley.framework.coredraw.src4.interfaces.ITechFont;
 import pasa.cbentley.framework.gui.src4.ctx.GuiCtx;
+import pasa.cbentley.framework.gui.src4.factories.DrawableStringFactory;
 import pasa.cbentley.framework.gui.src4.factories.interfaces.IBOStringData;
 import pasa.cbentley.framework.gui.src4.factories.interfaces.IBOStringEdit;
 import pasa.cbentley.framework.gui.src4.tech.ITechStringDrawable;
 
 public abstract class CreatorAbstractString extends CreatorAbstract {
 
-   public CreatorAbstractString(CreateContext gc) {
-      super(gc);
+   protected DrawableStringFactory fac;
+
+   public CreatorAbstractString(CreateContext cc) {
+      super(cc);
+      fac = gc.getStringDrawableFactory();
    }
 
-   
-   public ByteObject getTechString() {
-      ByteObject tech = new ByteObject(boc, new byte[IBOStringData.SDATA_BASIC_SIZE], 0);
+   /**
+    * 
+    * @return
+    */
+   public ByteObject getBOStringDataTitle() {
       int stringType = ITechStringDrawable.PRESET_CONFIG_1_TITLE;
       int stringMode = ITechStringDrawable.S_ACTION_MODE_0_READ;
-      tech.set1(SDATA_OFFSET_02_PRESET_CONFIG1, stringType);
-      tech.set1(SDATA_OFFSET_06_ACTION_MODE1, stringMode);
-
-      return tech;
+      ByteObject bo = fac.getBOStringData(stringType, stringMode);
+      return bo;
    }
 
-   public ByteObject getTechStringEdit() {
-      ByteObject tech = new ByteObject(boc, new byte[IBOStringEdit.SEDIT_BASIC_SIZE], 0);
+   public ByteObject getBOStringData() {
+      int stringType = ITechStringDrawable.PRESET_CONFIG_0_NONE;
+      int stringMode = ITechStringDrawable.S_ACTION_MODE_0_READ;
+      ByteObject bo = fac.getBOStringData(stringType, stringMode);
+      return bo;
+   }
 
+   public ByteObject getBOStringFigureScrollReader() {
+      int face = ITechFont.FACE_PROPORTIONAL;
+      int style = ITechFont.STYLE_PLAIN;
+      int size = ITechFont.SIZE_3_MEDIUM;
+      int color = getRepo().getContent1();
+
+      ByteObject effects = null;
+      ByteObject mask = null;
+      ByteObject scale = null;
+      ByteObject anchor = null;
+      ByteObject bo = facFigure.getString(null, face, style, size, color, effects, mask, scale, anchor);
+
+      facFigure.setFigStringRegularScroll(bo);
+      return bo;
+   }
+
+   public ByteObject getBOStringFigure() {
+
+      int face = ITechFont.FACE_MONOSPACE;
+      int style = ITechFont.STYLE_PLAIN;
+      int size = ITechFont.SIZE_3_MEDIUM;
+      int color = getRepo().getContent1();
+
+      ByteObject effects = null;
+      ByteObject mask = null;
+      ByteObject scale = null;
+      ByteObject anchor = null;
+      ByteObject bo = facFigure.getString(null, face, style, size, color, effects, mask, scale, anchor);
+
+      facFigure.setFigStringRegularScroll(bo);
+      return bo;
+   }
+
+   public ByteObject getBOStringEdit() {
+      ByteObject tech = fac.getBOStringEditDefault();
       int symbolTable = 1;
       tech.set1(IBOStringEdit.SEDIT_OFFSET_09_SYMBOL_TABLE1, symbolTable);
       return tech;
+   }
+
+   protected ByteObject getBOStringDataReader() {
+      int stringType = ITechStringDrawable.PRESET_CONFIG_3_SCROLL_V;
+      int stringMode = ITechStringDrawable.S_ACTION_MODE_1_SELECT;
+      ByteObject bo = fac.getBOStringData(stringType, stringMode);
+      return bo;
    }
 }

@@ -2,11 +2,11 @@ package pasa.cbentley.framework.gui.src4.core;
 
 import pasa.cbentley.byteobjects.src4.core.BOAbstractFactory;
 import pasa.cbentley.byteobjects.src4.core.ByteObject;
-import pasa.cbentley.byteobjects.src4.ctx.IBOTypesDrw;
 import pasa.cbentley.core.src4.utils.ColorUtils;
 import pasa.cbentley.core.src4.utils.interfaces.IColors;
 import pasa.cbentley.framework.coredraw.src4.interfaces.IMFont;
 import pasa.cbentley.framework.drawx.src4.ctx.DrwCtx;
+import pasa.cbentley.framework.drawx.src4.ctx.IBOTypesDrawX;
 import pasa.cbentley.framework.drawx.src4.factories.AnchorFactory;
 import pasa.cbentley.framework.drawx.src4.factories.BoxFactory;
 import pasa.cbentley.framework.drawx.src4.factories.FigureFactory;
@@ -19,7 +19,7 @@ import pasa.cbentley.framework.gui.src4.ctx.GuiCtx;
 import pasa.cbentley.layouter.src4.ctx.IBOTypesLayout;
 import pasa.cbentley.layouter.src4.engine.TblrFactory;
 
-public class DefaultStyles extends BOAbstractFactory implements IBOStyle, ITechFigure, IBOTypesDrw {
+public class DefaultStyles extends BOAbstractFactory implements IBOStyle, ITechFigure, IBOTypesDrawX {
 
    protected final GuiCtx gc;
 

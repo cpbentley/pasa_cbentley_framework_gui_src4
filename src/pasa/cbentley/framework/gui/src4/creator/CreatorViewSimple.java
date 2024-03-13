@@ -4,8 +4,8 @@ import pasa.cbentley.byteobjects.src4.core.ByteObject;
 import pasa.cbentley.core.src4.interfaces.C;
 import pasa.cbentley.framework.gui.src4.core.StyleClass;
 import pasa.cbentley.framework.gui.src4.ctx.GuiCtx;
-import pasa.cbentley.framework.gui.src4.ctx.IBOTypesGui;
 import pasa.cbentley.framework.gui.src4.factories.interfaces.IBOViewPane;
+import pasa.cbentley.framework.gui.src4.tech.ITechLinks;
 
 public class CreatorViewSimple extends CreatorAbstractView  {
 
@@ -34,7 +34,7 @@ public class CreatorViewSimple extends CreatorAbstractView  {
       StyleClass sc = new StyleClass(gc, boStyle);
 
       ByteObject bo = getBOMenu();
-      sc.linkByteObject(bo, IBOTypesGui.LINK_75_MENU_BAR_TECH);
+      sc.linkByteObject(bo, ITechLinks.LINK_75_MENU_BAR_TECH);
 
       return sc;
    }

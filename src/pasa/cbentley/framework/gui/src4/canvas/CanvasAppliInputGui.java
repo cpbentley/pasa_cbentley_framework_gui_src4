@@ -166,7 +166,7 @@ public class CanvasAppliInputGui extends CanvasAppliInput implements IDrawableLi
       }
 
       //#debug
-      toDLog().pInit("Size inside constructor w=" + getWidth() + " h=" + getHeight(), null, CanvasAppliInputGui.class, "CanvasAppliDrawable", LVL_05_FINE, true);
+      toDLog().pInit("Size w=" + getWidth() + " h=" + getHeight(), null, CanvasAppliInputGui.class, "Created@170", LVL_05_FINE, true);
    }
 
    /**
@@ -326,7 +326,7 @@ public class CanvasAppliInputGui extends CanvasAppliInput implements IDrawableLi
       vcContent.toStringSetDebugName("vcContent");
       vcContent.setParentVC(vcRoot);
 
-      StyleClass scEmpty = gc.getClass(IUIView.SC_6_EMPTY);
+      StyleClass scEmpty = gc.getStyleClass(IUIView.SC_6_EMPTY);
       topoViewDrawableRoot = new TopoViewDrawable(gc, scEmpty, vcRoot, vcContent);
 
       //#debug
@@ -582,7 +582,7 @@ public class CanvasAppliInputGui extends CanvasAppliInput implements IDrawableLi
       int cy = cd.getIC().is.getY();
       int cueColor = ColorUtils.getRGBInt(128, 128, 128, 128);
       ByteObject fig = gc.getDC().getFigureFactory().getEllipse(cueColor);
-      IDrawable cue = new FigDrawable(gc, gc.getClass(IUIView.SC_6_EMPTY), fig);
+      IDrawable cue = new FigDrawable(gc, gc.getStyleClass(IUIView.SC_6_EMPTY), fig);
 
       SizerFactory siz = gc.getLAC().getSizerFactory();
       ByteObject sizerF = siz.getSizerFontH();

@@ -139,7 +139,7 @@ public class ShiftLines extends ImgAnimable implements ITechShiftLine {
     * @param iw
     */
    private void doShiftLeftToRight(int iw) {
-      StringBBuilder sb = new StringBBuilder(gc.getUCtx());
+      StringBBuilder sb = new StringBBuilder(gc.getUC());
       for (int i = 0; i < numLinesToShift; i++) {
          if (i != 0) {
             sb.append(",");

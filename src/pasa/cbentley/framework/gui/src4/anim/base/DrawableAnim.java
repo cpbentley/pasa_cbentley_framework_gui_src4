@@ -120,7 +120,7 @@ public abstract class DrawableAnim extends ObjectGC implements IAnimable {
    /**
     * {@link IBOAnim} definition.
     * Could be null.
-    * Type is {@link IBOTypesGui#TYPE_130_ANIMATION}
+    * Type is {@link IBOTypesGui#TYPE_GUI_11_ANIMATION}
     */
    protected ByteObject definition;
 
@@ -199,7 +199,7 @@ public abstract class DrawableAnim extends ObjectGC implements IAnimable {
          throw new NullPointerException("Null Animation Defintion");
       this.d = d;
       this.definition = def;
-      this.tech = def.getSubFirst(IBOTypesGui.TYPE_199_ANIM_TECH);
+      this.tech = def.getSubFirst(IBOTypesGui.TYPE_GUI_13_ANIM);
       initGlobalDef();
    }
 

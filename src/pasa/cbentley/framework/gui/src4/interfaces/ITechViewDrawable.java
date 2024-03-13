@@ -102,18 +102,17 @@ public interface ITechViewDrawable extends ITech {
 
    /**
     * Set to true when content pw follows the ViewPort's width at all times.
-    * <br>
-    * <br>
+    * <p>
     * Specific case of {@link ITechViewDrawable#FLAG_VSTATE_12_CONTENT_W_DEPENDS_VIEWPORT}, where not only it depends, but it is matched exactly.
     * <br>
-    * Horizontal scrolling is thus impossible since pw being equal to dw. 
-    * <br>
-    * <br>
+    * Horizontal scrolling is thus impossible since pw is equal to dw. 
+    * </p>
+    * <p>
     * Makes {@link ViewDrawable} malleable with {@link ViewDrawable#isMalleable()}.
-    * <br>
-    * <br>
+    * </p>
+    * <p>
     * Case of a {@link TableView} with {@link ITechCell#TYPE_1_FLOW}.
-    * <br>
+    * </p>
     */
    public static final int FLAG_VSTATE_10_CONTENT_PW_VIEWPORT_DW     = 1 << 9;
 
@@ -138,9 +137,10 @@ public interface ITechViewDrawable extends ITech {
     * <li> {@link ITechCell#CELL_3_FILL_STRONG}
     * <li> {@link ITechCell#CELL_4_FILL_AVERAGE}
     * <li> {@link ITechCell#CELL_5_FILL_WEAK}
-    * <br>
-    * <br>
-    * Make {@link ViewDrawable} malleable with {@link ViewDrawable#isMalleable()}.
+    * 
+    * <p>
+    * This flags makes {@link ViewDrawable} malleable with {@link ViewDrawable#isMalleable()}.
+    * </p>
     * 
     */
    public static final int FLAG_VSTATE_12_CONTENT_W_DEPENDS_VIEWPORT = 1 << 11;

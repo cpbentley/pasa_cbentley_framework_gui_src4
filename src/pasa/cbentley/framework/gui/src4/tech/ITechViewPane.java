@@ -7,7 +7,6 @@ import pasa.cbentley.framework.gui.src4.core.ScrollBar;
 import pasa.cbentley.framework.gui.src4.core.ScrollConfig;
 import pasa.cbentley.framework.gui.src4.core.ViewDrawable;
 import pasa.cbentley.framework.gui.src4.core.ViewPane;
-import pasa.cbentley.framework.gui.src4.ctx.IBOTypesGui;
 import pasa.cbentley.framework.gui.src4.factories.interfaces.IBOViewPane;
 import pasa.cbentley.framework.gui.src4.interfaces.ITechDrawable;
 import pasa.cbentley.framework.gui.src4.string.StringDrawable;
@@ -115,7 +114,7 @@ public interface ITechViewPane extends IByteObject {
     * <br>
     * If not defined, will use ViewPane's style but log a Dev Warning.
     * 
-    * Uses the {@link IBOTypesGui#LINK_64_STYLE_VIEWPORT} for styling.
+    * Uses the {@link ITechLinks#LINK_64_STYLE_VIEWPORT} for styling.
     */
    public static final int DRW_STYLE_2_VIEWPORT                  = 2;
 

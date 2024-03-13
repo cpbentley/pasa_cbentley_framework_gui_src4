@@ -44,6 +44,7 @@ import pasa.cbentley.framework.gui.src4.interfaces.ITechDrawable;
 import pasa.cbentley.framework.gui.src4.menu.MenuBar;
 import pasa.cbentley.framework.gui.src4.table.TableView;
 import pasa.cbentley.framework.gui.src4.table.interfaces.ITechTable;
+import pasa.cbentley.framework.gui.src4.tech.ITechLinks;
 import pasa.cbentley.framework.gui.src4.tech.ITechStringDrawable;
 import pasa.cbentley.framework.gui.src4.utils.DrawableUtilz;
 import pasa.cbentley.framework.input.src4.interfaces.ITechPaintThread;
@@ -64,7 +65,7 @@ import pasa.cbentley.powerdata.spec.src4.spec.CharTrieUtilz;
  * <br>
  * <br>
  * A {@link StringDrawable} can customize the look and parameters of the {@link StringEditControl}
- * with the {@link StyleClass} at {@link IBOTypesGui#LINK_55_STYLE_STRING_EDIT_CONTROL}.
+ * with the {@link StyleClass} at {@link ITechLinks#LINK_55_STYLE_STRING_EDIT_CONTROL}.
  * <br>
  * <br>
  * When the key focus is given to another
@@ -74,7 +75,7 @@ import pasa.cbentley.powerdata.spec.src4.spec.CharTrieUtilz;
  * <br>
  * 
  * Uses {@link StringTech} tech parameters descriptors. 
- * <li> {@link IBOTypesGui#TYPE_124_STRING_TECH} as data descriptor 
+ * <li> {@link IBOTypesGui#TYPE_124_STRING_DATA} as data descriptor 
  * <li> {@link IBOTypesGui#TYPE_125_STRING_EDIT_TECH} as descriptor of data
  * <br>
  * <br>
@@ -183,7 +184,7 @@ public class StringEditControl extends TableView implements IDrawListener, IBOSt
    private int                currentLanguageID;
 
    /**
-    * Loaded from the charset language type given by {@link IBOTypesGui#TYPE_124_STRING_TECH}.
+    * Loaded from the charset language type given by {@link IBOTypesGui#TYPE_124_STRING_DATA}.
     */
    private IPowerCharTrie     dictionnaryTrie;
 
@@ -311,7 +312,7 @@ public class StringEditControl extends TableView implements IDrawListener, IBOSt
     * @param styleKey
     */
    public StringEditControl(GuiCtx gc, StyleClass sc) {
-      super(gc, sc, gc.getTablePolicyC().getButtonLine(false, 0, 0));
+      super(gc, sc, gc.getTablePolicyFactory().getButtonLine(false, 0, 0));
 
       pr = new PredictionRunner(gc, this);
       pulseEventPID = gc.getEventsBusGui().createNewProducerID(1);
@@ -346,7 +347,7 @@ public class StringEditControl extends TableView implements IDrawListener, IBOSt
       editModule = new StringEditModule(gc);
       //check about the tech strings.. we want total control over those here.
 
-      techStr = gc.getDrawableStringFactory().getStringTech(ITechStringDrawable.PRESET_CONFIG_1_TITLE);
+      techStr = gc.getDrawableStringFactory().getBOStringData(ITechStringDrawable.PRESET_CONFIG_1_TITLE);
 
       drawableSpecial = new StringDrawable(gc, normalSK, "#", ITechStringDrawable.PRESET_CONFIG_1_TITLE);
 
@@ -368,13 +369,13 @@ public class StringEditControl extends TableView implements IDrawListener, IBOSt
 
       //modify the tech so that no cell is selected 
       ObjectTableModel predictionModel = pr.getModel();
-      predictionTable = new TableView(gc, sc, gc.getTablePolicyC().getButtonLine(true, 0, 0), predictionModel);
+      predictionTable = new TableView(gc, sc, gc.getTablePolicyFactory().getButtonLine(true, 0, 0), predictionModel);
       predictionTable.init(0, 0);
 
       predictionTable.addEventListener(this, ITechTable.EVENT_ID_00_SELECT);
 
       puncts = new ObjectTableModel(gc.getDMC(), punctuations);
-      punctuationTable = new TableView(gc, sc, gc.getTablePolicyC().getButtonLine(true, 0, 0), puncts);
+      punctuationTable = new TableView(gc, sc, gc.getTablePolicyFactory().getButtonLine(true, 0, 0), puncts);
       punctuationTable.init(0, 0);
 
       punctuationTable.addEventListener(this, ITechTable.EVENT_ID_00_SELECT);
@@ -957,7 +958,7 @@ public class StringEditControl extends TableView implements IDrawListener, IBOSt
             String[] dataModel = Symbs.charsets;
             ObjectTableModel otm = new ObjectTableModel(gc.getDMC(), dataModel);
             //ByteObject tablePol = TablePolicyC.getButtonLine(true, 40, 20);
-            ByteObject tablePol = gc.getTablePolicyC().getSimple1ColPolicy();
+            ByteObject tablePol = gc.getTablePolicyFactory().getSimple1ColPolicy();
             charSetsTableView = new TableView(gc, this.styleClass, tablePol);
             charSetsTableView.setDataModel(otm);
             //register 
@@ -1072,7 +1073,7 @@ public class StringEditControl extends TableView implements IDrawListener, IBOSt
       }
       controlledSD = sd;
 
-      styleClass = controlledSD.getStyleClass().getStyleClass(IBOTypesGui.LINK_55_STYLE_STRING_EDIT_CONTROL);
+      styleClass = controlledSD.getStyleClass().getStyleClass(ITechLinks.LINK_55_STYLE_STRING_EDIT_CONTROL);
 
       controlledSD.setEditModule(editModule);
       editModule.setStringEditController(this);

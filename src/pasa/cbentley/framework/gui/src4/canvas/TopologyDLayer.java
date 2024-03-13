@@ -352,7 +352,7 @@ public class TopologyDLayer extends ObjectGC {
     * @return
     */
    public int[] intersect(int x, int y, int w, int h) {
-      UCtx uc = gc.getUCtx();
+      UCtx uc = gc.getUC();
       IntBuffer ib = new IntBuffer(uc, dlayerNextEmpty);
       Geo2dUtils geo = uc.getGeo2dUtils();
       for (int i = 0; i < dlayerNextEmpty; i++) {
@@ -654,7 +654,7 @@ public class TopologyDLayer extends ObjectGC {
    public void styleUpdate() {
       for (int i = 0; i < dlayerNextEmpty; i++) {
          int id = dlayers[i].getStyleClass().getID();
-         dlayers[i].setStyleClass(gc.getClass(id));
+         dlayers[i].setStyleClass(gc.getStyleClass(id));
       }
    }
 

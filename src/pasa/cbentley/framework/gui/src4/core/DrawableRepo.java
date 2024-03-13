@@ -151,7 +151,7 @@ public class DrawableRepo implements ITechNav, IStringable {
    }
 
    public UCtx toStringGetUCtx() {
-      return gc.getUCtx();
+      return gc.getUC();
    }
 
    //#enddebug

@@ -1,9 +1,9 @@
 package pasa.cbentley.framework.gui.src4.core;
 
 import pasa.cbentley.byteobjects.src4.core.ByteObject;
-import pasa.cbentley.byteobjects.src4.ctx.IBOTypesDrw;
 import pasa.cbentley.core.src4.interfaces.C;
 import pasa.cbentley.core.src4.logging.Dctx;
+import pasa.cbentley.framework.drawx.src4.ctx.IBOTypesDrawX;
 import pasa.cbentley.framework.drawx.src4.engine.GraphicsX;
 import pasa.cbentley.framework.drawx.src4.engine.RgbImage;
 import pasa.cbentley.framework.drawx.src4.factories.interfaces.IBOFigure;
@@ -168,7 +168,7 @@ public class FigDrawable extends Drawable implements ITechFigure {
    }
 
    /**
-    * Modifies the figure {@link IDrwTypes#TYPE_050_FIGURE}  of this {@link FigDrawable}
+    * Modifies the figure {@link IDrwTypes#TYPE_DRWX_00_FIGURE}  of this {@link FigDrawable}
     * <br>
     * <br>
     * Invalidates cache.
@@ -179,7 +179,7 @@ public class FigDrawable extends Drawable implements ITechFigure {
     * @param p
     */
    public void setFigure(ByteObject p) {
-      p.checkType(IBOTypesDrw.TYPE_050_FIGURE);
+      p.checkType(IBOTypesDrawX.TYPE_DRWX_00_FIGURE);
       if (this.figure != p) {
          this.figure = p;
       }
@@ -192,7 +192,7 @@ public class FigDrawable extends Drawable implements ITechFigure {
       }
       //deals with animations on the figure
       if (figure.hasFlag(IBOFigure.FIG__OFFSET_02_FLAG, IBOFigure.FIG_FLAG_6_ANIMATED)) {
-         ByteObject[] anims = figure.getSubs(IBOTypesGui.TYPE_130_ANIMATION);
+         ByteObject[] anims = figure.getSubs(IBOTypesGui.TYPE_GUI_11_ANIMATION);
          for (int i = 0; i < anims.length; i++) {
             ByteObject anim = anims[i];
             anim.setValue(IBOAnim.ANIM_OFFSET_06_TARGET1, ITechAnim.ANIM_TARGET_9_CONTENT, 1);

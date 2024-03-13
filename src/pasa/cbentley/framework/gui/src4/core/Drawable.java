@@ -1,7 +1,10 @@
+/*
+ * (c) 2018-2020 Charles-Philip Bentley
+ * This code is licensed under MIT license (see LICENSE.txt for details)
+ */
 package pasa.cbentley.framework.gui.src4.core;
 
 import pasa.cbentley.byteobjects.src4.core.ByteObject;
-import pasa.cbentley.byteobjects.src4.ctx.IBOTypesDrw;
 import pasa.cbentley.core.src4.ctx.ICtx;
 import pasa.cbentley.core.src4.event.BusEvent;
 import pasa.cbentley.core.src4.helpers.StringBBuilder;
@@ -21,6 +24,7 @@ import pasa.cbentley.framework.cmd.src4.interfaces.ICmdListener;
 import pasa.cbentley.framework.coredraw.src4.interfaces.IMFont;
 import pasa.cbentley.framework.coreui.src4.utils.ViewState;
 import pasa.cbentley.framework.datamodel.src4.table.ObjectTableModel;
+import pasa.cbentley.framework.drawx.src4.ctx.IBOTypesDrawX;
 import pasa.cbentley.framework.drawx.src4.engine.GraphicsX;
 import pasa.cbentley.framework.drawx.src4.engine.RgbCache;
 import pasa.cbentley.framework.drawx.src4.engine.RgbImage;
@@ -60,6 +64,7 @@ import pasa.cbentley.framework.gui.src4.interfaces.INavigational;
 import pasa.cbentley.framework.gui.src4.interfaces.ITechCanvasDrawable;
 import pasa.cbentley.framework.gui.src4.interfaces.ITechDrawable;
 import pasa.cbentley.framework.gui.src4.table.TableView;
+import pasa.cbentley.framework.gui.src4.tech.ITechLinks;
 import pasa.cbentley.framework.gui.src4.utils.DrawableUtilz;
 import pasa.cbentley.framework.gui.src4.utils.SeveralActor;
 import pasa.cbentley.layouter.src4.ctx.LayouterCtx;
@@ -341,7 +346,7 @@ public class Drawable extends ObjectGC implements IDrawable, IBOStyle, IStringab
    protected int                    styleStates;
 
    /**
-    * Technical style. For a basic drawable, it will always use {@link IBOTypesGui#LINK_10_BASE_TECH}.
+    * Technical style. For a basic drawable, it will always use {@link ITechLinks#LINK_10_BASE_TECH}.
     * Can be null.
     * <br>
     * <br>
@@ -1108,7 +1113,7 @@ public class Drawable extends ObjectGC implements IDrawable, IBOStyle, IStringab
             //TODO why Scrollbar does not override this method?
             int[] holes = getHoles();
             //erase the area minus the holes
-            int[] ag = gc.getUCtx().getGeo2dUtils().getHolesInverse(getX(), getY(), getDrawnWidth(), getDrawnHeight(), holes);
+            int[] ag = gc.getUC().getGeo2dUtils().getHolesInverse(getX(), getY(), getDrawnWidth(), getDrawnHeight(), holes);
             for (int i = 0; i < ag.length; i += 4) {
                //repaint area
                int ax = ag[i];
@@ -2251,7 +2256,7 @@ public class Drawable extends ObjectGC implements IDrawable, IBOStyle, IStringab
       //different table view style class.
       int id = styleClass.getID();
       if (id != -1) {
-         styleClass = gc.getClass(id);
+         styleClass = gc.getStyleClass(id);
       }
       invalidateLayout();
       setStateFlag(STATE_06_STYLED, false);
@@ -2807,7 +2812,7 @@ public class Drawable extends ObjectGC implements IDrawable, IBOStyle, IStringab
    }
 
    /**
-    * Look up any Style layer with an {@link IBOAnim} {@link IBOTypesGui#TYPE_130_ANIMATION} defined and load them in the {@link DrawableAnimator}.
+    * Look up any Style layer with an {@link IBOAnim} {@link IBOTypesGui#TYPE_GUI_11_ANIMATION} defined and load them in the {@link DrawableAnimator}.
     * <br>
     * <br>
     * Read all animations of the style figure layers.
@@ -2836,7 +2841,7 @@ public class Drawable extends ObjectGC implements IDrawable, IBOStyle, IStringab
       //go over each style elements and inspect animated figures.
       for (int i = 0; i < styleElements.length; i++) {
          ByteObject styleSub = styleElements[i];
-         if (styleSub != null && styleSub.getType() == IBOTypesDrw.TYPE_050_FIGURE) {
+         if (styleSub != null && styleSub.getType() == IBOTypesDrawX.TYPE_DRWX_00_FIGURE) {
             if (styleSub.hasFlag(IBOFigure.FIG__OFFSET_02_FLAG, IBOFigure.FIG_FLAG_6_ANIMATED)) {
                if (styleSub == contentFig) {
                   //animate only the content? How?
@@ -2846,7 +2851,7 @@ public class Drawable extends ObjectGC implements IDrawable, IBOStyle, IStringab
 
                int flag = getStyleOp().getStyleDLayerPosition(style, styleSub);
                //the animations of this style figure
-               ByteObject[] animsDrw = styleSub.getSubs(IBOTypesGui.TYPE_130_ANIMATION);
+               ByteObject[] animsDrw = styleSub.getSubs(IBOTypesGui.TYPE_GUI_11_ANIMATION);
                for (int j = 0; j < animsDrw.length; j++) {
                   if (animsDrw[j] != null) {
                      animsDrw[j].setValue(IBOAnim.ANIM_OFFSET_06_TARGET1, flag, 1);
@@ -3100,20 +3105,36 @@ public class Drawable extends ObjectGC implements IDrawable, IBOStyle, IStringab
    }
 
    /**
-    * Updates the style state.
-    * <br>
-    * Look up {@link StyleClass} for a style change from the current and updates the active style.
-    * <br>
-    * <br>
-    * Generates specific animation only when state {@link ITechDrawable#STATE_06_STYLED} is set.
+    * Updates the style state. Look up {@link StyleClass} for a style change from the current and updates the active style.
+    * 
+    * <p>
+    * The final style layer will be merged when the call to {@link Drawable#styleValidate()}.
+    * 
+    * </p>
+    * 
+    * <li> {@link ITechDrawable#STYLE_01_CUSTOM}
+    * <li> {@link ITechDrawable#STYLE_02_CUSTOM}
+    * <li> {@link ITechDrawable#STYLE_03_MARKED}
+    * <li> {@link ITechDrawable#STYLE_04_GREYED}
+    * <li> {@link ITechDrawable#STYLE_05_SELECTED}
+    * <li> {@link ITechDrawable#STYLE_06_FOCUSED_KEY}
+    * <li> {@link ITechDrawable#STYLE_07_FOCUSED_POINTER}
+    * <li> {@link ITechDrawable#STYLE_08_PRESSED}
+    * <li> {@link ITechDrawable#STYLE_09_DRAGGED}
+    * <li> {@link ITechDrawable#STYLE_10_DRAGGED_OVER}
     * 
     * <br>
+    * 
+    * <p>
+    * Generates specific animation only when state {@link ITechDrawable#STATE_06_STYLED} is set.
+    * <b>Animation Concerns</b>:
     * {@link ITechDrawable#STATE_02_DRAWN}.
-    * No point animating a Drawable invisible.
-    * <br>
-    * <br>
-    * The style layer will be lumped when the call to {@link Drawable#styleValidate()}.
-    * <br>
+    *  No point animating a Drawable invisible.
+    * 
+    * </p>
+    * 
+    * 
+    * 
     * StyleClass tracks whether new style implies an animation.
     * <br>
     * It is like an entry event for the state style.<br>
@@ -3584,7 +3605,7 @@ public class Drawable extends ObjectGC implements IDrawable, IBOStyle, IStringab
    }
 
    public String toStringOneLineStates() {
-      StringBBuilder sb = new StringBBuilder(gc.getUCtx());
+      StringBBuilder sb = new StringBBuilder(gc.getUC());
       sb.append("");
       sb.append(ToStringStaticGui.toStringStates(this));
       return sb.toString();

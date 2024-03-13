@@ -2,8 +2,8 @@ package pasa.cbentley.framework.gui.src4.creator;
 
 import pasa.cbentley.byteobjects.src4.core.ByteObject;
 import pasa.cbentley.framework.gui.src4.core.StyleClass;
-import pasa.cbentley.framework.gui.src4.ctx.GuiCtx;
-import pasa.cbentley.framework.gui.src4.ctx.IBOTypesGui;
+import pasa.cbentley.framework.gui.src4.interfaces.ITechDrawable;
+import pasa.cbentley.framework.gui.src4.tech.ITechLinks;
 
 public class CreatorStyleClassSimple extends CreatorAbstractStyleClass {
 
@@ -26,19 +26,21 @@ public class CreatorStyleClassSimple extends CreatorAbstractStyleClass {
    protected CreatorAbstractTable createCreatorTable() {
       return new CreatorTableSimple(crc);
    }
+
+   protected CreatorAbstractView createCreatorView() {
+      return new CreatorViewSimple(crc);
+   }
+
    public StyleClass getStyleClassFigure() {
       ByteObject style = creatorStyle.getStyleFigure();
       StyleClass sc = new StyleClass(gc, style);
       return sc;
    }
-   protected CreatorAbstractView createCreatorView() {
-      return new CreatorViewSimple(crc);
-   }
 
    public StyleClass getStyleClassGradient() {
       ByteObject rootStyle = creatorStyle.getStyleRoot();
       StyleClass sc = new StyleClass(gc, rootStyle);
-      populateStyleClass(sc);
+      populateStyleClassAll(sc);
       return sc;
    }
 
@@ -55,7 +57,7 @@ public class CreatorStyleClassSimple extends CreatorAbstractStyleClass {
       StyleClass sc = new StyleClass(gc, boStyle);
 
       ByteObject bo = creatorView.getBOMenu();
-      sc.linkByteObject(bo, IBOTypesGui.LINK_75_MENU_BAR_TECH);
+      sc.linkByteObject(bo, ITechLinks.LINK_75_MENU_BAR_TECH);
 
       return sc;
    }
@@ -63,7 +65,7 @@ public class CreatorStyleClassSimple extends CreatorAbstractStyleClass {
    public StyleClass getStyleClassRoot() {
       ByteObject rootStyle = creatorStyle.getStyleRoot();
       StyleClass sc = new StyleClass(gc, rootStyle);
-      populateStyleClass(sc);
+      populateStyleClassAll(sc);
       return sc;
    }
 
@@ -91,16 +93,80 @@ public class CreatorStyleClassSimple extends CreatorAbstractStyleClass {
       return creatorScrollbar.getStyleClassWrapperTopLeft();
    }
 
-   public StyleClass getStyleClassTable() {
-      return getStyleClassRoot();
+   public StyleClass getStyleClassSelected() {
+      ByteObject style = creatorStyle.getStyleRoot();
+      StyleClass sc = new StyleClass(gc, style);
+
+      ByteObject styleSelected = creatorStyle.getStyleSelected();
+      sc.linkStateStyle(styleSelected, ITechDrawable.STYLE_05_SELECTED);
+      
+      StyleClass scVp = getStyleClassViewPane();
+      sc.linkStyleClass(scVp, ITechLinks.LINK_65_STYLE_VIEWPANE);
+      populateStyleClassViewPane(scVp);
+      
+      return sc;
    }
 
+   public StyleClass getStyleClassTable() {
+      ByteObject style = creatorStyle.getStyleRoot();
+      StyleClass sc = new StyleClass(gc, style);
+
+      populateStyleClassString(sc);
+
+      ByteObject tableTech = creatorTable.getBOTableViewNoTitles();
+      sc.linkByteObject(tableTech, ITechLinks.LINK_80_BO_TABLEVIEW);
+
+      StyleClass scVp = getStyleClassViewPane();
+      sc.linkStyleClass(scVp, ITechLinks.LINK_65_STYLE_VIEWPANE);
+      populateStyleClassViewPane(scVp);
+
+      return sc;
+   }
+
+   public StyleClass getStyleClassTextReader() {
+      ByteObject style = creatorStyle.getStyleTextReader();
+      StyleClass sc = new StyleClass(gc, style);
+
+      populateStyleClassStringReader(sc);
+
+      StyleClass scVp = getStyleClassViewPane();
+      sc.linkStyleClass(scVp, ITechLinks.LINK_65_STYLE_VIEWPANE);
+      populateStyleClassViewPane(scVp);
+      return sc;
+   }
+
+   public StyleClass getStyleClassTitle() {
+      ByteObject style = creatorStyle.getStyleTitle();
+      StyleClass sc = new StyleClass(gc, style);
+
+      ByteObject stringTech = creatorString.getBOStringDataTitle();
+      sc.linkByteObject(stringTech, ITechLinks.LINK_41_BO_STRING_DATA);
+
+      ByteObject stringEditTech = creatorString.getBOStringEdit();
+      sc.linkByteObject(stringEditTech, ITechLinks.LINK_42_BO_STRING_EDIT);
+
+      return sc;
+   }
+
+   public StyleClass getStyleClassFigureLosange() {
+      ByteObject style = creatorStyle.getStyleFigureLosange();
+      StyleClass sc = new StyleClass(gc, style);
+
+      ByteObject stringTech = creatorString.getBOStringDataTitle();
+      sc.linkByteObject(stringTech, ITechLinks.LINK_41_BO_STRING_DATA);
+
+      ByteObject stringEditTech = creatorString.getBOStringEdit();
+      sc.linkByteObject(stringEditTech, ITechLinks.LINK_42_BO_STRING_EDIT);
+
+      return sc;
+   }
+   
    public StyleClass getStyleClassViewPane() {
       ByteObject boStyle = creatorView.getBOStyleViewPane();
       StyleClass sc = new StyleClass(gc, boStyle);
 
       ByteObject bo = creatorView.getBOViewPane();
-      sc.linkByteObject(bo, IBOTypesGui.LINK_66_BO_VIEWPANE);
+      sc.linkByteObject(bo, ITechLinks.LINK_66_BO_VIEWPANE);
 
       populateStyleClassViewPane(sc);
 
@@ -114,49 +180,60 @@ public class CreatorStyleClassSimple extends CreatorAbstractStyleClass {
       return sc;
    }
 
-   protected void populateStyleClass(StyleClass sc) {
+   protected void populateStyleClassAll(StyleClass sc) {
+      populateStyleClassString(sc);
+      populateStyleClassTables(sc);
 
       StyleClass scVp = getStyleClassViewPane();
-      sc.linkStyleClass(scVp, IBOTypesGui.LINK_65_STYLE_VIEWPANE);
+      sc.linkStyleClass(scVp, ITechLinks.LINK_65_STYLE_VIEWPANE);
 
-      populateStyleClassViewPane(sc);
+      populateStyleClassViewPane(scVp);
 
+   }
+
+   protected void populateStyleClassString(StyleClass sc) {
+      ByteObject stringData = creatorString.getBOStringDataTitle();
+      sc.linkByteObject(stringData, ITechLinks.LINK_41_BO_STRING_DATA);
+
+      ByteObject stringEdit = creatorString.getBOStringEdit();
+      sc.linkByteObject(stringEdit, ITechLinks.LINK_42_BO_STRING_EDIT);
+
+   }
+
+   protected void populateStyleClassStringReader(StyleClass sc) {
+      ByteObject stringTech = creatorString.getBOStringDataReader();
+      sc.linkByteObject(stringTech, ITechLinks.LINK_41_BO_STRING_DATA);
+      ByteObject stringEditTech = creatorString.getBOStringEdit();
+      sc.linkByteObject(stringEditTech, ITechLinks.LINK_42_BO_STRING_EDIT);
+
+      ByteObject stringFigure = creatorString.getBOStringFigureScrollReader();
+      sc.linkByteObject(stringFigure, ITechLinks.LINK_40_BO_STRING_FIGURE);
+   }
+
+   private void populateStyleClassTables(StyleClass sc) {
       ByteObject tableTech = creatorTable.getTableTech();
-      sc.linkByteObject(tableTech, IBOTypesGui.LINK_80_TECH_TABLE);
-
-      ByteObject stringTech = creatorString.getTechString();
-      sc.linkByteObject(stringTech, IBOTypesGui.LINK_41_BO_STRING_DRAWABLE);
-
-      ByteObject stringEditTech = creatorString.getTechStringEdit();
-      sc.linkByteObject(stringEditTech, IBOTypesGui.LINK_40_TECH_STRING_EDIT);
+      sc.linkByteObject(tableTech, ITechLinks.LINK_80_BO_TABLEVIEW);
 
       ByteObject menuTech = creatorView.getBOMenu();
-      sc.linkByteObject(menuTech, IBOTypesGui.LINK_75_MENU_BAR_TECH);
-
-      StyleClass scHoleHeader = getStyleClassHoleHeader();
-      sc.linkStyleClass(scHoleHeader, IBOTypesGui.LINK_58_STYLE_VIEWPANE_HOLE_HEADER);
-
-      StyleClass scHoleSB = getStyleClassHoleScrollbar();
-      sc.linkStyleClass(scHoleSB, IBOTypesGui.LINK_59_STYLE_VIEWPANE_HOLE_SB);
-
+      sc.linkByteObject(menuTech, ITechLinks.LINK_75_MENU_BAR_TECH);
    }
 
    protected void populateStyleClassViewPane(StyleClass sc) {
 
       StyleClass scViewPort = getStyleClassViewPort();
-      sc.linkStyleClass(scViewPort, IBOTypesGui.LINK_64_STYLE_VIEWPORT);
+      sc.linkStyleClass(scViewPort, ITechLinks.LINK_64_STYLE_VIEWPORT);
 
       StyleClass scScrollbarH = getStyleClassScrollbarH();
-      sc.linkStyleClass(scScrollbarH, IBOTypesGui.LINK_71_STYLE_VIEWPANE_H_SCROLLBAR);
+      sc.linkStyleClass(scScrollbarH, ITechLinks.LINK_71_STYLE_VIEWPANE_H_SCROLLBAR);
 
       StyleClass scScrollbarV = getStyleClassScrollbarV();
-      sc.linkStyleClass(scScrollbarV, IBOTypesGui.LINK_72_STYLE_VIEWPANE_V_SCROLLBAR);
+      sc.linkStyleClass(scScrollbarV, ITechLinks.LINK_72_STYLE_VIEWPANE_V_SCROLLBAR);
 
       StyleClass scHoleHeader = getStyleClassHoleHeader();
-      sc.linkStyleClass(scHoleHeader, IBOTypesGui.LINK_58_STYLE_VIEWPANE_HOLE_HEADER);
+      sc.linkStyleClass(scHoleHeader, ITechLinks.LINK_58_STYLE_VIEWPANE_HOLE_HEADER);
 
       StyleClass scHoleSB = getStyleClassHoleScrollbar();
-      sc.linkStyleClass(scHoleSB, IBOTypesGui.LINK_59_STYLE_VIEWPANE_HOLE_SB);
+      sc.linkStyleClass(scHoleSB, ITechLinks.LINK_59_STYLE_VIEWPANE_HOLE_SB);
 
    }
 

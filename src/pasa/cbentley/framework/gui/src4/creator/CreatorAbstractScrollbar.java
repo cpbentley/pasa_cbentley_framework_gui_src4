@@ -4,8 +4,8 @@ import pasa.cbentley.byteobjects.src4.core.ByteObject;
 import pasa.cbentley.framework.drawx.src4.factories.interfaces.IBOFigure;
 import pasa.cbentley.framework.gui.src4.core.StyleClass;
 import pasa.cbentley.framework.gui.src4.ctx.GuiCtx;
-import pasa.cbentley.framework.gui.src4.ctx.IBOTypesGui;
 import pasa.cbentley.framework.gui.src4.factories.interfaces.IBOScrollBar;
+import pasa.cbentley.framework.gui.src4.tech.ITechLinks;
 
 /**
  * Creators of anything related Scroll
@@ -36,13 +36,13 @@ public abstract class CreatorAbstractScrollbar extends CreatorAbstract implement
    protected abstract CreatorAbstractBOStyle createCreatorStyle();
 
    /**
-    * Use for link {@link IBOTypesGui#LINK_68_BO_V_SCROLLBAR}.
+    * Use for link {@link ITechLinks#LINK_68_BO_V_SCROLLBAR}.
     * @return {@link IBOScrollBar}
     */
    public abstract ByteObject getBOScrollbarHorizontal();
 
    /**
-    * Use for link {@link IBOTypesGui#LINK_68_BO_V_SCROLLBAR}.
+    * Use for link {@link ITechLinks#LINK_68_BO_V_SCROLLBAR}.
     * @return {@link IBOScrollBar}
     */
    public abstract ByteObject getBOScrollbarVertical();
@@ -50,7 +50,7 @@ public abstract class CreatorAbstractScrollbar extends CreatorAbstract implement
    /**
     * TBLR directional figure for uses inside wrappers.
     * 
-    * Use for link {@link IBOTypesGui#LINK_49_FIG_SCROLLBAR_WRAPPER}.
+    * Use for link {@link ITechLinks#LINK_49_FIG_SCROLLBAR_WRAPPER}.
     * @return {@link IBOFigure}
     */
    public abstract ByteObject getBOFigWrapper();
@@ -61,7 +61,7 @@ public abstract class CreatorAbstractScrollbar extends CreatorAbstract implement
 
    /**
     * <p>
-    * Use for link {@link IBOTypesGui#LINK_50_STYLE_SCROLLBAR_BLOCK_BG}.
+    * Use for link {@link ITechLinks#LINK_50_STYLE_SCROLLBAR_BLOCK_BG}.
     * </p>
     * @return {@link StyleClass}
     */
@@ -69,7 +69,7 @@ public abstract class CreatorAbstractScrollbar extends CreatorAbstract implement
 
    /**
     * <p>
-    * Use for link {@link IBOTypesGui#LINK_51_STYLE_SCROLLBAR_BLOCK_FIG}.
+    * Use for link {@link ITechLinks#LINK_51_STYLE_SCROLLBAR_BLOCK_FIG}.
     * </p>
     * @return {@link StyleClass}
     */
@@ -77,7 +77,7 @@ public abstract class CreatorAbstractScrollbar extends CreatorAbstract implement
 
    /**
     * <p>
-    * Use for link {@link IBOTypesGui#LINK_52_STYLE_SCROLLBAR_TOP_LEFT_WRAPPER}.
+    * Use for link {@link ITechLinks#LINK_52_STYLE_SCROLLBAR_TOP_LEFT_WRAPPER}.
     * </p>
     * @return {@link StyleClass}
     */
@@ -85,7 +85,7 @@ public abstract class CreatorAbstractScrollbar extends CreatorAbstract implement
 
    /**
     * <p>
-    * Use for link {@link IBOTypesGui#LINK_53_STYLE_SCROLLBAR_BOT_RIGHT_WRAPPER}.
+    * Use for link {@link ITechLinks#LINK_53_STYLE_SCROLLBAR_BOT_RIGHT_WRAPPER}.
     * </p>
     * @return {@link StyleClass}
     */

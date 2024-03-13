@@ -308,7 +308,7 @@ public class FunctionMove extends Function implements IBOMoveFunction {
 
    private void initFib() {
       if (incrementType == ITechMoveFunction.INCREMENT_1_FIB) {
-         xFib = gc.getUCtx().getMathUtils().getFibIncrement(maxFrames);
+         xFib = gc.getUC().getMathUtils().getFibIncrement(maxFrames);
       }
    }
 
@@ -424,7 +424,7 @@ public class FunctionMove extends Function implements IBOMoveFunction {
    }
 
    public UCtx toStringGetUCtx() {
-      return gc.getUCtx();
+      return gc.getUC();
    }
 
    //#enddebug

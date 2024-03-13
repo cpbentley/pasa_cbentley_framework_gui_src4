@@ -56,7 +56,7 @@ public class PredictionRunner extends AbstractBRunnable implements IBRunnable {
     * @param s
     */
    public PredictionRunner(GuiCtx gc, StringEditControl s) {
-      super(gc.getUCtx());
+      super(gc.getUC());
       this.gc = gc;
       sec = s;
       predictions = new ObjectTableModel(gc.getDMC(), 1);

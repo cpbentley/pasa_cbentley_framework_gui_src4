@@ -15,11 +15,11 @@ import pasa.cbentley.framework.gui.src4.core.LayouterEngineDrawable;
 import pasa.cbentley.framework.gui.src4.core.ScrollConfig;
 import pasa.cbentley.framework.gui.src4.core.StyleClass;
 import pasa.cbentley.framework.gui.src4.ctx.GuiCtx;
-import pasa.cbentley.framework.gui.src4.ctx.IBOTypesGui;
 import pasa.cbentley.framework.gui.src4.interfaces.ITechCanvasDrawable;
 import pasa.cbentley.framework.gui.src4.interfaces.ITechDrawable;
 import pasa.cbentley.framework.gui.src4.table.TableView;
 import pasa.cbentley.framework.gui.src4.table.interfaces.ITechTable;
+import pasa.cbentley.framework.gui.src4.tech.ITechLinks;
 import pasa.cbentley.framework.gui.src4.tech.ITechStringDrawable;
 
 /**
@@ -295,18 +295,18 @@ public class StringListInput extends StringDrawable implements IEventConsumer {
       for (int i = 0; i < data.length; i++) {
          data[i] = model.getObject(i).toString();
       }
-      t9 = new T9(gc.getUCtx(), data);
+      t9 = new T9(gc.getUC(), data);
    }
 
    public void setList(String[] list) {
       model = new ObjectTableModel(gc.getDMC(), list);
-      t9 = new T9(gc.getUCtx(), list);
+      t9 = new T9(gc.getUC(), list);
    }
 
    public void showTable(InputConfig ic) {
       if (model != null) {
          if (listView == null) {
-            StyleClass symbolStyleClass = this.styleClass.getStyleClass(IBOTypesGui.LINK_45_STRING_LIST_VIEW);
+            StyleClass symbolStyleClass = this.styleClass.getStyleClass(ITechLinks.LINK_45_STRING_LIST_VIEW);
             if (symbolStyleClass == null) {
                symbolStyleClass = this.styleClass;
             }

@@ -18,7 +18,6 @@ import pasa.cbentley.framework.gui.src4.canvas.InputConfig;
 import pasa.cbentley.framework.gui.src4.canvas.PointerGestureDrawable;
 import pasa.cbentley.framework.gui.src4.canvas.ViewContext;
 import pasa.cbentley.framework.gui.src4.ctx.GuiCtx;
-import pasa.cbentley.framework.gui.src4.ctx.IBOTypesGui;
 import pasa.cbentley.framework.gui.src4.ctx.IToStringFlagsGui;
 import pasa.cbentley.framework.gui.src4.ctx.ToStringStaticGui;
 import pasa.cbentley.framework.gui.src4.factories.interfaces.IBOViewPane;
@@ -29,6 +28,7 @@ import pasa.cbentley.framework.gui.src4.interfaces.ITechDrawable;
 import pasa.cbentley.framework.gui.src4.interfaces.ITechViewDrawable;
 import pasa.cbentley.framework.gui.src4.string.StringDrawable;
 import pasa.cbentley.framework.gui.src4.table.TableView;
+import pasa.cbentley.framework.gui.src4.tech.ITechLinks;
 import pasa.cbentley.framework.gui.src4.tech.ITechViewPane;
 import pasa.cbentley.framework.gui.src4.utils.DrawableUtilz;
 import pasa.cbentley.framework.input.src4.gesture.GestureDetector;
@@ -168,7 +168,8 @@ public class ViewDrawable extends Drawable implements ITechViewDrawable, ITechVi
     */
    protected void activateShrinkExpandFlags() {
       int pw = layEngine.getPw();
-      if (pw < getDw()) {
+      int dw = getDw();
+      if (pw < dw) {
          if (layEngine.hasFlagSizerW(IBOSizer.SIZER_FLAG_2_ALLOW_SHRINK)) {
             setDw(pw);
          }
@@ -181,9 +182,10 @@ public class ViewDrawable extends Drawable implements ITechViewDrawable, ITechVi
          }
       }
       int ph = layEngine.getPh();
-      if (ph < getDh()) {
+      int dh = getDh();
+      if (ph < dh) {
          if (layEngine.hasFlagSizerH(IBOSizer.SIZER_FLAG_2_ALLOW_SHRINK)) {
-            setDw(pw);
+            setDh(ph);
          }
          if (hasFlagGene(FLAG_GENE_30_SHRINKABLE_H)) {
             setDh(ph);
@@ -225,7 +227,7 @@ public class ViewDrawable extends Drawable implements ITechViewDrawable, ITechVi
     */
    private void createViewPaneIfNull() {
       if (viewPane == null) {
-         StyleClass scViewPane = styleClass.getStyleClass(IBOTypesGui.LINK_65_STYLE_VIEWPANE);
+         StyleClass scViewPane = styleClass.getStyleClass(ITechLinks.LINK_65_STYLE_VIEWPANE);
          viewPane = new ViewPane(gc, scViewPane, this);
          //viewPane use the same context
          viewPane.setViewContext(getVC());
@@ -1159,7 +1161,7 @@ public class ViewDrawable extends Drawable implements ITechViewDrawable, ITechVi
          throw new IllegalArgumentException("" + width);
       }
       if (height <= 0) {
-         if (gc.getUCtx().getConfigU().isForceExceptions()) {
+         if (gc.getUC().getConfigU().isForceExceptions()) {
             throw new IllegalArgumentException("" + height);
          } else {
             //#debug
@@ -1741,7 +1743,9 @@ public class ViewDrawable extends Drawable implements ITechViewDrawable, ITechVi
    }
 
    public void rebuild() {
-      viewPane.rebuild();
+      if(viewPane != null) {
+         viewPane.rebuild();
+      }
       super.rebuild();
    }
 
@@ -1827,7 +1831,7 @@ public class ViewDrawable extends Drawable implements ITechViewDrawable, ITechVi
    public void setStyleClass(StyleClass sc) {
       super.setStyleClass(sc);
       if (viewPane != null) {
-         StyleClass scViewPane = styleClass.getStyleClass(IBOTypesGui.LINK_65_STYLE_VIEWPANE);
+         StyleClass scViewPane = styleClass.getStyleClass(ITechLinks.LINK_65_STYLE_VIEWPANE);
          viewPane.setStyleClass(scViewPane);
       }
    }

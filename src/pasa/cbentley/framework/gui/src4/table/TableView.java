@@ -1,7 +1,6 @@
 package pasa.cbentley.framework.gui.src4.table;
 
 import pasa.cbentley.byteobjects.src4.core.ByteObject;
-import pasa.cbentley.byteobjects.src4.ctx.IBOTypesDrw;
 import pasa.cbentley.byteobjects.src4.objects.litteral.LitteralStringOperator;
 import pasa.cbentley.core.src4.event.BusEvent;
 import pasa.cbentley.core.src4.event.IEventConsumer;
@@ -23,6 +22,7 @@ import pasa.cbentley.framework.coreui.src4.utils.ViewState;
 import pasa.cbentley.framework.datamodel.src4.table.ITableModel;
 import pasa.cbentley.framework.datamodel.src4.table.ModelAux;
 import pasa.cbentley.framework.datamodel.src4.table.ObjectTableModel;
+import pasa.cbentley.framework.drawx.src4.ctx.IBOTypesDrawX;
 import pasa.cbentley.framework.drawx.src4.engine.GraphicsX;
 import pasa.cbentley.framework.drawx.src4.factories.FigureOperator;
 import pasa.cbentley.framework.gui.src4.canvas.ExecutionContextGui;
@@ -59,6 +59,7 @@ import pasa.cbentley.framework.gui.src4.table.interfaces.IBOTableSpan;
 import pasa.cbentley.framework.gui.src4.table.interfaces.IBOTableView;
 import pasa.cbentley.framework.gui.src4.table.interfaces.ITechCell;
 import pasa.cbentley.framework.gui.src4.table.interfaces.ITechTable;
+import pasa.cbentley.framework.gui.src4.tech.ITechLinks;
 import pasa.cbentley.framework.gui.src4.tech.ITechStringDrawable;
 import pasa.cbentley.framework.gui.src4.tech.ITechViewPane;
 import pasa.cbentley.framework.gui.src4.utils.DrawableMapper;
@@ -164,7 +165,7 @@ import pasa.cbentley.framework.input.src4.gesture.GestureDetector;
  * TODO Should the Table disable ViewPane on cells? It may indeed do so when it
  * provides a way to further display. It cannot set false to scrolling
  * behavior. It must use its own special flag.
- * The {@link IBOTypesGui#LINK_66_BO_VIEWPANE} and {@link IBOTypesGui#LINK_65_STYLE_VIEWPANE} must be
+ * The {@link ITechLinks#LINK_66_BO_VIEWPANE} and {@link ITechLinks#LINK_65_STYLE_VIEWPANE} must be
  * 
  * The ViewPort cap is decided by flag {@link IBOCellPolicy#CELLP_FLAG_7_OVERSIZE}.
  * When this flag is set and at least one cell is bigger than viewport,
@@ -289,7 +290,7 @@ import pasa.cbentley.framework.input.src4.gesture.GestureDetector;
  * @see ViewDrawable
  * @see IBOCellPolicy
  */
-public class TableView extends ViewDrawable implements IDrawableListener, IEventConsumer, IDrawListener, ITechCell, IBOTypesDrw, IBOCellPolicy, IBOGenetics, IBOTableView, ICommandable, ITechTable {
+public class TableView extends ViewDrawable implements IDrawableListener, IEventConsumer, IDrawListener, ITechCell, IBOTypesDrawX, IBOCellPolicy, IBOGenetics, IBOTableView, ICommandable, ITechTable {
 
    private static final int SETUP_WEAK              = Integer.MIN_VALUE;
 
@@ -611,12 +612,12 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
    }
 
    public TableView(GuiCtx gc, StyleClass sc, ByteObject policyCol, ByteObject policyRow, ITableModel model) {
-      this(gc, sc, gc.getTablePolicyC().getTablePolicy(policyCol, policyRow), model);
+      this(gc, sc, gc.getTablePolicyFactory().getTablePolicy(policyCol, policyRow), model);
    }
 
    /**
     * 
-    * @param sc StyleClass on which {@link IBOTypesGui#TYPE_103_TABLE_TECH} will be fetched
+    * @param sc StyleClass on which {@link IBOTypesGui#TYPE_GUI_02_TABLE} will be fetched
     * @param policyTable TablePolicy
     * @param model when null initialize without a model. that means no data
     */
@@ -631,7 +632,7 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
       setDataModel(model);
       //check nullities and set default values if absent. (
       if (policyTable == null) {
-         policyTable = gc.getTablePolicyC().getMenuSubPolicy();
+         policyTable = gc.getTablePolicyFactory().getMenuSubPolicy();
       }
    }
 
@@ -755,7 +756,7 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
             }
             if (policyTable == null) {
                //when still null, it defaults to one column.
-               policyTable = gc.getTablePolicyC().getMenuSubPolicy();
+               policyTable = gc.getTablePolicyFactory().getMenuSubPolicy();
             }
             initPolicy(policyTable);
          }
@@ -1266,7 +1267,7 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
             dx += getStyleWLeftConsumed();
          }
       }
-      StyleClass titleColStyleClass = styleClass.getStyleClass(IBOTypesGui.LINK_82_STYLE_TABLE_COL_TITLE);
+      StyleClass titleColStyleClass = styleClass.getStyleClass(ITechLinks.LINK_82_STYLE_TABLE_COL_TITLE);
       StringDrawable[] cols = modelCol.titleStringDrawables;
       if (cols == null) {
          return;
@@ -1310,7 +1311,7 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
          }
       }
       int width = d.getDrawnWidth();
-      StyleClass titleRowStyleClass = styleClass.getStyleClass(IBOTypesGui.LINK_83_STYLE_TABLE_ROW_TITLE);
+      StyleClass titleRowStyleClass = styleClass.getStyleClass(ITechLinks.LINK_83_STYLE_TABLE_ROW_TITLE);
       StringDrawable[] rows = modelRow.titleStringDrawables;
       if (rows == null) {
          return;
@@ -2614,11 +2615,8 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
    }
 
    /**
-    * Init to be done before the painting is done.
-    * <br>
-    * <br>
+    * Init to be done before the painting is done.<br>
     * Implemented by subclasses.
-    * <br>
     * @param g
     */
    public void initDataDraw(GraphicsX g) {
@@ -2635,14 +2633,14 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
 
       if (d == modelCol.titlesView) {
          //System.out.println("#TableView#initInject Column Titles addW=" + addW);
-         StyleClass titleColStyleClass = styleClass.getSCNotNull(IBOTypesGui.LINK_82_STYLE_TABLE_COL_TITLE);
+         StyleClass titleColStyleClass = styleClass.getSCNotNull(ITechLinks.LINK_82_STYLE_TABLE_COL_TITLE);
          ByteObject style = titleColStyleClass.getRootStyle();
          int colH = getStyleOp().getStyleFont(style).getHeight() + getStyleHConsumed();
          modelCol.titlesView.setDrawableSize(w, colH, true);
          return true;
       } else if (d == modelRow.titlesView) {
          //System.out.println("#TableView#initInject Row Titles addH=" + addH);
-         StyleClass titleRowStyleClass = styleClass.getSCNotNull(IBOTypesGui.LINK_83_STYLE_TABLE_ROW_TITLE);
+         StyleClass titleRowStyleClass = styleClass.getSCNotNull(ITechLinks.LINK_83_STYLE_TABLE_ROW_TITLE);
          ByteObject style = titleRowStyleClass.getRootStyle();
          int rowW = (getStyleOp().getStyleFont(style).charWidth('9') * 2) + getStyleHConsumed();
          modelRow.titlesView.setDrawableSize(rowW, h, true);
@@ -4494,7 +4492,7 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
          }
          modelCol.setupTitles();
          if (modelCol.titlesView == null) {
-            StyleClass titleColStyleClass = styleClass.getStyleClass(IBOTypesGui.LINK_82_STYLE_TABLE_COL_TITLE);
+            StyleClass titleColStyleClass = styleClass.getStyleClass(ITechLinks.LINK_82_STYLE_TABLE_COL_TITLE);
             //Place Holder to hold Columns..
             //ViewPane will automatically set as parent this one
             DrawableInjected titlesView = new DrawableInjected(gc, titleColStyleClass, this, this);
@@ -4514,7 +4512,7 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
       if (hasTech(T_FLAG_3_SHOW_ROW_TITLE)) {
          modelRow.setupTitles();
          if (modelRow.titlesView == null) {
-            StyleClass titleRowStyleClass = styleClass.getStyleClass(IBOTypesGui.LINK_83_STYLE_TABLE_ROW_TITLE);
+            StyleClass titleRowStyleClass = styleClass.getStyleClass(ITechLinks.LINK_83_STYLE_TABLE_ROW_TITLE);
             DrawableInjected titlesView = new DrawableInjected(gc, titleRowStyleClass, this, this);
             titlesView.toStringSetName("TitleRowsContainer");
             titlesView.setBehaviorFlag(ITechDrawable.BEHAVIOR_23_PARENT_EVENT_CONTROL, true);
@@ -4761,7 +4759,7 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
       sb.append("numTotal (" + numTotalCols + "," + numTotalRows + ")");
 
       toStringModelColRow(sb.newLevel());
-      TablePolicyFactory tablePol = gc.getTablePolicyC();
+      TablePolicyFactory tablePol = gc.getTablePolicyFactory();
       if (policyTable != null) {
          gc.getTableOperator().toStringTablePolicy(policyTable, sb.newLevel());
       } else {
@@ -4947,10 +4945,10 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
    protected void updateStyleClass() {
       //TODO ATTENTION. Model provides a TECH. in which case the tech from the styleClass is never
       // used
-      boTable = styleClass.getByteObject(IBOTypesGui.LINK_80_TECH_TABLE);
+      boTable = styleClass.getByteObject(ITechLinks.LINK_80_BO_TABLEVIEW);
       // take default Tech
       if (boTable == null) {
-         boTable = gc.getTablePolicyC().getBOTableDefault();
+         boTable = gc.getTablePolicyFactory().getBOTableDefault();
       }
       if (hasTechM(T_FLAGM_7_CLOCK_VERTICAL)) {
          setBehaviorFlag(ITechDrawable.BEHAVIOR_29_NAV_CLOCK_VERTICAL, true);
@@ -4958,11 +4956,11 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
       if (hasTechM(T_FLAGM_6_CLOCK_HORIZ)) {
          setBehaviorFlag(ITechDrawable.BEHAVIOR_30_NAV_CLOCK_HORIZONTAL, true);
       }
-      tableCellStyleClass = styleClass.getStyleClass(IBOTypesGui.LINK_81_STYLE_CLASS_TABLE_CELL);
+      tableCellStyleClass = styleClass.getStyleClass(ITechLinks.LINK_81_STYLE_CLASS_TABLE_CELL);
       //style class for mapper
       mapperObjectDrawable.setStyleClass(tableCellStyleClass);
 
-      figureOverlay = styleClass.getByteObject(IBOTypesGui.LINK_84_STYLE_TABLE_OVERLAY_FIGURE);
+      figureOverlay = styleClass.getByteObject(ITechLinks.LINK_84_STYLE_TABLE_OVERLAY_FIGURE);
       emptyBluePrint.setStyleClass(styleClass);
    }
 
@@ -4973,11 +4971,11 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
 
    private void updateTitleStyles() {
       if (modelRow.titlesView != null) {
-         StyleClass titleRowStyleClass = styleClass.getStyleClass(IBOTypesGui.LINK_83_STYLE_TABLE_ROW_TITLE);
+         StyleClass titleRowStyleClass = styleClass.getStyleClass(ITechLinks.LINK_83_STYLE_TABLE_ROW_TITLE);
          modelRow.titlesView.setStyleClass(titleRowStyleClass);
       }
       if (modelCol.titlesView != null) {
-         StyleClass titleRowStyleClass = styleClass.getStyleClass(IBOTypesGui.LINK_82_STYLE_TABLE_COL_TITLE);
+         StyleClass titleRowStyleClass = styleClass.getStyleClass(ITechLinks.LINK_82_STYLE_TABLE_COL_TITLE);
          modelCol.titlesView.setStyleClass(titleRowStyleClass);
       }
    }

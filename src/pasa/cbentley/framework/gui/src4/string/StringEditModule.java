@@ -20,11 +20,11 @@ import pasa.cbentley.framework.gui.src4.ctx.GuiCtx;
 import pasa.cbentley.framework.gui.src4.ctx.IEventsGui;
 import pasa.cbentley.framework.gui.src4.factories.interfaces.IBOStringData;
 import pasa.cbentley.framework.gui.src4.factories.interfaces.IBOStringEdit;
-import pasa.cbentley.framework.gui.src4.ctx.IBOTypesGui;
 import pasa.cbentley.framework.gui.src4.interfaces.IDrawListener;
 import pasa.cbentley.framework.gui.src4.interfaces.IDrawable;
 import pasa.cbentley.framework.gui.src4.interfaces.ITechDrawable;
 import pasa.cbentley.framework.gui.src4.table.TableView;
+import pasa.cbentley.framework.gui.src4.tech.ITechLinks;
 import pasa.cbentley.framework.gui.src4.tech.ITechStringDrawable;
 import pasa.cbentley.powerdata.spec.src4.guicontrols.T9PrefixTrieSearch;
 import pasa.cbentley.powerdata.spec.src4.guicontrols.TrieTranslationSearch;
@@ -212,7 +212,7 @@ public class StringEditModule implements IDrawListener, IBOStringData, IStringab
     */
    public StringEditModule(GuiCtx gc) {
       this.gc = gc;
-      editTech = gc.getDrawableStringFactory().getBOEditNormal();
+      editTech = gc.getDrawableStringFactory().getBOStringEditNormal();
       CMD_SET_EDIT = new MCmd(gc.getCC(), "Edit Mode True");
    }
 
@@ -794,7 +794,7 @@ public class StringEditModule implements IDrawListener, IBOStringData, IStringab
    /**
     * Update to a new {@link StringDrawable}.
     * <br>
-    * Uses the Edit tech {@link IBOTypesGui#LINK_40_TECH_STRING_EDIT} from the {@link StringDrawable} style class.
+    * Uses the Edit tech {@link ITechLinks#LINK_42_BO_STRING_EDIT} from the {@link StringDrawable} style class.
     * <br>
     * Position the caret.
     * 
@@ -804,13 +804,13 @@ public class StringEditModule implements IDrawListener, IBOStringData, IStringab
       stringDrawable = sd;
       StyleClass sc = sd.getStyleClass();
 
-      ByteObject editTech = sc.getByteObject(IBOTypesGui.LINK_40_TECH_STRING_EDIT);
+      ByteObject editTech = sc.getByteObject(ITechLinks.LINK_42_BO_STRING_EDIT);
       if (editTech != null) {
          this.editTech = editTech;
       } else {
-         this.editTech = gc.getDrawableStringFactory().getBOEditNormal();
+         this.editTech = gc.getDrawableStringFactory().getBOStringEditNormal();
       }
-      caretFigure = sc.getByteObject(IBOTypesGui.LINK_42_CARET_FIGURE);
+      caretFigure = sc.getByteObject(ITechLinks.LINK_43_CARET_FIGURE);
       if (caretFigure == null) {
          caretFigure = gc.getStyleManager().getDefaultCaretFigure();
       }
@@ -872,7 +872,7 @@ public class StringEditModule implements IDrawListener, IBOStringData, IStringab
    }
 
    public UCtx toStringGetUCtx() {
-      return gc.getUCtx();
+      return gc.getUC();
    }
    //#enddebug
 }

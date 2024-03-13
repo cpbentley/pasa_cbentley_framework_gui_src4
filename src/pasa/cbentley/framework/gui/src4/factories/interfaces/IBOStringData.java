@@ -13,7 +13,7 @@ import pasa.cbentley.framework.gui.src4.tech.ITechStringDrawable;
 /**
  * Defines
  * 
- * <li> {@link IBOTypesGui#TYPE_124_STRING_TECH} data related options
+ * <li> {@link IBOTypesGui#TYPE_124_STRING_DATA} data related options
  * <li> {@link IBOTypesGui#TYPE_125_STRING_EDIT_TECH} visual/technical options for edition
  * 
  * 
@@ -127,8 +127,8 @@ public interface IBOStringData extends IByteObject {
    public static final int SDATA_OFFSET_05_MAX_SIZE1         = A_OBJECT_BASIC_SIZE + 4;
 
    /**
-    * Defines if the {@link StringDrawable} can be selected or edited.
-    * <br>
+    * Defines whether the {@link StringDrawable} can be selected or edited.
+    * 
     * This is a hardcoded genetic trait. that can be changed on a cloned {@link ByteObject} so as to not
     * changed the trait for other StringDrawable using the byteobject definition.
     * <li> {@link ITechStringDrawable#S_ACTION_MODE_0_READ}

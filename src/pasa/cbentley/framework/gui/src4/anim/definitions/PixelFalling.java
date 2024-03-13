@@ -83,7 +83,7 @@ public class PixelFalling extends ImgAnimable {
    }
 
    public void lifeStart() {
-      r = gc.getUCtx().getRandom();
+      r = gc.getUC().getRandom();
       bw = img.getWidth();
       bh = img.getHeight();
       buffer = new int[bw * bh];

@@ -1228,7 +1228,7 @@ public class CellModel implements IStringable, ITechCell, IBOCellPolicy, ITableU
    }
 
    public UCtx toStringGetUCtx() {
-      return gc.getUCtx();
+      return gc.getUC();
    }
 
    public void toStringHelperFlags(Dctx sb) {

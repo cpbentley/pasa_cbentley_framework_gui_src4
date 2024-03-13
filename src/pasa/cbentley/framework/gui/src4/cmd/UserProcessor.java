@@ -81,7 +81,7 @@ public class UserProcessor implements ITriggers, IStringable {
 
    public UserProcessor(CmdCtx cc) {
       this.cc = cc;
-      allContexts = new IntToObjects(cc.getUCtx());
+      allContexts = new IntToObjects(cc.getUC());
       patternTrigger = new CmdTriggerLive(cc);
    }
 
@@ -605,7 +605,7 @@ public class UserProcessor implements ITriggers, IStringable {
    }
 
    public UCtx toStringGetUCtx() {
-      return cc.getUCtx();
+      return cc.getUC();
    }
 
    //#enddebug

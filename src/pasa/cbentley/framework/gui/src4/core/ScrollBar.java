@@ -29,6 +29,7 @@ import pasa.cbentley.framework.gui.src4.interfaces.IDrawableListener;
 import pasa.cbentley.framework.gui.src4.interfaces.ITechCanvasDrawable;
 import pasa.cbentley.framework.gui.src4.interfaces.ITechDrawable;
 import pasa.cbentley.framework.gui.src4.interfaces.ITechViewDrawable;
+import pasa.cbentley.framework.gui.src4.tech.ITechLinks;
 import pasa.cbentley.framework.gui.src4.tech.ITechViewPane;
 import pasa.cbentley.framework.gui.src4.utils.DrawableUtilz;
 import pasa.cbentley.framework.input.src4.gesture.GestureDetector;
@@ -79,8 +80,8 @@ import pasa.cbentley.layouter.src4.engine.LayoutOperator;
  * <li> It may draws the current state of the scrolling configuration.<br>
  * <br>
  * <br>
- * In Wrapper style, the scrollbar is entirely defined by {@link IBOTypesGui#LINK_53_STYLE_SCROLLBAR_BOT_RIGHT_WRAPPER}
- * and {@link IBOTypesGui#LINK_52_STYLE_SCROLLBAR_TOP_LEFT_WRAPPER}
+ * In Wrapper style, the scrollbar is entirely defined by {@link ITechLinks#LINK_53_STYLE_SCROLLBAR_BOT_RIGHT_WRAPPER}
+ * and {@link ITechLinks#LINK_52_STYLE_SCROLLBAR_TOP_LEFT_WRAPPER}
  * <br>
  * <br>
  * <b>Directional Figures</b> : <br> 
@@ -178,6 +179,8 @@ public class ScrollBar extends Drawable implements IBOScrollBar, IDrawableListen
 
    /**
     * Controls the state of the Scrollbar.
+    * 
+    * Never null
     */
    protected ScrollConfig scrollConfig;
 
@@ -215,33 +218,55 @@ public class ScrollBar extends Drawable implements IBOScrollBar, IDrawableListen
          throw new NullPointerException("Null ViewPane");
       pane = vp;
       ByteObject tech = null;
-      int techid = IBOTypesGui.LINK_68_BO_V_SCROLLBAR;
+      int techid = ITechLinks.LINK_68_BO_V_SCROLLBAR;
       if (horiz) {
-         techid = IBOTypesGui.LINK_69_BO_H_SCROLLBAR;
+         techid = ITechLinks.LINK_69_BO_H_SCROLLBAR;
       }
       //different Tech for horizontal and vertical
       tech = styleClass.getByteObjectNotNull(techid);
-      initScrollbar(tech);
+      a_InitScrollbar(tech);
 
    }
 
    /**
     * {@link StyleClass} with following links
-    * <li> {@link IBOTypesGui#LINK_49_FIG_SCROLLBAR_WRAPPER}
-    * <li> {@link IBOTypesGui#LINK_50_STYLE_SCROLLBAR_BLOCK_BG}
-    * <li> {@link IBOTypesGui#LINK_51_STYLE_SCROLLBAR_BLOCK_FIG}
-    * <li> {@link IBOTypesGui#LINK_52_STYLE_SCROLLBAR_TOP_LEFT_WRAPPER}
-    * <li> {@link IBOTypesGui#LINK_53_STYLE_SCROLLBAR_BOT_RIGHT_WRAPPER}
+    * <li> {@link ITechLinks#LINK_49_FIG_SCROLLBAR_WRAPPER}
+    * <li> {@link ITechLinks#LINK_50_STYLE_SCROLLBAR_BLOCK_BG}
+    * <li> {@link ITechLinks#LINK_51_STYLE_SCROLLBAR_BLOCK_FIG}
+    * <li> {@link ITechLinks#LINK_52_STYLE_SCROLLBAR_TOP_LEFT_WRAPPER}
+    * <li> {@link ITechLinks#LINK_53_STYLE_SCROLLBAR_BOT_RIGHT_WRAPPER}
     * 
-    * <li> {@link IBOTypesGui#LINK_68_BO_V_SCROLLBAR}
-    * <li> {@link IBOTypesGui#LINK_69_BO_H_SCROLLBAR}
+    * <li> {@link ITechLinks#LINK_68_BO_V_SCROLLBAR}
+    * <li> {@link ITechLinks#LINK_69_BO_H_SCROLLBAR}
     * @param gc
     * @param sc
     * @param tech
     */
    public ScrollBar(GuiCtx gc, StyleClass sc, ByteObject tech) {
       super(gc, sc);
-      initScrollbar(tech);
+      a_InitScrollbar(tech);
+   }
+
+   private void a_InitScrollbar(ByteObject boScrollbar) {
+      boScrollbar.checkType(IBOTypesGui.TYPE_GUI_01_SCROLLBAR);
+      setBOScrollbar(boScrollbar); //method checks for null.
+
+      if (hasTechFlag(SB_FLAG_1_VERT)) {
+         setBehaviorFlag(ITechDrawable.BEHAVIOR_26_NAV_VERTICAL, true);
+      } else {
+         setBehaviorFlag(ITechDrawable.BEHAVIOR_27_NAV_HORIZONTAL, true);
+      }
+      scrollConfig = new ScrollConfig(gc);
+      scrollConfig.scrollMoveType = boScrollbar.get1(SB_OFFSET_07_SCROLL_TYPES1);
+      styleValidate();
+      if (style == null) {
+         throw new NullPointerException("Null Style");
+      }
+      //debug
+      toStringSetName("Scrollbar " + (hasTechFlag(SB_FLAG_1_VERT) ? "Vertical" : "Horizontal"));
+
+      //#debug
+      toDLog().pInit(toStringGetName()+ " ", this, ScrollBar.class, "Created@268", LVL_05_FINE, true);
    }
 
    protected void actionUnselectTopBot(InputConfig ic) {
@@ -317,7 +342,7 @@ public class ScrollBar extends Drawable implements IBOScrollBar, IDrawableListen
     * @param wrapperH
     */
    private void createWrapperDef() {
-      StyleClass sc = styleClass.getStyleClass(IBOTypesGui.LINK_52_STYLE_SCROLLBAR_TOP_LEFT_WRAPPER);
+      StyleClass sc = styleClass.getStyleClass(ITechLinks.LINK_52_STYLE_SCROLLBAR_TOP_LEFT_WRAPPER);
       if (sc != null) {
          createWrapperTwo();
       } else {
@@ -331,7 +356,7 @@ public class ScrollBar extends Drawable implements IBOScrollBar, IDrawableListen
    private void createWrapperDefSingle() {
       DrwCtx dc = gc.getDC();
       //gets figure definition and take its direction type
-      ByteObject fig = styleClass.getByteObject(IBOTypesGui.LINK_49_FIG_SCROLLBAR_WRAPPER);
+      ByteObject fig = styleClass.getByteObject(ITechLinks.LINK_49_FIG_SCROLLBAR_WRAPPER);
       FigureFactory figFac = dc.getFigureFactory();
       GradientFactory gradFac = dc.getGradientFactory();
       if (fig == null) {
@@ -343,7 +368,7 @@ public class ScrollBar extends Drawable implements IBOScrollBar, IDrawableListen
 
       int dirTopLeft = (hasTechFlag(SB_FLAG_1_VERT) ? C.DIR_0_TOP : C.DIR_2_LEFT);
       ByteObject topLeftFig = figOp.cloneFigDirectionanl(fig, dirTopLeft);
-      StyleClass scTopLeft = styleClass.getSCNotNull(IBOTypesGui.LINK_52_STYLE_SCROLLBAR_TOP_LEFT_WRAPPER);
+      StyleClass scTopLeft = styleClass.getSCNotNull(ITechLinks.LINK_52_STYLE_SCROLLBAR_TOP_LEFT_WRAPPER);
       topLeftFigure = new FigDrawable(gc, scTopLeft, topLeftFig);
       topLeftFigure.setParent(this);
       topLeftFigure.setBehaviorFlag(ITechDrawable.BEHAVIOR_23_PARENT_EVENT_CONTROL, true);
@@ -351,7 +376,7 @@ public class ScrollBar extends Drawable implements IBOScrollBar, IDrawableListen
       int dirBotRight = (hasTechFlag(SB_FLAG_1_VERT) ? C.DIR_1_BOTTOM : C.DIR_3_RIGHT);
       ByteObject botRightFig = figOp.cloneFigDirectionanl(fig, dirBotRight);
 
-      StyleClass scBotRight = styleClass.getSCNotNull(IBOTypesGui.LINK_53_STYLE_SCROLLBAR_BOT_RIGHT_WRAPPER);
+      StyleClass scBotRight = styleClass.getSCNotNull(ITechLinks.LINK_53_STYLE_SCROLLBAR_BOT_RIGHT_WRAPPER);
       botRightFigure = new FigDrawable(gc, scBotRight, botRightFig);
       botRightFigure.setParent(this);
       botRightFigure.setBehaviorFlag(ITechDrawable.BEHAVIOR_23_PARENT_EVENT_CONTROL, true);
@@ -361,16 +386,11 @@ public class ScrollBar extends Drawable implements IBOScrollBar, IDrawableListen
       botRightFigure.toStringSetName("Fig" + (hasTechFlag(SB_FLAG_1_VERT) ? "Bottom" : "Right"));
    }
 
-   public StyleClass getStyleClassForChildren() {
-
-      return this.styleClass;
-   }
-
    private void createWrappers() {
       DrwCtx dc = gc.getDC();
       //gets figure definition and take its direction type
       StyleClass src = getStyleClassForChildren();
-      ByteObject fig = src.getByteObject(IBOTypesGui.LINK_49_FIG_SCROLLBAR_WRAPPER);
+      ByteObject fig = src.getByteObject(ITechLinks.LINK_49_FIG_SCROLLBAR_WRAPPER);
       FigureFactory figFac = dc.getFigureFactory();
       GradientFactory gradFac = dc.getGradientFactory();
       ByteObject topLeftFig = null;
@@ -387,12 +407,12 @@ public class ScrollBar extends Drawable implements IBOScrollBar, IDrawableListen
          botRightFig = figOp.cloneFigDirectionanl(fig, dirBotRight);
       }
 
-      StyleClass scLeft = src.getStyleClass(IBOTypesGui.LINK_52_STYLE_SCROLLBAR_TOP_LEFT_WRAPPER);
+      StyleClass scLeft = src.getStyleClass(ITechLinks.LINK_52_STYLE_SCROLLBAR_TOP_LEFT_WRAPPER);
       topLeftFigure = new FigDrawable(gc, scLeft, topLeftFig);
       topLeftFigure.setParent(this);
       topLeftFigure.setBehaviorFlag(ITechDrawable.BEHAVIOR_23_PARENT_EVENT_CONTROL, true);
 
-      StyleClass scRight = src.getStyleClass(IBOTypesGui.LINK_53_STYLE_SCROLLBAR_BOT_RIGHT_WRAPPER);
+      StyleClass scRight = src.getStyleClass(ITechLinks.LINK_53_STYLE_SCROLLBAR_BOT_RIGHT_WRAPPER);
       botRightFigure = new FigDrawable(gc, scRight, botRightFig);
       botRightFigure.setParent(this);
       botRightFigure.setBehaviorFlag(ITechDrawable.BEHAVIOR_23_PARENT_EVENT_CONTROL, true);
@@ -407,20 +427,29 @@ public class ScrollBar extends Drawable implements IBOScrollBar, IDrawableListen
     * One style class for each type of wrapper.
     */
    private void createWrapperTwo() {
-      StyleClass scLeft = styleClass.getStyleClass(IBOTypesGui.LINK_52_STYLE_SCROLLBAR_TOP_LEFT_WRAPPER);
+      StyleClass scLeft = styleClass.getStyleClass(ITechLinks.LINK_52_STYLE_SCROLLBAR_TOP_LEFT_WRAPPER);
       topLeftFigure = new Drawable(gc, scLeft);
       topLeftFigure.setParent(this);
       topLeftFigure.setBehaviorFlag(ITechDrawable.BEHAVIOR_23_PARENT_EVENT_CONTROL, true);
       //debug
       topLeftFigure.toStringSetName("Fig" + (hasTechFlag(SB_FLAG_1_VERT) ? "Top" : "Left"));
 
-      StyleClass scRight = styleClass.getStyleClass(IBOTypesGui.LINK_53_STYLE_SCROLLBAR_BOT_RIGHT_WRAPPER);
+      StyleClass scRight = styleClass.getStyleClass(ITechLinks.LINK_53_STYLE_SCROLLBAR_BOT_RIGHT_WRAPPER);
       botRightFigure = new Drawable(gc, scRight);
       botRightFigure.setParent(this);
       botRightFigure.setBehaviorFlag(ITechDrawable.BEHAVIOR_23_PARENT_EVENT_CONTROL, true);
 
       //debug
       botRightFigure.toStringSetName("Fig" + (hasTechFlag(SB_FLAG_1_VERT) ? "Bottom" : "Right"));
+   }
+
+   private void doUpdateBlockXYWH() {
+      //we work on number of pixels used by background figure
+      if (hasTechFlag(SB_FLAG_1_VERT)) {
+         doUpdateBlockXYWHVert();
+      } else {
+         doUpdateBlockXYWHHoriz();
+      }
    }
 
    private void doUpdateBlockXYWHHoriz() {
@@ -542,15 +571,6 @@ public class ScrollBar extends Drawable implements IBOScrollBar, IDrawableListen
       }
 
       doUpdateBlockXYWH();
-   }
-
-   private void doUpdateBlockXYWH() {
-      //we work on number of pixels used by background figure
-      if (hasTechFlag(SB_FLAG_1_VERT)) {
-         doUpdateBlockXYWHVert();
-      } else {
-         doUpdateBlockXYWHHoriz();
-      }
    }
 
    /**
@@ -683,14 +703,12 @@ public class ScrollBar extends Drawable implements IBOScrollBar, IDrawableListen
    }
 
    public ScrollConfig getConfig() {
-      return scrollConfig;
-   }
-
-   public void setScrollConfig(ScrollConfig scrollConfig) {
-      if (scrollConfig == null) {
+      //#mdebug
+      if(scrollConfig == null) {
          throw new NullPointerException();
       }
-      this.scrollConfig = scrollConfig;
+      //#enddebug
+      return scrollConfig;
    }
 
    /**
@@ -712,6 +730,23 @@ public class ScrollBar extends Drawable implements IBOScrollBar, IDrawableListen
          size += getStyleHConsumed();
       }
       return size;
+   }
+
+   public int getSbSpaceConsumedHorizLeft() {
+      if (hasBehavior(ITechDrawable.BEHAVIOR_16_IMMATERIAL)) {
+         return 0;
+      }
+      if (hasTechFlag(SB_FLAG_3_WRAPPER)) {
+         if (isHorizontal()) {
+            return (getBOSize2nd() + this.getStyleWConsumed());
+         }
+      } else {
+         //block type of scrollbar. then vertical scrollbar will consume
+         if (hasTechFlag(SB_FLAG_1_VERT)) {
+            return getMainSize();
+         }
+      }
+      return 0;
    }
 
    /**
@@ -741,25 +776,21 @@ public class ScrollBar extends Drawable implements IBOScrollBar, IDrawableListen
       return 0;
    }
 
-   public int getSbSpaceConsumedHorizLeft() {
+   public int getSbSpaceConsumedVertMax() {
       if (hasBehavior(ITechDrawable.BEHAVIOR_16_IMMATERIAL)) {
          return 0;
       }
       if (hasTechFlag(SB_FLAG_3_WRAPPER)) {
-         if (isHorizontal()) {
-            return (getBOSize2nd() + this.getStyleWConsumed());
+         if (hasTechFlag(SB_FLAG_1_VERT)) {
+            return 2 * (getBOSize2nd() + this.getStyleHConsumed());
          }
       } else {
          //block type of scrollbar. then vertical scrollbar will consume
-         if (hasTechFlag(SB_FLAG_1_VERT)) {
+         if (!hasTechFlag(SB_FLAG_1_VERT)) {
             return getMainSize();
          }
       }
       return 0;
-   }
-
-   public boolean isHorizontal() {
-      return !hasTechFlag(SB_FLAG_1_VERT);
    }
 
    /**
@@ -786,23 +817,6 @@ public class ScrollBar extends Drawable implements IBOScrollBar, IDrawableListen
       return 0;
    }
 
-   public int getSbSpaceConsumedVertMax() {
-      if (hasBehavior(ITechDrawable.BEHAVIOR_16_IMMATERIAL)) {
-         return 0;
-      }
-      if (hasTechFlag(SB_FLAG_3_WRAPPER)) {
-         if (hasTechFlag(SB_FLAG_1_VERT)) {
-            return 2 * (getBOSize2nd() + this.getStyleHConsumed());
-         }
-      } else {
-         //block type of scrollbar. then vertical scrollbar will consume
-         if (!hasTechFlag(SB_FLAG_1_VERT)) {
-            return getMainSize();
-         }
-      }
-      return 0;
-   }
-   
    public int getSbSpaceConsumedVertTop() {
       if (hasBehavior(ITechDrawable.BEHAVIOR_16_IMMATERIAL)) {
          return 0;
@@ -818,6 +832,91 @@ public class ScrollBar extends Drawable implements IBOScrollBar, IDrawableListen
          }
       }
       return 0;
+   }
+
+   /**
+    * Width pixels consumed on the left of the box.
+    * 
+    * <li>For wrappers, its the width of the left wrapper
+    * <li>For block scrollbars, its the main size when vertical and reversed (i.e. drawn at the top)
+    * 
+    * @return
+    */
+   public int getShiftXLeft() {
+      if (hasTechFlag(SB_FLAG_3_WRAPPER)) {
+         if (!hasTechFlag(SB_FLAG_1_VERT)) {
+            return getWrapperLeftRightWidth() + this.getStyleWConsumed();
+         }
+      } else {
+         //block
+         if (hasTechFlag(SB_FLAG_1_VERT) && hasTechFlag(SB_FLAG_6_BLOCK_INVERSE)) {
+            return getMainSize();
+         }
+      }
+      return 0;
+   }
+   
+   public int getShiftXRight() {
+      if (hasTechFlag(SB_FLAG_3_WRAPPER)) {
+         if (!hasTechFlag(SB_FLAG_1_VERT)) {
+            return getWrapperLeftRightWidth() + this.getStyleWConsumed();
+         }
+      } else {
+         //block
+         if (hasTechFlag(SB_FLAG_1_VERT) && !hasTechFlag(SB_FLAG_6_BLOCK_INVERSE)) {
+            return getMainSize();
+         }
+      }
+      return 0;
+   }
+
+   /**
+    * Height pixels consumed at the bottom of the box.
+    * 
+    * <li>For wrappers, its the size of the top wrapper
+    * <li>For block scrollbars, its the main size when horizontal and reversed (i.e. drawn at the top)
+    * 
+    * @return
+    */
+   public int getShiftYBot() {
+      if (hasTechFlag(SB_FLAG_3_WRAPPER)) {
+         if (hasTechFlag(SB_FLAG_1_VERT)) {
+            return getWrapperTopBotHeight() + this.getStyleHConsumed();
+         }
+      } else {
+         //block
+         if (!hasTechFlag(SB_FLAG_1_VERT) && !hasTechFlag(SB_FLAG_6_BLOCK_INVERSE)) {
+            return getMainSize();
+         }
+      }
+      return 0;
+   }
+
+   /**
+    * Height pixels consumed at the top of the box.
+    * 
+    * <li>For wrappers, its the size of the top wrapper
+    * <li>For block scrollbars, its the main size when horizontal and reversed (i.e. drawn at the top)
+    * 
+    * @return
+    */
+   public int getShiftYTop() {
+      if (hasTechFlag(SB_FLAG_3_WRAPPER)) {
+         if (hasTechFlag(SB_FLAG_1_VERT)) {
+            return getWrapperTopBotHeight() + this.getStyleHConsumed();
+         }
+      } else {
+         //block
+         if (!hasTechFlag(SB_FLAG_1_VERT) && hasTechFlag(SB_FLAG_6_BLOCK_INVERSE)) {
+            return getMainSize();
+         }
+      }
+      return 0;
+   }
+
+   public StyleClass getStyleClassForChildren() {
+
+      return this.styleClass;
    }
 
    /**
@@ -885,86 +984,6 @@ public class ScrollBar extends Drawable implements IBOScrollBar, IDrawableListen
 
    public int getWrapperTopBotWidthStyled() {
       return getWrapperTopBotWidth() + getStyleWConsumed();
-   }
-
-   /**
-    * Width pixels consumed on the left of the box.
-    * 
-    * <li>For wrappers, its the width of the left wrapper
-    * <li>For block scrollbars, its the main size when vertical and reversed (i.e. drawn at the top)
-    * 
-    * @return
-    */
-   public int getShiftXLeft() {
-      if (hasTechFlag(SB_FLAG_3_WRAPPER)) {
-         if (!hasTechFlag(SB_FLAG_1_VERT)) {
-            return getWrapperLeftRightWidth() + this.getStyleWConsumed();
-         }
-      } else {
-         //block
-         if (hasTechFlag(SB_FLAG_1_VERT) && hasTechFlag(SB_FLAG_6_BLOCK_INVERSE)) {
-            return getMainSize();
-         }
-      }
-      return 0;
-   }
-
-   public int getShiftXRight() {
-      if (hasTechFlag(SB_FLAG_3_WRAPPER)) {
-         if (!hasTechFlag(SB_FLAG_1_VERT)) {
-            return getWrapperLeftRightWidth() + this.getStyleWConsumed();
-         }
-      } else {
-         //block
-         if (hasTechFlag(SB_FLAG_1_VERT) && !hasTechFlag(SB_FLAG_6_BLOCK_INVERSE)) {
-            return getMainSize();
-         }
-      }
-      return 0;
-   }
-
-   /**
-    * Height pixels consumed at the bottom of the box.
-    * 
-    * <li>For wrappers, its the size of the top wrapper
-    * <li>For block scrollbars, its the main size when horizontal and reversed (i.e. drawn at the top)
-    * 
-    * @return
-    */
-   public int getShiftYBot() {
-      if (hasTechFlag(SB_FLAG_3_WRAPPER)) {
-         if (hasTechFlag(SB_FLAG_1_VERT)) {
-            return getWrapperTopBotHeight() + this.getStyleHConsumed();
-         }
-      } else {
-         //block
-         if (!hasTechFlag(SB_FLAG_1_VERT) && !hasTechFlag(SB_FLAG_6_BLOCK_INVERSE)) {
-            return getMainSize();
-         }
-      }
-      return 0;
-   }
-
-   /**
-    * Height pixels consumed at the top of the box.
-    * 
-    * <li>For wrappers, its the size of the top wrapper
-    * <li>For block scrollbars, its the main size when horizontal and reversed (i.e. drawn at the top)
-    * 
-    * @return
-    */
-   public int getShiftYTop() {
-      if (hasTechFlag(SB_FLAG_3_WRAPPER)) {
-         if (hasTechFlag(SB_FLAG_1_VERT)) {
-            return getWrapperTopBotHeight() + this.getStyleHConsumed();
-         }
-      } else {
-         //block
-         if (!hasTechFlag(SB_FLAG_1_VERT) && hasTechFlag(SB_FLAG_6_BLOCK_INVERSE)) {
-            return getMainSize();
-         }
-      }
-      return 0;
    }
 
    public boolean hasTechFlag(int flag) {
@@ -1037,83 +1056,6 @@ public class ScrollBar extends Drawable implements IBOScrollBar, IDrawableListen
 
       }
       setStateFlag(ITechDrawable.STATE_05_LAYOUTED, true);
-   }
-
-   private void initSizeSBBlock(int width, int height) {
-      //
-      int size = getMainSize();
-      //the usual scrollbar
-      if (hasTechFlag(SB_FLAG_1_VERT)) {
-         this.setDh(height);
-         this.setDw(size);
-      } else {
-         this.setDw(width);
-         this.setDh(size);
-      }
-
-      if (hasTechFlag(SB_FLAG_1_VERT)) {
-         numPixelsForBlock = boundaryBoxH - this.getStyleHConsumed();
-      } else {
-         numPixelsForBlock = boundaryBoxW - this.getStyleWConsumed();
-      }
-      if (hasTechFlag(SB_FLAG_5_ARROW_ON_BLOC)) {
-         //here we init the 
-         initSizeWrapper();
-
-         if (hasTechFlag(SB_FLAG_1_VERT)) {
-            int tbH = getWrapperTopBotHeight();
-            numPixelsForBlock -= (2 * tbH);
-         } else {
-            int lrW = getWrapperLeftRightWidth();
-            numPixelsForBlock -= (2 * lrW);
-         }
-      }
-
-      //init the block bg figure
-      if (blockBgFigure != null) {
-         int size3 = getBOSize3rd();
-         if (hasTechFlag(SB_FLAG_1_VERT)) {
-            blockBgFigure.setSizePixels(size3, numPixelsForBlock);
-         } else {
-            blockBgFigure.setSizePixels(numPixelsForBlock, size3);
-         }
-      }
-      //the block figure
-   }
-
-   private void initSizeSBWrapper(int width, int height) {
-      if (hasTechFlag(SB_FLAG_4_WRAPPER_FILL)) {
-         setDw(width);
-         setDh(height);
-      } else {
-         int s2ndSize = getBOSize2nd();
-         int s1stSize = getBOSize1st();
-         if (hasTechFlag(SB_FLAG_1_VERT)) {
-            this.setDw(s1stSize + this.getStyleWConsumed());
-            this.setDh(height);
-         } else {
-            this.setDw(width);
-            this.setDh(s1stSize + this.getStyleHConsumed());
-         }
-
-         ///TODO hole management
-         setStateFlag(ITechDrawable.STATE_24_HOLED, true);
-         holes = new int[4];
-         //only with overlay.. let ViewPane query this and decide what to do
-         if (hasTechFlag(SB_FLAG_1_VERT)) {
-            holes[ITechDrawable.HOLE_0_X] = getX();
-            holes[ITechDrawable.HOLE_1_Y] = getY() + s2ndSize;
-            holes[ITechDrawable.HOLE_2_W] = getWrapperTopBotWidth();
-            holes[ITechDrawable.HOLE_3_H] = boundaryBoxH - (2 * s2ndSize);
-         } else {
-            holes[ITechDrawable.HOLE_0_X] = getX() + s2ndSize;
-            holes[ITechDrawable.HOLE_1_Y] = getY();
-            holes[ITechDrawable.HOLE_2_W] = boundaryBoxW - (2 * s2ndSize);
-            holes[ITechDrawable.HOLE_3_H] = getWrapperLeftRightHeight();
-         }
-      }
-
-      initSizeWrapper();
    }
 
    private void initBlock(int x, int y, int w, int h) {
@@ -1250,26 +1192,81 @@ public class ScrollBar extends Drawable implements IBOScrollBar, IDrawableListen
       botRightFigure.setXY(cx, cy);
    }
 
-   private void initScrollbar(ByteObject boScrollbar) {
-      boScrollbar.checkType(IBOTypesGui.TYPE_102_SCROLLBAR_TECH);
-      setBOScrollbar(boScrollbar); //method checks for null.
+   private void initSizeSBBlock(int width, int height) {
+      //
+      int size = getMainSize();
+      //the usual scrollbar
+      if (hasTechFlag(SB_FLAG_1_VERT)) {
+         this.setDh(height);
+         this.setDw(size);
+      } else {
+         this.setDw(width);
+         this.setDh(size);
+      }
 
       if (hasTechFlag(SB_FLAG_1_VERT)) {
-         setBehaviorFlag(ITechDrawable.BEHAVIOR_26_NAV_VERTICAL, true);
+         numPixelsForBlock = boundaryBoxH - this.getStyleHConsumed();
       } else {
-         setBehaviorFlag(ITechDrawable.BEHAVIOR_27_NAV_HORIZONTAL, true);
+         numPixelsForBlock = boundaryBoxW - this.getStyleWConsumed();
       }
-      scrollConfig = new ScrollConfig(gc);
-      scrollConfig.scrollMoveType = boScrollbar.get1(SB_OFFSET_07_SCROLL_TYPES1);
-      styleValidate();
-      if (style == null) {
-         throw new NullPointerException("Null Style");
-      }
-      //debug
-      toStringSetName("Scrollbar " + (hasTechFlag(SB_FLAG_1_VERT) ? "Vertical" : "Horizontal"));
+      if (hasTechFlag(SB_FLAG_5_ARROW_ON_BLOC)) {
+         //here we init the 
+         initSizeWrapper();
 
-      //#debug
-      toDLog().pInit("Created in constructor", this, ScrollBar.class, "initScrollbar", LVL_05_FINE, true);
+         if (hasTechFlag(SB_FLAG_1_VERT)) {
+            int tbH = getWrapperTopBotHeight();
+            numPixelsForBlock -= (2 * tbH);
+         } else {
+            int lrW = getWrapperLeftRightWidth();
+            numPixelsForBlock -= (2 * lrW);
+         }
+      }
+
+      //init the block bg figure
+      if (blockBgFigure != null) {
+         int size3 = getBOSize3rd();
+         if (hasTechFlag(SB_FLAG_1_VERT)) {
+            blockBgFigure.setSizePixels(size3, numPixelsForBlock);
+         } else {
+            blockBgFigure.setSizePixels(numPixelsForBlock, size3);
+         }
+      }
+      //the block figure
+   }
+
+   private void initSizeSBWrapper(int width, int height) {
+      if (hasTechFlag(SB_FLAG_4_WRAPPER_FILL)) {
+         setDw(width);
+         setDh(height);
+      } else {
+         int s2ndSize = getBOSize2nd();
+         int s1stSize = getBOSize1st();
+         if (hasTechFlag(SB_FLAG_1_VERT)) {
+            this.setDw(s1stSize + this.getStyleWConsumed());
+            this.setDh(height);
+         } else {
+            this.setDw(width);
+            this.setDh(s1stSize + this.getStyleHConsumed());
+         }
+
+         ///TODO hole management
+         setStateFlag(ITechDrawable.STATE_24_HOLED, true);
+         holes = new int[4];
+         //only with overlay.. let ViewPane query this and decide what to do
+         if (hasTechFlag(SB_FLAG_1_VERT)) {
+            holes[ITechDrawable.HOLE_0_X] = getX();
+            holes[ITechDrawable.HOLE_1_Y] = getY() + s2ndSize;
+            holes[ITechDrawable.HOLE_2_W] = getWrapperTopBotWidth();
+            holes[ITechDrawable.HOLE_3_H] = boundaryBoxH - (2 * s2ndSize);
+         } else {
+            holes[ITechDrawable.HOLE_0_X] = getX() + s2ndSize;
+            holes[ITechDrawable.HOLE_1_Y] = getY();
+            holes[ITechDrawable.HOLE_2_W] = boundaryBoxW - (2 * s2ndSize);
+            holes[ITechDrawable.HOLE_3_H] = getWrapperLeftRightHeight();
+         }
+      }
+
+      initSizeWrapper();
    }
 
    /**
@@ -1290,6 +1287,10 @@ public class ScrollBar extends Drawable implements IBOScrollBar, IDrawableListen
          topLeftFigure.setSizePixels(lrCW, lrCH);
          botRightFigure.setSizePixels(lrCW, lrCH);
       }
+   }
+
+   public boolean isHorizontal() {
+      return !hasTechFlag(SB_FLAG_1_VERT);
    }
 
    protected void manageBlockBgPointerEvent(InputConfig ic) {
@@ -1703,7 +1704,7 @@ public class ScrollBar extends Drawable implements IBOScrollBar, IDrawableListen
          //linked parameter of Tech has the StyleDef
          createWrappers();
       } else {
-         StyleClass bkey = styleClass.getStyleClass(IBOTypesGui.LINK_51_STYLE_SCROLLBAR_BLOCK_FIG);
+         StyleClass bkey = styleClass.getStyleClass(ITechLinks.LINK_51_STYLE_SCROLLBAR_BLOCK_FIG);
          if (bkey != null) {
             //there is at least a block
             blockFigure = new Drawable(gc, bkey);
@@ -1711,7 +1712,7 @@ public class ScrollBar extends Drawable implements IBOScrollBar, IDrawableListen
             blockFigure.setBehaviorFlag(ITechDrawable.BEHAVIOR_23_PARENT_EVENT_CONTROL, true);
             blockFigure.toStringSetName("BlockFigure");
             //check if there is a special background
-            StyleClass key = styleClass.getStyleClass(IBOTypesGui.LINK_50_STYLE_SCROLLBAR_BLOCK_BG);
+            StyleClass key = styleClass.getStyleClass(ITechLinks.LINK_50_STYLE_SCROLLBAR_BLOCK_BG);
             blockBgFigure = new Drawable(gc, key);
             blockBgFigure.setParent(this);
             blockBgFigure.setBehaviorFlag(ITechDrawable.BEHAVIOR_23_PARENT_EVENT_CONTROL, true);
@@ -1746,6 +1747,13 @@ public class ScrollBar extends Drawable implements IBOScrollBar, IDrawableListen
       toDLog().pFlow(x + "," + y, this, ScrollBar.class, "setMyXY", LVL_05_FINE, true);
       this.setX(x);
       this.setY(y);
+   }
+
+   public void setScrollConfig(ScrollConfig scrollConfig) {
+      if (scrollConfig == null) {
+         throw new NullPointerException();
+      }
+      this.scrollConfig = scrollConfig;
    }
 
    /**

@@ -1,10 +1,8 @@
 package pasa.cbentley.framework.gui.src4.string;
 
 import pasa.cbentley.byteobjects.src4.core.ByteObject;
-import pasa.cbentley.core.src4.ctx.UCtx;
 import pasa.cbentley.core.src4.interfaces.C;
 import pasa.cbentley.core.src4.logging.Dctx;
-import pasa.cbentley.core.src4.logging.IDLog;
 import pasa.cbentley.core.src4.utils.interfaces.IColors;
 import pasa.cbentley.framework.cmd.src4.engine.CmdNode;
 import pasa.cbentley.framework.coredraw.src4.interfaces.IMFont;
@@ -17,11 +15,11 @@ import pasa.cbentley.framework.gui.src4.core.Drawable;
 import pasa.cbentley.framework.gui.src4.core.ScrollBar;
 import pasa.cbentley.framework.gui.src4.core.StyleClass;
 import pasa.cbentley.framework.gui.src4.ctx.GuiCtx;
-import pasa.cbentley.framework.gui.src4.ctx.IBOTypesGui;
 import pasa.cbentley.framework.gui.src4.factories.TablePolicyFactory;
 import pasa.cbentley.framework.gui.src4.interfaces.ITechDrawable;
 import pasa.cbentley.framework.gui.src4.table.TableView;
 import pasa.cbentley.framework.gui.src4.table.interfaces.ITechTable;
+import pasa.cbentley.framework.gui.src4.tech.ITechLinks;
 import pasa.cbentley.framework.gui.src4.tech.ITechViewPane;
 
 /**
@@ -91,7 +89,7 @@ public class SymbolTable extends TableView {
     * @param sc
     */
    public SymbolTable(GuiCtx gc, StyleClass sc) {
-      super(gc, sc, gc.getTablePolicyC().createTableFlowHorizPrefContent());
+      super(gc, sc, gc.getTablePolicyFactory().createTableFlowHorizPrefContent());
       techSymbol = styleClass.getByteObject(TECH_ID_CHAR_TABLE);
 
       CmdNode ctx = gc.getCC().createCmdNode("Symbols");
@@ -100,7 +98,7 @@ public class SymbolTable extends TableView {
       //create model
       IMFont f = getStyleOp().getStyleFont(style);
 
-      StyleClass scCell = sc.getStyleClass(IBOTypesGui.LINK_81_STYLE_CLASS_TABLE_CELL);
+      StyleClass scCell = sc.getStyleClass(ITechLinks.LINK_81_STYLE_CLASS_TABLE_CELL);
 
       base = new Drawable(gc, scCell);
       //init with font sizer ctx
@@ -116,7 +114,7 @@ public class SymbolTable extends TableView {
 
       StyleClass scHeader = styleClass.getStyleClass(LINK_HEADER_STYLE);
 
-      updateCharArray();
+      doUpdateCharArray();
       trailer = new StringDrawable(gc, scHeader, "");
 
       headerTopTitle = new StringDrawable(gc, scHeader, "Table of Symbols");
@@ -134,7 +132,7 @@ public class SymbolTable extends TableView {
          currentPlaneIndex = SymbolUtils.planes.length - 1;
       }
       currentPlane = SymbolUtils.planes[currentPlaneIndex];
-      updateCharArray();
+      doUpdateCharArray();
       ic.srActionDoneRepaint(this);
    }
 
@@ -145,14 +143,43 @@ public class SymbolTable extends TableView {
          currentPlaneIndex = 0;
       }
       currentPlane = SymbolUtils.planes[currentPlaneIndex];
-      updateCharArray();
+      doUpdateCharArray();
       ic.srActionDoneRepaint(this);
    }
 
    protected void cmdToggleFiltering(InputConfig ic) {
       isFiltering = !isFiltering;
-      updateCharArray();
+      doUpdateCharArray();
       ic.srActionDoneRepaint(this);
+   }
+
+   /**
+    * Depending on plane, special + custom chars
+    * <br>
+    * <br>
+    * 
+    */
+   public void doUpdateCharArray() {
+      myChars = SymbolUtils.getPlaneChars(currentPlane, isFiltering);
+      if (selectedIndex >= myChars.length) {
+         selectedIndex = myChars.length - 1;
+      }
+      doUpdateHeader();
+   }
+
+   /**
+    * Request {@link ScreenResult} to repaint header {@link Drawable}.
+    * <br>
+    * <br>
+    * @param sr
+    */
+   public void doUpdateHeader() {
+      char c = getSelectedChar();
+      String update = c + " p:" + ((c >> 8) & 0xFF) + " :" + (c & 0xFF);
+      if (headerBotTitle != null) {
+         headerBotTitle.setStringNoUpdate(update);
+         headerBotTitle.layoutInvalidate(true);
+      }
    }
 
    /**
@@ -301,8 +328,8 @@ public class SymbolTable extends TableView {
          this.selectedIndexPrevious = getSelectedIndexPrevious();
          this.selectedIndex = selectedIndex;
       }
-      updateCharArray();
-      updateHeader();
+      doUpdateCharArray();
+      doUpdateHeader();
 
       //#debug
       toDLog().pEvent("selectedIndex=" + selectedIndex, this, SymbolTable.class, "selectionMoveEvent", LVL_05_FINE, true);
@@ -311,67 +338,22 @@ public class SymbolTable extends TableView {
    }
 
    //#mdebug
-   public IDLog toDLog() {
-      return toStringGetUCtx().toDLog();
-   }
-
-   public String toString() {
-      return Dctx.toString(this);
-   }
-
    public void toString(Dctx dc) {
-      dc.root(this, "SymbolTable");
+      dc.root(this, SymbolTable.class, 320);
       toStringPrivate(dc);
-      dc.append(" selectedIndex=" + selectedIndex + " size=" + getSize());
-      dc.append(gc.getTableOperator().toStringModelGenetics(modelGenetics, ""));
-
-   }
-
-   public String toString1Line() {
-      return Dctx.toString1Line(this);
+      super.toString(dc.sup());
+      dc.nlLvl(modelGenetics, "modelGenetics");
    }
 
    public void toString1Line(Dctx dc) {
-      dc.root1Line(this, "SymbolTable");
+      dc.root1Line(this, SymbolTable.class);
       toStringPrivate(dc);
-   }
-
-   public UCtx toStringGetUCtx() {
-      return gc.getUCtx();
+      super.toString1Line(dc.sup1Line());
    }
 
    private void toStringPrivate(Dctx dc) {
-
+      dc.appendVarWithSpace("selectedIndex", selectedIndex);
+      dc.appendVarWithSpace("size", getSize());
    }
-
    //#enddebug
-
-   /**
-    * Depending on plane, special + custom chars
-    * <br>
-    * <br>
-    * 
-    */
-   public void updateCharArray() {
-      myChars = SymbolUtils.getPlaneChars(currentPlane, isFiltering);
-      if (selectedIndex >= myChars.length) {
-         selectedIndex = myChars.length - 1;
-      }
-      updateHeader();
-   }
-
-   /**
-    * Request {@link ScreenResult} to repaint header {@link Drawable}.
-    * <br>
-    * <br>
-    * @param sr
-    */
-   public void updateHeader() {
-      char c = getSelectedChar();
-      String update = c + " p:" + ((c >> 8) & 0xFF) + " :" + (c & 0xFF);
-      if (headerBotTitle != null) {
-         headerBotTitle.setStringNoUpdate(update);
-         headerBotTitle.layoutInvalidate(true);
-      }
-   }
 }

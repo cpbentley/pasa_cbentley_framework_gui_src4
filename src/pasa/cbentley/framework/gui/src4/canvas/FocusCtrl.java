@@ -173,7 +173,7 @@ public class FocusCtrl implements IStringable {
    public FocusCtrl(GuiCtx gc) {
       this.gc = gc;
       topologyNav = new TopologyTBLRNav(gc);
-      focusChange = new BusEvent(gc.getUCtx(), gc.getEventsBusGui(), IEventsGui.PID_1_DRAW, IEventsGui.PID_1_DRW_EID_1_FOCUS_CHANGE);
+      focusChange = new BusEvent(gc.getUC(), gc.getEventsBusGui(), IEventsGui.PID_1_DRAW, IEventsGui.PID_1_DRW_EID_1_FOCUS_CHANGE);
    }
 
    private void focusGainPointer(IDrawable d) {
@@ -714,7 +714,7 @@ public class FocusCtrl implements IStringable {
    }
 
    public UCtx toStringGetUCtx() {
-      return gc.getUCtx();
+      return gc.getUC();
    }
 
    //#enddebug

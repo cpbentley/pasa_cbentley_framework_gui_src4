@@ -5,12 +5,14 @@ import pasa.cbentley.byteobjects.src4.core.interfaces.IByteObject;
 import pasa.cbentley.framework.cmd.src4.ctx.CmdCtx;
 import pasa.cbentley.framework.drawx.src4.engine.GraphicsX;
 import pasa.cbentley.framework.drawx.src4.engine.RgbImage;
+import pasa.cbentley.framework.drawx.src4.style.IBOStyle;
 import pasa.cbentley.framework.gui.src4.anim.ITechAnim;
 import pasa.cbentley.framework.gui.src4.anim.move.Move;
 import pasa.cbentley.framework.gui.src4.canvas.InputConfig;
 import pasa.cbentley.framework.gui.src4.canvas.TopologyDLayer;
 import pasa.cbentley.framework.gui.src4.core.Drawable;
 import pasa.cbentley.framework.gui.src4.core.DrawableAnimator;
+import pasa.cbentley.framework.gui.src4.core.FigDrawable;
 import pasa.cbentley.framework.gui.src4.core.ImageDrawable;
 import pasa.cbentley.framework.gui.src4.core.StyleClass;
 import pasa.cbentley.framework.gui.src4.core.ViewDrawable;
@@ -188,6 +190,14 @@ public interface ITechDrawable extends IByteObject {
     * Content is supposed to be cached for repetitive draws.
     */
    public static final int BEHAVIOR_22_TIP_HEAVY_CONTENT         = 1 << 21;
+   
+   
+   /**
+    * The drawable content espouses the {@link IBOStyle} fx. i.e {@link IBOStyle} overrides.
+    * 
+    * A {@link FigDrawable} will change the base color of its figure.
+    */
+   public static final int GENE_01_STYLED                          = 1 << 20;
 
    /**
     * Set when Parent wants to control event of their child drawable.

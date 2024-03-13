@@ -1,6 +1,7 @@
 package pasa.cbentley.framework.gui.src4.tech;
 
 import pasa.cbentley.core.src4.interfaces.ITech;
+import pasa.cbentley.framework.drawx.src4.string.interfaces.IBOFigString;
 import pasa.cbentley.framework.gui.src4.core.ViewDrawable;
 import pasa.cbentley.framework.gui.src4.interfaces.ITechDrawable;
 import pasa.cbentley.framework.gui.src4.interfaces.ITechViewDrawable;
@@ -97,14 +98,16 @@ public interface ITechStringDrawable extends ITech {
    /**
     * Sizer type for width and height.
     * 
-    * Sizing of {@link StringDrawable} will depend on sizers.
+    * Sizing of {@link StringDrawable} will depend on sizers 
     * <li> {@link StringDrawable#setSizersPreset_1LineLong()}
     * <li> {@link StringDrawable#setSizersPreset_Free()}
     * <li> {@link StringDrawable#setSizersPreset_1LineAtWidth(int)}
     * <li> {@link StringDrawable#setSizersPreset_1CharPerLines(int)}
     * <li> {@link StringDrawable#setSizersPreset_TrimOnWidth(int)}
     * <li> {@link StringDrawable#setSizersPreset_FreeWidthYLines(int)}
-    * 
+    * and on the {@link IBOFigString} parameters
+    * <li> {@link IBOFigString#FIG_STRING_OFFSET_07_WRAP_WIDTH1}
+    * <li> {@link IBOFigString#FIG_STRING_OFFSET_08_WRAP_HEIGHT1}
     * <p>
     * This mode does not 
     * <li>No preset Shrinking flags set.

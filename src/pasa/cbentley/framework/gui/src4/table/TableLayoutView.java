@@ -80,7 +80,7 @@ public class TableLayoutView extends TableView implements IBOStringData, IComman
     * @param styleKey
     */
    public TableLayoutView(GuiCtx gc, StyleClass styleKey, int numCols) {
-      super(gc, styleKey, gc.getTablePolicyC().getTwoColumns());
+      super(gc, styleKey, gc.getTablePolicyFactory().getTwoColumns());
       model = new ObjectTableModel(gc.getDMC(), numCols);
       setDataModel(model);
 
@@ -131,7 +131,7 @@ public class TableLayoutView extends TableView implements IBOStringData, IComman
    public void formAppendCmd(int cmdid) {
       if (menuHeader == null) {
          //override tech with special tech
-         StyleClass sc = gc.getClass(IUIView.SC_1_MENU);
+         StyleClass sc = gc.getStyleClass(IUIView.SC_1_MENU);
          menuHeader = new NestedMenus(gc,sc);
          setHeader(menuHeader, C.POS_1_BOT, ITechViewPane.PLANET_MODE_0_EAT);
       }

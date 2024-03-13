@@ -2,7 +2,6 @@ package pasa.cbentley.framework.gui.src4.core;
 
 import pasa.cbentley.byteobjects.src4.core.ByteObject;
 import pasa.cbentley.byteobjects.src4.core.interfaces.IByteObject;
-import pasa.cbentley.byteobjects.src4.ctx.IBOTypesDrw;
 import pasa.cbentley.core.src4.ctx.ICtx;
 import pasa.cbentley.core.src4.ctx.IToStringFlags;
 import pasa.cbentley.core.src4.ctx.UCtx;
@@ -18,14 +17,15 @@ import pasa.cbentley.core.src4.structs.IntToObjects;
 import pasa.cbentley.core.src4.utils.ArrayUtils;
 import pasa.cbentley.core.src4.utils.BitUtils;
 import pasa.cbentley.core.src4.utils.IntUtils;
+import pasa.cbentley.framework.drawx.src4.ctx.IBOTypesDrawX;
 import pasa.cbentley.framework.drawx.src4.style.IBOStyle;
 import pasa.cbentley.framework.gui.src4.ctx.GuiCtx;
-import pasa.cbentley.framework.gui.src4.ctx.IBOTypesGui;
 import pasa.cbentley.framework.gui.src4.ctx.ObjectGC;
 import pasa.cbentley.framework.gui.src4.ctx.ToStringStaticGui;
 import pasa.cbentley.framework.gui.src4.interfaces.IDrawable;
 import pasa.cbentley.framework.gui.src4.interfaces.ITechDrawable;
 import pasa.cbentley.framework.gui.src4.table.interfaces.IBOTableView;
+import pasa.cbentley.framework.gui.src4.tech.ITechLinks;
 
 /**
  * {@link StyleClass} defines the style and behaviours of Drawable objects.
@@ -39,7 +39,7 @@ import pasa.cbentley.framework.gui.src4.table.interfaces.IBOTableView;
  * A class can be shared between {@link IDrawable}s.
  * <br>
  * <br>
- * The designer creates a root {@link ByteObject} style and different sub styles ({@link IBOTypesDrw#TYPE_071_STYLE}).
+ * The designer creates a root {@link ByteObject} style and different sub styles ({@link IBOTypesDrawX#TYPE_DRWX_12_STYLE}).
  * 
  * From these, {@link StyleClass} create variations of the root style. 
  * <br>
@@ -221,7 +221,7 @@ public class StyleClass extends ObjectGC implements IStringable, IStatorable {
 
    private StyleClass(GuiCtx gc) {
       super(gc);
-      this.uc = gc.getUCtx();
+      this.uc = gc.getUC();
    }
 
    /**
@@ -231,7 +231,7 @@ public class StyleClass extends ObjectGC implements IStringable, IStatorable {
     */
    public StyleClass(GuiCtx gc, ByteObject rootStyle) {
       super(gc);
-      this.uc = gc.getUCtx();
+      this.uc = gc.getUC();
       if (rootStyle == null) {
          throw new NullPointerException("RootStyle is null");
       }
@@ -269,7 +269,7 @@ public class StyleClass extends ObjectGC implements IStringable, IStatorable {
       if (FLAG_CACHE_STYLE) {
          //add the style combination in the bag of possibles.
          if (cachePossibles[handle] == null) {
-            cachePossibles[handle] = new IntToObjects(gc.getUCtx());
+            cachePossibles[handle] = new IntToObjects(gc.getUC());
          }
          cachePossibles[handle].add(possibles, p);
       }
@@ -500,12 +500,10 @@ public class StyleClass extends ObjectGC implements IStringable, IStatorable {
    }
    /**
     * This method is used to in order to catch un linked style class.
-    * <br>
-    * <br>
     * Don't call this method if the style class could be null.
-    * <br>
-    * <br>
     * 
+    * <li> {@link ITechLinks#LINK_58_STYLE_VIEWPANE_HOLE_HEADER}
+    * <li> {@link ITechLinks#LINK_64_STYLE_VIEWPORT}
     * @param linkID
     * @return
     */
@@ -523,9 +521,9 @@ public class StyleClass extends ObjectGC implements IStringable, IStatorable {
             //generate warning
 
             //#debug
-            String msg = "StyleClass not found for LinkID=" + linkID + " " + ToStringStaticGui.toStringLinkStatic(linkID) + ". Default Class will be used";
+            String msg = "StyleClass not found for LinkID=" + linkID + " [" + ToStringStaticGui.toStringLinkStatic(linkID) + "]. Default Class will be used";
 
-            toDLog().pInit1(msg, this, StyleClass.class, "getSCNotNull");
+            toDLog().pInit1(msg, this, StyleClass.class, "getSCNotNull@524");
 
             o = sc;
          }
@@ -635,10 +633,10 @@ public class StyleClass extends ObjectGC implements IStringable, IStatorable {
     * Each ViewPane style class is independant of each other.
     * <br>
     * <br>
-    * <li>{@link IBOTypesGui#LINK_65_STYLE_VIEWPANE}
-    * <li>{@link IBOTypesGui#LINK_84_STYLE_TABLE_OVERLAY_FIGURE}
-    * <li>{@link IBOTypesGui#LINK_86_STYLE_TABLE_TITLE_BOT}
-    * <li>{@link IBOTypesGui#LINK_85_STYLE_TABLE_TITLE_TOP}
+    * <li>{@link ITechLinks#LINK_65_STYLE_VIEWPANE}
+    * <li>{@link ITechLinks#LINK_84_STYLE_TABLE_OVERLAY_FIGURE}
+    * <li>{@link ITechLinks#LINK_86_STYLE_TABLE_TITLE_BOT}
+    * <li>{@link ITechLinks#LINK_85_STYLE_TABLE_TITLE_TOP}
     * @param linkID
     * @return
     */
@@ -703,7 +701,7 @@ public class StyleClass extends ObjectGC implements IStringable, IStatorable {
    }
 
    public void linkBOViewPane(ByteObject bo) {
-      this.linkByteObject(bo, IBOTypesGui.LINK_66_BO_VIEWPANE);
+      this.linkByteObject(bo, ITechLinks.LINK_66_BO_VIEWPANE);
    }
 
    /**
@@ -797,10 +795,15 @@ public class StyleClass extends ObjectGC implements IStringable, IStatorable {
 
    /**
    * Links that style to the state flag defined in {@link IDrawable}.
-   * <br>
-   * <br>
+   * <li> {@link ITechDrawable#STYLE_03_MARKED} 
+   * <li> {@link ITechDrawable#STYLE_04_GREYED} 
+   * <li> {@link ITechDrawable#STYLE_05_SELECTED} 
+   * <li> {@link ITechDrawable#STYLE_06_FOCUSED_KEY} 
+   * <li> {@link ITechDrawable#STYLE_07_FOCUSED_POINTER} 
+   * <li> {@link ITechDrawable#STYLE_08_PRESSED} 
+   * 
    * @param style defintion. when null, nothing happens.
-    * @param stateStyle {@link ITechDrawable#STYLE_04_GREYED} or {@link ITechDrawable#STYLE_05_SELECTED}, ...
+   * @param stateStyle {@link ITechDrawable#STYLE_04_GREYED} or {@link ITechDrawable#STYLE_05_SELECTED}, ...
    */
    public void linkStateStyle(ByteObject style, int stateStyle) {
       if (isImmutable) {
@@ -871,11 +874,11 @@ public class StyleClass extends ObjectGC implements IStringable, IStatorable {
     * @return
     */
    public StyleClass[] loadFromByteArray(byte[] data) {
-      BADataIS bc = gc.getUCtx().createNewBADataIS(data);
+      BADataIS bc = gc.getUC().createNewBADataIS(data);
       int num = bc.readInt();
       int numObjects = bc.readInt();
       StyleClass[] ar = new StyleClass[num];
-      IntToObjects ito = new IntToObjects(gc.getUCtx(), numObjects);
+      IntToObjects ito = new IntToObjects(gc.getUC(), numObjects);
       for (int i = 0; i < ar.length; i++) {
          StyleClass sc = null;
          int magicword = bc.readInt();
@@ -922,7 +925,7 @@ public class StyleClass extends ObjectGC implements IStringable, IStatorable {
     * @return
     */
    public byte[] serialize(StyleClass[] classes) {
-      UCtx uc = gc.getUCtx();
+      UCtx uc = gc.getUC();
       BADataOS dos = uc.createNewBADataOS();
       IntToObjects ito = new IntToObjects(uc, 20);
       //4 byte for number of classes.
@@ -965,7 +968,7 @@ public class StyleClass extends ObjectGC implements IStringable, IStatorable {
     * @return
     */
    public StyleClass serializeReverseSC(byte[] data) {
-      UCtx uc = gc.getUCtx();
+      UCtx uc = gc.getUC();
       BADataIS dis = uc.createNewBADataIS(data);
       return serializeUnwrap(new IntToObjects(uc), dis);
    }

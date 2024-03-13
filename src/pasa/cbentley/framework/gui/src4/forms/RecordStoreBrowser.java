@@ -160,7 +160,7 @@ public class RecordStoreBrowser extends TableLayoutView implements IAppendable, 
          RequestStringInput sd;
          //
          String msg = "Go To ID";
-         ByteObject strTech = gc.getDrawableStringFactory().getStringTechEdit(ITechStringDrawable.PRESET_CONFIG_1_TITLE, 5, ITechStringDrawable.S_DATA_2_NUMERIC);
+         ByteObject strTech = gc.getDrawableStringFactory().getBOStringData(ITechStringDrawable.PRESET_CONFIG_1_TITLE, 5, ITechStringDrawable.S_DATA_2_NUMERIC);
       } else {
          if (cmd.param == 1) {
             String s = (String) cmd.paramO;

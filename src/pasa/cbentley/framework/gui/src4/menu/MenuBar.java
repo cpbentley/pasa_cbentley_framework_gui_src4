@@ -198,7 +198,7 @@ public class MenuBar extends Drawable {
    public MenuBar(GuiCtx gc, StyleClass styleKey) {
       super(gc, styleKey);
       //the table is only an organizer
-      tv = new TableView(gc, styleKey, gc.getTablePolicyC().getMenuPolicy());
+      tv = new TableView(gc, styleKey, gc.getTablePolicyFactory().getMenuPolicy());
       int type = ITechStringDrawable.PRESET_CONFIG_1_TITLE;
       mRight = new StringDrawable(gc, styleClass.getStyleClass(CHILD_LINK_RIGHT_DRAWABLE), "Right", type);
       mRight.setStateFlag(ITechDrawable.STATE_06_STYLED, true);
@@ -237,7 +237,7 @@ public class MenuBar extends Drawable {
 
    private ByteObject getSubMenuPolicy() {
       int hsize = getVC().getHeight() - getDrawnHeight();
-      ByteObject policy = gc.getTablePolicyC().getMenuSubPolicy(getDrawnWidth(), hsize);
+      ByteObject policy = gc.getTablePolicyFactory().getMenuSubPolicy(getDrawnWidth(), hsize);
       return policy;
    }
 

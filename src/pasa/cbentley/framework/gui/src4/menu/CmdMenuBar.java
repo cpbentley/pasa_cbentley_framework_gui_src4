@@ -20,7 +20,6 @@ import pasa.cbentley.framework.gui.src4.core.Drawable;
 import pasa.cbentley.framework.gui.src4.core.LayouterEngineDrawable;
 import pasa.cbentley.framework.gui.src4.core.StyleClass;
 import pasa.cbentley.framework.gui.src4.ctx.GuiCtx;
-import pasa.cbentley.framework.gui.src4.ctx.IBOTypesGui;
 import pasa.cbentley.framework.gui.src4.factories.TablePolicyFactory;
 import pasa.cbentley.framework.gui.src4.interfaces.ITechCanvasDrawable;
 import pasa.cbentley.framework.gui.src4.interfaces.ICmdsView;
@@ -29,6 +28,7 @@ import pasa.cbentley.framework.gui.src4.interfaces.ITechDrawable;
 import pasa.cbentley.framework.gui.src4.string.StringDrawable;
 import pasa.cbentley.framework.gui.src4.table.TableView;
 import pasa.cbentley.framework.gui.src4.table.interfaces.ITechTable;
+import pasa.cbentley.framework.gui.src4.tech.ITechLinks;
 import pasa.cbentley.framework.gui.src4.utils.DrawableUtilz;
 
 /**
@@ -238,10 +238,10 @@ public class CmdMenuBar extends TableView implements IEventConsumer, ICmdsView {
     * @param styleClass
     */
    public CmdMenuBar(GuiCtx gc, StyleClass styleClass) {
-      super(gc, styleClass, gc.getTablePolicyC().getMenuPolicy());
+      super(gc, styleClass, gc.getTablePolicyFactory().getMenuPolicy());
 
       cc = gc.getCC();
-      techBar = styleClass.getByteObject(IBOTypesGui.LINK_75_MENU_BAR_TECH);
+      techBar = styleClass.getByteObject(ITechLinks.LINK_75_MENU_BAR_TECH);
       //no need to get channel info. since we are a subclass and we are only interested by select which we override
       //EventChannel.addConsumerProducer(this, TableView.EVENT_ID_0SELECT, tv, tv.getProducerID());
       setHelperFlag(ITechTable.HELPER_FLAG_21_MODEL_STYLE, true);
@@ -507,9 +507,9 @@ public class CmdMenuBar extends TableView implements IEventConsumer, ICmdsView {
     */
    private void initSubMenuTable() {
       if (cmdTableView == null) {
-         ByteObject policy = gc.getTablePolicyC().getMenuSubPolicy();
+         ByteObject policy = gc.getTablePolicyFactory().getMenuSubPolicy();
          //
-         StyleClass tableSC = styleClass.getSCNotNull(IBOTypesGui.LINK_74_STYLE_CLASS_MENU);
+         StyleClass tableSC = styleClass.getSCNotNull(ITechLinks.LINK_74_STYLE_CLASS_MENU);
          cmdTableView = new TableView(gc, tableSC, policy);
          cmdTableView.setShrink(true, true);
          cmdTableView.setParent(this);
@@ -846,7 +846,7 @@ public class CmdMenuBar extends TableView implements IEventConsumer, ICmdsView {
     * @param v
     */
    public void setHoriz(boolean v) {
-      TablePolicyFactory tabc = gc.getTablePolicyC();
+      TablePolicyFactory tabc = gc.getTablePolicyFactory();
       if (!horiz && v) {
          //set horiz mode, change table policy
          int w = 0;

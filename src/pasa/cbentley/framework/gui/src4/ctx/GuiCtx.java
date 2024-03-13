@@ -63,6 +63,7 @@ import pasa.cbentley.framework.gui.src4.string.StringDrawable;
 import pasa.cbentley.framework.gui.src4.string.StringEditControl;
 import pasa.cbentley.framework.gui.src4.table.CellPolicy;
 import pasa.cbentley.framework.gui.src4.table.TableOperator;
+import pasa.cbentley.framework.gui.src4.tech.ITechLinks;
 import pasa.cbentley.framework.gui.src4.utils.StatusData;
 import pasa.cbentley.framework.input.src4.ctx.InputCtx;
 import pasa.cbentley.framework.input.src4.interfaces.IBOCanvasAppli;
@@ -368,31 +369,24 @@ public class GuiCtx extends ABOCtx implements ITechCtxSettingsAppGui {
 
    /**
     * Returns the ID {@link StyleClass}.
-    * <br>
-    * <br>
     * This is the preferred way for code to get their style class for application level items.
-    * <br>
-    * <br>
     * The Theming constructs the {@link StyleClass} array.
-    * <br>
-    * <br>
     * When ID is too big for the classes, method returns the root style class.
-    * <br>
     * @param id
     * @return never null.
     * @throws 
     */
-   public StyleClass getClass(int i) {
-      if (i >= classes.length) {
+   public StyleClass getStyleClass(int id) {
+      if (id >= classes.length) {
          //#debug
-         toDLog().pInit1("Class Style ID not valid " + i, null, GuiCtx.class, "getClass");
+         toDLog().pInit1("StyleClass ID not valid " + id, null, GuiCtx.class, "getStyleClass@378");
          //#debug
          if (uc.getConfigU().isForceExceptions()) {
-            throw new IllegalStateException("Style classes not initialized to support id " + i);
+            throw new IllegalStateException("Style classes not initialized to support id " + id);
          }
          return classes[0];
       }
-      return classes[i];
+      return classes[id];
    }
 
    public StyleClass[] getClasses() {
@@ -467,6 +461,10 @@ public class GuiCtx extends ABOCtx implements ITechCtxSettingsAppGui {
       return drawableOperator;
    }
 
+   public DrawableStringFactory getStringDrawableFactory() {
+      return getDrawableStringFactory();
+   }
+
    public DrawableStringFactory getDrawableStringFactory() {
       if (stringFactory == null) {
          stringFactory = new DrawableStringFactory(this);
@@ -482,7 +480,7 @@ public class GuiCtx extends ABOCtx implements ITechCtxSettingsAppGui {
    }
 
    public StyleClass getEmptySC() {
-      return getClass(IUIView.SC_6_EMPTY);
+      return getStyleClass(IUIView.SC_6_EMPTY);
 
    }
 
@@ -554,7 +552,7 @@ public class GuiCtx extends ABOCtx implements ITechCtxSettingsAppGui {
     */
    public StringEditControl getStrEditCtrl() {
       if (me == null) {
-         StyleClass sc = getClass(IUIView.SC_0_BASE_TABLE).getStyleClass(IBOTypesGui.LINK_90_STRING_EDIT_CONTROL);
+         StyleClass sc = getStyleClass(IUIView.SC_0_BASE_TABLE).getStyleClass(ITechLinks.LINK_90_STRING_EDIT_CONTROL);
          me = new StringEditControl(this, sc);
          me.init(0, -1);
       }
@@ -593,7 +591,7 @@ public class GuiCtx extends ABOCtx implements ITechCtxSettingsAppGui {
       return tableOperator;
    }
 
-   public TablePolicyFactory getTablePolicyC() {
+   public TablePolicyFactory getTablePolicyFactory() {
       if (tablePolicyFactory == null) {
          tablePolicyFactory = new TablePolicyFactory(this);
       }

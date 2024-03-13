@@ -95,7 +95,7 @@ public class MoveGhost extends DrawableAnim {
       } else {
          int index = trailNextEmpty;
          ghosts = DrawableArrays.ensureCapacity(ghosts, index);
-         ghostsTrails = gc.getUCtx().getMem().ensureCapacity(ghostsTrails, index);
+         ghostsTrails = gc.getUC().getMem().ensureCapacity(ghostsTrails, index);
          ghosts[index] = trailDrawable;
          ghostsTrails[index] = trail;
          trailNextEmpty++;

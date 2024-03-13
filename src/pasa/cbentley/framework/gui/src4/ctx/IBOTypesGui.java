@@ -1,186 +1,80 @@
 package pasa.cbentley.framework.gui.src4.ctx;
 
-import pasa.cbentley.byteobjects.src4.core.ByteObject;
 import pasa.cbentley.byteobjects.src4.ctx.IBOTypesBOC;
-import pasa.cbentley.framework.gui.src4.core.StyleClass;
-import pasa.cbentley.framework.gui.src4.core.ViewPane;
-import pasa.cbentley.framework.gui.src4.factories.interfaces.IBOStringData;
-import pasa.cbentley.framework.gui.src4.factories.interfaces.IBOViewPane;
-import pasa.cbentley.framework.gui.src4.string.StringEditModule;
-import pasa.cbentley.framework.gui.src4.string.StringDrawable;
-import pasa.cbentley.framework.gui.src4.string.StringEditControl;
-import pasa.cbentley.framework.gui.src4.table.TableView;
+import pasa.cbentley.byteobjects.src4.ctx.IBOTypesExtendedBOC;
+import pasa.cbentley.framework.core.src4.ctx.IBOTypesCoreFramework;
+import pasa.cbentley.framework.coredata.src4.ctx.IBOTypesCoreData;
+import pasa.cbentley.framework.coredraw.src4.ctx.IBOTypesCoreDraw;
+import pasa.cbentley.framework.coreui.src4.ctx.IBOTypesCoreUI;
+import pasa.cbentley.framework.datamodel.src4.ctx.IBOTypesDataModel;
+import pasa.cbentley.framework.drawx.src4.ctx.IBOTypesDrawX;
+import pasa.cbentley.framework.input.src4.ctx.IBOTypesInput;
+import pasa.cbentley.layouter.src4.ctx.IBOTypesLayout;
 
 /**
  * Framework sub types belonging to the Drawable framework
- * <br>
- * <br>
  * 
- * Range allocation is [50-200]
- * <br>
- * <br>
- * For new types, extension type 
- * <br>
- * <br>
+ * <li> {@link IBOTypesBOC}
+ * <li> {@link IBOTypesExtendedBOC}
+ * <li> {@link IBOTypesDrawX}
+ * <li> {@link IBOTypesLayout}
+ * <li> {@link IBOTypesInput}
+ * <li> {@link IBOTypesDataModel}
+ * 
+ * <li> {@link IBOTypesCoreDraw}
+ * <li> {@link IBOTypesCoreUI}
+ * <li> {@link IBOTypesCoreFramework}
+ * <li> {@link IBOTypesCoreData}
+ * <li>
+ * <li>
  * @author Charles-Philip Bentley
  *
  */
 public interface IBOTypesGui extends IBOTypesBOC {
 
-   public static final int  LINK_10_BASE_TECH                         = 10;
+   public static final int SID_VIEWTYPE_A                       = 151;
 
-   public static final int  LINK_49_FIG_SCROLLBAR_WRAPPER             = 49;
+   public static final int SID_VIEWTYPE_Z                       = 190;
 
-   public static final int  LINK_50_STYLE_SCROLLBAR_BLOCK_BG          = 50;
+   public static final int TYPE_GUI_00_VIEWPANE                 = SID_VIEWTYPE_A + 0;
 
-   public static final int  LINK_51_STYLE_SCROLLBAR_BLOCK_FIG         = 51;
+   public static final int TYPE_GUI_01_SCROLLBAR                = SID_VIEWTYPE_A + 1;
 
-   /**
-    * StyleClass for top/left wrappers and arrows and blocks.
-    */
-   public static final int  LINK_52_STYLE_SCROLLBAR_TOP_LEFT_WRAPPER  = 52;
+   public static final int TYPE_GUI_02_TABLE                    = SID_VIEWTYPE_A + 2;
 
-   /**
-    * StyleClass for bottom/right wrappers and arrows and blocks.
-    */
-   public static final int  LINK_53_STYLE_SCROLLBAR_BOT_RIGHT_WRAPPER = 53;
+   public static final int TYPE_GUI_03_TABLE_GENETICS           = SID_VIEWTYPE_A + 3;
 
-   /**
-    * Style creator links Drawable and ViewPane styleKeys with this ID. 
-    * <br>
-    * <br>
-    * {@link StyleClass#linkStyleClass(StyleClass, int)} : link between a Drawable style and the style of its ViewPane. 
-    * <br>
-    * <br>
-    * If the drawable style has not been linked, the default ViewPane style is returned.
-    */
-   public static final int  LINK_65_STYLE_VIEWPANE                    = 65;
+   public static final int TYPE_GUI_04_TABLE_POLICY             = SID_VIEWTYPE_A + 4;
 
-   public static final int  LINK_64_STYLE_VIEWPORT                    = 64;
-
-   /**
-    * ID linked to {@link StyleClass#linkByteObject(ByteObject, int)}
-    * 
-    * {@link IBOViewPane}
-    */
-   public static final int  LINK_66_BO_VIEWPANE                       = 66;
-
-   /**
-    * Link to {@link ViewPane}'s {@link StyleClass} for holes.
-    * <br>
-    * <br>
-    * Style is used when a specific Drawable (Special Button) is put into the hole.
-    */
-   public static final int  LINK_58_STYLE_VIEWPANE_HOLE_HEADER        = 58;
-
-   public static final int  LINK_59_STYLE_VIEWPANE_HOLE_SB            = 59;
-
-   public static final int  LINK_68_BO_V_SCROLLBAR                    = 68;
-
-   public static final int  LINK_69_BO_H_SCROLLBAR                    = 69;
-
-   public static final int  LINK_71_STYLE_VIEWPANE_H_SCROLLBAR        = 71;
-
-   public static final int  LINK_72_STYLE_VIEWPANE_V_SCROLLBAR        = 72;
-
-   /**
-    * Technical options of MenuBar
-    */
-   public static final int  LINK_75_MENU_BAR_TECH                     = 75;
-
-   /**
-    * Style Class to be used for the menu showing commands
-    */
-   public static final int  LINK_74_STYLE_CLASS_MENU                  = 74;
-
-   /**
-    * Id to be used with stylekey with {@link StyleClass#linkTech(int, mordan.memory.ByteObject, int)}
-    * <br>
-    * 
-    */
-   public static final int  LINK_80_TECH_TABLE                        = 80;
-
-   /**
-    * {@link StyleClass} that will be used by cells Drawable inside a {@link TableView} 
-    */
-   public static final int  LINK_81_STYLE_CLASS_TABLE_CELL            = 81;
-
-   /**
-    *  {@link StyleClass}
-    */
-   public static final int  LINK_82_STYLE_TABLE_COL_TITLE             = 82;
-
-   /**
-    * {@link StyleClass}
-    */
-   public static final int  LINK_83_STYLE_TABLE_ROW_TITLE             = 83;
-
-   /**
-    * {@link ByteObject}
-    */
-   public static final int  LINK_84_STYLE_TABLE_OVERLAY_FIGURE        = 84;
-
-   public static final int  LINK_85_STYLE_TABLE_TITLE_TOP             = 85;
-
-   public static final int  LINK_86_STYLE_TABLE_TITLE_BOT             = 86;
-
-   /**
-    * Usually this style must be set on the root {@link StyleClass}
-    */
-   public static final int  LINK_90_STRING_EDIT_CONTROL               = 90;
-
-   /**
-    * Linked to StyleClass of {@link StringDrawable}.
-    * <br>
-    * Reads by {@link StringDrawable} edit module {@link StringEditModule}.
-    */
-   public static final int  LINK_40_TECH_STRING_EDIT                  = 40;
-
-   /**
-    * {@link IBOStringData}
-    * Linked to StyleClass.
-    * Reads by {@link StringDrawable}.
-    */
-   public static final int  LINK_41_BO_STRING_DRAWABLE                = 41;
-
-   public static final int  LINK_42_CARET_FIGURE                      = 42;
-
-   /**
-    * Link between a {@link StringDrawable} and the style of its auxilliary {@link TableView}.
-    */
-   public static final int  LINK_45_STRING_LIST_VIEW                  = 45;
-
-   public static final int  TYPE_101_VIEWPANE_TECH                    = 101;
-
-   public static final int  TYPE_102_SCROLLBAR_TECH                   = 102;
-
-   public static final int  TYPE_103_TABLE_TECH                       = 103;
-
-   public static final int  TYPE_119_GENETICS                         = 119;
-
-   public static final int  TYPE_120_TABLE_POLICY                     = 120;
-
-   public static final int  TYPE_121_SPANNING                         = 121;
+   public static final int TYPE_GUI_05_CELL_SPANNING            = SID_VIEWTYPE_A + 5;
 
    /**
     * ByteObject type.
     */
-   public static final int  TYPE_122_CELL_POLICY                      = 122;
+   public static final int TYPE_GUI_06_CELL_POLICY              = SID_VIEWTYPE_A + 6;
 
    /**
     * Technical options for displaying string of characters.
     */
-   public static final int  TYPE_124_STRING_TECH                      = 124;
+   public static final int TYPE_124_STRING_DATA                 = SID_VIEWTYPE_A + 7;
 
    /**
     * Technical options for editing a string of characters.
     */
-   public static final int  TYPE_125_STRING_EDIT_TECH                 = 125;
+   public static final int TYPE_125_STRING_EDIT_TECH            = SID_VIEWTYPE_A + 8;
+
+   public static final int TYPE_DRWX_07_STRING_AUX_0_DATA       = IBOTypesDrawX.TYPE_DRWX_07_STRING_AUX_XXX + 0;
+
+   public static final int TYPE_DRWX_07_STRING_AUX_1_EDIT       = IBOTypesDrawX.TYPE_DRWX_07_STRING_AUX_XXX + 1;
+
+   public static final int TYPE_DRWX_07_STRING_AUX_2_PREDICTION = IBOTypesDrawX.TYPE_DRWX_07_STRING_AUX_XXX + 2;
+
+   public static final int TYPE_DRWX_07_STRING_AUX_3_GLOBAL     = IBOTypesDrawX.TYPE_DRWX_07_STRING_AUX_XXX + 2;
 
    /**
     * Global options that are user specific and apply to all string edition items
     */
-   public static final int  TYPE_126_STRING_GLOBAL                    = 126;
+   public static final int TYPE_GUI_09_STRING_GLOBAL            = SID_VIEWTYPE_A + 9;
 
    /**
     * Parameters for prediction types.
@@ -191,7 +85,7 @@ public interface IBOTypesGui extends IBOTypesBOC {
     * <br>
     * Prediction Engine to use
     */
-   public static final int  TYPE_127_STRING_PREDITION                 = 127;
+   public static final int TYPE_127_STRING_PREDITION            = SID_VIEWTYPE_A + 10;
 
    /**
     * Defines animation parameters.
@@ -202,22 +96,11 @@ public interface IBOTypesGui extends IBOTypesBOC {
     * Basic example, animation that changes the alpha value
     * will create a Animation class AlphaValue
     */
-   public static final int  TYPE_130_ANIMATION                        = 130;
+   public static final int TYPE_GUI_11_ANIMATION                = SID_VIEWTYPE_A + 11;
 
-   public static final int  TYPE_141_USER_INTERACTION                 = 141;
+   public static final int TYPE_GUI_12_USER_INTERACTION         = SID_VIEWTYPE_A + 12;
 
-   public static final int  TYPE_199_ANIM_TECH                        = 199;
+   public static final int TYPE_GUI_13_ANIM                     = SID_VIEWTYPE_A + 13;
 
-   public static final int  TYPE_200_EXTENSION                        = 200;
-
-   /**
-    * Defines the style of attached {@link StringEditControl}.
-    * <br>
-    * Overrides the default one loaded initially by Framework
-    */
-   public static final char LINK_55_STYLE_STRING_EDIT_CONTROL         = 55;
-
-   public static final int  SID_VIEWTYPE_A                            = 100;
-
-   public static final int  SID_VIEWTYPE_Z                            = 199;
+   public static final int TYPE_GUI_15_EXTENSION                = SID_VIEWTYPE_A + 14;
 }

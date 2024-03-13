@@ -10,7 +10,7 @@ public class BusEventGui extends BusEvent {
    private InputConfig ic;
 
    public BusEventGui(GuiCtx gc, InputConfig ic, int pid, int eid) {
-      super(gc.getUCtx(), gc.getEventsBusGui(), pid, eid);
+      super(gc.getUC(), gc.getEventsBusGui(), pid, eid);
       this.gc = gc;
       this.ic = ic;
    }

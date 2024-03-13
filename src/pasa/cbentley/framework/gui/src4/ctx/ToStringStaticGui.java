@@ -12,6 +12,7 @@ import pasa.cbentley.framework.gui.src4.interfaces.ITechViewDrawable;
 import pasa.cbentley.framework.gui.src4.table.interfaces.IBOTablePolicy;
 import pasa.cbentley.framework.gui.src4.table.interfaces.ITechCell;
 import pasa.cbentley.framework.gui.src4.table.interfaces.ITechTable;
+import pasa.cbentley.framework.gui.src4.tech.ITechLinks;
 import pasa.cbentley.framework.gui.src4.tech.ITechStringDrawable;
 import pasa.cbentley.framework.gui.src4.tech.ITechViewPane;
 
@@ -121,72 +122,72 @@ public class ToStringStaticGui extends ToStringStaticBase {
 
    /**
     * Debug name for link IDs such as 
-    * <li>{@link IBOTypesGui#LINK_40_TECH_STRING_EDIT}
-    * <li>{@link IBOTypesGui#LINK_50_STYLE_SCROLLBAR_BLOCK_BG}
-    * <li>{@link IBOTypesGui#LINK_65_STYLE_VIEWPANE}
+    * <li>{@link ITechLinks#LINK_42_BO_STRING_EDIT}
+    * <li>{@link ITechLinks#LINK_50_STYLE_SCROLLBAR_BLOCK_BG}
+    * <li>{@link ITechLinks#LINK_65_STYLE_VIEWPANE}
     * 
     * @param link
     * @return
     */
    public static String toStringLinkStatic(int link) {
       switch (link) {
-         case IBOTypesGui.LINK_10_BASE_TECH:
+         case ITechLinks.LINK_10_BASE_TECH:
             return "BaseTech";
-         case IBOTypesGui.LINK_40_TECH_STRING_EDIT:
+         case ITechLinks.LINK_42_BO_STRING_EDIT:
             return "BO_StringEdit";
-         case IBOTypesGui.LINK_41_BO_STRING_DRAWABLE:
+         case ITechLinks.LINK_41_BO_STRING_DATA:
             return "BO_String";
-         case IBOTypesGui.LINK_42_CARET_FIGURE:
+         case ITechLinks.LINK_43_CARET_FIGURE:
             return "Figure_Caret";
-         case IBOTypesGui.LINK_45_STRING_LIST_VIEW:
+         case ITechLinks.LINK_45_STRING_LIST_VIEW:
             return "StringListView";
-         case IBOTypesGui.LINK_49_FIG_SCROLLBAR_WRAPPER:
+         case ITechLinks.LINK_49_FIG_SCROLLBAR_WRAPPER:
             return "ScrollBar_FigureWrapper";
-         case IBOTypesGui.LINK_50_STYLE_SCROLLBAR_BLOCK_BG:
+         case ITechLinks.LINK_50_STYLE_SCROLLBAR_BLOCK_BG:
             return "StyleClass_Scrollbar_BlockBg";
-         case IBOTypesGui.LINK_51_STYLE_SCROLLBAR_BLOCK_FIG:
+         case ITechLinks.LINK_51_STYLE_SCROLLBAR_BLOCK_FIG:
             return "StyleClass_Scrollbar_BlockFig";
-         case IBOTypesGui.LINK_52_STYLE_SCROLLBAR_TOP_LEFT_WRAPPER:
+         case ITechLinks.LINK_52_STYLE_SCROLLBAR_TOP_LEFT_WRAPPER:
             return "StyleClass_Scrollbar_TopLeft_Wrapper";
-         case IBOTypesGui.LINK_53_STYLE_SCROLLBAR_BOT_RIGHT_WRAPPER:
+         case ITechLinks.LINK_53_STYLE_SCROLLBAR_BOT_RIGHT_WRAPPER:
             return "StyleClass_Scrollbar_BotRight_Wrapper";
-         case IBOTypesGui.LINK_58_STYLE_VIEWPANE_HOLE_HEADER:
+         case ITechLinks.LINK_58_STYLE_VIEWPANE_HOLE_HEADER:
             return "StyleClass_Hole_Headers";
-         case IBOTypesGui.LINK_59_STYLE_VIEWPANE_HOLE_SB:
+         case ITechLinks.LINK_59_STYLE_VIEWPANE_HOLE_SB:
             return "StyleClass_Hole_Scrollbars";
-         case IBOTypesGui.LINK_64_STYLE_VIEWPORT:
+         case ITechLinks.LINK_64_STYLE_VIEWPORT:
             return "StyleClass_ViewPort";
-         case IBOTypesGui.LINK_65_STYLE_VIEWPANE:
+         case ITechLinks.LINK_65_STYLE_VIEWPANE:
             return "StyleClass_ViewPane";
-         case IBOTypesGui.LINK_66_BO_VIEWPANE:
+         case ITechLinks.LINK_66_BO_VIEWPANE:
             return "BO_ViewPane";
-         case IBOTypesGui.LINK_68_BO_V_SCROLLBAR:
+         case ITechLinks.LINK_68_BO_V_SCROLLBAR:
             return "BO_Scrollbar_Vertical";
-         case IBOTypesGui.LINK_69_BO_H_SCROLLBAR:
+         case ITechLinks.LINK_69_BO_H_SCROLLBAR:
             return "BO_Scrollbar_Horizontal";
-         case IBOTypesGui.LINK_71_STYLE_VIEWPANE_H_SCROLLBAR:
+         case ITechLinks.LINK_71_STYLE_VIEWPANE_H_SCROLLBAR:
             return "StyleClass_Scrollbar_Horizontal";
-         case IBOTypesGui.LINK_72_STYLE_VIEWPANE_V_SCROLLBAR:
+         case ITechLinks.LINK_72_STYLE_VIEWPANE_V_SCROLLBAR:
             return "StyleClass_Scrollbar_Vertical";
-         case IBOTypesGui.LINK_74_STYLE_CLASS_MENU:
+         case ITechLinks.LINK_74_STYLE_CLASS_MENU:
             return "StyleClass_menubar";
-         case IBOTypesGui.LINK_75_MENU_BAR_TECH:
+         case ITechLinks.LINK_75_MENU_BAR_TECH:
             return "BO_MenuBar";
-         case IBOTypesGui.LINK_80_TECH_TABLE:
+         case ITechLinks.LINK_80_BO_TABLEVIEW:
             return "BO_Table";
-         case IBOTypesGui.LINK_81_STYLE_CLASS_TABLE_CELL:
+         case ITechLinks.LINK_81_STYLE_CLASS_TABLE_CELL:
             return "StyleClass_Table_Cell";
-         case IBOTypesGui.LINK_82_STYLE_TABLE_COL_TITLE:
+         case ITechLinks.LINK_82_STYLE_TABLE_COL_TITLE:
             return "StyleClass_Table_Column";
-         case IBOTypesGui.LINK_83_STYLE_TABLE_ROW_TITLE:
+         case ITechLinks.LINK_83_STYLE_TABLE_ROW_TITLE:
             return "StyleClass_Table_Row";
-         case IBOTypesGui.LINK_84_STYLE_TABLE_OVERLAY_FIGURE:
+         case ITechLinks.LINK_84_STYLE_TABLE_OVERLAY_FIGURE:
             return "StyleClass_Table_Overlay_Figure";
-         case IBOTypesGui.LINK_85_STYLE_TABLE_TITLE_TOP:
+         case ITechLinks.LINK_85_STYLE_TABLE_TITLE_TOP:
             return "Table Title Top";
-         case IBOTypesGui.LINK_86_STYLE_TABLE_TITLE_BOT:
+         case ITechLinks.LINK_86_STYLE_TABLE_TITLE_BOT:
             return "Table Title Bottom";
-         case IBOTypesGui.LINK_90_STRING_EDIT_CONTROL:
+         case ITechLinks.LINK_90_STRING_EDIT_CONTROL:
             return "BO_StringEditControl";
          default:
             return "UnknownLink " + link;
@@ -195,23 +196,23 @@ public class ToStringStaticGui extends ToStringStaticBase {
 
    public static String toStringTypeBO(final int type) {
       switch (type) {
-         case IBOTypesGui.TYPE_101_VIEWPANE_TECH:
+         case IBOTypesGui.TYPE_GUI_00_VIEWPANE:
             return "ViewPaneTech";
-         case IBOTypesGui.TYPE_102_SCROLLBAR_TECH:
+         case IBOTypesGui.TYPE_GUI_01_SCROLLBAR:
             return "ScrollbarTech";
-         case IBOTypesGui.TYPE_103_TABLE_TECH:
+         case IBOTypesGui.TYPE_GUI_02_TABLE:
             return "TableTech";
-         case IBOTypesGui.TYPE_119_GENETICS:
+         case IBOTypesGui.TYPE_GUI_03_TABLE_GENETICS:
             return "Genetics";
-         case IBOTypesGui.TYPE_121_SPANNING:
+         case IBOTypesGui.TYPE_GUI_05_CELL_SPANNING:
             return "Spanning";
-         case IBOTypesGui.TYPE_122_CELL_POLICY:
+         case IBOTypesGui.TYPE_GUI_06_CELL_POLICY:
             return "CellPolicy";
-         case IBOTypesGui.TYPE_124_STRING_TECH:
+         case IBOTypesGui.TYPE_124_STRING_DATA:
             return "StringTech";
          case IBOTypesGui.TYPE_125_STRING_EDIT_TECH:
             return "StringEditTech";
-         case IBOTypesGui.TYPE_126_STRING_GLOBAL:
+         case IBOTypesGui.TYPE_GUI_09_STRING_GLOBAL:
             return "StringGlobal";
          case IBOTypesGui.TYPE_127_STRING_PREDITION:
             return "StringPred";
@@ -362,20 +363,20 @@ public class ToStringStaticGui extends ToStringStaticBase {
       }
    }
 
-   public static String debugStringType(int type) {
+   public static String toStringStringPreset(int type) {
       switch (type) {
          case ITechStringDrawable.PRESET_CONFIG_0_NONE:
-            return "BASIC";
+            return "None";
          case ITechStringDrawable.PRESET_CONFIG_1_TITLE:
-            return "TITLE";
+            return "Title";
          case ITechStringDrawable.PRESET_CONFIG_3_SCROLL_V:
-            return "STRING_TYPE_XLINES_V_SCROLL";
+            return "ScrollV";
          case ITechStringDrawable.PRESET_CONFIG_2_SCROLL_H:
-            return "STRING_TYPE_TEXT_H_SCROLL";
+            return "ScrollH";
          case ITechStringDrawable.PRESET_CONFIG_4_NATURAL_NO_WRAP:
-            return "STRING_TYPE_NATURAL_NO_WRAP";
+            return "NaturalNoWrap";
          case ITechStringDrawable.PRESET_CONFIG_5_CHAR:
-            return "STRING_TYPE_CHAR";
+            return "Char";
          default:
             throw new IllegalArgumentException("" + type);
       }

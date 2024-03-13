@@ -200,7 +200,7 @@ public class ListUIRecords extends TableLayoutView implements IValidable {
    private void init(IntToStrings its, RgbImage[] imgs, int type) {
       typel = type;
       itsmodel = its;
-      t9 = new T9(gc.getUCtx(), itsmodel.strings);
+      t9 = new T9(gc.getUC(), itsmodel.strings);
       if (imgs != null) {
          if (imgs.length == its.ints.length) {
             images = imgs;

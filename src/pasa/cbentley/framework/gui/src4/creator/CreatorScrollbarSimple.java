@@ -6,6 +6,7 @@ import pasa.cbentley.framework.gui.src4.core.StyleClass;
 import pasa.cbentley.framework.gui.src4.ctx.GuiCtx;
 import pasa.cbentley.framework.gui.src4.ctx.IBOTypesGui;
 import pasa.cbentley.framework.gui.src4.factories.interfaces.IBOScrollBar;
+import pasa.cbentley.framework.gui.src4.tech.ITechLinks;
 
 /**
  * Creators of anything related Scroll
@@ -34,7 +35,7 @@ public class CreatorScrollbarSimple extends CreatorAbstractScrollbar {
    }
 
    protected ByteObject getBOScrollbar(boolean vertical) {
-      ByteObject boSB = new ByteObject(boc, IBOTypesGui.TYPE_102_SCROLLBAR_TECH, SB_BASIC_SIZE);
+      ByteObject boSB = new ByteObject(boc, IBOTypesGui.TYPE_GUI_01_SCROLLBAR, SB_BASIC_SIZE);
       int scrollbar1Size = 16;
       int scrollbar2Size = 15;
       int scrollbar3Size = 10;
@@ -139,22 +140,22 @@ public class CreatorScrollbarSimple extends CreatorAbstractScrollbar {
       StyleClass sc = new StyleClass(gc, boStyle);
 
       ByteObject bo = getBOScrollbarH();
-      sc.linkByteObject(bo, IBOTypesGui.LINK_69_BO_H_SCROLLBAR);
+      sc.linkByteObject(bo, ITechLinks.LINK_69_BO_H_SCROLLBAR);
 
       ByteObject boFigure = getBOFigWrapper();
-      sc.linkByteObject(boFigure, IBOTypesGui.LINK_49_FIG_SCROLLBAR_WRAPPER);
+      sc.linkByteObject(boFigure, ITechLinks.LINK_49_FIG_SCROLLBAR_WRAPPER);
 
       StyleClass sbBlockBg = getStyleClassBlockBgHoriz();
-      sc.linkStyleClass(sbBlockBg, IBOTypesGui.LINK_50_STYLE_SCROLLBAR_BLOCK_BG);
+      sc.linkStyleClass(sbBlockBg, ITechLinks.LINK_50_STYLE_SCROLLBAR_BLOCK_BG);
 
       StyleClass sbBlockFig = getStyleClassBlockBgHoriz();
-      sc.linkStyleClass(sbBlockFig, IBOTypesGui.LINK_51_STYLE_SCROLLBAR_BLOCK_FIG);
+      sc.linkStyleClass(sbBlockFig, ITechLinks.LINK_51_STYLE_SCROLLBAR_BLOCK_FIG);
 
       StyleClass sbWrapperTopLeft = getStyleClassWrapperTopLeft();
-      sc.linkStyleClass(sbWrapperTopLeft, IBOTypesGui.LINK_52_STYLE_SCROLLBAR_TOP_LEFT_WRAPPER);
+      sc.linkStyleClass(sbWrapperTopLeft, ITechLinks.LINK_52_STYLE_SCROLLBAR_TOP_LEFT_WRAPPER);
 
       StyleClass sbWrapperBotRight = getStyleClassWrapperBotRight();
-      sc.linkStyleClass(sbWrapperBotRight, IBOTypesGui.LINK_53_STYLE_SCROLLBAR_BOT_RIGHT_WRAPPER);
+      sc.linkStyleClass(sbWrapperBotRight, ITechLinks.LINK_53_STYLE_SCROLLBAR_BOT_RIGHT_WRAPPER);
 
       return sc;
    }
@@ -164,22 +165,22 @@ public class CreatorScrollbarSimple extends CreatorAbstractScrollbar {
       StyleClass sc = new StyleClass(gc, boStyle);
 
       ByteObject bo = getBOScrollbarVertical();
-      sc.linkByteObject(bo, IBOTypesGui.LINK_68_BO_V_SCROLLBAR);
+      sc.linkByteObject(bo, ITechLinks.LINK_68_BO_V_SCROLLBAR);
 
       ByteObject boFigure = getBOFigWrapper();
-      sc.linkByteObject(boFigure, IBOTypesGui.LINK_49_FIG_SCROLLBAR_WRAPPER);
+      sc.linkByteObject(boFigure, ITechLinks.LINK_49_FIG_SCROLLBAR_WRAPPER);
 
       StyleClass sbBlockBg = getStyleClassBlockBgVert();
-      sc.linkStyleClass(sbBlockBg, IBOTypesGui.LINK_50_STYLE_SCROLLBAR_BLOCK_BG);
+      sc.linkStyleClass(sbBlockBg, ITechLinks.LINK_50_STYLE_SCROLLBAR_BLOCK_BG);
 
       StyleClass sbBlockFig = getStyleClassBlockBgVert();
-      sc.linkStyleClass(sbBlockFig, IBOTypesGui.LINK_51_STYLE_SCROLLBAR_BLOCK_FIG);
+      sc.linkStyleClass(sbBlockFig, ITechLinks.LINK_51_STYLE_SCROLLBAR_BLOCK_FIG);
 
       StyleClass sbWrapperTopLeft = getStyleClassWrapperTopLeft();
-      sc.linkStyleClass(sbWrapperTopLeft, IBOTypesGui.LINK_52_STYLE_SCROLLBAR_TOP_LEFT_WRAPPER);
+      sc.linkStyleClass(sbWrapperTopLeft, ITechLinks.LINK_52_STYLE_SCROLLBAR_TOP_LEFT_WRAPPER);
 
       StyleClass sbWrapperBotRight = getStyleClassWrapperBotRight();
-      sc.linkStyleClass(sbWrapperBotRight, IBOTypesGui.LINK_53_STYLE_SCROLLBAR_BOT_RIGHT_WRAPPER);
+      sc.linkStyleClass(sbWrapperBotRight, ITechLinks.LINK_53_STYLE_SCROLLBAR_BOT_RIGHT_WRAPPER);
 
       return sc;
    }

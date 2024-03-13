@@ -76,7 +76,7 @@ public class MLogViewer extends TableView implements IMLog, IMemFreeable {
     * @param h
     */
    public MLogViewer(GuiCtx gc, StyleClass sc) {
-      this(gc, sc, gc.getTablePolicyC().getSimple1ColPolicy(), null);
+      this(gc, sc, gc.getTablePolicyFactory().getSimple1ColPolicy(), null);
    }
 
    /**
@@ -87,7 +87,7 @@ public class MLogViewer extends TableView implements IMLog, IMemFreeable {
     */
    public MLogViewer(GuiCtx gc, StyleClass sc, ByteObject policy, IntToObjects its) {
       super(gc, sc, policy);
-      UCtx uc = gc.getUCtx();
+      UCtx uc = gc.getUC();
       setFlagGene(ITechViewDrawable.FLAG_GENE_31_EXPANDABLE_W, true);
       if(its == null) {
          its = new IntToObjects(uc);

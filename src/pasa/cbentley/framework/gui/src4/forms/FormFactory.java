@@ -32,7 +32,7 @@ public class FormFactory {
     */
    public ListUIRecords create(StyleClass sc, String title, int selType) {
       ITableModel model = new ObjectTableModel(gc.getDMC(), new String[0]);
-      TablePolicyFactory tableFac = gc.getTablePolicyC();
+      TablePolicyFactory tableFac = gc.getTablePolicyFactory();
       ListUIRecords lu = new ListUIRecords(gc, sc, tableFac.getSimple1ColPolicy(), model);
       lu.setSelectionType(selType);
       return lu;
@@ -40,7 +40,7 @@ public class FormFactory {
 
    public ListUIRecords create(StyleClass sc, String title, int selType, IntToStrings its, IImage[] imgs) {
       ITableModel model = new ObjectTableModel(gc.getDMC(), new String[0]);
-      TablePolicyFactory tableFac = gc.getTablePolicyC();
+      TablePolicyFactory tableFac = gc.getTablePolicyFactory();
       ListUIRecords lu = new ListUIRecords(gc, sc, tableFac.getSimple1ColPolicy(), model);
       lu.setSelectionType(selType);
       return lu;
@@ -48,14 +48,14 @@ public class FormFactory {
 
    public ListUIRecords create(StyleClass sc, String title, IObjectStore mo) {
       ITableModel model = new ObjectTableModel(gc.getDMC(), new String[0]);
-      TablePolicyFactory tableFac = gc.getTablePolicyC();
+      TablePolicyFactory tableFac = gc.getTablePolicyFactory();
       ListUIRecords lu = new ListUIRecords(gc, sc, tableFac.getSimple1ColPolicy(), model);
       return lu;
    }
 
    public ListUIRecords create(StyleClass sc, String title, int type, IByteCache bc, ViewOptions vo) {
       ITableModel model = new ObjectTableModel(gc.getDMC(), new String[0]);
-      TablePolicyFactory tableFac = gc.getTablePolicyC();
+      TablePolicyFactory tableFac = gc.getTablePolicyFactory();
       ListUIRecords lu = new ListUIRecords(gc, sc, tableFac.getSimple1ColPolicy(), model);
       if (bc == null)
          throw new NullPointerException();

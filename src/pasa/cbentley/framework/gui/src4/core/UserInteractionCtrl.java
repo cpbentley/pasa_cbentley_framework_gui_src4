@@ -28,7 +28,7 @@ public class UserInteractionCtrl implements IMemFreeable {
 
    public UserInteractionCtrl(GuiCtx gc) {
       this.gc = gc;
-      UCtx uc = gc.getUCtx();
+      UCtx uc = gc.getUC();
       itos = new IntToObjects(uc);
 
       //how can you unregister a module?
@@ -85,7 +85,7 @@ public class UserInteractionCtrl implements IMemFreeable {
    }
 
    public UCtx toStringGetUCtx() {
-      return gc.getUCtx();
+      return gc.getUC();
    }
 
    //#enddebug

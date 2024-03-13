@@ -18,7 +18,6 @@ import pasa.cbentley.framework.gui.src4.canvas.InputConfig;
 import pasa.cbentley.framework.gui.src4.canvas.PointerGestureDrawable;
 import pasa.cbentley.framework.gui.src4.canvas.ViewContext;
 import pasa.cbentley.framework.gui.src4.ctx.GuiCtx;
-import pasa.cbentley.framework.gui.src4.ctx.IBOTypesGui;
 import pasa.cbentley.framework.gui.src4.ctx.IToStringFlagsGui;
 import pasa.cbentley.framework.gui.src4.factories.interfaces.IBOScrollBar;
 import pasa.cbentley.framework.gui.src4.factories.interfaces.IBOViewPane;
@@ -28,6 +27,7 @@ import pasa.cbentley.framework.gui.src4.interfaces.ITechCanvasDrawable;
 import pasa.cbentley.framework.gui.src4.interfaces.ITechDrawable;
 import pasa.cbentley.framework.gui.src4.interfaces.ITechViewDrawable;
 import pasa.cbentley.framework.gui.src4.table.TableView;
+import pasa.cbentley.framework.gui.src4.tech.ITechLinks;
 import pasa.cbentley.framework.gui.src4.tech.ITechViewPane;
 import pasa.cbentley.framework.gui.src4.utils.DrawableUtilz;
 import pasa.cbentley.framework.input.src4.gesture.GestureDetector;
@@ -124,7 +124,7 @@ import pasa.cbentley.layouter.src4.interfaces.ILayoutable;
  * <br>
  * <b>Holes</b> : <br>
  * The ViewPane scrollbars and headers may create empty areas. An external class may set an {@link IDrawable} into those holes. <br>
- * By default, the ViewPane draws a hole style given by child {@link IBOTypesGui#LINK_58_STYLE_VIEWPANE_HOLE_HEADER} inside those areas.
+ * By default, the ViewPane draws a hole style given by child {@link ITechLinks#LINK_58_STYLE_VIEWPANE_HOLE_HEADER} inside those areas.
  * <br>
  * <br>
  * <b>Competitive modes</b>:<br>
@@ -383,7 +383,7 @@ public class ViewPane extends Drawable implements ITechViewPane, ITechDrawable, 
       this.satellites = new IDrawable[SAT_MAX_NUM];
       this.viewedDrawable = vd;
       doUpdateStyleClass();
-      trailScope = new IntBuffer(gc.getUCtx());
+      trailScope = new IntBuffer(gc.getUC());
 
       //#debug
       this.toStringSetName("ViewPane");
@@ -483,10 +483,10 @@ public class ViewPane extends Drawable implements ITechViewPane, ITechDrawable, 
     * TODO make sure no bug when style set with {@link ITechViewPane#DRW_STYLE_1_VIEWPANE}
     */
    protected void doUpdateStyleClass() {
-      boViewPane = styleClass.getByteObjectNotNull(IBOTypesGui.LINK_66_BO_VIEWPANE);
+      boViewPane = styleClass.getByteObjectNotNull(ITechLinks.LINK_66_BO_VIEWPANE);
       //how do you hijack the style?
       StyleClass src = getStyleClassForChildren();
-      viewPortSC = src.getStyleClass(IBOTypesGui.LINK_64_STYLE_VIEWPORT);
+      viewPortSC = src.getStyleClass(ITechLinks.LINK_64_STYLE_VIEWPORT);
       if (isStyleAppliedToViewPane()) {
          //reuse stylecache of view drawable
          ByteObject style = null;
@@ -1871,7 +1871,7 @@ public class ViewPane extends Drawable implements ITechViewPane, ITechDrawable, 
       if (hScrollBar == null) {
          //from styleKey of ViewPane
          StyleClass src = getStyleClassForChildren();
-         StyleClass sc = src.getSCNotNull(IBOTypesGui.LINK_71_STYLE_VIEWPANE_H_SCROLLBAR);
+         StyleClass sc = src.getSCNotNull(ITechLinks.LINK_71_STYLE_VIEWPANE_H_SCROLLBAR);
          //TODO implement figure sharing..that is one figure drawn using flipping for scrollbars
          //how would do that? scrollbars have the same style, same sizing
          //wrappers are just drawable with style layers
@@ -1897,7 +1897,7 @@ public class ViewPane extends Drawable implements ITechViewPane, ITechDrawable, 
       if (vScrollBar == null) {
          //get scrollbar parameters style from the view pane style
          StyleClass src = getStyleClassForChildren();
-         StyleClass sc = src.getStyleClass(IBOTypesGui.LINK_72_STYLE_VIEWPANE_V_SCROLLBAR);
+         StyleClass sc = src.getStyleClass(ITechLinks.LINK_72_STYLE_VIEWPANE_V_SCROLLBAR);
          vScrollBar = new ScrollBar(gc, sc, false, this);
          vScrollBar.getLayEngine().setManualOverride(true); //everything is decided
          vScrollBar.doUpdateBOViewPane(boViewPane);
@@ -1918,14 +1918,15 @@ public class ViewPane extends Drawable implements ITechViewPane, ITechDrawable, 
       ScrollConfig scy = null;
       if (vScrollBar != null) {
          scy = vScrollBar.getConfig();
+         //#debug
+         toDLog().pInit("vertical ScrollBar -> ScrollConfig Y", scy, ViewPane.class, "initScrollingConfigs", LVL_05_FINE, false);
       }
       if (hScrollBar != null) {
          scx = hScrollBar.getConfig();
+         //#debug
+         toDLog().pInit("horizontal ScrollBar -> ScrollConfig X", scx, ViewPane.class, "initScrollingConfigs@1926", LVL_05_FINE, false);
       }
-      //#debug
-      toDLog().pFlow("ScrollConfig X", scx, ViewPane.class, "initScrollingConfigs", LVL_05_FINE, false);
-      //#debug
-      toDLog().pFlow("ScrollConfig Y", scy, ViewPane.class, "initScrollingConfigs", LVL_05_FINE, false);
+
       viewedDrawable.initScrollingConfig(scx, scy);
 
       doUpdateScrollbarStructures();
@@ -2111,7 +2112,7 @@ public class ViewPane extends Drawable implements ITechViewPane, ITechDrawable, 
       this.setStateFlag(STATE_05_LAYOUTED, true);
       //now that is layouted. we can call configs
       initScrollingConfigs();
-      
+
       gc.getNavigator().setNavCtx(viewedDrawable, viewedDrawable.hasFlagView(FLAG_VSTATE_22_SCROLLED));
    }
 
@@ -2480,18 +2481,25 @@ public class ViewPane extends Drawable implements ITechViewPane, ITechDrawable, 
     */
    private boolean isScrollNeededH() {
       if (viewedDrawable.hasFlagView(FLAG_VSTATE_10_CONTENT_PW_VIEWPORT_DW)) {
+         //#debug
+         toDLog().pInit("FLAG_VSTATE_10_CONTENT_PW_VIEWPORT_DW=true", this, ViewPane.class, "isScrollNeededH@2507", LVL_04_FINER, true);
          return false;
       }
       if (boViewPane.hasFlag(VP_OFFSET_01_FLAG, VP_FLAG_2_SCROLLBAR_ALWAYS)) {
+         //#debug
+         toDLog().pInit("VP_FLAG_2_SCROLLBAR_ALWAYS=true", this, ViewPane.class, "isScrollNeededH@2513", LVL_04_FINER, true);
+
          return true;
       }
       int viewPortWidth2 = getViewPortWidth();
       int preferredContentWidth = viewedDrawable.getPreferredContentWidth();
-      
-      //#debug
-      toDLog().pInit("viewportWidth=" + viewPortWidth2 + " < " + preferredContentWidth, this, ViewPane.class, "isScrollHNeeded@2450", LVL_04_FINER, true);
 
-      return viewPortWidth2 < preferredContentWidth;
+      boolean isScrollNeeded = viewPortWidth2 < preferredContentWidth;
+
+      //#debug
+      toDLog().pInit("viewportWidth=" + viewPortWidth2 + " < " + preferredContentWidth + " = " + isScrollNeeded, this, ViewPane.class, "isScrollHNeeded@2450", LVL_04_FINER, true);
+
+      return isScrollNeeded;
    }
 
    public boolean isScrollHPixels() {
@@ -2504,16 +2512,25 @@ public class ViewPane extends Drawable implements ITechViewPane, ITechDrawable, 
     */
    private boolean isScrollNeededV() {
       if (viewedDrawable.hasFlagView(FLAG_VSTATE_11_CONTENT_PH_VIEWPORT_DH)) {
+         //#debug
+         toDLog().pInit("FLAG_VSTATE_11_CONTENT_PH_VIEWPORT_DH=true", this, ViewPane.class, "isScrollNeededV@2507", LVL_04_FINER, true);
          return false;
       }
       if (boViewPane.hasFlag(VP_OFFSET_01_FLAG, VP_FLAG_2_SCROLLBAR_ALWAYS)) {
+         //#debug
+         toDLog().pInit("VP_FLAG_2_SCROLLBAR_ALWAYS=true", this, ViewPane.class, "isScrollNeededV@2513", LVL_04_FINER, true);
          return true;
       }
+
       int viewPortHeight2 = getViewPortHeight();
       int preferredContentHeight = viewedDrawable.getPreferredContentHeight();
+
+      boolean isScrollNeeded = viewPortHeight2 < preferredContentHeight;
+
       //#debug
-      toDLog().pInit("viewportHeight=" + viewPortHeight2 + " < " + preferredContentHeight, this, ViewPane.class, "isScrollNeededV@2450", LVL_04_FINER, true);
-      return viewPortHeight2 < preferredContentHeight;
+      toDLog().pInit("viewportHeight=" + viewPortHeight2 + " < " + preferredContentHeight + " = " + isScrollNeeded, this, ViewPane.class, "isScrollNeededV@2521", LVL_04_FINER, true);
+
+      return isScrollNeeded;
    }
 
    public boolean isScrollVPixels() {
@@ -2633,7 +2650,7 @@ public class ViewPane extends Drawable implements ITechViewPane, ITechDrawable, 
       }
 
       StyleClass src = getStyleClassForChildren();
-      StyleClass scHole = src.getStyleClass(IBOTypesGui.LINK_58_STYLE_VIEWPANE_HOLE_HEADER);
+      StyleClass scHole = src.getStyleClass(ITechLinks.LINK_58_STYLE_VIEWPANE_HOLE_HEADER);
 
       int topHoleHeight = 0;
       if (headerTop != null) {
@@ -3040,7 +3057,7 @@ public class ViewPane extends Drawable implements ITechViewPane, ITechDrawable, 
       if (hScrollBar != null && vScrollBar != null) {
          if ((isScrollBarHorizEat() || isScrollBarHorizExpand()) && (isScrollBarVertEat() || isScrollBarVertExpand())) {
             StyleClass src = getStyleClassForChildren();
-            StyleClass scScrollbarHole = src.getStyleClass(IBOTypesGui.LINK_59_STYLE_VIEWPANE_HOLE_SB);
+            StyleClass scScrollbarHole = src.getStyleClass(ITechLinks.LINK_59_STYLE_VIEWPANE_HOLE_SB);
             //there are no holes and when fill and not neutral
             if (vScrollBar.hasTechFlag(SB_FLAG_4_WRAPPER_FILL)) {
                if (this.getCompetTypeSb() != ITechViewPane.COMPET_SB_0_NEUTRAL) {
@@ -3088,9 +3105,9 @@ public class ViewPane extends Drawable implements ITechViewPane, ITechDrawable, 
    private boolean layDimensionScrollbars() {
       boolean isVNeeded = isScrollNeededV();
       boolean isHNeeded = isScrollNeededH();
-      
+
       //#debug
-      toDLog().pInit("isVNeeded="+isVNeeded  + " isHNeeded="+isHNeeded, this, ViewPane.class, "layDimensionScrollbars", LVL_05_FINE, true);
+      toDLog().pInit("isVNeeded=" + isVNeeded + " isHNeeded=" + isHNeeded, this, ViewPane.class, "layDimensionScrollbars@3093", LVL_05_FINE, true);
       if (!isVNeeded && !isHNeeded) {
          vScrollBar = null;
          hScrollBar = null;

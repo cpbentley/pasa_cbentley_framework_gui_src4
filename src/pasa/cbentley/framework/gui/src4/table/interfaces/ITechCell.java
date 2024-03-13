@@ -39,15 +39,17 @@ public interface ITechCell extends ITech {
 
    /**
     * Needs an explicit pixel value for column's widht or row's height.
-    * <br>
     * 
-    * <br>
-    * This value is given by either 
-    * <li>{@link IBOCellPolicy#OFFSET_09WIDTH4}
-    * <li>{@link IBOCellPolicy#FLAGZ_2COL_SIZES} 
-    * <li>{@link ISizer}
-    * <br>
-    * That means if value is {@link IBOCellPolicy#OFFSET_09WIDTH4}, this policy will have the meaning of {@link ITechCell#CELL_0_IMPLICIT_SET} meaning.
+    * <p>
+    * <li>{@link IBOCellPolicy#CELLP_OFFSET_09_SIZE4}
+    * <li>{@link IBOCellPolicy#CELLP_FLAGZ_2_SIZES} 
+    * <li>{@link IBOCellPolicy#CELLP_FLAGZ_8_SIZER} 
+    * </p>
+    * 
+    * <p>
+    * That means if value is {@link IBOCellPolicy#CELLP_OFFSET_09_SIZE4}, 
+    * this policy will have the meaning of {@link ITechCell#CELL_0_IMPLICIT_SET} meaning.
+    * </p>
     * 
     */
    public static final int CELL_1_EXPLICIT_SET                    = 1;

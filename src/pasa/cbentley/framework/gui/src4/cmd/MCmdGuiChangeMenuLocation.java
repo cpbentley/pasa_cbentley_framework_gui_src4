@@ -9,7 +9,6 @@ import pasa.cbentley.framework.datamodel.src4.table.ObjectTableModel;
 import pasa.cbentley.framework.gui.src4.canvas.InputConfig;
 import pasa.cbentley.framework.gui.src4.core.StyleClass;
 import pasa.cbentley.framework.gui.src4.ctx.GuiCtx;
-import pasa.cbentley.framework.gui.src4.ctx.IBOTypesGui;
 import pasa.cbentley.framework.gui.src4.factories.TableCellPolicyFactory;
 import pasa.cbentley.framework.gui.src4.factories.TablePolicyFactory;
 import pasa.cbentley.framework.gui.src4.interfaces.ICmdsView;
@@ -18,6 +17,7 @@ import pasa.cbentley.framework.gui.src4.menu.CmdMenuBar;
 import pasa.cbentley.framework.gui.src4.menu.IMenus;
 import pasa.cbentley.framework.gui.src4.table.TableView;
 import pasa.cbentley.framework.gui.src4.table.interfaces.ITechTable;
+import pasa.cbentley.framework.gui.src4.tech.ITechLinks;
 
 public class MCmdGuiChangeMenuLocation extends MCmdGui implements IEventConsumer {
 
@@ -58,12 +58,12 @@ public class MCmdGuiChangeMenuLocation extends MCmdGui implements IEventConsumer
       if (menuPosTable == null) {
          String[] data = new String[] { "Top", "Bottom", "Left", "Right" };
          TableCellPolicyFactory cellFac = gc.getTableCellPolicyFactory();
-         TablePolicyFactory tabFac = gc.getTablePolicyC();
+         TablePolicyFactory tabFac = gc.getTablePolicyFactory();
          ByteObject colPol = cellFac.getGeneric(2, 0);
          ByteObject rowPol = cellFac.getGeneric(0, 0);
          ByteObject policyTable = tabFac.getTablePolicy(colPol, rowPol);
-         StyleClass scMenu = gc.getClass(IUIView.SC_1_MENU);
-         StyleClass scMenuItems = scMenu.getSCNotNull(IBOTypesGui.LINK_74_STYLE_CLASS_MENU);
+         StyleClass scMenu = gc.getStyleClass(IUIView.SC_1_MENU);
+         StyleClass scMenuItems = scMenu.getSCNotNull(ITechLinks.LINK_74_STYLE_CLASS_MENU);
          TableView tv = new TableView(gc, scMenuItems, policyTable);
          ObjectTableModel otm = new ObjectTableModel(gc.getDMC(), data, 1);
          tv.setDataModel(otm);

@@ -3,8 +3,11 @@ package pasa.cbentley.framework.gui.src4.factories;
 import pasa.cbentley.byteobjects.src4.core.BOAbstractFactory;
 import pasa.cbentley.byteobjects.src4.core.ByteObject;
 import pasa.cbentley.byteobjects.src4.objects.pointer.IBOMergeMask;
+import pasa.cbentley.framework.drawx.src4.ctx.IBOTypesDrawX;
+import pasa.cbentley.framework.drawx.src4.string.interfaces.IBOStrAux;
 import pasa.cbentley.framework.gui.src4.ctx.GuiCtx;
 import pasa.cbentley.framework.gui.src4.ctx.IBOTypesGui;
+import pasa.cbentley.framework.gui.src4.factories.interfaces.IBOStrAuxEdit;
 import pasa.cbentley.framework.gui.src4.factories.interfaces.IBOStringData;
 import pasa.cbentley.framework.gui.src4.factories.interfaces.IBOStringEdit;
 import pasa.cbentley.framework.gui.src4.interfaces.ITechDrawable;
@@ -22,22 +25,21 @@ public class DrawableStringFactory extends BOAbstractFactory implements IBOStrin
    }
 
    /**
-    * Create a Transparent definition of a String tech input param just defining the charset
-    * <br>
-    * <br>
-    * @param ctype0English
+    * Create a Transparent definition of a String tech input param just defining the charset.
+    * 
+    * @param charset value for {@link IBOStringData#SDATA_OFFSET_03_CHARSET_ID1}
     * @return
     */
-   public ByteObject getStringTechTCharSet(int charset) {
-      ByteObject bo = new ByteObject(boc, IBOTypesGui.TYPE_124_STRING_TECH, SDATA_BASIC_SIZE);
+   public ByteObject getBOStringDataTransparentCharSet(int charset) {
+      ByteObject bo = new ByteObject(boc, IBOTypesGui.TYPE_124_STRING_DATA, SDATA_BASIC_SIZE);
       bo.set1(IBOStringData.SDATA_OFFSET_03_CHARSET_ID1, charset);
-      
+
       gc.getDC().getMergeMaskFactory().setMergeMask(bo, IBOMergeMask.MERGE_MASK_OFFSET_5VALUES1, IBOMergeMask.MERGE_MASK_FLAG5_2);
       return bo;
    }
 
-   public ByteObject getBOEditDefault() {
-      ByteObject tech = getBOEditEmpty();
+   public ByteObject getBOStringEditDefault() {
+      ByteObject tech = getBOStringEditEmpty();
 
       tech.setFlag(SEDIT_OFFSET_01_FLAG, SEDIT_FLAG_1_CARET_BG, false);
 
@@ -67,33 +69,38 @@ public class DrawableStringFactory extends BOAbstractFactory implements IBOStrin
     * 
     * @return
     */
-   public ByteObject getStringTech() {
-      ByteObject bo = new ByteObject(boc, IBOTypesGui.TYPE_124_STRING_TECH, SDATA_BASIC_SIZE);
+   public ByteObject getBOStringDataEmpty() {
+      ByteObject bo = new ByteObject(boc, IBOTypesGui.TYPE_124_STRING_DATA, SDATA_BASIC_SIZE);
       return bo;
    }
 
    /**
+    * Creates an {@link IBOStringData} with provided preset config.
+    * 
     * <li>{@link ITechStringDrawable#PRESET_CONFIG_0_NONE}
     * <li>{@link ITechStringDrawable#PRESET_CONFIG_1_TITLE}
     * <li>{@link ITechStringDrawable#PRESET_CONFIG_2_SCROLL_H}
     * 
-    * @param stringType
+    * @param preset
     * @return
     */
-   public ByteObject getStringTech(int stringType) {
-      ByteObject bo = new ByteObject(boc, IBOTypesGui.TYPE_124_STRING_TECH, SDATA_BASIC_SIZE);
-      bo.set1(IBOStringData.SDATA_OFFSET_02_PRESET_CONFIG1, stringType);
+   public ByteObject getBOStringData(int preset) {
+      ByteObject bo = new ByteObject(boc, IBOTypesGui.TYPE_124_STRING_DATA, SDATA_BASIC_SIZE);
+      bo.set1(IBOStringData.SDATA_OFFSET_02_PRESET_CONFIG1, preset);
       return bo;
    }
 
    /**
     * 
+    * <li> {@link ITechStringDrawable#S_ACTION_MODE_0_READ}
+    * <li> {@link ITechStringDrawable#S_ACTION_MODE_1_SELECT}
+    * <li> {@link ITechStringDrawable#S_ACTION_MODE_2_EDIT}
     * @param stringType
     * @param mode {@link IBOStringData#SDATA_OFFSET_06_ACTION_MODE1}
     * @return
     */
-   public ByteObject getStringTech(int stringType, int mode) {
-      ByteObject bo = new ByteObject(boc, IBOTypesGui.TYPE_124_STRING_TECH, SDATA_BASIC_SIZE);
+   public ByteObject getBOStringData(int stringType, int mode) {
+      ByteObject bo = new ByteObject(boc, IBOTypesGui.TYPE_124_STRING_DATA, SDATA_BASIC_SIZE);
       bo.set1(IBOStringData.SDATA_OFFSET_02_PRESET_CONFIG1, stringType);
       bo.set1(IBOStringData.SDATA_OFFSET_06_ACTION_MODE1, mode);
       return bo;
@@ -116,12 +123,19 @@ public class DrawableStringFactory extends BOAbstractFactory implements IBOStrin
     * <br>
     * @return
     */
-   public ByteObject getStringTech(int stringType, int mode, int maxSize, int inputType) {
-      return getStringTech(stringType, mode, maxSize, inputType, Symbs.CHAR_SET_0_DEFAULT);
+   public ByteObject getBOStringData(int stringType, int mode, int maxSize, int inputType) {
+      return getBOStringData(stringType, mode, maxSize, inputType, Symbs.CHAR_SET_0_DEFAULT);
    }
 
-   public ByteObject getStringTechEdit(int stringType, int maxSize, int inputType) {
-      return getStringTech(stringType, ITechStringDrawable.S_ACTION_MODE_2_EDIT, maxSize, inputType, Symbs.CHAR_SET_0_DEFAULT);
+   /**
+    * 
+    * @param stringType
+    * @param maxSize
+    * @param inputType
+    * @return
+    */
+   public ByteObject getBOStringData(int stringType, int maxSize, int inputType) {
+      return getBOStringData(stringType, ITechStringDrawable.S_ACTION_MODE_2_EDIT, maxSize, inputType, Symbs.CHAR_SET_0_DEFAULT);
    }
 
    /**
@@ -136,8 +150,8 @@ public class DrawableStringFactory extends BOAbstractFactory implements IBOStrin
     * @param charSetID {@link IBOStringData#SDATA_OFFSET_03_CHARSET_ID1}
     * @return
     */
-   public ByteObject getStringTech(int stringType, int mode, int maxSize, int inputType, int charSetID) {
-      ByteObject bo = new ByteObject(boc, IBOTypesGui.TYPE_124_STRING_TECH, SDATA_BASIC_SIZE);
+   public ByteObject getBOStringData(int stringType, int mode, int maxSize, int inputType, int charSetID) {
+      ByteObject bo = new ByteObject(boc, IBOTypesGui.TYPE_124_STRING_DATA, SDATA_BASIC_SIZE);
       bo.set1(SDATA_OFFSET_02_PRESET_CONFIG1, stringType);
       bo.set1(SDATA_OFFSET_03_CHARSET_ID1, charSetID);
       bo.set1(SDATA_OFFSET_04_DATA_TYPE1, inputType);
@@ -151,25 +165,36 @@ public class DrawableStringFactory extends BOAbstractFactory implements IBOStrin
     * <br>
     * @return
     */
-   public ByteObject getBOEditEmpty() {
+   public ByteObject getBOStringEditEmpty() {
       ByteObject bo = new ByteObject(boc, IBOTypesGui.TYPE_125_STRING_EDIT_TECH, SEDIT_BASIC_SIZE);
       return bo;
+   }
+
+   /**
+    * {@link IBOStrAuxEdit}
+    * 
+    * @return
+    */
+   public ByteObject createStrAuxEdit() {
+      ByteObject p = getBOFactory().createByteObject(IBOTypesDrawX.TYPE_DRWX_07_STRING_AUX, IBOStrAuxEdit.SEDIT_BASIC_SIZE);
+      p.set1(IBOStrAux.STR_AUX_OFFSET_1_EXT_TYPE1, IBOTypesGui.TYPE_DRWX_07_STRING_AUX_1_EDIT);
+      return p;
    }
 
    /**
     * The default tech maybe modified externally without other people knowing about it!
     * @return
     */
-   public ByteObject getDefaultStringTech() {
-      return getStringTech();
+   public ByteObject getBOStringDataDefault() {
+      return getBOStringDataEmpty();
    }
 
    /**
     * 
     * @return
     */
-   public ByteObject getBOEditNormal() {
-      ByteObject tech = getBOEditEmpty();
+   public ByteObject getBOStringEditNormal() {
+      ByteObject tech = getBOStringEditEmpty();
 
       boolean isCaretBg = true;
       tech.setFlag(SEDIT_OFFSET_01_FLAG, SEDIT_FLAG_1_CARET_BG, isCaretBg);
@@ -201,8 +226,8 @@ public class DrawableStringFactory extends BOAbstractFactory implements IBOStrin
     * @param ck
     * @return
     */
-   public ByteObject getStringTechTable() {
-      ByteObject is = getStringTech();
+   public ByteObject getBOStringDataSmallTitle() {
+      ByteObject is = getBOStringDataEmpty();
 
       is.setFlag(SDATA_OFFSET_01_FLAG, SDATA_FLAG_1_PASSWORD, false);
       is.setFlag(SDATA_OFFSET_01_FLAG, SDATA_FLAG_3_MAJ, false);

@@ -1,17 +1,17 @@
 package pasa.cbentley.framework.gui.src4.string;
 
 import pasa.cbentley.byteobjects.src4.core.ByteObject;
-import pasa.cbentley.byteobjects.src4.ctx.IBOTypesDrw;
 import pasa.cbentley.core.src4.event.BusEvent;
 import pasa.cbentley.core.src4.i8n.I8nString;
 import pasa.cbentley.core.src4.io.XString;
 import pasa.cbentley.core.src4.logging.Dctx;
 import pasa.cbentley.framework.coredraw.src4.interfaces.IMFont;
+import pasa.cbentley.framework.drawx.src4.ctx.IBOTypesDrawX;
 import pasa.cbentley.framework.drawx.src4.ctx.ToStringStaticDrawx;
 import pasa.cbentley.framework.drawx.src4.engine.GraphicsX;
-import pasa.cbentley.framework.drawx.src4.factories.interfaces.IBOFigString;
 import pasa.cbentley.framework.drawx.src4.string.StringMetrics;
 import pasa.cbentley.framework.drawx.src4.string.Stringer;
+import pasa.cbentley.framework.drawx.src4.string.interfaces.IBOFigString;
 import pasa.cbentley.framework.drawx.src4.string.interfaces.ITechStringDrw;
 import pasa.cbentley.framework.drawx.src4.style.IBOStyle;
 import pasa.cbentley.framework.gui.src4.canvas.InputConfig;
@@ -25,7 +25,6 @@ import pasa.cbentley.framework.gui.src4.core.StyleClass;
 import pasa.cbentley.framework.gui.src4.core.ViewDrawable;
 import pasa.cbentley.framework.gui.src4.core.ViewPane;
 import pasa.cbentley.framework.gui.src4.ctx.GuiCtx;
-import pasa.cbentley.framework.gui.src4.ctx.IBOTypesGui;
 import pasa.cbentley.framework.gui.src4.ctx.ToStringStaticGui;
 import pasa.cbentley.framework.gui.src4.factories.interfaces.IBOStringData;
 import pasa.cbentley.framework.gui.src4.interfaces.IDrawListener;
@@ -34,20 +33,20 @@ import pasa.cbentley.framework.gui.src4.interfaces.ITechDrawable;
 import pasa.cbentley.framework.gui.src4.interfaces.ITechViewDrawable;
 import pasa.cbentley.framework.gui.src4.table.TableView;
 import pasa.cbentley.framework.gui.src4.tech.ITechLayoutDrawable;
+import pasa.cbentley.framework.gui.src4.tech.ITechLinks;
 import pasa.cbentley.framework.gui.src4.tech.ITechStringDrawable;
 import pasa.cbentley.framework.gui.src4.tech.ITechViewPane;
 import pasa.cbentley.framework.gui.src4.utils.DrawableUtilz;
 import pasa.cbentley.layouter.src4.engine.SizerFactory;
 import pasa.cbentley.layouter.src4.tech.IBOSizer;
 import pasa.cbentley.layouter.src4.tech.ITechLayout;
-import pasa.cbentley.powerdata.spec.src4.power.IPowerCharCollector;
 
 /**
  * 
  * Draws a String using : 
  * <li> char[] array
  * <li> String
- * <li>Scaled single Char using {@link IDrwTypes#TYPE_070_TEXT_EFFECTS}
+ * <li>Scaled single Char using {@link IDrwTypes#TYPE_DRWX_11_TEXT_EFFECTS}
  * <br>
  * <br>
  * <li> Read only {@link ITechStringDrawable#S_ACTION_MODE_0_READ}
@@ -147,6 +146,8 @@ import pasa.cbentley.powerdata.spec.src4.power.IPowerCharCollector;
  */
 public class StringDrawable extends ViewDrawable implements IBOStringData, IDrawListener {
 
+   private ByteObject  boFigString;
+
    /**
     * Controls the Input of characters.
     * <br>
@@ -171,8 +172,34 @@ public class StringDrawable extends ViewDrawable implements IBOStringData, IDraw
     */
    Stringer            stringer;
 
-   private ByteObject  boFigString;
+   public StringDrawable(GuiCtx gc, StyleClass sc) {
+      super(gc, sc);
+      initTech(null);
+      createStringer();
+   }
 
+   /**
+    * 
+    * @param gc
+    * @param sc
+    * @param str
+    * @param offset
+    * @param len
+    */
+   public StringDrawable(GuiCtx gc, StyleClass sc, char[] str, int offset, int len) {
+      this(gc, sc, str, offset, len, null);
+
+   }
+
+   /**
+    * 
+    * @param gc
+    * @param sc
+    * @param cs
+    * @param offset
+    * @param len
+    * @param boStringData {@link IBOStringData}
+    */
    public StringDrawable(GuiCtx gc, StyleClass sc, char[] cs, int offset, int len, ByteObject boStringData) {
       super(gc, sc);
 
@@ -180,11 +207,6 @@ public class StringDrawable extends ViewDrawable implements IBOStringData, IDraw
       initTech(boStringData);
       createStringer();
       setStringNoUpdate(cs, offset, len);
-   }
-
-   public StringDrawable(GuiCtx gc, StyleClass sc, char[] str, int offset, int len) {
-      this(gc, sc, str, offset, len, null);
-
    }
 
    public StringDrawable(GuiCtx gc, StyleClass sc, I8nString str) {
@@ -241,9 +263,9 @@ public class StringDrawable extends ViewDrawable implements IBOStringData, IDraw
    public StringDrawable(GuiCtx gc, StyleClass sc, String str, int presetConfig) {
       super(gc, sc);
 
-      ByteObject boStringDrawable = styleClass.getByteObject(IBOTypesGui.LINK_41_BO_STRING_DRAWABLE);
+      ByteObject boStringDrawable = styleClass.getByteObject(ITechLinks.LINK_41_BO_STRING_DATA);
       if (boStringDrawable == null) {
-         boStringDrawable = gc.getDrawableStringFactory().getStringTech(presetConfig);
+         boStringDrawable = gc.getDrawableStringFactory().getBOStringData(presetConfig);
       }
       if (presetConfig != -1) {
          boStringDrawable = boStringDrawable.cloneCopyHead();
@@ -306,44 +328,15 @@ public class StringDrawable extends ViewDrawable implements IBOStringData, IDraw
       ic.srActionDoneRepaint();
    }
 
-   private void initPreferredSizeFromViewPortArea(LayouterEngineDrawable ds, int breakWidth, int breakHeight) {
+   private Stringer createStringer() {
+      ByteObject strFig = this.styleClass.getByteObject(ITechLinks.LINK_40_BO_STRING_FIGURE);
+      ByteObject textFigure = getStringerStyle();
 
-      //#debug
-      toDLog().pInit("breakWidth=" + breakWidth + " breakHeight=" + breakHeight, this, StringDrawable.class, "initPreferredSizeFromViewPortArea@312", LVL_05_FINE, true);
-
-      Stringer initStringer = getStringer();
-      StringMetrics metrics = initStringer.getMetrics();
-      int typeStr = getPresetConfig();
-      if (typeStr == ITechStringDrawable.PRESET_CONFIG_5_CHAR) {
-         initViewDrawableCharType(breakWidth, breakHeight);
-      } else {
-         //----------------------------
-         //compute breaks, preferred dimension given dim parameters and type
-
-         initStringer.setAreaWH(breakWidth, breakHeight);
-         initStringer.setBreakOnArea();
-
-         initStringer.buildAgain();
-
-         int pw = metrics.getPrefWidth();
-         int ph = metrics.getPrefHeight();
-
-         ds.setPh(ph);
-         ds.setPw(pw);
-
-         //clipping is only necessary when partial strings are drawn.
-         if ((hasFlagView(FLAG_VSTATE_22_SCROLLED))) {
-            if (viewPane != null && viewPane.isContentClipped()) {
-               //TODO is this possible?
-               //clipping is also needed when init style is smaller than some state styles?
-               setFlagView(ITechViewDrawable.FLAG_VSTATE_01_CLIP, true);
-            } else {
-               setFlagView(ITechViewDrawable.FLAG_VSTATE_01_CLIP, false);
-            }
-         } else {
-            setFlagView(ITechViewDrawable.FLAG_VSTATE_01_CLIP, false);
-         }
-      }
+      stringer = new Stringer(gc.getDC());
+      stringer.setTextFigure(textFigure);
+      //old issue.. when x,y are modified afterwards? stringer needs to be updated
+      stringer.setAreaXYWH(getContentX(), getContentY(), getContentW(), getContentH());
+      return stringer;
    }
 
    /**
@@ -370,7 +363,8 @@ public class StringDrawable extends ViewDrawable implements IBOStringData, IDraw
       boolean isNavH = false;
       boolean isNavV = false;
       boolean isSelect = false;
-      isSelect = (boStringDrawable.get1(SDATA_OFFSET_06_ACTION_MODE1) == ITechStringDrawable.S_ACTION_MODE_2_EDIT) ? true : false;
+      int get1 = boStringDrawable.get1(SDATA_OFFSET_06_ACTION_MODE1);
+      isSelect = (get1 == ITechStringDrawable.S_ACTION_MODE_2_EDIT) ? true : false;
       if (editModule != null) {
          isNavH = true;
          isNavV = true;
@@ -478,6 +472,22 @@ public class StringDrawable extends ViewDrawable implements IBOStringData, IDraw
    private void editTakeCtrl() {
       StringEditControl sec = gc.getStrEditCtrl();
       sec.doTakeControl(this);
+   }
+
+   /**
+    * The {@link IBOFigString} overriding style's
+    * 
+    * <p>
+    * When null, {@link StringDrawable} will use the {@link IBOStyle} from its {@link StyleClass}
+    * </p>
+    * 
+    * <p>
+    * Set it using {@link StringDrawable#setBOFigString(ByteObject)}
+    * </p>
+    * @return
+    */
+   public ByteObject getBOFigString() {
+      return boFigString;
    }
 
    public ByteObject getBOStringData() {
@@ -652,23 +662,8 @@ public class StringDrawable extends ViewDrawable implements IBOStringData, IDraw
       return boStringDrawable.get1(IBOStringData.SDATA_OFFSET_02_PRESET_CONFIG1);
    }
 
-   /**
-    * Overrides
-    */
-   public int getSizePreferredHeight() {
-      //TODO
-      if (hasFlagView(FLAG_VSTATE_08_PREF_SIZE_COMPUTED)) {
-         return layEngine.getPh();
-      } else {
-         int preset = getPresetConfig();
-         if (preset == ITechStringDrawable.PRESET_CONFIG_1_TITLE) {
-            //a preferred title H is 1 line
-            return getStringMetrics().getPrefCharHeight();
-            //logic 2 is 2 lines
-         }
-         //when no computed.. it was called by init method
-         return vc.getHeight();
-      }
+   public SizerFactory getSizerFac() {
+      return gc.getLAC().getFactorySizer();
    }
 
    /**
@@ -711,57 +706,28 @@ public class StringDrawable extends ViewDrawable implements IBOStringData, IDraw
       return stringer;
    }
 
-   private Stringer createStringer() {
-      ByteObject textFigure = getStringerStyle();
-      stringer = new Stringer(gc.getDC());
-      stringer.setTextFigure(textFigure);
-      //old issue.. when x,y are modified afterwards? stringer needs to be updated
-      stringer.setAreaXYWH(getContentX(), getContentY(), getContentW(), getContentH());
-      return stringer;
-   }
-
-   /**
-    * The {@link IBOFigString} overriding style's
-    * 
-    * <p>
-    * When null, {@link StringDrawable} will use the {@link IBOStyle} from its {@link StyleClass}
-    * </p>
-    * 
-    * <p>
-    * Set it using {@link StringDrawable#setBOFigString(ByteObject)}
-    * </p>
-    * @return
-    */
-   public ByteObject getBOFigString() {
-      return boFigString;
-   }
-   
-   public void setBOFigString(ByteObject boFigString) {
-      this.boFigString = boFigString;
-      this.stringer.setTextFigure(boFigString);
-   }
-
    /**
     * Gets the {@link IBOFigString} used for computing {@link StringMetrics} in {@link Stringer}.
     * 
-    * @return cannot be null and must be {@link IBOTypesDrw#TYPE_050_FIGURE}
+    * @return cannot be null and must be {@link IBOTypesDrawX#TYPE_DRWX_00_FIGURE}
     */
    private ByteObject getStringerStyle() {
       int initStyle = boStringDrawable.get4(SDATA_OFFSET_07_INIT_STYLE_FLAGS4);
-      ByteObject strFigure = null;
-      //System.out.println("#StringDrawable InitStyle " + initStyle + " " + new String(chars, offset, Math.min(len, 15)) + " " + toStringDimension());
-      if (initStyle == 0) {
-         strFigure = getStyleOp().getContentStyle(style);
-      } else {
-         strFigure = getStyleOp().getContentStyle(styleClass.getStyle(initStyle, ctype, structStyle));
+      //#debug
+      toDLog().pInit("InitStyle=" + initStyle, this, StringDrawable.class, "getStringerStyle", LVL_05_FINE, true);
+      ByteObject styleSrc = this.style;
+      if (initStyle != 0) {
+         styleSrc = styleClass.getStyle(initStyle, ctype, structStyle);
       }
+
+      ByteObject strFigure = getStyleOp().getContentStyle(styleSrc);
       if (strFigure == null) {
          //#debug
          toDLog().pNull("Style could not be Found", this, StringDrawable.class, "getStringerStyle", LVL_09_WARNING, true);
          strFigure = gc.getStyleManager().getDefaultContentStyle();
       }
       //#mdebug
-      strFigure.checkType(IBOTypesDrw.TYPE_050_FIGURE);
+      strFigure.checkType(IBOTypesDrawX.TYPE_DRWX_00_FIGURE);
       //#enddebug
       return strFigure;
    }
@@ -788,6 +754,59 @@ public class StringDrawable extends ViewDrawable implements IBOStringData, IDraw
          return editModule.initListen(sizerW, sizerH, d);
       }
       return false;
+   }
+
+   public void initPosition() {
+      super.initPosition();
+      int x = getX();
+      int y = getY();
+      int contentW = getContentW();
+      int contentH = getContentH();
+      stringer.setAreaXYWH(x, y, contentW, contentH);
+
+   }
+
+   private void initPreferredSizeFromViewPortArea(LayouterEngineDrawable ds, int breakWidth, int breakHeight) {
+
+      //#debug
+      toDLog().pInit("breakWidth=" + breakWidth + " breakHeight=" + breakHeight, this, StringDrawable.class, "initPreferredSizeFromViewPortArea@754", LVL_05_FINE, true);
+
+      Stringer initStringer = getStringer();
+      StringMetrics metrics = initStringer.getMetrics();
+      int typeStr = getPresetConfig();
+      if (typeStr == ITechStringDrawable.PRESET_CONFIG_5_CHAR) {
+         initViewDrawableCharType(breakWidth, breakHeight);
+      } else {
+         //----------------------------
+         //compute breaks, preferred dimension given dim parameters and type
+
+         initStringer.setAreaWH(breakWidth, breakHeight);
+         initStringer.setBreakOnArea();
+
+         initStringer.buildAgain();
+
+         int pw = metrics.getPrefWidth();
+         int ph = metrics.getPrefHeight();
+
+         //#debug
+         toDLog().pInit("Stringer initialized pw=" + pw + " ph=" + ph + " #lines=" + metrics.getNumOfLines(), this, StringDrawable.class, "initPreferredSizeFromViewPortArea@774", LVL_04_FINER, true);
+
+         ds.setPh(ph);
+         ds.setPw(pw);
+
+         //clipping is only necessary when partial strings are drawn.
+         if ((hasFlagView(FLAG_VSTATE_22_SCROLLED))) {
+            if (viewPane != null && viewPane.isContentClipped()) {
+               //TODO is this possible?
+               //clipping is also needed when init style is smaller than some state styles?
+               setFlagView(ITechViewDrawable.FLAG_VSTATE_01_CLIP, true);
+            } else {
+               setFlagView(ITechViewDrawable.FLAG_VSTATE_01_CLIP, false);
+            }
+         } else {
+            setFlagView(ITechViewDrawable.FLAG_VSTATE_01_CLIP, false);
+         }
+      }
    }
 
    /**
@@ -819,13 +838,13 @@ public class StringDrawable extends ViewDrawable implements IBOStringData, IDraw
     */
    protected void initTech(ByteObject boStringData) {
       if (boStringData == null) {
-         boStringData = styleClass.getByteObject(IBOTypesGui.LINK_41_BO_STRING_DRAWABLE);
+         boStringData = styleClass.getByteObject(ITechLinks.LINK_41_BO_STRING_DATA);
          if (boStringData == null) {
-            boStringData = gc.getDrawableStringFactory().getDefaultStringTech();
+            boStringData = gc.getDrawableStringFactory().getBOStringDataDefault();
          }
       }
       this.boStringDrawable = boStringData;
-      int type = boStringDrawable.get1(IBOStringData.SDATA_OFFSET_02_PRESET_CONFIG1);
+      int type = getPresetConfig();
       setTypeString(type);
    }
 
@@ -1058,8 +1077,18 @@ public class StringDrawable extends ViewDrawable implements IBOStringData, IDraw
       }
    }
 
+   public void rebuild() {
+      stringer.buildAgain();
+      super.rebuild();
+   }
+
    public void removeEditControl() {
       editRemoveCtrl();
+   }
+
+   public void setBOFigString(ByteObject boFigString) {
+      this.boFigString = boFigString;
+      this.stringer.setTextFigure(boFigString);
    }
 
    /**
@@ -1129,10 +1158,6 @@ public class StringDrawable extends ViewDrawable implements IBOStringData, IDraw
       this.setSizers(sizerW, sizerH);
    }
 
-   public SizerFactory getSizerFac() {
-      return gc.getLAC().getFactorySizer();
-   }
-
    /**
     * One line as long as it needs to be
     */
@@ -1164,6 +1189,14 @@ public class StringDrawable extends ViewDrawable implements IBOStringData, IDraw
 
    }
 
+   public void setStringNoUpdate(char[] cs, int offset, int len) {
+      if (cs == null) {
+         stringer.setString("");
+      } else {
+         stringer.setString(cs, offset, len);
+      }
+   }
+
    /**
     * Change the string reference <b>without</b> updating the layout.
     * <br>
@@ -1184,14 +1217,6 @@ public class StringDrawable extends ViewDrawable implements IBOStringData, IDraw
       }
       stringer.setString(str);
       setStateFlag(ITechDrawable.STATE_32_CHANGED, true);
-   }
-
-   public void setStringNoUpdate(char[] cs, int offset, int len) {
-      if (cs == null) {
-         stringer.setString("");
-      } else {
-         stringer.setString(cs, offset, len);
-      }
    }
 
    /**
@@ -1260,16 +1285,6 @@ public class StringDrawable extends ViewDrawable implements IBOStringData, IDraw
       }
    }
 
-   public void initPosition() {
-      super.initPosition();
-      int x = getX();
-      int y = getY();
-      int contentW = getContentW();
-      int contentH = getContentH();
-      stringer.setAreaXYWH(x, y, contentW, contentH);
-
-   }
-
    public void stringUpdate() {
       super.invalidateLayout();
       //layout 
@@ -1326,7 +1341,8 @@ public class StringDrawable extends ViewDrawable implements IBOStringData, IDraw
    }
 
    private void toStringPrivate(Dctx dc) {
-      dc.append(ToStringStaticGui.debugStringType(boStringDrawable.get1(IBOStringData.SDATA_OFFSET_02_PRESET_CONFIG1)));
+      String v = ToStringStaticGui.toStringStringPreset(boStringDrawable.get1(IBOStringData.SDATA_OFFSET_02_PRESET_CONFIG1));
+      dc.appendVarWithSpace("preset", v);
 
    }
 

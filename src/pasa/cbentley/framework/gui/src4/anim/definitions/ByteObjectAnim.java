@@ -3,7 +3,6 @@ package pasa.cbentley.framework.gui.src4.anim.definitions;
 import pasa.cbentley.byteobjects.src4.core.ByteObject;
 import pasa.cbentley.byteobjects.src4.ctx.BOCtx;
 import pasa.cbentley.byteobjects.src4.ctx.IBOTypesBOC;
-import pasa.cbentley.byteobjects.src4.ctx.IBOTypesDrw;
 import pasa.cbentley.byteobjects.src4.objects.color.GradientFunction;
 import pasa.cbentley.byteobjects.src4.objects.function.Function;
 import pasa.cbentley.byteobjects.src4.objects.function.IBOAction;
@@ -151,7 +150,7 @@ public class ByteObjectAnim extends DrawableAnim {
          buildTarget();
          //once target is known, Gradient function maybe built
          GradientFunction gf = new GradientFunction(gc.getBOC());
-         ByteObject grad = definition.getSubFirst(IBOTypesDrw.TYPE_059_GRADIENT);
+         ByteObject grad = definition.getSubFirst(IBOTypesBOC.TYPE_038_GRADIENT);
          //in an animation context, we use the step for the gradient size
          int size = definition.get2(IBOAnim.ANIM_OFFSET_09_NUM_STEPS2);
          int primaryColor = gc.getBOC().getPointerOperator().getPointerValueEx(this.pointer, target);

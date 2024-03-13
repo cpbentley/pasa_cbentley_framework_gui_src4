@@ -531,7 +531,7 @@ public class DrawableAnimator implements IStringable, ITechAnimable {
    }
 
    public UCtx toStringGetUCtx() {
-      return gc.getUCtx();
+      return gc.getUC();
    }
    //#enddebug
 }

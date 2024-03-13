@@ -4,8 +4,8 @@ import pasa.cbentley.byteobjects.src4.core.ByteObject;
 import pasa.cbentley.core.src4.interfaces.C;
 import pasa.cbentley.framework.gui.src4.core.StyleClass;
 import pasa.cbentley.framework.gui.src4.ctx.GuiCtx;
-import pasa.cbentley.framework.gui.src4.ctx.IBOTypesGui;
 import pasa.cbentley.framework.gui.src4.factories.interfaces.IBOViewPane;
+import pasa.cbentley.framework.gui.src4.tech.ITechLinks;
 
 public abstract class CreatorAbstractView extends CreatorAbstract {
 
@@ -23,7 +23,7 @@ public abstract class CreatorAbstractView extends CreatorAbstract {
    protected abstract CreatorAbstractBOStyle createCreatorStyle();
 
    /**
-    * Use for link {@link IBOTypesGui#LINK_66_BO_VIEWPANE}.
+    * Use for link {@link ITechLinks#LINK_66_BO_VIEWPANE}.
     * @return {@link IBOViewPane}
     */
    public abstract ByteObject getBOViewPane();

@@ -90,8 +90,8 @@ public class PinBoardDrawable extends ViewDrawable {
    public void addDrawable(IDrawable d, int rx, int ry) {
       int nn = nextempty + 1;
       drawables = DrawableArrays.ensureCapacity(drawables, nn);
-      xs = gc.getUCtx().getMem().ensureCapacity(xs, nn);
-      ys = gc.getUCtx().getMem().ensureCapacity(ys, nn);
+      xs = gc.getUC().getMem().ensureCapacity(xs, nn);
+      ys = gc.getUC().getMem().ensureCapacity(ys, nn);
       drawables[nextempty] = d;
       xs[nextempty] = rx;
       ys[nextempty] = ry;

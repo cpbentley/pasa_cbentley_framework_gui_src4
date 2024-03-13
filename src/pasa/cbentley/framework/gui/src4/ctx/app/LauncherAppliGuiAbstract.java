@@ -42,7 +42,7 @@ public abstract class LauncherAppliGuiAbstract extends LauncherAppliAbstract  {
    protected final BOCtx boc;
 
    public LauncherAppliGuiAbstract(BOCtx boc) {
-      super(boc.getUCtx());
+      super(boc.getUC());
       this.boc = boc;
    }
 

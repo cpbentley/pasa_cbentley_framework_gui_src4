@@ -2,8 +2,7 @@ package pasa.cbentley.framework.gui.src4.creator;
 
 import pasa.cbentley.framework.gui.src4.core.ScrollBar;
 import pasa.cbentley.framework.gui.src4.core.StyleClass;
-import pasa.cbentley.framework.gui.src4.ctx.GuiCtx;
-import pasa.cbentley.framework.gui.src4.ctx.IBOTypesGui;
+import pasa.cbentley.framework.gui.src4.tech.ITechLinks;
 
 public abstract class CreatorAbstractStyleClass extends CreatorAbstract {
 
@@ -62,7 +61,7 @@ public abstract class CreatorAbstractStyleClass extends CreatorAbstract {
     * Returns the {@link StyleClass} used for the {@link ScrollBar}.
     * 
     * <p>
-    * It is the one linked to the root and viewpane with {@link IBOTypesGui#LINK_58_STYLE_VIEWPANE_HOLE_HEADER} 
+    * It is the one linked to the root and viewpane with {@link ITechLinks#LINK_58_STYLE_VIEWPANE_HOLE_HEADER} 
     * </p>
     * @return
     */
@@ -78,7 +77,7 @@ public abstract class CreatorAbstractStyleClass extends CreatorAbstract {
     * Returns the {@link StyleClass} used for the block background of the {@link ScrollBar}.
     * 
     * <p>
-    * It is the one linked to the root and viewpane with {@link IBOTypesGui#LINK_50_STYLE_SCROLLBAR_BLOCK_BG} 
+    * It is the one linked to the root and viewpane with {@link ITechLinks#LINK_50_STYLE_SCROLLBAR_BLOCK_BG} 
     * </p>
     * @return
     */
@@ -88,7 +87,7 @@ public abstract class CreatorAbstractStyleClass extends CreatorAbstract {
     * Returns the {@link StyleClass} used for the block figure of the {@link ScrollBar}.
     * 
     * <p>
-    * It is the one linked to the root and viewpane with {@link IBOTypesGui#LINK_51_STYLE_SCROLLBAR_BLOCK_FIG} 
+    * It is the one linked to the root and viewpane with {@link ITechLinks#LINK_51_STYLE_SCROLLBAR_BLOCK_FIG} 
     * </p>
     * @return
     */
@@ -98,15 +97,15 @@ public abstract class CreatorAbstractStyleClass extends CreatorAbstract {
     * Returns the {@link StyleClass} used for the horizontal {@link ScrollBar}.
     * 
     * <p>
-    * It is the one linked to the root and viewpane with {@link IBOTypesGui#LINK_71_STYLE_VIEWPANE_H_SCROLLBAR} 
+    * It is the one linked to the root and viewpane with {@link ITechLinks#LINK_71_STYLE_VIEWPANE_H_SCROLLBAR} 
     * </p>
     * 
     * The returned {@link StyleClass} has the following links
-    * <li> {@link IBOTypesGui#LINK_49_FIG_SCROLLBAR_WRAPPER}
-    * <li> {@link IBOTypesGui#LINK_50_STYLE_SCROLLBAR_BLOCK_BG}
-    * <li> {@link IBOTypesGui#LINK_51_STYLE_SCROLLBAR_BLOCK_FIG}
-    * <li> {@link IBOTypesGui#LINK_52_STYLE_SCROLLBAR_TOP_LEFT_WRAPPER}
-    * <li> {@link IBOTypesGui#LINK_53_STYLE_SCROLLBAR_BOT_RIGHT_WRAPPER}
+    * <li> {@link ITechLinks#LINK_49_FIG_SCROLLBAR_WRAPPER}
+    * <li> {@link ITechLinks#LINK_50_STYLE_SCROLLBAR_BLOCK_BG}
+    * <li> {@link ITechLinks#LINK_51_STYLE_SCROLLBAR_BLOCK_FIG}
+    * <li> {@link ITechLinks#LINK_52_STYLE_SCROLLBAR_TOP_LEFT_WRAPPER}
+    * <li> {@link ITechLinks#LINK_53_STYLE_SCROLLBAR_BOT_RIGHT_WRAPPER}
     * @return
     */
    public abstract StyleClass getStyleClassScrollbarH();
@@ -115,7 +114,7 @@ public abstract class CreatorAbstractStyleClass extends CreatorAbstract {
     * Returns the {@link StyleClass} used for the vertical {@link ScrollBar}.
     * 
     * <p>
-    * It is the one linked to the root and viewpane with {@link IBOTypesGui#LINK_72_STYLE_VIEWPANE_V_SCROLLBAR} 
+    * It is the one linked to the root and viewpane with {@link ITechLinks#LINK_72_STYLE_VIEWPANE_V_SCROLLBAR} 
     * </p>
     * @return
     */
@@ -125,7 +124,7 @@ public abstract class CreatorAbstractStyleClass extends CreatorAbstract {
     * Returns the {@link StyleClass} used for the botright wrapper of the {@link ScrollBar}.
     * 
     * <p>
-    * It is the one linked to the root and viewpane with {@link IBOTypesGui#LINK_53_STYLE_SCROLLBAR_BOT_RIGHT_WRAPPER} 
+    * It is the one linked to the root and viewpane with {@link ITechLinks#LINK_53_STYLE_SCROLLBAR_BOT_RIGHT_WRAPPER} 
     * </p>
     * @return
     */
@@ -135,11 +134,17 @@ public abstract class CreatorAbstractStyleClass extends CreatorAbstract {
     * Returns the {@link StyleClass} used for the topleft wrapper of the {@link ScrollBar}.
     * 
     * <p>
-    * It is the one linked to the root and viewpane with {@link IBOTypesGui#LINK_52_STYLE_SCROLLBAR_TOP_LEFT_WRAPPER} 
+    * It is the one linked to the root and viewpane with {@link ITechLinks#LINK_52_STYLE_SCROLLBAR_TOP_LEFT_WRAPPER} 
     * </p>
     * @return
     */
    public abstract StyleClass getStyleClassScrollbarWrapperTopLeft();
+
+   public abstract StyleClass getStyleClassSelected();
+
+   public abstract StyleClass getStyleClassTextReader();
+
+   public abstract StyleClass getStyleClassTitle();
 
    public abstract StyleClass getStyleClassViewPane();
 

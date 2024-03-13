@@ -137,7 +137,7 @@ public class CellPolicy extends BOAbstractOperator implements IBOCellPolicy {
          sb.nl();
          sb.append(title);
          sb.append("=");
-         gc.getUCtx().getIU().debugAlone(ar, sb, ",");
+         gc.getUC().getIU().debugAlone(ar, sb, ",");
       }
    }
 

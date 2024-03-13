@@ -85,7 +85,7 @@ public class RepaintTask extends TimerTask implements IStringable {
    }
 
    public UCtx toStringGetUCtx() {
-      return gc.getUCtx();
+      return gc.getUC();
    }
 
    //#enddebug

@@ -83,7 +83,7 @@ public class UserInteraction implements IStringable {
 
    public UserInteraction(GuiCtx gc, int type) {
       this.gc = gc;
-      me = new ByteObject(gc.getBOC(), IBOTypesGui.TYPE_141_USER_INTERACTION, IBOUserInterAction.UIA_BASIC_SIZE);
+      me = new ByteObject(gc.getBOC(), IBOTypesGui.TYPE_GUI_12_USER_INTERACTION, IBOUserInterAction.UIA_BASIC_SIZE);
       me.set1(IBOUserInterAction.UIA_OFFSET_02_TYPE1, type);
    }
 
@@ -140,7 +140,7 @@ public class UserInteraction implements IStringable {
    }
 
    public UCtx toStringGetUCtx() {
-      return gc.getUCtx();
+      return gc.getUC();
    }
 
    //#enddebug

@@ -9,6 +9,7 @@ import pasa.cbentley.framework.gui.src4.ctx.IBOTypesGui;
 import pasa.cbentley.framework.gui.src4.ctx.ToStringStaticGui;
 import pasa.cbentley.framework.gui.src4.factories.interfaces.IBOScrollBar;
 import pasa.cbentley.framework.gui.src4.factories.interfaces.IBOViewPane;
+import pasa.cbentley.framework.gui.src4.tech.ITechLinks;
 import pasa.cbentley.framework.gui.src4.tech.ITechViewPane;
 import pasa.cbentley.layouter.src4.interfaces.ISizable;
 
@@ -53,7 +54,7 @@ public class DrawableFactory extends BOAbstractFactory implements IBOScrollBar, 
    }
 
    public ByteObject getSbTech(boolean horiz, int size1, int size2, boolean wrapper) {
-      ByteObject tech = getBOFactory().createByteObject(IBOTypesGui.TYPE_102_SCROLLBAR_TECH, SB_BASIC_SIZE);
+      ByteObject tech = getBOFactory().createByteObject(IBOTypesGui.TYPE_GUI_01_SCROLLBAR, SB_BASIC_SIZE);
       //create tech parameters for scrollbar
       tech.setValue(SB_OFFSET_03_PRIMARY_SIZE4, size1, 4);
       //for button height/width, uses 150 percent of Font Height 
@@ -65,7 +66,7 @@ public class DrawableFactory extends BOAbstractFactory implements IBOScrollBar, 
    }
 
    public ByteObject getDefViewPaneTech() {
-      ByteObject p = getBOFactory().createByteObject(IBOTypesGui.TYPE_101_VIEWPANE_TECH, IBOViewPane.VP_BASIC_SIZE);
+      ByteObject p = getBOFactory().createByteObject(IBOTypesGui.TYPE_GUI_00_VIEWPANE, IBOViewPane.VP_BASIC_SIZE);
       p.setValue(IBOViewPane.VP_OFFSET_11_COMPETITION_HEADER_TYPE1, COMPET_HEADER_0_NEUTRAL, 1);
       p.setFlag(IBOViewPane.VP_OFFSET_01_FLAG, IBOViewPane.VP_FLAG_3_SCROLLBAR_MASTER, false);
       p.setFlag(IBOViewPane.VP_OFFSET_01_FLAG, IBOViewPane.VP_FLAGX_1_STYLE_VIEWPANE, false);
@@ -182,7 +183,7 @@ public class DrawableFactory extends BOAbstractFactory implements IBOScrollBar, 
     * @return
     */
    public ByteObject getScrollBarTech(boolean horiz, boolean wrapper, boolean wFill, boolean arrowBlock, boolean inverseBlock, boolean clock, int size) {
-      ByteObject p = getBOFactory().createByteObject(IBOTypesGui.TYPE_102_SCROLLBAR_TECH, SB_BASIC_SIZE);
+      ByteObject p = getBOFactory().createByteObject(IBOTypesGui.TYPE_GUI_01_SCROLLBAR, SB_BASIC_SIZE);
       p.setFlag(SB_OFFSET_01_FLAG, SB_FLAG_1_VERT, !horiz);
       p.setFlag(SB_OFFSET_01_FLAG, SB_FLAG_3_WRAPPER, wrapper);
       p.setFlag(SB_OFFSET_01_FLAG, SB_FLAG_4_WRAPPER_FILL, wFill);
@@ -200,9 +201,9 @@ public class DrawableFactory extends BOAbstractFactory implements IBOScrollBar, 
     * @param tech
     */
    public void linkTech(StyleClass sc, ByteObject tech) {
-      int techid = IBOTypesGui.LINK_69_BO_H_SCROLLBAR;
+      int techid = ITechLinks.LINK_69_BO_H_SCROLLBAR;
       if (tech.hasFlag(SB_OFFSET_01_FLAG, SB_FLAG_1_VERT)) {
-         techid = IBOTypesGui.LINK_68_BO_V_SCROLLBAR;
+         techid = ITechLinks.LINK_68_BO_V_SCROLLBAR;
       }
       sc.linkByteObject(tech, techid);
    }

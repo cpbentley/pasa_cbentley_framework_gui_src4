@@ -46,7 +46,7 @@ public abstract class ScenarioItemAbstract implements IStatorable {
    }
 
    public UCtx toStringGetUCtx() {
-      return gc.getUCtx();
+      return gc.getUC();
    }
 
    //#enddebug

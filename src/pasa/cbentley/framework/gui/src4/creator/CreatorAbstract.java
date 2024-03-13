@@ -2,7 +2,6 @@ package pasa.cbentley.framework.gui.src4.creator;
 
 import pasa.cbentley.byteobjects.src4.core.ByteObject;
 import pasa.cbentley.byteobjects.src4.ctx.BOCtx;
-import pasa.cbentley.byteobjects.src4.ctx.IBOTypesDrw;
 import pasa.cbentley.byteobjects.src4.objects.color.ColorRepo;
 import pasa.cbentley.byteobjects.src4.objects.color.ColorSet;
 import pasa.cbentley.byteobjects.src4.objects.color.GradientFactory;
@@ -14,6 +13,7 @@ import pasa.cbentley.core.src4.utils.interfaces.IColorsBase;
 import pasa.cbentley.core.src4.utils.interfaces.IColorsWeb;
 import pasa.cbentley.framework.coredraw.src4.interfaces.ITechFont;
 import pasa.cbentley.framework.drawx.src4.ctx.DrwCtx;
+import pasa.cbentley.framework.drawx.src4.ctx.IBOTypesDrawX;
 import pasa.cbentley.framework.drawx.src4.factories.AnchorFactory;
 import pasa.cbentley.framework.drawx.src4.factories.BoxFactory;
 import pasa.cbentley.framework.drawx.src4.factories.FigureFactory;
@@ -39,7 +39,7 @@ import pasa.cbentley.layouter.src4.tech.IBOSizer;
 import pasa.cbentley.layouter.src4.tech.ITechLayout;
 
 public abstract class CreatorAbstract
-      extends ObjectGC implements ITechViewPane, IBOSizer, ITechGradient, ITechFigure, ITechLayout, IBOTableView, IBOStyle, IBOScrollBar, ITechViewDrawable, ITechDrawable, IBOViewPane, IBOStringData, IMenus, IColorsBase, ITechFont, IColors, IColorsWeb, IBOTypesDrw {
+      extends ObjectGC implements ITechViewPane, IBOSizer, ITechGradient, ITechFigure, ITechLayout, IBOTableView, IBOStyle, IBOScrollBar, ITechViewDrawable, ITechDrawable, IBOViewPane, IBOStringData, IMenus, IColorsBase, ITechFont, IColors, IColorsWeb, IBOTypesDrawX {
 
    protected final AnchorFactory      anchorFac;
 

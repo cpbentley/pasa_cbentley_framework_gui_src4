@@ -5,10 +5,10 @@ import pasa.cbentley.byteobjects.src4.core.ByteObject;
 import pasa.cbentley.core.src4.logging.Dctx;
 import pasa.cbentley.framework.gui.src4.core.StyleClass;
 import pasa.cbentley.framework.gui.src4.ctx.GuiCtx;
-import pasa.cbentley.framework.gui.src4.ctx.IBOTypesGui;
 import pasa.cbentley.framework.gui.src4.ctx.ToStringStaticGui;
 import pasa.cbentley.framework.gui.src4.factories.interfaces.IBOScrollBar;
 import pasa.cbentley.framework.gui.src4.factories.interfaces.IBOViewPane;
+import pasa.cbentley.framework.gui.src4.tech.ITechLinks;
 import pasa.cbentley.framework.gui.src4.tech.ITechViewPane;
 import pasa.cbentley.layouter.src4.engine.LayoutOperator;
 
@@ -101,9 +101,9 @@ public class DrawableOperator extends BOAbstractOperator implements IBOScrollBar
     * @param tech
     */
    public void linkTech(StyleClass sc, ByteObject tech) {
-      int techid = IBOTypesGui.LINK_69_BO_H_SCROLLBAR;
+      int techid = ITechLinks.LINK_69_BO_H_SCROLLBAR;
       if (tech.hasFlag(SB_OFFSET_01_FLAG, SB_FLAG_1_VERT)) {
-         techid = IBOTypesGui.LINK_68_BO_V_SCROLLBAR;
+         techid = ITechLinks.LINK_68_BO_V_SCROLLBAR;
       }
       sc.linkByteObject(tech, techid);
    }

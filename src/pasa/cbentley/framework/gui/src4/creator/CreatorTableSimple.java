@@ -14,7 +14,7 @@ public class CreatorTableSimple extends CreatorAbstractTable {
 
    public ByteObject getTableTech() {
 
-      ByteObject tech = createByteObject(IBOTypesGui.TYPE_103_TABLE_TECH, T_BASIC_SIZE);
+      ByteObject tech = createByteObject(IBOTypesGui.TYPE_GUI_02_TABLE, T_BASIC_SIZE);
 
       int gridSizeH = 1;
       int gridSizeV = 1;

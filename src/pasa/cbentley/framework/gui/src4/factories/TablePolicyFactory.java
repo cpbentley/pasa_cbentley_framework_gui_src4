@@ -53,10 +53,11 @@ public class TablePolicyFactory extends BOAbstractFactory implements IBOTablePol
    }
 
    /**
-    * 
+    * A flow of cells that start top left towards top right.
+    * All cells have the w,h pixel size.
     * @param w -1-
     * @param h
-    * @return
+    * @return {@link IBOTablePolicy}
     */
    public ByteObject getFlowHoriz(int w, int h) {
       //flow column
@@ -64,6 +65,23 @@ public class TablePolicyFactory extends BOAbstractFactory implements IBOTablePol
       policyCol.setFlag(IBOCellPolicy.CELLP_OFFSET_02_FLAG, IBOCellPolicy.CELLP_FLAG_7_OVERSIZE, false);
       //as many rows are wanted, one logical size
       ByteObject policyRow = getCellPolicyFactory().getGeneric(0, h);
+      ByteObject policyTable = getTablePolicy(policyCol, policyRow);
+      return policyTable;
+   }
+
+   /**
+    * A flow of cells that start top left towards top right.
+    * All cells have the w,h pixel size.
+    * @param w -1-
+    * @param h
+    * @return {@link IBOTablePolicy}
+    */
+   public ByteObject getFlowHoriz(ByteObject sizerW, ByteObject sizerH) {
+      //flow column
+      ByteObject policyCol = getCellPolicyFactory().getFlow(sizerW, true);
+      policyCol.setFlag(IBOCellPolicy.CELLP_OFFSET_02_FLAG, IBOCellPolicy.CELLP_FLAG_7_OVERSIZE, false);
+      //as many rows are wanted, one logical size
+      ByteObject policyRow = getCellPolicyFactory().getGeneric(0, sizerH);
       ByteObject policyTable = getTablePolicy(policyCol, policyRow);
       return policyTable;
    }
@@ -171,7 +189,7 @@ public class TablePolicyFactory extends BOAbstractFactory implements IBOTablePol
     * @return
     */
    public ByteObject getSpanning(int colAbs, int colValue, int rowAbs, int rowValue) {
-      ByteObject p = getBOFactory().createByteObject(IBOTypesGui.TYPE_121_SPANNING, IBOTableSpan.BASIC_SIZE_SPANNING);
+      ByteObject p = getBOFactory().createByteObject(IBOTypesGui.TYPE_GUI_05_CELL_SPANNING, IBOTableSpan.BASIC_SIZE_SPANNING);
       p.setValue(IBOTableSpan.SPAN_OFFSET_2_COL2, colAbs, 2);
       p.setValue(IBOTableSpan.SPAN_OFFSET_3_COL_VALUE2, colValue, 2);
       p.setValue(IBOTableSpan.SPAN_OFFSET_4_ROW2, rowAbs, 2);
@@ -190,7 +208,7 @@ public class TablePolicyFactory extends BOAbstractFactory implements IBOTablePol
    }
 
    public ByteObject getTablePolicy(ByteObject colPol, ByteObject rowPol, ByteObject[] spans) {
-      ByteObject p = getBOFactory().createByteObject(IBOTypesGui.TYPE_120_TABLE_POLICY, BASIC_SIZE_TABLE_POLICY);
+      ByteObject p = getBOFactory().createByteObject(IBOTypesGui.TYPE_GUI_04_TABLE_POLICY, BASIC_SIZE_TABLE_POLICY);
       ByteObject[] ar = null;
       if (spans != null) {
          p.setFlag(TP_OFFSET_1FLAG, TP_FLAG_3SPANNING, true);
@@ -224,7 +242,7 @@ public class TablePolicyFactory extends BOAbstractFactory implements IBOTablePol
    }
 
    public ByteObject getBOTable(boolean rowSlection, boolean showColTitles, boolean showRowTitles) {
-      ByteObject tech = getBOFactory().createByteObject(IBOTypesGui.TYPE_103_TABLE_TECH, T_BASIC_SIZE);
+      ByteObject tech = getBOFactory().createByteObject(IBOTypesGui.TYPE_GUI_02_TABLE, T_BASIC_SIZE);
       tech.setFlag(T_OFFSET_01_FLAG, T_FLAG_3_SHOW_ROW_TITLE, showRowTitles);
       tech.setFlag(T_OFFSET_01_FLAG, T_FLAG_4_SHOW_COL_TITLE, showColTitles);
       tech.setFlag(T_OFFSET_01_FLAG, T_FLAGX_3_ROW_SELECTION, rowSlection);

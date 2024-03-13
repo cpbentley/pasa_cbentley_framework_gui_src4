@@ -3,10 +3,10 @@ package pasa.cbentley.framework.gui.src4.anim;
 import pasa.cbentley.byteobjects.src4.core.BOAbstractFactory;
 import pasa.cbentley.byteobjects.src4.core.ByteObject;
 import pasa.cbentley.byteobjects.src4.ctx.IBOTypesBOC;
-import pasa.cbentley.byteobjects.src4.ctx.IBOTypesDrw;
 import pasa.cbentley.byteobjects.src4.objects.function.Function;
 import pasa.cbentley.byteobjects.src4.objects.function.ITechFunction;
 import pasa.cbentley.core.src4.interfaces.C;
+import pasa.cbentley.framework.drawx.src4.ctx.IBOTypesDrawX;
 import pasa.cbentley.framework.drawx.src4.factories.interfaces.IBOFigure;
 import pasa.cbentley.framework.gui.src4.anim.definitions.AlphaChangeRgb;
 import pasa.cbentley.framework.gui.src4.anim.definitions.ByteObjectAnim;
@@ -107,7 +107,7 @@ public class AnimFactory extends BOAbstractFactory implements IBOAnim, ITechShif
     * @return
     */
    public ByteObject getAnimationAlpha(int type, boolean up, int repeat) {
-      ByteObject p = getBOFactory().createByteObject(IBOTypesGui.TYPE_130_ANIMATION, ANIM_BASIC_SIZE);
+      ByteObject p = getBOFactory().createByteObject(IBOTypesGui.TYPE_GUI_11_ANIMATION, ANIM_BASIC_SIZE);
       p.setValue(ANIM_OFFSET_01_TYPE1, ANIM_TYPE_06_ALPHA, 1);
       p.setValue(ANIM_OFFSET_05_TIME1, type, 1);
       p.setFlag(ANIM_OFFSET_02_FLAG, ANIM_FLAG_8_CUSTOM, up);
@@ -116,7 +116,7 @@ public class AnimFactory extends BOAbstractFactory implements IBOAnim, ITechShif
    }
 
    public ByteObject getAnimationAlpha(int type, ByteObject function, ByteObject sleepFunct, int repeat) {
-      ByteObject p = getBOFactory().createByteObject(IBOTypesGui.TYPE_130_ANIMATION, ANIM_BASIC_SIZE);
+      ByteObject p = getBOFactory().createByteObject(IBOTypesGui.TYPE_GUI_11_ANIMATION, ANIM_BASIC_SIZE);
       p.setValue(ANIM_OFFSET_01_TYPE1, ANIM_TYPE_06_ALPHA, 1);
       p.setValue(ANIM_OFFSET_05_TIME1, type, 1);
       if (repeat == -1) {
@@ -129,7 +129,7 @@ public class AnimFactory extends BOAbstractFactory implements IBOAnim, ITechShif
    }
 
    public ByteObject getAnimationAlpha(int type, int repeat, int[] values, int sleep) {
-      ByteObject p = getBOFactory().createByteObject(IBOTypesGui.TYPE_130_ANIMATION, ANIM_BASIC_SIZE);
+      ByteObject p = getBOFactory().createByteObject(IBOTypesGui.TYPE_GUI_11_ANIMATION, ANIM_BASIC_SIZE);
       p.setValue(ANIM_OFFSET_01_TYPE1, ANIM_TYPE_06_ALPHA, 1);
       p.setValue(ANIM_OFFSET_05_TIME1, type, 1);
       p.setValue(ANIM_OFFSET_08_SLEEP2, sleep, 2);
@@ -140,7 +140,7 @@ public class AnimFactory extends BOAbstractFactory implements IBOAnim, ITechShif
    }
 
    public ByteObject getAnimationValue(ByteObject pointer, ByteObject function, int time, int target, int sleep, int repeat, ByteObject sleepFun) {
-      ByteObject p = getBOFactory().createByteObject(IBOTypesGui.TYPE_130_ANIMATION, ANIM_BASIC_SIZE);
+      ByteObject p = getBOFactory().createByteObject(IBOTypesGui.TYPE_GUI_11_ANIMATION, ANIM_BASIC_SIZE);
       p.set1(ANIM_OFFSET_01_TYPE1, ANIM_TYPE_01_VALUE);
       p.set1(ANIM_OFFSET_04_DRAW_TYPE1, ANIM_DRAW_2_DRAWABLE);
       p.set1(ANIM_OFFSET_05_TIME1, time);
@@ -196,7 +196,7 @@ public class AnimFactory extends BOAbstractFactory implements IBOAnim, ITechShif
    }
 
    public ByteObject getAnimBase(int timing) {
-      ByteObject p = getBOFactory().createByteObject(IBOTypesGui.TYPE_130_ANIMATION, ANIM_BASIC_SIZE);
+      ByteObject p = getBOFactory().createByteObject(IBOTypesGui.TYPE_GUI_11_ANIMATION, ANIM_BASIC_SIZE);
       p.setValue(ANIM_OFFSET_05_TIME1, timing, 1);
       return p;
    }
@@ -216,7 +216,7 @@ public class AnimFactory extends BOAbstractFactory implements IBOAnim, ITechShif
     * @return
     */
    public ByteObject getAnimChunkMove(int type) {
-      ByteObject p = getBOFactory().createByteObject(IBOTypesGui.TYPE_130_ANIMATION, ANIM_BASIC_SIZE);
+      ByteObject p = getBOFactory().createByteObject(IBOTypesGui.TYPE_GUI_11_ANIMATION, ANIM_BASIC_SIZE);
       p.setValue(ANIM_OFFSET_01_TYPE1, ANIM_TYPE_03_MOVE, 1);
       return p;
    }
@@ -227,10 +227,10 @@ public class AnimFactory extends BOAbstractFactory implements IBOAnim, ITechShif
    }
 
    /**
-    * Animation that reads the color of a {@link ITechFigureTypes#TYPE_050_FIGURE} and computes a gradient.
+    * Animation that reads the color of a {@link ITechFigureTypes#TYPE_DRWX_00_FIGURE} and computes a gradient.
     * <br>
     * <br>
-    * {@link ITechFigureTypes#TYPE_059_GRADIENT} hosts the final color with {@link IGradient#GRADIENT_OFFSET_04_COLOR4}.
+    * {@link ITechFigureTypes#TYPE_038_GRADIENT} hosts the final color with {@link IGradient#GRADIENT_OFFSET_04_COLOR4}.
     * <br>
     * {@link IGradient#GRADIENT_OFFSET_07_STEP1} contains the number of gradient steps.
     * <br>
@@ -245,7 +245,7 @@ public class AnimFactory extends BOAbstractFactory implements IBOAnim, ITechShif
     * @return
     */
    public ByteObject getAnimGradient(ByteObject pointer, ByteObject gradient, int timing, int target, int size) {
-      ByteObject p = getBOFactory().createByteObject(IBOTypesGui.TYPE_130_ANIMATION, ANIM_BASIC_SIZE);
+      ByteObject p = getBOFactory().createByteObject(IBOTypesGui.TYPE_GUI_11_ANIMATION, ANIM_BASIC_SIZE);
       p.setValue(ANIM_OFFSET_01_TYPE1, ANIM_TYPE_08_GRADIENT, 1);
       p.setValue(ANIM_OFFSET_05_TIME1, timing, 1);
       p.setValue(ANIM_OFFSET_06_TARGET1, target, 1);
@@ -261,7 +261,7 @@ public class AnimFactory extends BOAbstractFactory implements IBOAnim, ITechShif
     * @return
     */
    public ByteObject getAnimMove(ByteObject fct) {
-      ByteObject p = getBOFactory().createByteObject(IBOTypesGui.TYPE_130_ANIMATION, ANIM_BASIC_SIZE);
+      ByteObject p = getBOFactory().createByteObject(IBOTypesGui.TYPE_GUI_11_ANIMATION, ANIM_BASIC_SIZE);
       p.setValue(ANIM_OFFSET_01_TYPE1, ANIM_TYPE_03_MOVE, 1);
       return p;
    }
@@ -274,13 +274,13 @@ public class AnimFactory extends BOAbstractFactory implements IBOAnim, ITechShif
     * @return
     */
    public ByteObject getAnimMove(int type, boolean origine, ByteObject anchor2) {
-      ByteObject p = getBOFactory().createByteObject(IBOTypesGui.TYPE_130_ANIMATION, ANIM_BASIC_SIZE);
+      ByteObject p = getBOFactory().createByteObject(IBOTypesGui.TYPE_GUI_11_ANIMATION, ANIM_BASIC_SIZE);
       p.setValue(ANIM_OFFSET_01_TYPE1, ANIM_TYPE_03_MOVE, 1);
       return p;
    }
 
    public ByteObject getAnimMove(int time, ByteObject fct) {
-      ByteObject p = getBOFactory().createByteObject(IBOTypesGui.TYPE_130_ANIMATION, ANIM_BASIC_SIZE);
+      ByteObject p = getBOFactory().createByteObject(IBOTypesGui.TYPE_GUI_11_ANIMATION, ANIM_BASIC_SIZE);
       p.setValue(ANIM_OFFSET_01_TYPE1, ANIM_TYPE_03_MOVE, 1);
       p.setValue(ANIM_OFFSET_05_TIME1, time, 1);
       return p;
@@ -294,7 +294,7 @@ public class AnimFactory extends BOAbstractFactory implements IBOAnim, ITechShif
     * @return
     */
    public ByteObject getAnimPixel(int type, boolean isOut) {
-      ByteObject p = getBOFactory().createByteObject(IBOTypesGui.TYPE_130_ANIMATION, ANIM_BASIC_SIZE);
+      ByteObject p = getBOFactory().createByteObject(IBOTypesGui.TYPE_GUI_11_ANIMATION, ANIM_BASIC_SIZE);
       p.setValue(ANIM_OFFSET_01_TYPE1, ANIM_TYPE_04_PIXELATE, 1);
       p.setValue(ANIM_OFFSET_05_TIME1, type, 1);
       p.setFlag(ANIM_OFFSET_02_FLAG, ANIM_FLAG_8_CUSTOM, isOut);
@@ -310,7 +310,7 @@ public class AnimFactory extends BOAbstractFactory implements IBOAnim, ITechShif
     * @return
     */
    public ByteObject getAnimReverse(int timing) {
-      ByteObject p = getBOFactory().createByteObject(IBOTypesGui.TYPE_130_ANIMATION, ANIM_BASIC_SIZE);
+      ByteObject p = getBOFactory().createByteObject(IBOTypesGui.TYPE_GUI_11_ANIMATION, ANIM_BASIC_SIZE);
       p.setValue(ANIM_OFFSET_01_TYPE1, ANIM_TYPE_02_REVERSE, 1);
       p.setValue(ANIM_OFFSET_05_TIME1, timing, 1);
       return p;
@@ -324,7 +324,7 @@ public class AnimFactory extends BOAbstractFactory implements IBOAnim, ITechShif
     * @return
     */
    public ByteObject getAnimShiftLine(boolean in, boolean leftToRight, boolean clip, int shiftBaseSize) {
-      ByteObject t = getBOFactory().createByteObject(IBOTypesGui.TYPE_199_ANIM_TECH, TECH_BASIC_SIZE);
+      ByteObject t = getBOFactory().createByteObject(IBOTypesGui.TYPE_GUI_13_ANIM, TECH_BASIC_SIZE);
       t.setFlag(TECH_OFFSET_1_FLAG, TECH_FLAG_5CLIP, in);
       t.setFlag(TECH_OFFSET_1_FLAG, TECH_FLAG_2REVERSE, leftToRight);
       t.setFlag(TECH_OFFSET_1_FLAG, TECH_FLAG_4MULTIPLY, true);
@@ -333,7 +333,7 @@ public class AnimFactory extends BOAbstractFactory implements IBOAnim, ITechShif
    }
 
    public ByteObject getAnimShiftLines(int timing) {
-      ByteObject p = getBOFactory().createByteObject(IBOTypesGui.TYPE_130_ANIMATION, ANIM_BASIC_SIZE);
+      ByteObject p = getBOFactory().createByteObject(IBOTypesGui.TYPE_GUI_11_ANIMATION, ANIM_BASIC_SIZE);
       p.setValue(ANIM_OFFSET_01_TYPE1, ANIM_TYPE_05_LINE_SHIFT, 1);
       p.setValue(ANIM_OFFSET_05_TIME1, timing, 1);
       return p;
@@ -623,8 +623,8 @@ public class AnimFactory extends BOAbstractFactory implements IBOAnim, ITechShif
     * @param anim Animation must be implicit
     */
    public void setFigAnimation(ByteObject fig, ByteObject anim) {
-      fig.checkType(IBOTypesDrw.TYPE_050_FIGURE);
-      anim.checkType(IBOTypesGui.TYPE_130_ANIMATION);
+      fig.checkType(IBOTypesDrawX.TYPE_DRWX_00_FIGURE);
+      anim.checkType(IBOTypesGui.TYPE_GUI_11_ANIMATION);
       if (fig.hasFlag(IBOFigure.FIG__OFFSET_02_FLAG, IBOFigure.FIG_FLAG_6_ANIMATED)) {
          //check the animations in the array remove
       } else {

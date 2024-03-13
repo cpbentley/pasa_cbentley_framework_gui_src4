@@ -12,12 +12,12 @@ import pasa.cbentley.framework.datamodel.src4.table.ObjectTableModel;
 import pasa.cbentley.framework.gui.src4.canvas.InputConfig;
 import pasa.cbentley.framework.gui.src4.core.StyleClass;
 import pasa.cbentley.framework.gui.src4.ctx.GuiCtx;
-import pasa.cbentley.framework.gui.src4.ctx.IBOTypesGui;
 import pasa.cbentley.framework.gui.src4.factories.TableCellPolicyFactory;
 import pasa.cbentley.framework.gui.src4.interfaces.ICmdsView;
 import pasa.cbentley.framework.gui.src4.interfaces.IUIView;
 import pasa.cbentley.framework.gui.src4.table.TableView;
 import pasa.cbentley.framework.gui.src4.table.interfaces.ITechTable;
+import pasa.cbentley.framework.gui.src4.tech.ITechLinks;
 
 /**
  * One instance per langTable
@@ -80,7 +80,7 @@ public class MCmdGuiChangeLanguage extends MCmdGui implements IEventConsumer {
             langTable = null;
          }
          //generates an event
-         gc.getUCtx().getEventBusRoot().sendNewEvent(IEventsCore.PID_01_FRAMEWORK, IEventsCore.PID_01_FRAMEWORK_2_LANGUAGE_CHANGED, cmd);
+         gc.getUC().getEventBusRoot().sendNewEvent(IEventsCore.PID_01_FRAMEWORK, IEventsCore.PID_01_FRAMEWORK_2_LANGUAGE_CHANGED, cmd);
          //set the action feedback on the command. flag it  as processed
          cmd.actionDone(null, responseType);
       } else {
@@ -92,9 +92,9 @@ public class MCmdGuiChangeLanguage extends MCmdGui implements IEventConsumer {
             LocaleID[] data = strLoader.getLocaleIDs();
             ByteObject colPol = cellFac.getGeneric(2, 0);
             ByteObject rowPol = cellFac.getGeneric(0, 0);
-            ByteObject policyTable = gc.getTablePolicyC().getTablePolicy(colPol, rowPol);
-            StyleClass scMenu = gc.getClass(IUIView.SC_1_MENU);
-            StyleClass scMenuItems = scMenu.getSCNotNull(IBOTypesGui.LINK_74_STYLE_CLASS_MENU);
+            ByteObject policyTable = gc.getTablePolicyFactory().getTablePolicy(colPol, rowPol);
+            StyleClass scMenu = gc.getStyleClass(IUIView.SC_1_MENU);
+            StyleClass scMenuItems = scMenu.getSCNotNull(ITechLinks.LINK_74_STYLE_CLASS_MENU);
 
             TableView tv = new TableView(gc, scMenuItems, policyTable);
             //position it bottom left or center center logical position relative to parent/screen

@@ -123,7 +123,7 @@ public class CanvasExtras extends ObjectGC {
          if (cmdMenuBar == null) {
             //TODO the style class will depend on the menu type
             //how can this be static
-            cmdMenuBar = new CmdMenuBar(gc, gc.getClass(IUIView.SC_1_MENU));
+            cmdMenuBar = new CmdMenuBar(gc, gc.getStyleClass(IUIView.SC_1_MENU));
             cmdMenuBar.getLay().laySiz_Preferred();
          }
          int pos = settingsGuiCtx.get1(ITechCtxSettingsAppGui.CTX_GUI_OFFSET_04_MENU_BAR_POSITION1);

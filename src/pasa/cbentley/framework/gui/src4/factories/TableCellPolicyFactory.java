@@ -20,7 +20,7 @@ public class TableCellPolicyFactory extends BOAbstractFactory implements IBOCell
 
    public static final int INDEX_FLAGS         = 9;
 
-   protected final GuiCtx gc;
+   protected final GuiCtx  gc;
 
    public TableCellPolicyFactory(GuiCtx gc) {
       super(gc.getBOC());
@@ -41,7 +41,7 @@ public class TableCellPolicyFactory extends BOAbstractFactory implements IBOCell
     * @return
     */
    private ByteObject get(int type, int numCells, int numVisible, int policy, int sizeCell, int sizeMin, int sizeMax) {
-      ByteObject p = getBOFactory().createByteObject(IBOTypesGui.TYPE_122_CELL_POLICY, CELLP_BASIC_SIZE);
+      ByteObject p = getBOFactory().createByteObject(IBOTypesGui.TYPE_GUI_06_CELL_POLICY, CELLP_BASIC_SIZE);
       p.setValue(CELLP_OFFSET_01_TYPE1, type, 1);
       p.setValue(CELLP_OFFSET_05_CELL_NUM2, numCells, 2);
       p.setValue(CELLP_OFFSET_06_NUM_VISIBLE1, numVisible, 1);
@@ -69,17 +69,29 @@ public class TableCellPolicyFactory extends BOAbstractFactory implements IBOCell
     * <br>
     * Weak Flow?
     * @param sizeCell postive/implicit(0)/logical(negative)
-    * @param isStrong
+    * @param isStrong for {@link IBOCellPolicy#CELLP_FLAG_5_STRONG_FLOW}
     * @return
     */
    public ByteObject getFlow(int sizeCell, boolean isStrong) {
-      ByteObject p = getBOFactory().createByteObject(IBOTypesGui.TYPE_122_CELL_POLICY, CELLP_BASIC_SIZE);
+      ByteObject p = getBOFactory().createByteObject(IBOTypesGui.TYPE_GUI_06_CELL_POLICY, CELLP_BASIC_SIZE);
       p.setValue(CELLP_OFFSET_01_TYPE1, TYPE_1_FLOW, 1);
       p.setValue(CELLP_OFFSET_09_SIZE4, sizeCell, 4);
       p.setFlag(CELLP_OFFSET_02_FLAG, CELLP_FLAG_5_STRONG_FLOW, isStrong);
       return p;
    }
 
+   public ByteObject getFlow(ByteObject sizer, boolean isStrong) {
+      ByteObject p = getBOFactory().createByteObject(IBOTypesGui.TYPE_GUI_06_CELL_POLICY, CELLP_BASIC_SIZE);
+      p.setValue(CELLP_OFFSET_01_TYPE1, TYPE_1_FLOW, 1);
+      p.setFlag(CELLP_OFFSET_02_FLAG, CELLP_FLAG_5_STRONG_FLOW, isStrong);
+      addSizer(p, sizer);
+      return p;
+   }
+
+   private void addSizer(ByteObject p, ByteObject sizer) {
+      p.setFlag(CELLP_OFFSET_04_FLAGZ, CELLP_FLAGZ_8_SIZER, true);
+      p.addByteObject(sizer);
+   }
    /**
     * Policy is Explicit in this case, except when size is zero.
     * 
@@ -88,7 +100,7 @@ public class TableCellPolicyFactory extends BOAbstractFactory implements IBOCell
     * @return
     */
    public ByteObject getGeneric(int numCells, int size) {
-      ByteObject p = getBOFactory().createByteObject(IBOTypesGui.TYPE_122_CELL_POLICY, CELLP_BASIC_SIZE);
+      ByteObject p = getBOFactory().createByteObject(IBOTypesGui.TYPE_GUI_06_CELL_POLICY, CELLP_BASIC_SIZE);
       p.setValue(CELLP_OFFSET_01_TYPE1, TYPE_0_GENERIC, 1);
       p.setValue(CELLP_OFFSET_05_CELL_NUM2, numCells, 2);
       if (size == 0) {
@@ -97,6 +109,30 @@ public class TableCellPolicyFactory extends BOAbstractFactory implements IBOCell
          p.setValue(CELLP_OFFSET_07_POLICY1, CELL_1_EXPLICIT_SET, 1);
       }
       p.setValue(CELLP_OFFSET_09_SIZE4, size, 4);
+      return p;
+   }
+
+   /**
+    * {@link IBOCellPolicy#CELLP_FLAGP_4_IMPLICIT}
+    * 
+    * @param numCells
+    * @return
+    */
+   public ByteObject getGenericImplicit(int numCells) {
+      ByteObject p = getBOFactory().createByteObject(IBOTypesGui.TYPE_GUI_06_CELL_POLICY, CELLP_BASIC_SIZE);
+      p.set1(CELLP_OFFSET_01_TYPE1, TYPE_0_GENERIC);
+      p.set2(CELLP_OFFSET_05_CELL_NUM2, numCells);
+      p.set1(CELLP_OFFSET_07_POLICY1, CELL_0_IMPLICIT_SET);
+      p.set4(CELLP_OFFSET_09_SIZE4, 0);
+      return p;
+   }
+
+   public ByteObject getGeneric(int numCells, ByteObject sizer) {
+      ByteObject p = getBOFactory().createByteObject(IBOTypesGui.TYPE_GUI_06_CELL_POLICY, CELLP_BASIC_SIZE);
+      p.set1(CELLP_OFFSET_01_TYPE1, TYPE_0_GENERIC);
+      p.set2(CELLP_OFFSET_05_CELL_NUM2, numCells);
+      p.set1(CELLP_OFFSET_07_POLICY1, CELL_1_EXPLICIT_SET);
+      addSizer(p, sizer);
       return p;
    }
 
@@ -165,7 +201,7 @@ public class TableCellPolicyFactory extends BOAbstractFactory implements IBOCell
 
       int totalSize = holders[INDEX_CONSUMED_SIZE] + CELLP_BASIC_SIZE;
 
-      ByteObject p = gc.getBOC().getByteObjectFactory().createByteObject(IBOTypesGui.TYPE_122_CELL_POLICY, totalSize);
+      ByteObject p = gc.getBOC().getByteObjectFactory().createByteObject(IBOTypesGui.TYPE_GUI_06_CELL_POLICY, totalSize);
 
       p.setValue(CELLP_OFFSET_01_TYPE1, TYPE_0_GENERIC, 1);
       p.setValue(CELLP_OFFSET_05_CELL_NUM2, numCells, 2);
@@ -226,7 +262,7 @@ public class TableCellPolicyFactory extends BOAbstractFactory implements IBOCell
 
       int totalSize = holders[INDEX_CONSUMED_SIZE] + CELLP_BASIC_SIZE;
 
-      ByteObject cellPolicy = gc.getBOC().getByteObjectFactory().createByteObject(IBOTypesGui.TYPE_122_CELL_POLICY, totalSize);
+      ByteObject cellPolicy = gc.getBOC().getByteObjectFactory().createByteObject(IBOTypesGui.TYPE_GUI_06_CELL_POLICY, totalSize);
 
       cellPolicy.setValue(CELLP_OFFSET_01_TYPE1, TYPE_0_GENERIC, 1);
       cellPolicy.setValue(CELLP_OFFSET_05_CELL_NUM2, numCells, 2);
@@ -302,7 +338,7 @@ public class TableCellPolicyFactory extends BOAbstractFactory implements IBOCell
    }
 
    public ByteObject getGenericEtalon(int numCells, int size, int etalon) {
-      ByteObject p = getBOFactory().createByteObject(IBOTypesGui.TYPE_122_CELL_POLICY, CELLP_BASIC_SIZE);
+      ByteObject p = getBOFactory().createByteObject(IBOTypesGui.TYPE_GUI_06_CELL_POLICY, CELLP_BASIC_SIZE);
       p.setValue(CELLP_OFFSET_01_TYPE1, TYPE_0_GENERIC, 1);
       p.setValue(CELLP_OFFSET_05_CELL_NUM2, numCells, 2);
       p.setValue(CELLP_OFFSET_07_POLICY1, CELL_1_EXPLICIT_SET, 1);
@@ -331,7 +367,7 @@ public class TableCellPolicyFactory extends BOAbstractFactory implements IBOCell
     * @return
     */
    public ByteObject getPrefered(int numCells, ByteObject maxSizer) {
-      ByteObject p = getBOFactory().createByteObject(IBOTypesGui.TYPE_122_CELL_POLICY, CELLP_BASIC_SIZE);
+      ByteObject p = getBOFactory().createByteObject(IBOTypesGui.TYPE_GUI_06_CELL_POLICY, CELLP_BASIC_SIZE);
       p.set1(CELLP_OFFSET_01_TYPE1, TYPE_0_GENERIC);
       p.set2(CELLP_OFFSET_05_CELL_NUM2, numCells);
       p.set1(CELLP_OFFSET_07_POLICY1, CELL_0_IMPLICIT_SET);
@@ -376,7 +412,7 @@ public class TableCellPolicyFactory extends BOAbstractFactory implements IBOCell
       p.setFlag(CELLP_OFFSET_02_FLAG, CELLP_FLAG_4_RATIO_EVEN, true);
       return p;
    }
-   
+
    public ByteObject getRatio(int numCells, int numVisible) {
       ByteObject p = get(TYPE_2_RATIO, numCells, numVisible, CELL_2_RATIO, 0, 0, 0);
       p.setFlag(CELLP_OFFSET_02_FLAG, CELLP_FLAG_4_RATIO_EVEN, true);

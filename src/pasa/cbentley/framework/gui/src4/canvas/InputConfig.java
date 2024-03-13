@@ -692,7 +692,7 @@ public class InputConfig implements IStringable, IInput, IActionFeedback {
    }
 
    public UCtx toStringGetUCtx() {
-      return gc.getUCtx();
+      return gc.getUC();
    }
 
    public String toStringMod() {

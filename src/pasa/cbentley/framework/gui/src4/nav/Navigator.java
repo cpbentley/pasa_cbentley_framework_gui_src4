@@ -72,8 +72,9 @@ public class Navigator extends ObjectGC implements ICmdsView {
 
       CmdTrigger ctT = triggerFactory.createKeyP(ITechCodes.KEY_DOWN);
       navCtx.addCmdLinkRepeated(ctT, navCmd);
+      
       //#debug
-      toDLog().pCmd("", ctT, ViewCommandListener.class, "initDefNav");
+      toDLog().pCmd("Before", ctT, Navigator.class, "initDefNav@76");
 
       CmdTrigger ctB = triggerFactory.createKeyP(ITechCodes.KEY_UP);
       navCtx.addCmdLinkRepeated(ctB, navCmd);
@@ -109,7 +110,7 @@ public class Navigator extends ObjectGC implements ICmdsView {
       cc.getNodeRoot().addCmdLink(ctF1, CMD_19_HELP);
 
       //#debug
-      toDLog().pCmd("", navCtx, ViewCommandListener.class, "initDefNav");
+      toDLog().pCmd("After", navCtx, Navigator.class, "initDefNav");
    }
 
    public void setNavCtx(CmdNode ct) {

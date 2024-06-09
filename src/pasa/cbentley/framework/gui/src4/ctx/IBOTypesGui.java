@@ -69,7 +69,7 @@ public interface IBOTypesGui extends IBOTypesBOC {
 
    public static final int TYPE_DRWX_07_STRING_AUX_2_PREDICTION = IBOTypesDrawX.TYPE_DRWX_07_STRING_AUX_XXX + 2;
 
-   public static final int TYPE_DRWX_07_STRING_AUX_3_GLOBAL     = IBOTypesDrawX.TYPE_DRWX_07_STRING_AUX_XXX + 2;
+   public static final int TYPE_DRWX_07_STRING_AUX_3_GLOBAL     = IBOTypesDrawX.TYPE_DRWX_07_STRING_AUX_XXX + 3;
 
    /**
     * Global options that are user specific and apply to all string edition items

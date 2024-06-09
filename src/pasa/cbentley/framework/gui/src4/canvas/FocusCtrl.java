@@ -531,7 +531,7 @@ public class FocusCtrl implements IStringable {
     */
    public void drawableShow(ExecutionContextGui drawExCtx, IDrawable d) {
       setNewFocus(d, ICmdsView.CTX_CAT_0_KEY);
-      d.getVC().getTopo().addDLayer(d, ITechCanvasDrawable.SHOW_TYPE_1_OVER);
+      d.getVC().getTopo().addDLayer(d, ITechCanvasDrawable.SHOW_TYPE_1_OVER_TOP);
    }
 
    //   /**

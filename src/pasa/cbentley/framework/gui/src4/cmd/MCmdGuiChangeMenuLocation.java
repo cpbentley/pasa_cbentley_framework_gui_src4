@@ -19,14 +19,20 @@ import pasa.cbentley.framework.gui.src4.table.TableView;
 import pasa.cbentley.framework.gui.src4.table.interfaces.ITechTable;
 import pasa.cbentley.framework.gui.src4.tech.ITechLinks;
 
+/**
+ * 
+ * @author Charles Bentley
+ *
+ */
 public class MCmdGuiChangeMenuLocation extends MCmdGui implements IEventConsumer {
+
+   private CmdInstance activeCmdMenuPos;
+
+   private TableView   menuPosTable;
 
    public MCmdGuiChangeMenuLocation(GuiCtx gc) {
       super(gc, ICmdsView.CMD_75_CHANGE_MENU_POSITION);
    }
-
-   private TableView menuPosTable;
-   private CmdInstance activeCmdMenuPos;
 
    public void consumeEvent(BusEvent e) {
       if (e.getProducer() == menuPosTable) {
@@ -43,7 +49,9 @@ public class MCmdGuiChangeMenuLocation extends MCmdGui implements IEventConsumer
       CmdInstance cmd = ic.getCmdInstance();
       //default menu bar is the one of the root canvas
       CmdMenuBar cm = gc.getCanvasGCRoot().getMenuBar();
-      int pos = cm.getMenuBarTech().get1(IMenus.MENUS_OFFSET_02_POSITION1);
+      ByteObject boMenuBar = cm.getMenuBarTech();
+      int pos = boMenuBar.get1(IMenus.MENUS_OFFSET_02_POSITION1);
+      
       //iterate version of command
       if (cmd.hasFlag(CmdInstance.STATE_FLAG_2_CANCELED))
          if (pos == C.POS_0_TOP) {
@@ -77,8 +85,9 @@ public class MCmdGuiChangeMenuLocation extends MCmdGui implements IEventConsumer
          activeCmdMenuPos = cmd;
       }
       //write feedback. user String Top,Bottom,Left,Right
-      cm.getMenuBarTech().set1(IMenus.MENUS_OFFSET_02_POSITION1, pos);
+      boMenuBar.set1(IMenus.MENUS_OFFSET_02_POSITION1, pos);
       int responseType = FLAG_04_RENEW_LAYOUT | FLAG_02_FULL_REPAINT | FLAG_06_DATA_REFRESH;
+      
       cmd.actionDone(null, responseType);
    }
 

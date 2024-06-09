@@ -4,11 +4,11 @@ import pasa.cbentley.byteobjects.src4.ctx.BOCtx;
 import pasa.cbentley.core.src4.ctx.UCtx;
 import pasa.cbentley.core.src4.i8n.IStringProducer;
 import pasa.cbentley.framework.cmd.src4.ctx.CmdCtx;
-import pasa.cbentley.framework.cmd.src4.ctx.ConfigCmdDef;
+import pasa.cbentley.framework.cmd.src4.ctx.ConfigCmdCtxDef;
 import pasa.cbentley.framework.cmd.src4.ctx.IConfigCmdCtx;
 import pasa.cbentley.framework.core.src4.app.IAppli;
 import pasa.cbentley.framework.core.src4.ctx.CoreFrameworkCtx;
-import pasa.cbentley.framework.core.src4.engine.LauncherAppliAbstract;
+import pasa.cbentley.framework.core.src4.engine.CreatorAppliAbstract;
 import pasa.cbentley.framework.coredata.src4.ctx.CoreDataCtx;
 import pasa.cbentley.framework.coredraw.src4.ctx.CoreDrawCtx;
 import pasa.cbentley.framework.datamodel.src4.ctx.ConfigDataModelDefault;
@@ -18,7 +18,9 @@ import pasa.cbentley.framework.drawx.src4.ctx.ConfigDrawXDefault;
 import pasa.cbentley.framework.drawx.src4.ctx.DrwCtx;
 import pasa.cbentley.framework.drawx.src4.ctx.IConfigDrawX;
 import pasa.cbentley.framework.gui.src4.ctx.GuiCtx;
+import pasa.cbentley.framework.gui.src4.ctx.config.ConfigGuiDef;
 import pasa.cbentley.framework.gui.src4.ctx.config.IConfigAppGui;
+import pasa.cbentley.framework.gui.src4.ctx.config.IConfigGui;
 import pasa.cbentley.framework.input.src4.ctx.ConfigInputDefault;
 import pasa.cbentley.framework.input.src4.ctx.IConfigInput;
 import pasa.cbentley.framework.input.src4.ctx.InputCtx;
@@ -28,7 +30,7 @@ import pasa.cbentley.layouter.src4.ctx.LayouterCtx;
 import pasa.cbentley.powerdata.spec.src4.ctx.PDCtxA;
 
 /**
- * {@link LauncherAppliAbstract}
+ * {@link CreatorAppliAbstract}
  * 
  * Specific configurations for a GUI Appli
  * <li> {@link IConfigAppGui}
@@ -37,11 +39,11 @@ import pasa.cbentley.powerdata.spec.src4.ctx.PDCtxA;
  * @author Charles Bentley
  *
  */
-public abstract class LauncherAppliGuiAbstract extends LauncherAppliAbstract  {
+public abstract class CreatorAppliAbstractGui extends CreatorAppliAbstract {
 
    protected final BOCtx boc;
 
-   public LauncherAppliGuiAbstract(BOCtx boc) {
+   public CreatorAppliAbstractGui(BOCtx boc) {
       super(boc.getUC());
       this.boc = boc;
    }
@@ -57,15 +59,15 @@ public abstract class LauncherAppliGuiAbstract extends LauncherAppliAbstract  {
       InputCtx ic = new InputCtx(configInput, cfc);
 
       IStringProducer stringProducer = getStringProducer(cfc);
-      IConfigAppGui config = getIConfigGui(cfc);
       PDCtxA pdc = getPDC(cfc);
       IConfigDataModel configData = getConfigDataModel(cfc);
       DataModelCtx dmc = new DataModelCtx(configData, boc, coreDataCtx, pdc);
 
       IConfigCmdCtx configCtx = getConfigCmd(cfc);
       CmdCtx cc = new CmdCtx(configCtx, cfc, pdc, stringProducer);
-      GuiCtx gc = new GuiCtx(config, cfc, ic, cc, boc, dc, dmc, stringProducer);
 
+      IConfigGui config = getConfigGui(cfc);
+      GuiCtx gc = new GuiCtx(config, cfc, ic, cc, boc, dc, dmc, stringProducer);
       return createAppMod(gc);
    }
 
@@ -79,7 +81,11 @@ public abstract class LauncherAppliGuiAbstract extends LauncherAppliAbstract  {
    }
 
    protected IConfigCmdCtx getConfigCmd(CoreFrameworkCtx cfc) {
-      return new ConfigCmdDef(uc);
+      return new ConfigCmdCtxDef(uc);
+   }
+
+   protected IConfigGui getConfigGui(CoreFrameworkCtx cfc) {
+      return new ConfigGuiDef(uc);
    }
 
    /**
@@ -128,13 +134,6 @@ public abstract class LauncherAppliGuiAbstract extends LauncherAppliAbstract  {
     * @return
     */
    protected abstract IStringProducer getStringProducer(CoreFrameworkCtx cfc);
-
-   /**
-    * 
-    * @param cfc
-    * @return
-    */
-   protected abstract IConfigAppGui getIConfigGui(CoreFrameworkCtx cfc);
 
    /**
     * 

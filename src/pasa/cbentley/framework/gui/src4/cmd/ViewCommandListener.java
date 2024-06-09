@@ -22,6 +22,7 @@ import pasa.cbentley.framework.coreui.src4.utils.ViewState;
 import pasa.cbentley.framework.gui.src4.canvas.CanvasAppliInputGui;
 import pasa.cbentley.framework.gui.src4.canvas.CanvasResultDrawable;
 import pasa.cbentley.framework.gui.src4.canvas.ExecutionContextGui;
+import pasa.cbentley.framework.gui.src4.canvas.ICanvasDrawable;
 import pasa.cbentley.framework.gui.src4.canvas.InputConfig;
 import pasa.cbentley.framework.gui.src4.canvas.InputStateDrawable;
 import pasa.cbentley.framework.gui.src4.core.Drawable;
@@ -154,7 +155,7 @@ public class ViewCommandListener extends ObjectGC implements ICmdsView, ICommand
       CmdInstance ci = new CmdInstance(cc, cmd, activeCtx, triggerMenu);
 
       //#debug
-      toDLog().pCmd("", ci, ViewCommandListener.class, "executeMenuCmd", LVL_05_FINE, true);
+      toDLog().pCmd("", ci, ViewCommandListener.class, "executeMenuCmd@158", LVL_05_FINE, true);
 
       cc.processCmd(ci);
    }
@@ -279,7 +280,7 @@ public class ViewCommandListener extends ObjectGC implements ICmdsView, ICommand
    public void processCmd(int vcmdID) {
       //at this stage, we have at least once visible canvas
       //a cmd has a rootCanvas associated
-      CanvasAppliInputGui canvasView = gc.getCanvasRoot();
+      ICanvasDrawable canvasView = gc.getCanvasRoot();
       InputStateDrawable isd = (InputStateDrawable) canvasView.getEvCtrl().getState();
       CanvasResultDrawable srd = canvasView.getRepaintCtrlDraw().getSD();
       InputConfig ic = new InputConfig(gc, canvasView, isd, srd);
@@ -309,7 +310,7 @@ public class ViewCommandListener extends ObjectGC implements ICmdsView, ICommand
 
       CmdInstanceDrawable cd = new CmdInstanceDrawable(gc, vcmdID);
       cd.setFeedback(ic);
-      gc.getCommanderGui().commandActionDrawable(cd.cmdID, cd);
+      gc.getCommanderGui().commandActionDrawable(cd);
    }
 
    /**
@@ -466,14 +467,22 @@ public class ViewCommandListener extends ObjectGC implements ICmdsView, ICommand
       getCmdMenuBar().setTopPriorityCommand(cmd);
    }
 
-   public void toString(Dctx sb) {
-      sb.root(this, "ViewCommandListener");
-      super.toString(sb.sup());
-
+   //#mdebug
+   public void toString(Dctx dc) {
+      dc.root(this, ViewCommandListener.class, 473);
+      toStringPrivate(dc);
+      super.toString(dc.sup());
    }
 
-   public void toString1Line(Dctx sb) {
-      sb.root1Line(this, "ViewCommandListener");
+   public void toString1Line(Dctx dc) {
+      dc.root1Line(this, ViewCommandListener.class, 479);
+      toStringPrivate(dc);
+      super.toString1Line(dc.sup1Line());
    }
+
+   private void toStringPrivate(Dctx dc) {
+
+   }
+   //#enddebug
 
 }

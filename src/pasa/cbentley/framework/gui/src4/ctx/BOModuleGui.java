@@ -5,6 +5,7 @@ import pasa.cbentley.byteobjects.src4.core.ByteObject;
 import pasa.cbentley.core.src4.logging.Dctx;
 import pasa.cbentley.core.src4.logging.IDebugStringable;
 import pasa.cbentley.core.src4.logging.ToStringStaticC;
+import pasa.cbentley.framework.drawx.src4.ctx.IBOTypesDrawX;
 import pasa.cbentley.framework.gui.src4.canvas.IBOCanvasAppliGui;
 import pasa.cbentley.framework.gui.src4.interfaces.ITechCanvasDrawable;
 import pasa.cbentley.framework.gui.src4.table.interfaces.IBOCellPolicy;
@@ -124,12 +125,8 @@ public class BOModuleGui extends BOModuleAbstract implements IBOTypesGui, IBOCan
          case TYPE_GUI_11_ANIMATION:
             gc.getAnimOperator().toStringAnim(bo, dc);
             break;
-         case TYPE_124_STRING_DATA:
-            gc.getDrawableStringOperator().toStringTech(bo, dc);
-            break;
-         case TYPE_125_STRING_EDIT_TECH:
-            gc.getDrawableStringOperator().toStringTechEdit(bo, dc);
-            break;
+         case IBOTypesDrawX.TYPE_DRWX_07_STRING_AUX:
+            return gc.getDrawableStringFactory().toStringStrAux(bo, dc);
          default:
             return false;
       }
@@ -171,12 +168,8 @@ public class BOModuleGui extends BOModuleAbstract implements IBOTypesGui, IBOCan
          case TYPE_GUI_11_ANIMATION:
             gc.getAnimOperator().toStringAnim1Line(bo, dc);
             break;
-         case TYPE_124_STRING_DATA:
-            gc.getDrawableStringOperator().toStringTech(bo, dc);
-            break;
-         case TYPE_125_STRING_EDIT_TECH:
-            gc.getDrawableStringOperator().toStringTechEdit(bo, dc);
-            break;
+         case IBOTypesDrawX.TYPE_DRWX_07_STRING_AUX:
+            return gc.getDrawableStringFactory().toStringStrAux1Line(bo, dc);
          default:
             return false;
       }
@@ -254,11 +247,11 @@ public class BOModuleGui extends BOModuleAbstract implements IBOTypesGui, IBOCan
 
                boolean isThumb = bo.hasFlag(CANVAS_APP_DRW_OFFSET_01_FLAG1, CANVAS_APP_DRW_FLAG_3_ONE_THUMB);
                boolean isUseMenuBar = bo.hasFlag(CANVAS_APP_DRW_OFFSET_01_FLAG1, CANVAS_APP_DRW_FLAG_4_USE_MENU_BAR);
-               dc.appendVarWithSpace("isThumb", isThumb);
+               dc.appendVarWithNewLine("isThumb", isThumb);
                dc.appendVarWithSpace("isUseMenuBar", isUseMenuBar);
 
                int themeID = bo.get2(CANVAS_APP_DRW_OFFSET_02_VIEW_THEME_ID2);
-               dc.appendVarWithSpace("themeID", themeID);
+               dc.appendVarWithNewLine("themeID", themeID);
 
                int debugMode = bo.get1(CANVAS_APP_DRW_OFFSET_07_DEBUG_MODE1);
                dc.appendVarWithSpace("debugMode", ToStringStaticGui.toStringDebugMode(debugMode));
@@ -266,7 +259,7 @@ public class BOModuleGui extends BOModuleAbstract implements IBOTypesGui, IBOCan
                dc.appendVarWithSpace("debugBarPosition", ToStringStaticC.toStringPos(debugBarPosition));
 
                int menuBarPosition = bo.get1(CANVAS_APP_DRW_OFFSET_04_MENU_BAR_POSITION1);
-               dc.appendVarWithSpace("menuBarPosition", ToStringStaticC.toStringPos(menuBarPosition));
+               dc.appendVarWithNewLine("menuBarPosition", ToStringStaticC.toStringPos(menuBarPosition));
 
                return true;
             }

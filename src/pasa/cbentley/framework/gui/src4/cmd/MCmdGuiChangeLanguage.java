@@ -103,7 +103,8 @@ public class MCmdGuiChangeLanguage extends MCmdGui implements IEventConsumer {
             tv.setXYLogic(C.LOGIC_3_BOTTOM_RIGHT, C.LOGIC_3_BOTTOM_RIGHT);
             //set the selection to the language
             //init once the model has been set.
-            tv.init(0, 0);
+            tv.setSizer_WH_Pref();
+            
             tv.addEventListener(this, ITechTable.EVENT_ID_00_SELECT);
             //show the form as child of current front drawable
             langTable = tv;
@@ -111,7 +112,7 @@ public class MCmdGuiChangeLanguage extends MCmdGui implements IEventConsumer {
          }
          langTable.shShowDrawableOver((InputConfig) cmd.getFeedback());
          LocaleID lang = strLoader.getLocaleID();
-         int index = ((ObjectTableModel) langTable.getTableModel()).findObjectRef(lang);
+         int index = ((ObjectTableModel) langTable.getTableModel()).findIndexObjectFirst(lang);
          if (index == -1) {
             index = 0;
          }

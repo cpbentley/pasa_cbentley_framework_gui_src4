@@ -35,8 +35,9 @@ import pasa.cbentley.framework.gui.src4.core.DrawableInjected;
 import pasa.cbentley.framework.gui.src4.core.StyleClass;
 import pasa.cbentley.framework.gui.src4.ctx.GuiCtx;
 import pasa.cbentley.framework.gui.src4.ctx.IBOTypesGui;
-import pasa.cbentley.framework.gui.src4.factories.interfaces.IBOStringData;
-import pasa.cbentley.framework.gui.src4.factories.interfaces.IBOStringEdit;
+import pasa.cbentley.framework.gui.src4.factories.interfaces.IBOStrAuxEdit;
+import pasa.cbentley.framework.gui.src4.factories.interfaces.IBOStrAuxData;
+import pasa.cbentley.framework.gui.src4.factories.interfaces.IBOStrAuxEdit;
 import pasa.cbentley.framework.gui.src4.interfaces.IDrawListener;
 import pasa.cbentley.framework.gui.src4.interfaces.IDrawable;
 import pasa.cbentley.framework.gui.src4.interfaces.ITechCanvasDrawable;
@@ -125,7 +126,7 @@ import pasa.cbentley.powerdata.spec.src4.spec.CharTrieUtilz;
  * <br>
  * The current key step is managed here.
  * <br>
- * CharSet ID may be changed. It modifies InputState {@link IBOStringData#SDATA_OFFSET_03_CHARSET_ID1} of the root {@link ByteObject}.
+ * CharSet ID may be changed. It modifies InputState {@link IBOStrAuxData#SDATA_OFFSET_03_CHARSET_ID1} of the root {@link ByteObject}.
  * <br>
  * <br>
  * <b>Structure</b> :
@@ -141,7 +142,7 @@ import pasa.cbentley.powerdata.spec.src4.spec.CharTrieUtilz;
  * @author Charles-Philip Bentley
  *
  */
-public class StringEditControl extends TableView implements IDrawListener, IBOStringData, IEventConsumer {
+public class StringEditControl extends TableView implements IDrawListener, IBOStrAuxData, IEventConsumer {
 
    public static final char   etalonChar             = 'z';
 
@@ -208,7 +209,7 @@ public class StringEditControl extends TableView implements IDrawListener, IBOSt
    /**
     * Style depends if MAJ lock is activated or not.
     * <br>
-    * In lowercase only {@link IBOStringData#SDATA_FLAG_3_MAJ} , this item is not shown.
+    * In lowercase only {@link IBOStrAuxData#SDATA_FLAG_3_MAJ} , this item is not shown.
     * <br>
     * Not shown on platform/devices that have a built-in MAJ (J2SE)
     * <br.
@@ -552,7 +553,7 @@ public class StringEditControl extends TableView implements IDrawListener, IBOSt
       isPredictionJustAdded = true;
 
       predictionTable.removeDrawable(e.getIC(), null);
-      punctuationTable.shShowDrawable(e.getIC(), ITechCanvasDrawable.SHOW_TYPE_1_OVER);
+      punctuationTable.shShowDrawable(e.getIC(), ITechCanvasDrawable.SHOW_TYPE_1_OVER_TOP);
 
       e.setFlag(BusEvent.FLAG_1_ACTED, true);
    }
@@ -835,12 +836,12 @@ public class StringEditControl extends TableView implements IDrawListener, IBOSt
    }
 
    /**
-    * Position {@link StringEditControl} depending on {@link IBOStringEdit#SEDIT_OFFSET_05_CONTROL_POSITION1} option
+    * Position {@link StringEditControl} depending on {@link IBOStrAuxEdit#SEDIT_OFFSET_05_CONTROL_POSITION1} option
     * <br>
     * Loads it in the painting chain
     */
    public void positionControl() {
-      int position = editModule.getEditTech().get1(IBOStringEdit.SEDIT_OFFSET_05_CONTROL_POSITION1);
+      int position = editModule.getEditTech().get1(IBOStrAuxEdit.SEDIT_OFFSET_05_CONTROL_POSITION1);
       if (position == ITechStringDrawable.SEDIT_CONTROL_0_CANVAS) {
       } else if (position == ITechStringDrawable.SEDIT_CONTROL_1_TOP && controlledSD != null) {
          //create a Top Center Pozer
@@ -873,7 +874,7 @@ public class StringEditControl extends TableView implements IDrawListener, IBOSt
          }
          pr.prefix = prefix;
          if (prefix != null && activeTrie != null) {
-            if (editModule.getEditTech().hasFlag(IBOStringEdit.SEDIT_OFFSET_01_FLAG, IBOStringEdit.SEDIT_FLAG_6_SAME_THREAD)) {
+            if (editModule.getEditTech().hasFlag(IBOStrAuxEdit.SEDIT_OFFSET_01_FLAG, IBOStrAuxEdit.SEDIT_FLAG_6_SAME_THREAD)) {
                pr.setRunFlag(IBRunnable.FLAG_01_BLOCKING, true);
             } else {
                pr.setRunFlag(IBRunnable.FLAG_01_BLOCKING, false);
@@ -971,7 +972,7 @@ public class StringEditControl extends TableView implements IDrawListener, IBOSt
          //this drawable gets the vertical navigation
          drawableCharSet.setStateStyle(ITechDrawable.STYLE_05_SELECTED, false);
          ic.srActionDoneRepaint(drawableCharSet);
-         charSetsTableView.shShowDrawable(ic, ITechCanvasDrawable.SHOW_TYPE_1_OVER);
+         charSetsTableView.shShowDrawable(ic, ITechCanvasDrawable.SHOW_TYPE_1_OVER_TOP);
       } else if (d == drawableSpeed) {
          //show general options pane to modifies speed and stuff
       } else if (d == drawableOptions) {
@@ -989,7 +990,7 @@ public class StringEditControl extends TableView implements IDrawListener, IBOSt
             symbolTable.addEventListener(this, ITechTable.EVENT_ID_00_SELECT);
          }
          //show it over
-         symbolTable.shShowDrawable(ic, ITechCanvasDrawable.SHOW_TYPE_1_OVER);
+         symbolTable.shShowDrawable(ic, ITechCanvasDrawable.SHOW_TYPE_1_OVER_TOP);
          ic.srActionDoneRepaint();
       }
    }
@@ -1018,11 +1019,11 @@ public class StringEditControl extends TableView implements IDrawListener, IBOSt
 
       drawableCharSet.setStringNoUpdate(Symbs.getCharSetName(charSetID));
       charSets = Symbs.getCharSet(charSetID);
-      boolean isMaj = inputState.hasFlag(IBOStringData.SDATA_OFFSET_01_FLAG, IBOStringData.SDATA_FLAG_3_MAJ);
+      boolean isMaj = inputState.hasFlag(IBOStrAuxData.SDATA_OFFSET_01_FLAG, IBOStrAuxData.SDATA_FLAG_3_MAJ);
       drawableMAJ.setStateStyle(ITechDrawable.STYLE_03_MARKED, isMaj);
 
       ByteObject editTech = editModule.getEditTech();
-      boolean isPred = editTech.hasFlag(IBOStringEdit.SEDIT_OFFSET_01_FLAG, IBOStringEdit.SEDIT_FLAG_4_KB_PREDICTIVE);
+      boolean isPred = editTech.hasFlag(IBOStrAuxEdit.SEDIT_OFFSET_01_FLAG, IBOStrAuxEdit.SEDIT_FLAG_4_KB_PREDICTIVE);
       drawableT9.setStateStyle(ITechDrawable.STYLE_03_MARKED, isPred);
       doPredictions();
    }
@@ -1092,9 +1093,9 @@ public class StringEditControl extends TableView implements IDrawListener, IBOSt
       ByteObject editTech = editModule.getEditTech();
 
       //CARET Management
-      boolean isBlinkCaret = editTech.hasFlag(IBOStringEdit.SEDIT_OFFSET_01_FLAG, IBOStringEdit.SEDIT_FLAG_2_CARET_BLINK);
+      boolean isBlinkCaret = editTech.hasFlag(IBOStrAuxEdit.SEDIT_OFFSET_01_FLAG, IBOStrAuxEdit.SEDIT_FLAG_2_CARET_BLINK);
       if (isBlinkCaret) {
-         pulseThread.setOnOffWaitTimes(editTech.get1(IBOStringEdit.SEDIT_OFFSET_10_CARET_BLINK_SPEED_ON1) * 10, editTech.get1(IBOStringEdit.SEDIT_OFFSET_11_CARET_BLINK_SPEED_OFF1) * 10);
+         pulseThread.setOnOffWaitTimes(editTech.get1(IBOStrAuxEdit.SEDIT_OFFSET_10_CARET_BLINK_SPEED_ON1) * 10, editTech.get1(IBOStrAuxEdit.SEDIT_OFFSET_11_CARET_BLINK_SPEED_OFF1) * 10);
          if (pulseThread.isPulseRunning()) {
             pulseThread.resetToOn();
          } else {

@@ -1654,7 +1654,7 @@ public class ScrollBar extends Drawable implements IBOScrollBar, IDrawableListen
       if (trailer != null) {
          if (trailer.hasState(ITechDrawable.STATE_03_HIDDEN)) {
             trailer.init(0, 0);
-            vc.getDrawCtrlAppli().shShowDrawable(ic, trailer, ITechCanvasDrawable.SHOW_TYPE_1_OVER);
+            vc.getDrawCtrlAppli().shShowDrawable(ic, trailer, ITechCanvasDrawable.SHOW_TYPE_1_OVER_TOP);
          }
          trailer.setXY(blockFigure.getX() - trailer.getDrawnWidth(), blockFigure.getY());
       }

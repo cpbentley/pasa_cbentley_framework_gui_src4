@@ -50,13 +50,17 @@ public class TopoViewDrawable extends ViewDrawable {
       return topology.getDrawable(x, y, null);
    }
 
+   public ViewContext getViewContextContent() {
+      return vcContent;
+   }
+
    public void initSize() {
       //let the drawable init
       super.initSize();
 
       //#mdebug
       String msg = "x=" + this.getContentX() + " y=" + this.getContentY() + " w=" + this.getViewPortContentW() + " h=" + this.getViewPortContentH() + " ";
-      toDLog().pInit1(msg, this, TopoViewDrawable.class, "init");
+      toDLog().pInit1(msg, this, TopoViewDrawable.class, "initSize@63");
       //#enddebug
       //set the viewcontext
       vcContent.setWidth(getViewPortContentW());
@@ -76,7 +80,7 @@ public class TopoViewDrawable extends ViewDrawable {
       int ph = vcContent.getHeight();
       layEngine.setPw(pw);
       layEngine.setPh(ph);
-      
+
       //once finished update the viewcontext
    }
 
@@ -126,17 +130,24 @@ public class TopoViewDrawable extends ViewDrawable {
       topology.manageRepeatInput(ic);
    }
 
-   public void toString(Dctx sb) {
-      sb.root(this, TopoViewDrawable.class, "119");
-      sb.appendWithSpace("'" + toStringGetName() + "'");
-      super.toString(sb.sup());
-      sb.nlLvl(topology, "TopologyDLayer for" + toStringGetName());
-      sb.nlLvl(vcContent, "ViewContext of ViewPort");
+   //#mdebug
+   public void toString(Dctx dc) {
+      dc.root(this, TopoViewDrawable.class, 136);
+      toStringPrivate(dc);
+      super.toString(dc.sup());
+      dc.nlLvl(topology, "TopologyDLayer for " + toStringGetName());
+      dc.nlLvl(vcContent, "ViewContext of ViewPort");
    }
 
    public void toString1Line(Dctx dc) {
-      dc.root1Line(this, TopoViewDrawable.class);
-      dc.appendWithSpace("'" + toStringGetName() + "'");
-      dc.appendWithSpace(layEngine.toString1Line());
+      dc.root1Line(this, TopoViewDrawable.class,143);
+      toStringPrivate(dc);
+      super.toString1Line(dc.sup1Line());
    }
+
+   private void toStringPrivate(Dctx dc) {
+      dc.appendWithSpace("'" + toStringGetName() + "'");
+   }
+   //#enddebug
+
 }

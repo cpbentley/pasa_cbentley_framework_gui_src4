@@ -577,6 +577,18 @@ public class ViewDrawable extends Drawable implements ITechViewDrawable, ITechVi
    }
 
    /**
+    * Returns masked data telling us if 
+    * @param d
+    * @return 0 if d is not a sattelite of this {@link ViewDrawable}
+    */
+   public int getSatteliteFlag(IDrawable d) {
+      if(viewPane == null) {
+         return 0;
+      } else {
+         return viewPane.getSatteliteFlag(d);
+      }
+   }
+   /**
     * The number of pixels consumed horizontally by the component. 
     * <br>
     * It will include pixels of the {@link ViewPane} expansion pixels.
@@ -1587,6 +1599,9 @@ public class ViewDrawable extends Drawable implements ITechViewDrawable, ITechVi
     * What if Sizer has a shrink flag? It will shrink
     * Parent of Headers is the ViewPane.
     * </p>
+    * 
+    * POST: Invalidated layout
+    * 
     * @param d
     * @param pos {@link C#POS_0_TOP} or {@link C#POS_1_BOT} or {@link C#POS_2_LEFT} or {@link C#POS_3_RIGHT}
     * @param mode planetary mode {@link ITechViewPane#PLANET_MODE_0_EAT} or {@link ITechViewPane#PLANET_MODE_1_EXPAND}
@@ -1910,7 +1925,11 @@ public class ViewDrawable extends Drawable implements ITechViewDrawable, ITechVi
    }
 
    private void toStringPrivate(Dctx dc) {
-
+      if(viewPane == null) {
+         dc.appendWithSpace("No ViewPane");
+      } else {
+         dc.appendWithSpace("With ViewPane");
+      }
    }
 
    public void toString1Line(Dctx dc) {

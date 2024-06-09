@@ -30,6 +30,7 @@ import pasa.cbentley.framework.gui.src4.canvas.CanvasAppliInputGui;
 import pasa.cbentley.framework.gui.src4.canvas.CanvasDrawControl;
 import pasa.cbentley.framework.gui.src4.canvas.FocusCtrl;
 import pasa.cbentley.framework.gui.src4.canvas.IBOCanvasAppliGui;
+import pasa.cbentley.framework.gui.src4.canvas.ICanvasDrawable;
 import pasa.cbentley.framework.gui.src4.canvas.InputConfig;
 import pasa.cbentley.framework.gui.src4.canvas.TopLevelCtrl;
 import pasa.cbentley.framework.gui.src4.canvas.ViewContext;
@@ -44,6 +45,7 @@ import pasa.cbentley.framework.gui.src4.core.StyleManager;
 import pasa.cbentley.framework.gui.src4.core.UserInteraction;
 import pasa.cbentley.framework.gui.src4.core.UserInteractionCtrl;
 import pasa.cbentley.framework.gui.src4.ctx.config.IConfigAppGui;
+import pasa.cbentley.framework.gui.src4.ctx.config.IConfigGui;
 import pasa.cbentley.framework.gui.src4.factories.DrawableFactory;
 import pasa.cbentley.framework.gui.src4.factories.DrawableOperator;
 import pasa.cbentley.framework.gui.src4.factories.DrawableStringFactory;
@@ -127,7 +129,7 @@ public class GuiCtx extends ABOCtx implements ITechCtxSettingsAppGui {
 
    private CommanderGui             commander;
 
-   protected final IConfigAppGui    config;
+   protected final IConfigGui       config;
 
    private MLogViewer               ctxLogger;
 
@@ -162,6 +164,8 @@ public class GuiCtx extends ABOCtx implements ITechCtxSettingsAppGui {
 
    protected final DrawableRepo     repo;
 
+   private StatorFactoryDrawable    statorFactory;
+
    /**
     * Supposedly only one status
     */
@@ -185,7 +189,11 @@ public class GuiCtx extends ABOCtx implements ITechCtxSettingsAppGui {
 
    private TopLevelCtrl             topLevelCtrl;
 
+   private int                      toStringFlagsDraw;
+
    private UserInteractionCtrl      uiaCtrl;
+
+   private ViewContext              vcGhost;
 
    private ViewCommandListener      vcl;
 
@@ -193,14 +201,10 @@ public class GuiCtx extends ABOCtx implements ITechCtxSettingsAppGui {
 
    private SettingsWrapperGui       wrapper;
 
-   private StatorFactoryDrawable    statorFactory;
-
-   private int                      toStringFlagsDraw;
-
-   public GuiCtx(IConfigAppGui config, CoreFrameworkCtx cfc, InputCtx ic, CmdCtx cc, BOCtx boc, DrwCtx dc, DataModelCtx dmc, IStringProducer strings) {
+   public GuiCtx(IConfigGui config, CoreFrameworkCtx cfc, InputCtx ic, CmdCtx cc, BOCtx boc, DrwCtx dc, DataModelCtx dmc, IStringProducer strings) {
       super(config, boc);
       this.config = config;
-      toStringSetToStringFlag(config.getFlagsGui());
+      toStringSetToStringFlag(config.toStringGetFlagsGui());
       this.cfc = cfc;
       this.ic = ic;
       this.cc = cc;
@@ -231,7 +235,8 @@ public class GuiCtx extends ABOCtx implements ITechCtxSettingsAppGui {
       canvasCtxs = new CanvasGuiCtx[2];
       focusCtrl = new FocusCtrl(this);
       uiaCtrl = new UserInteractionCtrl(this);
-
+      commander = new CommanderGui(this);
+      
       if (this.getClass() == GuiCtx.class) {
          a_Init();
       }
@@ -239,10 +244,6 @@ public class GuiCtx extends ABOCtx implements ITechCtxSettingsAppGui {
       //#debug
       toDLog().pInit("", this, GuiCtx.class, "Created@240", LVL_04_FINER, true);
 
-   }
-
-   public IStatorFactory getStatorFactory() {
-      return statorFactory;
    }
 
    public void a_Init() {
@@ -264,11 +265,19 @@ public class GuiCtx extends ABOCtx implements ITechCtxSettingsAppGui {
 
    }
 
+   public void checkNull(Object o) {
+      if (o == null) {
+         throw new NullPointerException();
+      }
+   }
+
    /**
+    * Related to {@link InputCtx#createBOTechCanvasAppliDefault()}
+    * 
     * {@link IBOCanvasAppliGui}
     * @return
     */
-   public ByteObject createTechCanvasAppliDrawableDefault() {
+   public ByteObject createBOCanvasAppliDrawableDefault() {
       int type = IBOCanvasAppli.CANVAS_APP_BASE_TYPE;
       int size = IBOCanvasAppliGui.CANVAS_APP_DRW_BASIC_SIZE;
       ByteObject tech = cfc.getBOC().getByteObjectFactory().createByteObject(type, size);
@@ -334,7 +343,7 @@ public class GuiCtx extends ABOCtx implements ITechCtxSettingsAppGui {
       return canvasCtxRoot;
    }
 
-   public CanvasAppliInputGui getCanvasRoot() {
+   public ICanvasDrawable getCanvasRoot() {
       if (canvasCtxRoot == null) {
          return null;
       }
@@ -356,37 +365,8 @@ public class GuiCtx extends ABOCtx implements ITechCtxSettingsAppGui {
       return cellPolicy;
    }
 
-   public TableCellPolicyFactory getTableCellPolicyFactory() {
-      if (cellPolicyFactory == null) {
-         cellPolicyFactory = new TableCellPolicyFactory(this);
-      }
-      return cellPolicyFactory;
-   }
-
    public CoreFrameworkCtx getCFC() {
       return ic.getCFC();
-   }
-
-   /**
-    * Returns the ID {@link StyleClass}.
-    * This is the preferred way for code to get their style class for application level items.
-    * The Theming constructs the {@link StyleClass} array.
-    * When ID is too big for the classes, method returns the root style class.
-    * @param id
-    * @return never null.
-    * @throws 
-    */
-   public StyleClass getStyleClass(int id) {
-      if (id >= classes.length) {
-         //#debug
-         toDLog().pInit1("StyleClass ID not valid " + id, null, GuiCtx.class, "getStyleClass@378");
-         //#debug
-         if (uc.getConfigU().isForceExceptions()) {
-            throw new IllegalStateException("Style classes not initialized to support id " + id);
-         }
-         return classes[0];
-      }
-      return classes[id];
    }
 
    public StyleClass[] getClasses() {
@@ -401,9 +381,6 @@ public class GuiCtx extends ABOCtx implements ITechCtxSettingsAppGui {
    }
 
    public CommanderGui getCommanderGui() {
-      if (commander == null) {
-         commander = new CommanderGui(this);
-      }
       return commander;
    }
 
@@ -431,10 +408,6 @@ public class GuiCtx extends ABOCtx implements ITechCtxSettingsAppGui {
       return dc;
    }
 
-   public int getScrollbarBlockMinPixel() {
-      return 3;
-   }
-
    public StyleClass getDefaultSC() {
       return defaults;
    }
@@ -459,10 +432,6 @@ public class GuiCtx extends ABOCtx implements ITechCtxSettingsAppGui {
          drawableOperator = new DrawableOperator(this);
       }
       return drawableOperator;
-   }
-
-   public DrawableStringFactory getStringDrawableFactory() {
-      return getDrawableStringFactory();
    }
 
    public DrawableStringFactory getDrawableStringFactory() {
@@ -526,11 +495,28 @@ public class GuiCtx extends ABOCtx implements ITechCtxSettingsAppGui {
       return repo;
    }
 
+   public int getScrollbarBlockMinPixel() {
+      return 3;
+   }
+
    public SettingsWrapperGui getSettingsWrapper() {
       if (wrapper == null) {
          wrapper = new SettingsWrapperGui(this);
       }
       return wrapper;
+   }
+
+   public int getStaticKeyRegistrationID(int type, int key) {
+      if (type == IStaticIDs.SID_STRINGS) {
+         if (key <= IStringsGui.AZ_STR_VIEW_A && key >= IStringsGui.AZ_STR_VIEW_Z) {
+            return key - IStringsGui.AZ_STR_VIEW_A;
+         }
+      }
+      return -1;
+   }
+
+   public IStatorFactory getStatorFactory() {
+      return statorFactory;
    }
 
    public StatusData getStatus() {
@@ -559,6 +545,10 @@ public class GuiCtx extends ABOCtx implements ITechCtxSettingsAppGui {
       return me;
    }
 
+   public DrawableStringFactory getStringDrawableFactory() {
+      return getDrawableStringFactory();
+   }
+
    public IStringProducer getStrings() {
       return strings;
    }
@@ -570,11 +560,43 @@ public class GuiCtx extends ABOCtx implements ITechCtxSettingsAppGui {
       return styleAdapterDef;
    }
 
+   /**
+    * Returns the ID {@link StyleClass}.
+    * This is the preferred way for code to get their style class for application level items.
+    * The Theming constructs the {@link StyleClass} array.
+    * When ID is too big for the classes, method returns the root style class.
+    * @param id
+    * @return never null.
+    * @throws 
+    */
+   public StyleClass getStyleClass(int id) {
+      if (classes == null) {
+         throw new IllegalStateException("StyleClasses have not been set to GuiCtx");
+      }
+      if (id >= classes.length) {
+         //#debug
+         toDLog().pInit1("StyleClass ID not valid " + id, null, GuiCtx.class, "getStyleClass@378");
+         //#debug
+         if (uc.getConfigU().isForceExceptions()) {
+            throw new IllegalStateException("Style classes not initialized to support id " + id);
+         }
+         return classes[0];
+      }
+      return classes[id];
+   }
+
    public StyleManager getStyleManager() {
       if (styleManager == null) {
          styleManager = new StyleManager(this);
       }
       return styleManager;
+   }
+
+   public TableCellPolicyFactory getTableCellPolicyFactory() {
+      if (cellPolicyFactory == null) {
+         cellPolicyFactory = new TableCellPolicyFactory(this);
+      }
+      return cellPolicyFactory;
    }
 
    public TableGeneticsFactory getTableGeneticsC() {
@@ -623,8 +645,6 @@ public class GuiCtx extends ABOCtx implements ITechCtxSettingsAppGui {
    public UserInteractionCtrl getUIACtrl() {
       return uiaCtrl;
    }
-
-   private ViewContext vcGhost;
 
    /**
     * Allows the creation of Drawable without a real Canvas but a Ghost canvas
@@ -677,15 +697,6 @@ public class GuiCtx extends ABOCtx implements ITechCtxSettingsAppGui {
       this.canvasCtxRoot = canvasGC;
    }
 
-   public int getStaticKeyRegistrationID(int type, int key) {
-      if (type == IStaticIDs.SID_STRINGS) {
-         if (key <= IStringsGui.AZ_STR_VIEW_A && key >= IStringsGui.AZ_STR_VIEW_Z) {
-            return key - IStringsGui.AZ_STR_VIEW_A;
-         }
-      }
-      return -1;
-   }
-
    /**
     * This method must be called before
     * 
@@ -731,7 +742,7 @@ public class GuiCtx extends ABOCtx implements ITechCtxSettingsAppGui {
    public void showIndependant(InputConfig ic, IDrawable drawable) {
       if (getCFC().getHostCore().hasFeatureSupport(ITechHostCore.SUP_ID_24_MULTIPLE_WINDOWS)) {
          ByteObject techCanvasHost = getCUC().createBOCanvasHostDefault();
-         ByteObject techCanvasAppli = createTechCanvasAppliDrawableDefault();
+         ByteObject techCanvasAppli = createBOCanvasAppliDrawableDefault();
 
          CanvasAppliInputGui canvas = new CanvasAppliInputGui(this, techCanvasAppli, techCanvasHost);
          //link to this canvas view 
@@ -793,14 +804,6 @@ public class GuiCtx extends ABOCtx implements ITechCtxSettingsAppGui {
       }
    }
 
-   public boolean toStringHasFlagDraw(int flag) {
-      return BitUtils.hasFlag(toStringFlagsDraw, flag);
-   }
-
-   public void toStringSetFlagDraw(int flag, boolean b) {
-      toStringFlagsDraw = BitUtils.setFlag(toStringFlagsDraw, flag, b);
-   }
-
    public void toStringGuiCtxTech1Line(Dctx dc, ByteObject bo) {
       int id = bo.get3(CTX_OFFSET_03_CTXID_3);
       if (id == GuiCtx.MODULE_ID) {
@@ -809,8 +812,16 @@ public class GuiCtx extends ABOCtx implements ITechCtxSettingsAppGui {
       }
    }
 
+   public boolean toStringHasFlagDraw(int flag) {
+      return BitUtils.hasFlag(toStringFlagsDraw, flag);
+   }
+
    private void toStringPrivate(Dctx dc) {
 
+   }
+
+   public void toStringSetFlagDraw(int flag, boolean b) {
+      toStringFlagsDraw = BitUtils.setFlag(toStringFlagsDraw, flag, b);
    }
 
    //#enddebug

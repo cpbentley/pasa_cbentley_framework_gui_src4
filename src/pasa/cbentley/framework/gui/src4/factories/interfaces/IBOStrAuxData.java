@@ -2,6 +2,7 @@ package pasa.cbentley.framework.gui.src4.factories.interfaces;
 
 import pasa.cbentley.byteobjects.src4.core.ByteObject;
 import pasa.cbentley.byteobjects.src4.core.interfaces.IByteObject;
+import pasa.cbentley.framework.drawx.src4.string.interfaces.IBOStrAux;
 import pasa.cbentley.framework.gui.src4.core.ViewDrawable;
 import pasa.cbentley.framework.gui.src4.ctx.IBOTypesGui;
 import pasa.cbentley.framework.gui.src4.interfaces.ITechDrawable;
@@ -19,16 +20,16 @@ import pasa.cbentley.framework.gui.src4.tech.ITechStringDrawable;
  * 
  * When a {@link StringDrawable} goes in edition mode, edition parameters are loaded by the {@link StringEditModule}.
  * 
- * @see IBOStringEdit
+ * @see IBOStrAuxEdit
  * @author Charles-Philip Bentley
  *
  */
-public interface IBOStringData extends IByteObject {
+public interface IBOStrAuxData extends IBOStrAux {
 
    /**
     * 10 bytes
     */
-   public static final int SDATA_BASIC_SIZE                  = A_OBJECT_BASIC_SIZE + 10;
+   public static final int SDATA_BASIC_SIZE                  = STR_AUX_SIZE + 10;
 
    /**
     * Flag string as password.
@@ -70,7 +71,7 @@ public interface IBOStringData extends IByteObject {
     */
    public static final int SDATA_FLAG_8_AUTO_CAP_SENTENCE    = 1 << 7;
 
-   public static final int SDATA_OFFSET_01_FLAG              = A_OBJECT_BASIC_SIZE;
+   public static final int SDATA_OFFSET_01_FLAG              = STR_AUX_SIZE;
 
    /**
     * Arrangement of characters in the string relative to a rectangular area and the {@link ISizer} constraints.
@@ -94,7 +95,7 @@ public interface IBOStringData extends IByteObject {
     * A logic sizer height of 2 will trim at the second line.
     * </p>
     */
-   public static final int SDATA_OFFSET_02_PRESET_CONFIG1      = A_OBJECT_BASIC_SIZE + 1;
+   public static final int SDATA_OFFSET_02_PRESET_CONFIG1      = STR_AUX_SIZE + 1;
 
    /**
     * Default Language Character set for the edition of the String.
@@ -107,7 +108,7 @@ public interface IBOStringData extends IByteObject {
     * <br>
     * What about localization? When 0, the default is used and it is not forced
     */
-   public static final int SDATA_OFFSET_03_CHARSET_ID1       = A_OBJECT_BASIC_SIZE + 2;
+   public static final int SDATA_OFFSET_03_CHARSET_ID1       = STR_AUX_SIZE + 2;
 
    /**
     * Constraint on data input
@@ -117,14 +118,14 @@ public interface IBOStringData extends IByteObject {
     * <li> {@link ITechStringDrawable#S_DATA_3_DECIMAL}
     * 
     */
-   public static final int SDATA_OFFSET_04_DATA_TYPE1        = A_OBJECT_BASIC_SIZE + 3;
+   public static final int SDATA_OFFSET_04_DATA_TYPE1        = STR_AUX_SIZE + 3;
 
    /**
     * 1-255 size of string. 0 for infinity.
     * <br>
     * Checked during initialization and by {@link StringEditModule} in edition mode.
     */
-   public static final int SDATA_OFFSET_05_MAX_SIZE1         = A_OBJECT_BASIC_SIZE + 4;
+   public static final int SDATA_OFFSET_05_MAX_SIZE1         = STR_AUX_SIZE + 4;
 
    /**
     * Defines whether the {@link StringDrawable} can be selected or edited.
@@ -136,7 +137,7 @@ public interface IBOStringData extends IByteObject {
     * <li> {@link ITechStringDrawable#S_ACTION_MODE_2_EDIT}
     * 
     */
-   public static final int SDATA_OFFSET_06_ACTION_MODE1      = A_OBJECT_BASIC_SIZE + 5;
+   public static final int SDATA_OFFSET_06_ACTION_MODE1      = STR_AUX_SIZE + 5;
 
    /**
     * Styles flags such as {@link ITechDrawable#STYLE_05_SELECTED} to be used when computing {@link StringDrawable} preferred size.
@@ -145,8 +146,8 @@ public interface IBOStringData extends IByteObject {
     * <li>Do nothing
     * <li>Recompute preferred dimension, possibly the whole canvas.
     */
-   public static final int SDATA_OFFSET_07_INIT_STYLE_FLAGS4 = A_OBJECT_BASIC_SIZE + 6;
+   public static final int SDATA_OFFSET_07_INIT_STYLE_FLAGS4 = STR_AUX_SIZE + 6;
 
-   public static final int SDATA_OFFSET_08_                  = A_OBJECT_BASIC_SIZE + 10;
+   public static final int SDATA_OFFSET_08_                  = STR_AUX_SIZE + 10;
 
 }

@@ -40,18 +40,14 @@ public class ExecutionContextGui extends ExecutionContext implements ITechExecut
 
    protected final GuiCtx     gc;
 
-   private IntToObjects       renders;
-
    private InputConfig        icc;
+
+   private IntToObjects       renders;
 
    public ExecutionContextGui(GuiCtx gc) {
       super(gc.getCUC());
       this.gc = gc;
       renders = new IntToObjects(gc.getUC());
-   }
-
-   public InputConfig getInputConfig() {
-      return icc;
    }
 
    /**
@@ -77,8 +73,20 @@ public class ExecutionContextGui extends ExecutionContext implements ITechExecut
       data.add(action, draw);
    }
 
+   public void addDrawnHide(IDrawable draw) {
+      this.addDrawn(draw, ACTION_2_HIDE);
+   }
+
    public void addDrawnHide(Object draw) {
       this.addDrawn(draw, ACTION_2_HIDE);
+   }
+
+   public void addDrawnInvalidated(IDrawable draw) {
+      this.addDrawn(draw, ACTION_3_INVALIDATE);
+   }
+
+   public void addDrawnShow(IDrawable draw) {
+      this.addDrawn(draw, ACTION_0_SHOW_OVER);
    }
 
    public void addInvalide(IDrawable d) {
@@ -101,6 +109,37 @@ public class ExecutionContextGui extends ExecutionContext implements ITechExecut
    public void clear() {
    }
 
+   private void execTypeDraw(ExecEntry ee) {
+      IDrawable d = (IDrawable) ee.o;
+      int action = ee.action;
+      if (action == ACTION_0_SHOW_OVER) {
+         //showing? what inputconfig? we are modifying state in the GUI thread
+         gc.getFocusCtrl().drawableShow(this, d);
+      } else if (action == ACTION_2_HIDE) {
+         gc.getFocusCtrl().drawableHide(cd, d, null);
+      } else if (action == ACTION_1_SHOW_REPLACE) {
+         gc.getFocusCtrl().drawableShow(this, d);
+      } else if (action == ACTION_3_INVALIDATE) {
+         d.invalidateLayout();
+      }
+   }
+
+   private void execTypePage(ExecEntry ee) {
+      int newPageID = ee.action;
+      boolean addToHistory = true;
+      ExecutionContextGui ex = this;
+      gc.getTopLvl().showPage(ex, newPageID, addToHistory);
+   }
+
+   private void execTypeRun(ExecEntry ee) {
+      Runnable d = (Runnable) ee.o;
+      d.run();
+   }
+
+   public InputConfig getInputConfig() {
+      return icc;
+   }
+
    public void renderStart() {
       for (int i = 0; i < renders.nextempty; i++) {
          ExecEntry ee = (ExecEntry) renders.objects[i];
@@ -116,33 +155,6 @@ public class ExecutionContextGui extends ExecutionContext implements ITechExecut
          } else {
             throw new IllegalArgumentException();
          }
-      }
-   }
-
-   private void execTypeRun(ExecEntry ee) {
-      Runnable d = (Runnable) ee.o;
-      d.run();
-   }
-
-   private void execTypePage(ExecEntry ee) {
-      int newPageID = ee.action;
-      boolean addToHistory = true;
-      ExecutionContextGui ex = this;
-      gc.getTopLvl().showPage(ex, newPageID, addToHistory);
-   }
-
-   private void execTypeDraw(ExecEntry ee) {
-      IDrawable d = (IDrawable) ee.o;
-      int action = ee.action;
-      if (action == ACTION_0_SHOW_OVER) {
-         //showing? what inputconfig? we are modifying state in the GUI thread
-         gc.getFocusCtrl().drawableShow(this, d);
-      } else if (action == ACTION_2_HIDE) {
-         gc.getFocusCtrl().drawableHide(cd, d, null);
-      } else if (action == ACTION_1_SHOW_REPLACE) {
-         gc.getFocusCtrl().drawableShow(this, d);
-      } else if (action == ACTION_3_INVALIDATE) {
-         d.invalidateLayout();
       }
    }
 

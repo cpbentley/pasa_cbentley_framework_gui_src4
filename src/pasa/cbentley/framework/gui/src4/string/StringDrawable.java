@@ -26,7 +26,7 @@ import pasa.cbentley.framework.gui.src4.core.ViewDrawable;
 import pasa.cbentley.framework.gui.src4.core.ViewPane;
 import pasa.cbentley.framework.gui.src4.ctx.GuiCtx;
 import pasa.cbentley.framework.gui.src4.ctx.ToStringStaticGui;
-import pasa.cbentley.framework.gui.src4.factories.interfaces.IBOStringData;
+import pasa.cbentley.framework.gui.src4.factories.interfaces.IBOStrAuxData;
 import pasa.cbentley.framework.gui.src4.interfaces.IDrawListener;
 import pasa.cbentley.framework.gui.src4.interfaces.IDrawable;
 import pasa.cbentley.framework.gui.src4.interfaces.ITechDrawable;
@@ -144,7 +144,7 @@ import pasa.cbentley.layouter.src4.tech.ITechLayout;
  * 
  *
  */
-public class StringDrawable extends ViewDrawable implements IBOStringData, IDrawListener {
+public class StringDrawable extends ViewDrawable implements IBOStrAuxData, IDrawListener {
 
    private ByteObject  boFigString;
 
@@ -198,7 +198,7 @@ public class StringDrawable extends ViewDrawable implements IBOStringData, IDraw
     * @param cs
     * @param offset
     * @param len
-    * @param boStringData {@link IBOStringData}
+    * @param boStringData {@link IBOStrAuxData}
     */
    public StringDrawable(GuiCtx gc, StyleClass sc, char[] cs, int offset, int len, ByteObject boStringData) {
       super(gc, sc);
@@ -221,7 +221,7 @@ public class StringDrawable extends ViewDrawable implements IBOStringData, IDraw
     * Creates a {@link StringDrawable} to display the String using the given style.
     * <br>
     * <br>
-    * The {@link IBOStringData#SDATA_OFFSET_02_PRESET_CONFIG1} decides the breaking during
+    * The {@link IBOStrAuxData#SDATA_OFFSET_02_PRESET_CONFIG1} decides the breaking during
     * initialization.
     * 
     * @param sc
@@ -232,7 +232,7 @@ public class StringDrawable extends ViewDrawable implements IBOStringData, IDraw
    }
 
    /**
-    * Overrides the {@link IBOStringData} from the style class
+    * Overrides the {@link IBOStrAuxData} from the style class
     * <br>
     * <br>
     * 
@@ -269,7 +269,7 @@ public class StringDrawable extends ViewDrawable implements IBOStringData, IDraw
       }
       if (presetConfig != -1) {
          boStringDrawable = boStringDrawable.cloneCopyHead();
-         boStringDrawable.set1(IBOStringData.SDATA_OFFSET_02_PRESET_CONFIG1, presetConfig);
+         boStringDrawable.set1(IBOStrAuxData.SDATA_OFFSET_02_PRESET_CONFIG1, presetConfig);
       }
       initTech(boStringDrawable);
       createStringer();
@@ -303,7 +303,7 @@ public class StringDrawable extends ViewDrawable implements IBOStringData, IDraw
 
    /**
     * 
-    * When receiving key focus {@link ITechDrawable#EVENT_03_KEY_FOCUS_GAIN}  and flag {@link IBOStringData#SDATA_FLAG_5_AUTO_EDIT_MODE} is set,
+    * When receiving key focus {@link ITechDrawable#EVENT_03_KEY_FOCUS_GAIN}  and flag {@link IBOStrAuxData#SDATA_FLAG_5_AUTO_EDIT_MODE} is set,
     * {@link StringDrawable} toggles on Edition mode.
     * <br>
     * When in mode {@link ITechStringDrawable#PRESET_CONFIG_1_TITLE}, type is temporarily set to {@link ITechStringDrawable#PRESET_CONFIG_3_SCROLL_V}
@@ -495,7 +495,7 @@ public class StringDrawable extends ViewDrawable implements IBOStringData, IDraw
    }
 
    /**
-    * Decides which breaking method to use according to context {@link IBOStringData#SDATA_OFFSET_02_PRESET_CONFIG1}
+    * Decides which breaking method to use according to context {@link IBOStrAuxData#SDATA_OFFSET_02_PRESET_CONFIG1}
     * <br>
     * <br>
     * <li>{@link ITechStringDrawable#PRESET_CONFIG_0_NONE}
@@ -647,7 +647,7 @@ public class StringDrawable extends ViewDrawable implements IBOStringData, IDraw
    }
 
    /**
-    * From {@link IBOStringData#SDATA_OFFSET_02_PRESET_CONFIG1}
+    * From {@link IBOStrAuxData#SDATA_OFFSET_02_PRESET_CONFIG1}
     * 
     * <li> {@link ITechStringDrawable#PRESET_CONFIG_0_NONE}
     * <li> {@link ITechStringDrawable#PRESET_CONFIG_1_TITLE}
@@ -659,7 +659,7 @@ public class StringDrawable extends ViewDrawable implements IBOStringData, IDraw
     * @return
     */
    public int getPresetConfig() {
-      return boStringDrawable.get1(IBOStringData.SDATA_OFFSET_02_PRESET_CONFIG1);
+      return boStringDrawable.get1(IBOStrAuxData.SDATA_OFFSET_02_PRESET_CONFIG1);
    }
 
    public SizerFactory getSizerFac() {
@@ -859,7 +859,7 @@ public class StringDrawable extends ViewDrawable implements IBOStringData, IDraw
     * The init method of Drawable has already been called by {@link ViewDrawable}. <br>
     * <br>
     * <p>
-    * The {@link IBOStringData#SDATA_OFFSET_02_PRESET_CONFIG1} applies to decide how the preferred dimension is computed.
+    * The {@link IBOStrAuxData#SDATA_OFFSET_02_PRESET_CONFIG1} applies to decide how the preferred dimension is computed.
     * <li> {@link ITechStringDrawable#PRESET_CONFIG_2_SCROLL_H} gives all text on 1 line.  </li>
     * <li> {@link ITechStringDrawable#PRESET_CONFIG_4_NATURAL_NO_WRAP}  </li>
     * <li> {@link ITechStringDrawable#PRESET_CONFIG_1_TITLE} text is trimmed to fit area </li>
@@ -1093,12 +1093,12 @@ public class StringDrawable extends ViewDrawable implements IBOStringData, IDraw
 
    /**
     * 
-    * @param boStringData {@link IBOStringData}
+    * @param boStringData {@link IBOStrAuxData}
     */
    public void setBOStringData(ByteObject boStringData) {
       styleInvalidate();
       this.boStringDrawable = boStringData;
-      int presetConfig = boStringDrawable.get1(IBOStringData.SDATA_OFFSET_02_PRESET_CONFIG1);
+      int presetConfig = boStringDrawable.get1(IBOStrAuxData.SDATA_OFFSET_02_PRESET_CONFIG1);
       setTypeString(presetConfig);
    }
 
@@ -1341,7 +1341,7 @@ public class StringDrawable extends ViewDrawable implements IBOStringData, IDraw
    }
 
    private void toStringPrivate(Dctx dc) {
-      String v = ToStringStaticGui.toStringStringPreset(boStringDrawable.get1(IBOStringData.SDATA_OFFSET_02_PRESET_CONFIG1));
+      String v = ToStringStaticGui.toStringStringPreset(boStringDrawable.get1(IBOStrAuxData.SDATA_OFFSET_02_PRESET_CONFIG1));
       dc.appendVarWithSpace("preset", v);
 
    }

@@ -49,11 +49,16 @@ public class ViewContext extends LayoutableAbstract implements IStringable, ILay
    }
 
    public ViewContext(GuiCtx gc, CanvasGuiCtx canvasGC) {
+      this(gc, canvasGC, null);
+   }
+
+   public ViewContext(GuiCtx gc, CanvasGuiCtx canvasGC, ViewContext parent) {
       super(gc.getLAC());
       this.gc = gc;
       this.canvasGC = canvasGC;
       engine.setManualOverride(true);
       topo = new TopologyDLayer(gc, this);
+      this.parentVC = parent;
    }
 
    /**
@@ -101,7 +106,9 @@ public class ViewContext extends LayoutableAbstract implements IStringable, ILay
 
    public int getScreenY() {
       if (parentVC == null) {
-         return getY();
+         int myY = getY();
+         int sy = canvasGC.getCanvas().getScreenY(myY);
+         return sy;
       }
       return getY() + parentVC.getScreenY();
    }
@@ -167,13 +174,14 @@ public class ViewContext extends LayoutableAbstract implements IStringable, ILay
 
    //#mdebug
    public void toString(Dctx dc) {
-      dc.root(this, ViewContext.class);
+      dc.root(this, ViewContext.class, 170);
       toStringPrivate(dc);
       super.toString(dc.sup());
       dc.nlLvl("Parent", parentVC);
 
       dc.appendVarWithNewLine("getX()", getX());
       dc.appendVarWithSpace("getY()", getY());
+      dc.appendVarWithNewLine("getScreenX()", getScreenX());
       dc.appendVarWithNewLine("getScreenX()", getScreenX());
       dc.appendVarWithSpace("getScreenY()", getScreenY());
    }

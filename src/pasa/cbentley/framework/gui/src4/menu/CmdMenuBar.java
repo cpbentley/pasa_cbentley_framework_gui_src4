@@ -263,7 +263,7 @@ public class CmdMenuBar extends TableView implements IEventConsumer, ICmdsView {
       setParentLink(mRight);
 
       //implicit producer is the command module. default producer
-      cc.getEventBusCmds().addConsumer(this, IEventCmds.PID_1_CMD, IEventCmds.EVENT_0_CMD_LABEL_CHANGE);
+      cc.getEventBusCmds().addConsumer(this, IEventCmds.PID_01_CMD, IEventCmds.PID_01_CMD_01_LABEL_CHANGE);
 
       
    }
@@ -298,7 +298,7 @@ public class CmdMenuBar extends TableView implements IEventConsumer, ICmdsView {
     * @param e {@link BusEvent}
     */
    public void consumeEvent(BusEvent e) {
-      if (e.getEventID() == IEventCmds.EVENT_4_COMMAND_EXECUTED) {
+      if (e.getEventID() == IEventCmds.PID_01_CMD_04_EXECUTED) {
          //update undo? visuals? only if currently shown.
          CmdInstance ci = (CmdInstance) e.getParamO1();
 
@@ -317,7 +317,7 @@ public class CmdMenuBar extends TableView implements IEventConsumer, ICmdsView {
             hideAndGoState0(ic);
             e.setFlag(BusEvent.FLAG_1_ACTED, true);
          }
-      } else if (e.getEventID() == IEventCmds.EVENT_0_CMD_LABEL_CHANGE) {
+      } else if (e.getEventID() == IEventCmds.PID_01_CMD_01_LABEL_CHANGE) {
          //get the producer
          doUpdateCmdModel(e, cmdModelDefault);
          doUpdateCmdModel(e, cmdModelPound);
@@ -339,7 +339,7 @@ public class CmdMenuBar extends TableView implements IEventConsumer, ICmdsView {
       if (e.getProducer() != null) {
          //or search for it
          MCmd producer = (MCmd) e.getProducer();
-         int index = objectTableModel.findObjectRef(producer);
+         int index = objectTableModel.findIndexObjectFirst(producer);
          if (index != -1) {
             objectTableModel.eventRefresh(index);
          } else {
@@ -947,7 +947,7 @@ public class CmdMenuBar extends TableView implements IEventConsumer, ICmdsView {
     * @param ic
     */
    protected void showSubMenuTable(InputConfig ic) {
-      cmdTableView.shShowDrawable(ic, ITechCanvasDrawable.SHOW_TYPE_1_OVER);
+      cmdTableView.shShowDrawable(ic, ITechCanvasDrawable.SHOW_TYPE_1_OVER_TOP);
       //registers as an event interceptor
       this.getCanvas().getVCRoot().getTopo().addInterceptor(this);
 

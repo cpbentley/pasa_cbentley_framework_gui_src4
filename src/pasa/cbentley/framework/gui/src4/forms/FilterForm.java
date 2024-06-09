@@ -20,7 +20,7 @@ import pasa.cbentley.framework.datamodel.src4.table.ITableModel;
 import pasa.cbentley.framework.gui.src4.core.StyleClass;
 import pasa.cbentley.framework.gui.src4.ctx.GuiCtx;
 import pasa.cbentley.framework.gui.src4.factories.DrawableStringFactory;
-import pasa.cbentley.framework.gui.src4.factories.interfaces.IBOStringData;
+import pasa.cbentley.framework.gui.src4.factories.interfaces.IBOStrAuxData;
 import pasa.cbentley.framework.gui.src4.interfaces.IDrawable;
 import pasa.cbentley.framework.gui.src4.string.StringDrawable;
 import pasa.cbentley.framework.gui.src4.table.TableLayoutView;
@@ -32,7 +32,7 @@ import pasa.cbentley.framework.gui.src4.tech.ITechStringDrawable;
  * @author cbentley
  * 
  */
-public class FilterForm extends TableLayoutView implements ICommandable, IBOStringData, ITechAcceptor {
+public class FilterForm extends TableLayoutView implements ICommandable, IBOStrAuxData, ITechAcceptor {
 
    private static final String MAIN_LIST_TITLE = "Filters";
 

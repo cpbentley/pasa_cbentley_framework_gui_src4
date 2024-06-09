@@ -9,9 +9,10 @@ import pasa.cbentley.framework.drawx.src4.string.CharOpt;
 import pasa.cbentley.framework.gui.src4.anim.AnimManager;
 import pasa.cbentley.framework.gui.src4.core.Drawable;
 import pasa.cbentley.framework.gui.src4.core.LayouterEngineDrawable;
+import pasa.cbentley.framework.gui.src4.core.StyleClass;
 import pasa.cbentley.framework.gui.src4.ctx.GuiCtx;
-import pasa.cbentley.framework.gui.src4.ctx.IToStringFlagsGui;
 import pasa.cbentley.framework.gui.src4.ctx.ITechCtxSettingsAppGui;
+import pasa.cbentley.framework.gui.src4.ctx.IToStringFlagsGui;
 import pasa.cbentley.framework.gui.src4.ctx.ToStringStaticGui;
 import pasa.cbentley.framework.gui.src4.interfaces.ITechCanvasDrawable;
 import pasa.cbentley.framework.gui.src4.string.StringDrawable;
@@ -30,33 +31,32 @@ import pasa.cbentley.framework.gui.src4.utils.RenderMetrics;
  */
 public class CanvasDebugger extends Drawable {
 
+   protected int          countAnimRepaints;
 
-   protected int               countAnimRepaints;
+   protected int          countDrawableRepaints;
 
-   protected int               countDrawableRepaints;
+   protected int          countFullRepaints;
 
-   protected int               countFullRepaints;
+   private int            debugMode      = 0;
 
-   private int                 debugMode      = 0;
+   private boolean        isDebugPainting;
 
-   private boolean             isDebugPainting;
+   private int            maxDiff;
 
-   private int                 maxDiff;
+   private int            minDiff;
 
-   private int                 minDiff;
+   private int            numPaintCalls;
 
-   private int                 numPaintCalls;
+   private int            oldConsumed;
 
-   private int                 oldConsumed;
+   private int            orientation;
 
-   private int                 orientation;
+   private StringBBuilder sb;
 
-   private StringBBuilder      sb;
+   protected int          totalPaintTime = 0;
 
-   protected int               totalPaintTime = 0;
-
-   public CanvasDebugger(GuiCtx gc) {
-      super(gc, gc.getStyleClass(0));
+   public CanvasDebugger(GuiCtx gc, StyleClass sc, ViewContext vc) {
+      super(gc, sc, vc);
       sb = new StringBBuilder(gc.getUC());
       toStringSetName("CanvasDebugger");
    }
@@ -256,8 +256,9 @@ public class CanvasDebugger extends Drawable {
    }
 
    /**
-    * This is drawn at the very end.
-    * <br>
+    * This is drawn at the very end of the draw method in {@link CanvasAppliInputGui}.
+    * 
+    * 
     * Draws the TopHeader displaying Debug Information about Processor Use during the Painting Cycle
     * and memory changes
     * TODO: make the debug stuff into a class similary to the Menu. overhaul the whole system.
@@ -269,17 +270,17 @@ public class CanvasDebugger extends Drawable {
     */
    protected void paintDebugComplete(GraphicsXD g, long time) {
       //#debug
-      gc.toDLog().pDraw("x=" + getX() + " y=" + getY(), null, CanvasDebugger.class, "paintDebugComplete");
+      gc.toDLog().pDraw("x=" + getX() + " y=" + getY(), null, CanvasDebugger.class, "paintDebugComplete@272");
 
       g.setTranslationShift(getX(), getY());
 
-      if (debugMode == ITechCanvasDrawable.DEBUG_3_2COMPLETE) {
+      if (debugMode == ITechCanvasDrawable.DEBUG_3_COMPLETE_2LINES) {
          //the main paint translated method
          //drawDebugAsBuffer(g, time);
          drawDebugDirect(g, time);
          //drawDebugAsString(g, time);
          g.clipReset();
-      } else if (debugMode == ITechCanvasDrawable.DEBUG_2_COMPLETE) {
+      } else if (debugMode == ITechCanvasDrawable.DEBUG_2_COMPLETE_1LINE) {
          //the main paint translated method
          //drawDebugAsBuffer(g, time);
          drawDebugDirect(g, time);
@@ -290,7 +291,7 @@ public class CanvasDebugger extends Drawable {
    }
 
    public int getSizePreferredHeight() {
-      if (debugMode == ITechCanvasDrawable.DEBUG_2_COMPLETE || debugMode == ITechCanvasDrawable.DEBUG_3_2COMPLETE) {
+      if (debugMode == ITechCanvasDrawable.DEBUG_2_COMPLETE_1LINE || debugMode == ITechCanvasDrawable.DEBUG_3_COMPLETE_2LINES) {
          return gc.getCDC().getFontFactory().getFontDebug().getHeight() * 2;
       } else {
          return gc.getCDC().getFontFactory().getFontDebug().getHeight();
@@ -338,13 +339,28 @@ public class CanvasDebugger extends Drawable {
 
    //#mdebug
    public void toString(Dctx dc) {
-      dc.root(this, CanvasDebugger.class, 334);
-      dc.appendVarWithSpace("DebugMode ", ToStringStaticGui.toStringDebugMode(debugMode));
+      dc.root(this, CanvasDebugger.class, 350);
+      toStringPrivate(dc);
       super.toString(dc.sup());
+
+      dc.appendVarWithNewLine("isDebugPainting", isDebugPainting);
+      dc.appendVarWithNewLine("countAnimRepaints", countAnimRepaints);
+      dc.appendVarWithNewLine("countDrawableRepaints", countDrawableRepaints);
+      dc.appendVarWithNewLine("countFullRepaints", countFullRepaints);
+      dc.appendVarWithNewLine("totalPaintTime", totalPaintTime);
+
    }
 
    public void toString1Line(Dctx dc) {
-      dc.root1Line(this, "CanvasDebugger");
+      dc.root1Line(this, CanvasDebugger.class, 350);
+      toStringPrivate(dc);
+      super.toString1Line(dc.sup1Line());
+
+   }
+
+   private void toStringPrivate(Dctx dc) {
+      dc.appendVarWithSpace("DebugMode", ToStringStaticGui.toStringDebugMode(debugMode));
+      dc.appendVarWithSpace("numPaintCalls", numPaintCalls);
    }
    //#enddebug
 

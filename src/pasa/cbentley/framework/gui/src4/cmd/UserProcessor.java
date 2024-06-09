@@ -265,7 +265,7 @@ public class UserProcessor implements ITriggers, IStringable {
          //list potential cmds by sending an event? GUI component may
          BEvent me = new BEvent(cc.getCUC());
          me.setParamO1(cs);
-         dex.addEvent(IEventCmds.EVENT_5_TRIGGER_SEARCH, this); //will be fired at the end
+         dex.addEvent(IEventCmds.PID_02_TRIGGER_01_SEARCH, this); //will be fired at the end
          //for each potential trigger. check if there is a time constraint
          CmdTriggerLive ctLive = cs.getLiveTrigger();
          //with a timing we must have a DeviceEvent TODO here otherwise Trigger is badly formed

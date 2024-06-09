@@ -42,28 +42,28 @@ import pasa.cbentley.framework.input.src4.InputState;
  */
 public class InputConfig implements IStringable, IInput, IActionFeedback {
 
-   private CmdInstanceDrawable ci;
+   private CmdInstanceDrawable     ci;
 
    //#debug
-   private IDrawable           d;
+   private IDrawable               d;
 
    private ExecutionContext        ex;
 
-   private GuiCtx              gc;
+   private GuiCtx                  gc;
 
-   public InputStateDrawable   is;
+   public InputStateDrawable       is;
 
-   public CanvasResultDrawable sr;
+   public CanvasResultDrawable     sr;
 
-   protected final CanvasAppliInputGui  canvas;
+   protected final ICanvasDrawable canvas;
 
-   public InputConfig(GuiCtx gc, CanvasAppliInputGui canvas, InputStateDrawable isd, CanvasResultDrawable srd) {
+   public InputConfig(GuiCtx gc, ICanvasDrawable canvas, InputStateDrawable isd, CanvasResultDrawable srd) {
       this.canvas = canvas;
       is = isd;
       sr = srd;
       this.gc = gc;
    }
-   
+
    public InputStateDrawable getInputState() {
       return is;
    }
@@ -78,7 +78,7 @@ public class InputConfig implements IStringable, IInput, IActionFeedback {
       return gc;
    }
 
-   public CanvasAppliInputGui getCanvas() {
+   public ICanvasDrawable getCanvas() {
       return canvas;
    }
 
@@ -99,6 +99,12 @@ public class InputConfig implements IStringable, IInput, IActionFeedback {
 
    public CmdInstanceDrawable getCmdInstance() {
       return ci;
+   }
+
+   public void checkCmdInstanceNotNull() {
+      if(ci == null) {
+         throw new NullPointerException();
+      }
    }
 
    public int getDraggedDiffX() {

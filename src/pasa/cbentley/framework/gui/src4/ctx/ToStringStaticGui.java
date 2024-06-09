@@ -5,8 +5,8 @@ import pasa.cbentley.core.src4.logging.ToStringStaticBase;
 import pasa.cbentley.framework.gui.src4.anim.ITechAnim;
 import pasa.cbentley.framework.gui.src4.anim.move.ITechMoveFunction;
 import pasa.cbentley.framework.gui.src4.core.ViewDrawable;
-import pasa.cbentley.framework.gui.src4.interfaces.ITechCanvasDrawable;
 import pasa.cbentley.framework.gui.src4.interfaces.IDrawable;
+import pasa.cbentley.framework.gui.src4.interfaces.ITechCanvasDrawable;
 import pasa.cbentley.framework.gui.src4.interfaces.ITechDrawable;
 import pasa.cbentley.framework.gui.src4.interfaces.ITechViewDrawable;
 import pasa.cbentley.framework.gui.src4.table.interfaces.IBOTablePolicy;
@@ -17,209 +17,6 @@ import pasa.cbentley.framework.gui.src4.tech.ITechStringDrawable;
 import pasa.cbentley.framework.gui.src4.tech.ITechViewPane;
 
 public class ToStringStaticGui extends ToStringStaticBase {
-
-   public static String toStringViewFlagGene(int state) {
-      switch (state) {
-         case ITechViewDrawable.FLAG_GENE_28_NOT_SCROLLABLE:
-            return "NotScrollable";
-         case ITechViewDrawable.FLAG_GENE_29_SHRINKABLE_W:
-            return "ShrinkableW";
-         case ITechViewDrawable.FLAG_GENE_30_SHRINKABLE_H:
-            return "ShrinkableH";
-         case ITechViewDrawable.FLAG_GENE_31_EXPANDABLE_W:
-            return "ExpandableW";
-         case ITechViewDrawable.FLAG_GENE_32_EXPANDABLE_H:
-            return "ExpandableH";
-         default:
-            return "Unknown" + state;
-      }
-   }
-
-   public static String toStringViewPaneStyleType(int type) {
-      switch (type) {
-         case ITechViewPane.DRW_STYLE_0_VIEWDRAWABLE:
-            return "ViewDrawabe";
-         case ITechViewPane.DRW_STYLE_1_VIEWPANE:
-            return "ViewPane";
-         case ITechViewPane.DRW_STYLE_2_VIEWPORT:
-            return "ViewPort";
-         case ITechViewPane.DRW_STYLE_3_IGNORED:
-            return "Ignored";
-         default:
-            return "UnknownStyle " + type;
-      }
-   }
-
-   public static String toStringMoveType(int v) {
-      switch (v) {
-         case ITechMoveFunction.TYPE_MOVE_0_ASAP:
-            return "ASAP";
-         case ITechMoveFunction.TYPE_MOVE_1_BRESENHAM:
-            return "Bresenham";
-         default:
-            return "Unknown" + v;
-      }
-   }
-
-   public static String toStringMoveIncrementType(int v) {
-      switch (v) {
-         case ITechMoveFunction.INCREMENT_0_PARAM:
-            return "Linear";
-         case ITechMoveFunction.INCREMENT_1_FIB:
-            return "Fib";
-         default:
-            return "Unknown" + v;
-      }
-   }
-
-   public static String toStringPolicyType(final int type) {
-      switch (type) {
-         case ITechCell.CELL_3_FILL_STRONG:
-            return "FILL_STRONG";
-         case ITechCell.CELL_4_FILL_AVERAGE:
-            return "FILL_AVERAGE";
-         case ITechCell.CELL_5_FILL_WEAK:
-            return "FILL_WEAK";
-         case ITechCell.CELL_1_EXPLICIT_SET:
-            return "EXPLICIT";
-         case ITechCell.CELL_2_RATIO:
-            return "RATIO";
-         case ITechCell.CELL_0_IMPLICIT_SET:
-            return "IMPLICIT";
-         default:
-            return "UNKNOWN" + type;
-      }
-   }
-
-   public static String toStringType(final int type) {
-      switch (type) {
-         case ITechCell.TYPE_0_GENERIC:
-            return "GENERIC";
-         case ITechCell.TYPE_2_RATIO:
-            return "RATIO";
-         case ITechCell.TYPE_1_FLOW:
-            return "FLOW";
-         default:
-            return "UNKNOWN " + type;
-      }
-   }
-
-   public static String toStringDebugMode(int mode) {
-      switch (mode) {
-         case ITechCanvasDrawable.DEBUG_0_NONE:
-            return "None";
-         case ITechCanvasDrawable.DEBUG_1_LIGHT:
-            return "Light";
-         case ITechCanvasDrawable.DEBUG_2_COMPLETE:
-            return "Complete";
-         case ITechCanvasDrawable.DEBUG_3_2COMPLETE:
-            return "2Complete";
-         default:
-            return "Unknown" + mode;
-      }
-
-   }
-
-   /**
-    * Debug name for link IDs such as 
-    * <li>{@link ITechLinks#LINK_42_BO_STRING_EDIT}
-    * <li>{@link ITechLinks#LINK_50_STYLE_SCROLLBAR_BLOCK_BG}
-    * <li>{@link ITechLinks#LINK_65_STYLE_VIEWPANE}
-    * 
-    * @param link
-    * @return
-    */
-   public static String toStringLinkStatic(int link) {
-      switch (link) {
-         case ITechLinks.LINK_10_BASE_TECH:
-            return "BaseTech";
-         case ITechLinks.LINK_42_BO_STRING_EDIT:
-            return "BO_StringEdit";
-         case ITechLinks.LINK_41_BO_STRING_DATA:
-            return "BO_String";
-         case ITechLinks.LINK_43_CARET_FIGURE:
-            return "Figure_Caret";
-         case ITechLinks.LINK_45_STRING_LIST_VIEW:
-            return "StringListView";
-         case ITechLinks.LINK_49_FIG_SCROLLBAR_WRAPPER:
-            return "ScrollBar_FigureWrapper";
-         case ITechLinks.LINK_50_STYLE_SCROLLBAR_BLOCK_BG:
-            return "StyleClass_Scrollbar_BlockBg";
-         case ITechLinks.LINK_51_STYLE_SCROLLBAR_BLOCK_FIG:
-            return "StyleClass_Scrollbar_BlockFig";
-         case ITechLinks.LINK_52_STYLE_SCROLLBAR_TOP_LEFT_WRAPPER:
-            return "StyleClass_Scrollbar_TopLeft_Wrapper";
-         case ITechLinks.LINK_53_STYLE_SCROLLBAR_BOT_RIGHT_WRAPPER:
-            return "StyleClass_Scrollbar_BotRight_Wrapper";
-         case ITechLinks.LINK_58_STYLE_VIEWPANE_HOLE_HEADER:
-            return "StyleClass_Hole_Headers";
-         case ITechLinks.LINK_59_STYLE_VIEWPANE_HOLE_SB:
-            return "StyleClass_Hole_Scrollbars";
-         case ITechLinks.LINK_64_STYLE_VIEWPORT:
-            return "StyleClass_ViewPort";
-         case ITechLinks.LINK_65_STYLE_VIEWPANE:
-            return "StyleClass_ViewPane";
-         case ITechLinks.LINK_66_BO_VIEWPANE:
-            return "BO_ViewPane";
-         case ITechLinks.LINK_68_BO_V_SCROLLBAR:
-            return "BO_Scrollbar_Vertical";
-         case ITechLinks.LINK_69_BO_H_SCROLLBAR:
-            return "BO_Scrollbar_Horizontal";
-         case ITechLinks.LINK_71_STYLE_VIEWPANE_H_SCROLLBAR:
-            return "StyleClass_Scrollbar_Horizontal";
-         case ITechLinks.LINK_72_STYLE_VIEWPANE_V_SCROLLBAR:
-            return "StyleClass_Scrollbar_Vertical";
-         case ITechLinks.LINK_74_STYLE_CLASS_MENU:
-            return "StyleClass_menubar";
-         case ITechLinks.LINK_75_MENU_BAR_TECH:
-            return "BO_MenuBar";
-         case ITechLinks.LINK_80_BO_TABLEVIEW:
-            return "BO_Table";
-         case ITechLinks.LINK_81_STYLE_CLASS_TABLE_CELL:
-            return "StyleClass_Table_Cell";
-         case ITechLinks.LINK_82_STYLE_TABLE_COL_TITLE:
-            return "StyleClass_Table_Column";
-         case ITechLinks.LINK_83_STYLE_TABLE_ROW_TITLE:
-            return "StyleClass_Table_Row";
-         case ITechLinks.LINK_84_STYLE_TABLE_OVERLAY_FIGURE:
-            return "StyleClass_Table_Overlay_Figure";
-         case ITechLinks.LINK_85_STYLE_TABLE_TITLE_TOP:
-            return "Table Title Top";
-         case ITechLinks.LINK_86_STYLE_TABLE_TITLE_BOT:
-            return "Table Title Bottom";
-         case ITechLinks.LINK_90_STRING_EDIT_CONTROL:
-            return "BO_StringEditControl";
-         default:
-            return "UnknownLink " + link;
-      }
-   }
-
-   public static String toStringTypeBO(final int type) {
-      switch (type) {
-         case IBOTypesGui.TYPE_GUI_00_VIEWPANE:
-            return "ViewPaneTech";
-         case IBOTypesGui.TYPE_GUI_01_SCROLLBAR:
-            return "ScrollbarTech";
-         case IBOTypesGui.TYPE_GUI_02_TABLE:
-            return "TableTech";
-         case IBOTypesGui.TYPE_GUI_03_TABLE_GENETICS:
-            return "Genetics";
-         case IBOTypesGui.TYPE_GUI_05_CELL_SPANNING:
-            return "Spanning";
-         case IBOTypesGui.TYPE_GUI_06_CELL_POLICY:
-            return "CellPolicy";
-         case IBOTypesGui.TYPE_124_STRING_DATA:
-            return "StringTech";
-         case IBOTypesGui.TYPE_125_STRING_EDIT_TECH:
-            return "StringEditTech";
-         case IBOTypesGui.TYPE_GUI_09_STRING_GLOBAL:
-            return "StringGlobal";
-         case IBOTypesGui.TYPE_127_STRING_PREDITION:
-            return "StringPred";
-         default:
-            return null;
-      }
-   }
 
    public static String debugAnimType(int type) {
       switch (type) {
@@ -242,6 +39,28 @@ public class ToStringStaticGui extends ToStringStaticBase {
       }
    }
 
+   public static void debugBehaviorFlag(IDrawable d, int flag, Dctx sb) {
+      if (d.hasBehavior(flag)) {
+         sb.append(toStringBehavior(flag));
+         sb.append(' ');
+      }
+   }
+
+   public static String debugCacheType(int cacheType) {
+      switch (cacheType) {
+         case ITechDrawable.CACHE_0_NONE:
+            return "NONE";
+         case ITechDrawable.CACHE_1_CONTENT:
+            return "Content";
+         case ITechDrawable.CACHE_2_FULL:
+            return "Full";
+         case ITechDrawable.CACHE_3_BG_DECO:
+            return "Deco";
+         default:
+            return "Unknown";
+      }
+   }
+
    public static String debugDrawType(int t) {
 
       switch (t) {
@@ -256,44 +75,6 @@ public class ToStringStaticGui extends ToStringStaticBase {
       }
    }
 
-   public static String debugTiming(int t) {
-
-      switch (t) {
-         case ITechAnim.ANIM_TIME_0_MAIN:
-            return "Main";
-         case ITechAnim.ANIM_TIME_1_ENTRY:
-            return "Entry";
-         case ITechAnim.ANIM_TIME_2_EXIT:
-            return "Exit";
-         default:
-            return "Unknown" + t;
-      }
-   }
-
-   public static void debugBehaviorFlag(IDrawable d, int flag, Dctx sb) {
-      if (d.hasBehavior(flag)) {
-         sb.append(toStringBehavior(flag));
-         sb.append(' ');
-      }
-   }
-
-   public static String toStringCompetitionType(int value) {
-      switch (value) {
-         case ITechViewPane.COMPET_HEADER_0_NEUTRAL:
-            return "Neutral";
-         case ITechViewPane.COMPET_HEADER_1_HORIZ:
-            return "Horizontal";
-         case ITechViewPane.COMPET_HEADER_2_VERTICAL:
-            return "Vertical";
-         case ITechViewPane.COMPET_HEADER_3_WHEEL:
-            return "WheelCC";
-         case ITechViewPane.COMPET_HEADER_4_WHEEL_CCW:
-            return "WheelCCW";
-         default:
-            return "Unknown " + value;
-      }
-   }
-
    public static String debugPlanetStruct(int val) {
       switch (val) {
          case ITechViewPane.PLANET_MODE_0_EAT:
@@ -304,94 +85,6 @@ public class ToStringStaticGui extends ToStringStaticBase {
             return "Overlay";
          case ITechViewPane.PLANET_MODE_3_IMMATERIAL:
             return "Immaterial";
-         default:
-            return "Unknown";
-      }
-   }
-
-   public static String toStringScrollMove(int t) {
-      switch (t) {
-         case ITechViewPane.SB_MOVE_TYPE_0_FIXED:
-            return "Fixed";
-         case ITechViewPane.SB_MOVE_TYPE_1_CLOCK:
-            return "Clock";
-         case ITechViewPane.SB_MOVE_TYPE_2_CIRCULAR:
-            return "Circular";
-         default:
-            return "UnknownType" + t;
-      }
-   }
-
-   public static String toStringScrollPartial(int t) {
-      switch (t) {
-         case ITechViewPane.PARTIAL_TYPE_0_BOTH:
-            return "Both";
-         case ITechViewPane.PARTIAL_TYPE_1_TOP:
-            return "Top";
-         case ITechViewPane.PARTIAL_TYPE_2_BOTTOM:
-            return "Bottom";
-         default:
-            return "UnknownType" + t;
-      }
-   }
-
-   public static String toStringScrollbarMode(int t) {
-      switch (t) {
-         case ITechViewPane.SCROLL_TYPE_0_PIXEL_UNIT:
-            return "Pixel";
-         case ITechViewPane.SCROLL_TYPE_1_LOGIC_UNIT:
-            return "Logic";
-         case ITechViewPane.SCROLL_TYPE_2_PAGE_UNIT:
-            return "Page";
-         default:
-            return "UnknownType" + t;
-      }
-   }
-
-   public static String toStringScrollVisual(int t) {
-      switch (t) {
-         case ITechViewPane.VISUAL_0_LEAVE:
-            return "Leave";
-         case ITechViewPane.VISUAL_1_PARTIAL:
-            return "Partial";
-         case ITechViewPane.VISUAL_2_SHRINK:
-            return "Shrink";
-         case ITechViewPane.VISUAL_3_FILL:
-            return "Fill";
-         default:
-            return "UnknownVisual" + t;
-      }
-   }
-
-   public static String toStringStringPreset(int type) {
-      switch (type) {
-         case ITechStringDrawable.PRESET_CONFIG_0_NONE:
-            return "None";
-         case ITechStringDrawable.PRESET_CONFIG_1_TITLE:
-            return "Title";
-         case ITechStringDrawable.PRESET_CONFIG_3_SCROLL_V:
-            return "ScrollV";
-         case ITechStringDrawable.PRESET_CONFIG_2_SCROLL_H:
-            return "ScrollH";
-         case ITechStringDrawable.PRESET_CONFIG_4_NATURAL_NO_WRAP:
-            return "NaturalNoWrap";
-         case ITechStringDrawable.PRESET_CONFIG_5_CHAR:
-            return "Char";
-         default:
-            throw new IllegalArgumentException("" + type);
-      }
-   }
-
-   public static String debugCacheType(int cacheType) {
-      switch (cacheType) {
-         case ITechDrawable.CACHE_0_NONE:
-            return "NONE";
-         case ITechDrawable.CACHE_1_CONTENT:
-            return "Content";
-         case ITechDrawable.CACHE_2_FULL:
-            return "Full";
-         case ITechDrawable.CACHE_3_BG_DECO:
-            return "Deco";
          default:
             return "Unknown";
       }
@@ -462,6 +155,34 @@ public class ToStringStaticGui extends ToStringStaticBase {
       } else {
          sb.reverse(1);
          sb.append("]");
+      }
+   }
+
+   public static String debugTiming(int t) {
+
+      switch (t) {
+         case ITechAnim.ANIM_TIME_0_MAIN:
+            return "Main";
+         case ITechAnim.ANIM_TIME_1_ENTRY:
+            return "Entry";
+         case ITechAnim.ANIM_TIME_2_EXIT:
+            return "Exit";
+         default:
+            return "Unknown" + t;
+      }
+   }
+
+   private static void debugViewBehavior(ViewDrawable d, int flag, Dctx sb) {
+      if (d.hasFlagView(flag)) {
+         sb.append(toStringViewFlagGene(flag));
+         sb.append(" ");
+      }
+   }
+
+   private static void debugViewStateFlag(ViewDrawable d, int flag, Dctx sb) {
+      if (d.hasFlagView(flag)) {
+         sb.append(toStringViewState(flag));
+         sb.append(" ");
       }
    }
 
@@ -539,6 +260,39 @@ public class ToStringStaticGui extends ToStringStaticBase {
       }
    }
 
+   public static String toStringCompetitionType(int value) {
+      switch (value) {
+         case ITechViewPane.COMPET_HEADER_0_NEUTRAL:
+            return "Neutral";
+         case ITechViewPane.COMPET_HEADER_1_HORIZ:
+            return "Horizontal";
+         case ITechViewPane.COMPET_HEADER_2_VERTICAL:
+            return "Vertical";
+         case ITechViewPane.COMPET_HEADER_3_WHEEL:
+            return "WheelCC";
+         case ITechViewPane.COMPET_HEADER_4_WHEEL_CCW:
+            return "WheelCCW";
+         default:
+            return "Unknown " + value;
+      }
+   }
+
+   public static String toStringDebugMode(int mode) {
+      switch (mode) {
+         case ITechCanvasDrawable.DEBUG_0_NONE:
+            return "None";
+         case ITechCanvasDrawable.DEBUG_1_LIGHT:
+            return "Light";
+         case ITechCanvasDrawable.DEBUG_2_COMPLETE_1LINE:
+            return "Complete";
+         case ITechCanvasDrawable.DEBUG_3_COMPLETE_2LINES:
+            return "2Complete";
+         default:
+            return "Unknown" + mode;
+      }
+
+   }
+
    public static String toStringEvent(int event) {
       switch (event) {
          case ITechDrawable.EVENT_01_NOTIFY_SHOW:
@@ -562,6 +316,194 @@ public class ToStringStaticGui extends ToStringStaticBase {
 
          default:
             return "UNKNOWN_EVENT" + event;
+      }
+   }
+
+   /**
+    * Debug name for link IDs such as 
+    * <li>{@link ITechLinks#LINK_42_BO_STRING_EDIT}
+    * <li>{@link ITechLinks#LINK_50_STYLE_SCROLLBAR_BLOCK_BG}
+    * <li>{@link ITechLinks#LINK_65_STYLE_VIEWPANE}
+    * 
+    * @param link
+    * @return
+    */
+   public static String toStringLinkStatic(int link) {
+      switch (link) {
+         case ITechLinks.LINK_10_BASE_TECH:
+            return "BaseTech";
+         case ITechLinks.LINK_42_BO_STRING_EDIT:
+            return "BO_StringEdit";
+         case ITechLinks.LINK_41_BO_STRING_DATA:
+            return "BO_String";
+         case ITechLinks.LINK_43_CARET_FIGURE:
+            return "Figure_Caret";
+         case ITechLinks.LINK_45_STRING_LIST_VIEW:
+            return "StringListView";
+         case ITechLinks.LINK_49_FIG_SCROLLBAR_WRAPPER:
+            return "ScrollBar_FigureWrapper";
+         case ITechLinks.LINK_50_STYLE_SCROLLBAR_BLOCK_BG:
+            return "StyleClass_Scrollbar_BlockBg";
+         case ITechLinks.LINK_51_STYLE_SCROLLBAR_BLOCK_FIG:
+            return "StyleClass_Scrollbar_BlockFig";
+         case ITechLinks.LINK_52_STYLE_SCROLLBAR_TOP_LEFT_WRAPPER:
+            return "StyleClass_Scrollbar_TopLeft_Wrapper";
+         case ITechLinks.LINK_53_STYLE_SCROLLBAR_BOT_RIGHT_WRAPPER:
+            return "StyleClass_Scrollbar_BotRight_Wrapper";
+         case ITechLinks.LINK_58_STYLE_VIEWPANE_HOLE_HEADER:
+            return "StyleClass_Hole_Headers";
+         case ITechLinks.LINK_59_STYLE_VIEWPANE_HOLE_SB:
+            return "StyleClass_Hole_Scrollbars";
+         case ITechLinks.LINK_64_STYLE_VIEWPORT:
+            return "StyleClass_ViewPort";
+         case ITechLinks.LINK_65_STYLE_VIEWPANE:
+            return "StyleClass_ViewPane";
+         case ITechLinks.LINK_66_BO_VIEWPANE:
+            return "BO_ViewPane";
+         case ITechLinks.LINK_68_BO_V_SCROLLBAR:
+            return "BO_Scrollbar_Vertical";
+         case ITechLinks.LINK_69_BO_H_SCROLLBAR:
+            return "BO_Scrollbar_Horizontal";
+         case ITechLinks.LINK_71_STYLE_VIEWPANE_H_SCROLLBAR:
+            return "StyleClass_Scrollbar_Horizontal";
+         case ITechLinks.LINK_72_STYLE_VIEWPANE_V_SCROLLBAR:
+            return "StyleClass_Scrollbar_Vertical";
+         case ITechLinks.LINK_74_STYLE_CLASS_MENU:
+            return "StyleClass_menubar";
+         case ITechLinks.LINK_75_MENU_BAR_TECH:
+            return "BO_MenuBar";
+         case ITechLinks.LINK_80_BO_TABLEVIEW:
+            return "BO_Table";
+         case ITechLinks.LINK_81_STYLE_CLASS_TABLE_CELL:
+            return "StyleClass_Table_Cell";
+         case ITechLinks.LINK_82_STYLE_TABLE_COL_TITLE:
+            return "StyleClass_Table_Column";
+         case ITechLinks.LINK_83_STYLE_TABLE_ROW_TITLE:
+            return "StyleClass_Table_Row";
+         case ITechLinks.LINK_84_STYLE_TABLE_OVERLAY_FIGURE:
+            return "StyleClass_Table_Overlay_Figure";
+         case ITechLinks.LINK_85_STYLE_TABLE_TITLE_TOP:
+            return "Table Title Top";
+         case ITechLinks.LINK_86_STYLE_TABLE_TITLE_BOT:
+            return "Table Title Bottom";
+         case ITechLinks.LINK_90_STRING_EDIT_CONTROL:
+            return "BO_StringEditControl";
+         default:
+            return "UnknownLink " + link;
+      }
+   }
+
+   public static String toStringMoveIncrementType(int v) {
+      switch (v) {
+         case ITechMoveFunction.INCREMENT_0_PARAM:
+            return "Linear";
+         case ITechMoveFunction.INCREMENT_1_FIB:
+            return "Fib";
+         default:
+            return "Unknown" + v;
+      }
+   }
+
+   public static String toStringMoveType(int v) {
+      switch (v) {
+         case ITechMoveFunction.TYPE_MOVE_0_ASAP:
+            return "ASAP";
+         case ITechMoveFunction.TYPE_MOVE_1_BRESENHAM:
+            return "Bresenham";
+         default:
+            return "Unknown" + v;
+      }
+   }
+
+   public static String toStringPolicyType(final int type) {
+      switch (type) {
+         case ITechCell.CELL_3_FILL_STRONG:
+            return "FILL_STRONG";
+         case ITechCell.CELL_4_FILL_AVERAGE:
+            return "FILL_AVERAGE";
+         case ITechCell.CELL_5_FILL_WEAK:
+            return "FILL_WEAK";
+         case ITechCell.CELL_1_EXPLICIT_SET:
+            return "EXPLICIT";
+         case ITechCell.CELL_2_RATIO:
+            return "RATIO";
+         case ITechCell.CELL_0_IMPLICIT_SET:
+            return "IMPLICIT";
+         default:
+            return "UNKNOWN" + type;
+      }
+   }
+
+   public static String toStringPSelectMode(int value) {
+      switch (value) {
+         case ITechTable.PSELECT_0_NONE:
+            return "SELECT_NONE";
+         case ITechTable.PSELECT_1_PRESS:
+            return "PRESS";
+         case ITechTable.PSELECT_2_PRESS_RELEASE:
+            return "PRESS_RELEASE";
+         case ITechTable.PSELECT_4_PRESS_DOUBLE:
+            return "PRESS_DOUBLE";
+         case ITechTable.PSELECT_3_SELECTED_PRESS:
+            return "PRESS_SELECTED";
+         case ITechTable.PSELECT_5_PRESS_RELEASE_DOUBLE:
+            return "PRESS_RELEASE_DOUBLE";
+         default:
+            return "Unknown" + value;
+      }
+   }
+
+   public static String toStringScrollbarMode(int t) {
+      switch (t) {
+         case ITechViewPane.SCROLL_TYPE_0_PIXEL_UNIT:
+            return "Pixel";
+         case ITechViewPane.SCROLL_TYPE_1_LOGIC_UNIT:
+            return "Logic";
+         case ITechViewPane.SCROLL_TYPE_2_PAGE_UNIT:
+            return "Page";
+         default:
+            return "UnknownType" + t;
+      }
+   }
+
+   public static String toStringScrollMove(int t) {
+      switch (t) {
+         case ITechViewPane.SB_MOVE_TYPE_0_FIXED:
+            return "Fixed";
+         case ITechViewPane.SB_MOVE_TYPE_1_CLOCK:
+            return "Clock";
+         case ITechViewPane.SB_MOVE_TYPE_2_CIRCULAR:
+            return "Circular";
+         default:
+            return "UnknownType" + t;
+      }
+   }
+
+   public static String toStringScrollPartial(int t) {
+      switch (t) {
+         case ITechViewPane.PARTIAL_TYPE_0_BOTH:
+            return "Both";
+         case ITechViewPane.PARTIAL_TYPE_1_TOP:
+            return "Top";
+         case ITechViewPane.PARTIAL_TYPE_2_BOTTOM:
+            return "Bottom";
+         default:
+            return "UnknownType" + t;
+      }
+   }
+
+   public static String toStringScrollVisual(int t) {
+      switch (t) {
+         case ITechViewPane.VISUAL_0_LEAVE:
+            return "Leave";
+         case ITechViewPane.VISUAL_1_PARTIAL:
+            return "Partial";
+         case ITechViewPane.VISUAL_2_SHRINK:
+            return "Shrink";
+         case ITechViewPane.VISUAL_3_FILL:
+            return "Fill";
+         default:
+            return "UnknownVisual" + t;
       }
    }
 
@@ -604,29 +546,29 @@ public class ToStringStaticGui extends ToStringStaticBase {
          case ITechDrawable.STATE_20_ANIMATED_FULL_HIDDEN:
             return "HiddenAnim";
          case ITechDrawable.STATE_21_ANIMATED_LAYERS:
-            return "21AnimatedLayer";
+            return "AnimatedLayer";
          case ITechDrawable.STATE_22_ANIMATED_CONTENT_HIDDEN:
-            return "22AnimatedContentHidden";
+            return "AnimatedContentHidden";
          case ITechDrawable.STATE_23_RELATIVE_TOPOLOGY:
-            return "23RelativeTopology";
+            return "RelativeTopology";
          case ITechDrawable.STATE_24_HOLED:
-            return "24Holed";
+            return "Holed";
          case ITechDrawable.STATE_25_AGGREGATE:
-            return "25Aggregate";
+            return "Aggregate";
          case ITechDrawable.STATE_26_POSITIONED:
             return "Positioned";
          case ITechDrawable.STATE_27_OVERLAYED:
-            return "27Overlyaed";
+            return "Overlyaed";
          case ITechDrawable.STATE_28_NOT_CONTAINED_IN_PARENT_AREA:
-            return "28OutsideParentArea";
+            return "OutsideParentArea";
          case ITechDrawable.STATE_29_CLIPPED:
-            return "29Clipped";
+            return "Clipped";
          case ITechDrawable.STATE_30_LAYOUTING:
             return "Layouting";
          case ITechDrawable.STATE_31_STYLE_CLASS_REFRESH:
-            return "31";
+            return "31StyleClassRefresh";
          case ITechDrawable.STATE_32_CHANGED:
-            return "32";
+            return "32Changed";
          default:
             return "Unknown State";
       }
@@ -678,17 +620,97 @@ public class ToStringStaticGui extends ToStringStaticBase {
       return sb.toString();
    }
 
-   private static void debugViewBehavior(ViewDrawable d, int flag, Dctx sb) {
-      if (d.hasFlagView(flag)) {
-         sb.append(toStringViewFlagGene(flag));
-         sb.append(" ");
+   public static String toStringStringPreset(int type) {
+      switch (type) {
+         case ITechStringDrawable.PRESET_CONFIG_0_NONE:
+            return "None";
+         case ITechStringDrawable.PRESET_CONFIG_1_TITLE:
+            return "Title";
+         case ITechStringDrawable.PRESET_CONFIG_3_SCROLL_V:
+            return "ScrollV";
+         case ITechStringDrawable.PRESET_CONFIG_2_SCROLL_H:
+            return "ScrollH";
+         case ITechStringDrawable.PRESET_CONFIG_4_NATURAL_NO_WRAP:
+            return "NaturalNoWrap";
+         case ITechStringDrawable.PRESET_CONFIG_5_CHAR:
+            return "Char";
+         default:
+            throw new IllegalArgumentException("" + type);
       }
    }
 
-   private static void debugViewStateFlag(ViewDrawable d, int flag, Dctx sb) {
-      if (d.hasFlagView(flag)) {
-         sb.append(toStringViewState(flag));
-         sb.append(" ");
+   public static String toStringTableType(int type) {
+      switch (type) {
+         case IBOTablePolicy.TABLE_TYPE_2GENERIC_ROW:
+            return "GENERIC_ROW";
+         case IBOTablePolicy.TABLE_TYPE_1GENERIC_COL:
+            return "GENERIC_COL";
+         case IBOTablePolicy.TABLE_TYPE_4FLOW_ROW:
+            return "FLOW_ROW";
+         case IBOTablePolicy.TABLE_TYPE_3FLOW_COL:
+            return "FLOW_COL";
+         case IBOTablePolicy.TABLE_TYPE_0STRICT:
+            return "STRICT";
+         default:
+            return "UNKOWN";
+      }
+
+   }
+
+   public static String toStringType(final int type) {
+      switch (type) {
+         case ITechCell.TYPE_0_GENERIC:
+            return "GENERIC";
+         case ITechCell.TYPE_2_RATIO:
+            return "RATIO";
+         case ITechCell.TYPE_1_FLOW:
+            return "FLOW";
+         default:
+            return "UNKNOWN " + type;
+      }
+   }
+
+   public static String toStringTypeBO(final int type) {
+      switch (type) {
+         case IBOTypesGui.TYPE_GUI_00_VIEWPANE:
+            return "ViewPaneTech";
+         case IBOTypesGui.TYPE_GUI_01_SCROLLBAR:
+            return "ScrollbarTech";
+         case IBOTypesGui.TYPE_GUI_02_TABLE:
+            return "TableTech";
+         case IBOTypesGui.TYPE_GUI_03_TABLE_GENETICS:
+            return "Genetics";
+         case IBOTypesGui.TYPE_GUI_05_CELL_SPANNING:
+            return "Spanning";
+         case IBOTypesGui.TYPE_GUI_06_CELL_POLICY:
+            return "CellPolicy";
+         case IBOTypesGui.TYPE_124_STRING_DATA:
+            return "StringTech";
+         case IBOTypesGui.TYPE_125_STRING_EDIT_TECH:
+            return "StringEditTech";
+         case IBOTypesGui.TYPE_GUI_09_STRING_GLOBAL:
+            return "StringGlobal";
+         case IBOTypesGui.TYPE_127_STRING_PREDITION:
+            return "StringPred";
+         default:
+            return null;
+      }
+   }
+
+   public static String toStringViewFlagGene(int state) {
+      switch (state) {
+         case ITechViewDrawable.FLAG_GENE_28_NOT_SCROLLABLE:
+            return "NotScrollable";
+         case ITechViewDrawable.FLAG_GENE_29_SHRINKABLE_W:
+            return "ShrinkableW";
+         case ITechViewDrawable.FLAG_GENE_30_SHRINKABLE_H:
+            return "ShrinkableH";
+         case ITechViewDrawable.FLAG_GENE_31_EXPANDABLE_W:
+            return "ExpandableW";
+         case ITechViewDrawable.FLAG_GENE_32_EXPANDABLE_H:
+            return "ExpandableH";
+         default:
+            return "Unknown" + state;
       }
    }
 
@@ -707,6 +729,20 @@ public class ToStringStaticGui extends ToStringStaticBase {
       sb.append("]");
    }
 
+   public static String toStringViewPaneStyleType(int type) {
+      switch (type) {
+         case ITechViewPane.DRW_STYLE_0_VIEWDRAWABLE:
+            return "ViewDrawabe";
+         case ITechViewPane.DRW_STYLE_1_VIEWPANE:
+            return "ViewPane";
+         case ITechViewPane.DRW_STYLE_2_VIEWPORT:
+            return "ViewPort";
+         case ITechViewPane.DRW_STYLE_3_IGNORED:
+            return "Ignored";
+         default:
+            return "UnknownStyle " + type;
+      }
+   }
 
    public static String toStringViewState(int state) {
       switch (state) {
@@ -791,42 +827,5 @@ public class ToStringStaticGui extends ToStringStaticBase {
          sb.reverse(1);
       }
       sb.append("]");
-   }
-
-   public static String toStringTableType(int type) {
-      switch (type) {
-         case IBOTablePolicy.TABLE_TYPE_2GENERIC_ROW:
-            return "GENERIC_ROW";
-         case IBOTablePolicy.TABLE_TYPE_1GENERIC_COL:
-            return "GENERIC_COL";
-         case IBOTablePolicy.TABLE_TYPE_4FLOW_ROW:
-            return "FLOW_ROW";
-         case IBOTablePolicy.TABLE_TYPE_3FLOW_COL:
-            return "FLOW_COL";
-         case IBOTablePolicy.TABLE_TYPE_0STRICT:
-            return "STRICT";
-         default:
-            return "UNKOWN";
-      }
-
-   }
-
-   public static String toStringPSelectMode(int value) {
-      switch (value) {
-         case ITechTable.PSELECT_0_NONE:
-            return "SELECT_NONE";
-         case ITechTable.PSELECT_1_PRESS:
-            return "PRESS";
-         case ITechTable.PSELECT_2_PRESS_RELEASE:
-            return "PRESS_RELEASE";
-         case ITechTable.PSELECT_4_PRESS_DOUBLE:
-            return "PRESS_DOUBLE";
-         case ITechTable.PSELECT_3_SELECTED_PRESS:
-            return "PRESS_SELECTED";
-         case ITechTable.PSELECT_5_PRESS_RELEASE_DOUBLE:
-            return "PRESS_RELEASE_DOUBLE";
-         default:
-            return "Unknown" + value;
-      }
    }
 }

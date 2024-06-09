@@ -67,8 +67,8 @@ public interface ITechCtxSettingsAppGui extends IBOCtxSettingsAppli {
    /**
     * <li>{@link ITechCanvasDrawable#DEBUG_0_NONE}
     * <li>{@link ITechCanvasDrawable#DEBUG_1_LIGHT}
-    * <li>{@link ITechCanvasDrawable#DEBUG_2_COMPLETE}
-    * <li>{@link ITechCanvasDrawable#DEBUG_3_2COMPLETE}
+    * <li>{@link ITechCanvasDrawable#DEBUG_2_COMPLETE_1LINE}
+    * <li>{@link ITechCanvasDrawable#DEBUG_3_COMPLETE_2LINES}
     * 
     */
    public static final int CTX_GUI_OFFSET_07_DEBUG_MODE1          = OFFSET_START + 7;

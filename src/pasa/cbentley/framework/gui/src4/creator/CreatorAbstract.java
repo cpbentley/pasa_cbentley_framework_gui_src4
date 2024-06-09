@@ -25,7 +25,7 @@ import pasa.cbentley.framework.gui.src4.ctx.GuiCtx;
 import pasa.cbentley.framework.gui.src4.ctx.ObjectGC;
 import pasa.cbentley.framework.gui.src4.factories.DrawableFactory;
 import pasa.cbentley.framework.gui.src4.factories.interfaces.IBOScrollBar;
-import pasa.cbentley.framework.gui.src4.factories.interfaces.IBOStringData;
+import pasa.cbentley.framework.gui.src4.factories.interfaces.IBOStrAuxData;
 import pasa.cbentley.framework.gui.src4.factories.interfaces.IBOViewPane;
 import pasa.cbentley.framework.gui.src4.interfaces.ITechDrawable;
 import pasa.cbentley.framework.gui.src4.interfaces.ITechViewDrawable;
@@ -39,7 +39,7 @@ import pasa.cbentley.layouter.src4.tech.IBOSizer;
 import pasa.cbentley.layouter.src4.tech.ITechLayout;
 
 public abstract class CreatorAbstract
-      extends ObjectGC implements ITechViewPane, IBOSizer, ITechGradient, ITechFigure, ITechLayout, IBOTableView, IBOStyle, IBOScrollBar, ITechViewDrawable, ITechDrawable, IBOViewPane, IBOStringData, IMenus, IColorsBase, ITechFont, IColors, IColorsWeb, IBOTypesDrawX {
+      extends ObjectGC implements ITechViewPane, IBOSizer, ITechGradient, ITechFigure, ITechLayout, IBOTableView, IBOStyle, IBOScrollBar, ITechViewDrawable, ITechDrawable, IBOViewPane, IBOStrAuxData, IMenus, IColorsBase, ITechFont, IColors, IColorsWeb, IBOTypesDrawX {
 
    protected final AnchorFactory      anchorFac;
 

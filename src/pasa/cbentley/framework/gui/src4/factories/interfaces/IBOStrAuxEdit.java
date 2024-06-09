@@ -1,7 +1,6 @@
 package pasa.cbentley.framework.gui.src4.factories.interfaces;
 
 import pasa.cbentley.byteobjects.src4.core.ByteObject;
-import pasa.cbentley.byteobjects.src4.core.interfaces.IByteObject;
 import pasa.cbentley.framework.drawx.src4.string.interfaces.IBOStrAux;
 import pasa.cbentley.framework.gui.src4.string.StringDrawable;
 import pasa.cbentley.framework.gui.src4.string.StringEditControl;
@@ -20,31 +19,33 @@ public interface IBOStrAuxEdit extends IBOStrAux {
    /**
     * By default, the caret is drawn as a FG figure.
     */
-   public static final int SEDIT_FLAG_1_CARET_BG                  = 1;
+   public static final int SEDIT_FLAG_1_CARET_BG                  = 1 << 0;
 
    /**
     * Set to make caret blink
     */
-   public static final int SEDIT_FLAG_2_CARET_BLINK               = 2;
+   public static final int SEDIT_FLAG_2_CARET_BLINK               = 1 << 1;
 
-   public static final int SEDIT_FLAG_4_KB_PREDICTIVE             = 8;
+   public static final int SEDIT_FLAG_3_                          = 1 << 2;
+
+   public static final int SEDIT_FLAG_4_KB_PREDICTIVE             = 1 << 3;
 
    /**
     * When
     */
-   public static final int SEDIT_FLAG_5_CAPS_ON                   = 16;
+   public static final int SEDIT_FLAG_5_CAPS_ON                   = 1 << 4;
 
-   public static final int SEDIT_FLAG_6_SAME_THREAD               = 32;
+   public static final int SEDIT_FLAG_6_SAME_THREAD               = 1 << 5;
 
    /**
     * Enables T9 dic search when NUMPAD is set.
     */
-   public static final int SEDIT_FLAG_7_NUMPAD_T9                 = 64;
+   public static final int SEDIT_FLAG_7_NUMPAD_T9                 = 1 << 6;
 
    /**
     * When Editing, use Keyboard or virtual keyboard when Device requires it.
     */
-   public static final int SEDIT_FLAG_8_KEYBOARD                  = 128;
+   public static final int SEDIT_FLAG_8_KEYBOARD                  = 1 << 7;
 
    /**
     * Save unknown Trie Dic into personnal dictionnary

@@ -166,8 +166,8 @@ public class CanvasDrawControl {
     * <br>
     * <br>
     * <b>Type</b>:
-    * <li> {@link ITechCanvasDrawable#SHOW_TYPE_0_REPLACE}
-    * <li> {@link ITechCanvasDrawable#SHOW_TYPE_1_OVER}
+    * <li> {@link ITechCanvasDrawable#SHOW_TYPE_0_REPLACE_BOTTOM}
+    * <li> {@link ITechCanvasDrawable#SHOW_TYPE_1_OVER_TOP}
     * <li> {@link ITechCanvasDrawable#SHOW_TYPE_2_OVER_INACTIVE}
     * <br>
     * @param view
@@ -208,7 +208,7 @@ public class CanvasDrawControl {
    }
 
    /**
-    * Draws {@link IDrawable} using {@link ITechCanvasDrawable#SHOW_TYPE_1_OVER}.
+    * Draws {@link IDrawable} using {@link ITechCanvasDrawable#SHOW_TYPE_1_OVER_TOP}.
     * <br>
     * <br>
     * Drawable takes the focus and loads its cmd in the Menu bar system.
@@ -217,19 +217,19 @@ public class CanvasDrawControl {
     * @param d
     */
    public void shShowDrawableOver(InputConfig ic, IDrawable d) {
-      shShowDrawable(ic, d, ITechCanvasDrawable.SHOW_TYPE_1_OVER, true, true);
+      shShowDrawable(ic, d, ITechCanvasDrawable.SHOW_TYPE_1_OVER_TOP, true, true);
    }
 
    public void shShowDrawableOverCmds(InputConfig ic, IDrawable d) {
-      shShowDrawable(ic, d, ITechCanvasDrawable.SHOW_TYPE_1_OVER, true, true);
+      shShowDrawable(ic, d, ITechCanvasDrawable.SHOW_TYPE_1_OVER_TOP, true, true);
    }
 
    public void shShowDrawableOverNoCmds(InputConfig ic, IDrawable d) {
-      shShowDrawable(ic, d, ITechCanvasDrawable.SHOW_TYPE_1_OVER, false, true);
+      shShowDrawable(ic, d, ITechCanvasDrawable.SHOW_TYPE_1_OVER_TOP, false, true);
    }
 
    public void shShowDrawableOverNoFocus(InputConfig ic, IDrawable d) {
-      shShowDrawable(ic, d, ITechCanvasDrawable.SHOW_TYPE_1_OVER, true, false);
+      shShowDrawable(ic, d, ITechCanvasDrawable.SHOW_TYPE_1_OVER_TOP, true, false);
    }
 
 }

@@ -50,6 +50,10 @@ public class LayouterEngineDrawable extends LayouterEngineRead implements ITechL
     */
    protected int          minusW;
 
+   private boolean        isContentSizerW;
+
+   private boolean        isContentSizerH;
+
    /**
     * Never null. However, caching can be disabled
     */
@@ -378,4 +382,20 @@ public class LayouterEngineDrawable extends LayouterEngineRead implements ITechL
 
    }
    //#enddebug
+
+   public boolean isContentSizerH() {
+      return isContentSizerH;
+   }
+
+   public void setContentSizerH(boolean isContentSizerH) {
+      this.isContentSizerH = isContentSizerH;
+   }
+
+   public boolean isContentSizerW() {
+      return isContentSizerW;
+   }
+
+   public void setContentSizerW(boolean isContentSizerW) {
+      this.isContentSizerW = isContentSizerW;
+   }
 }

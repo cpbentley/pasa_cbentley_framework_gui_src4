@@ -2,10 +2,12 @@ package pasa.cbentley.framework.gui.src4.mui;
 
 import pasa.cbentley.byteobjects.src4.core.ByteObject;
 import pasa.cbentley.byteobjects.src4.ctx.IBOTypesBOC;
+import pasa.cbentley.byteobjects.src4.objects.color.ITechGradient;
 import pasa.cbentley.core.src4.logging.Dctx;
 import pasa.cbentley.core.src4.stator.StatorReader;
 import pasa.cbentley.core.src4.stator.StatorWriter;
 import pasa.cbentley.core.src4.structs.IntToObjects;
+import pasa.cbentley.core.src4.utils.interfaces.IColorsBase;
 import pasa.cbentley.framework.cmd.src4.ctx.CmdCtx;
 import pasa.cbentley.framework.core.src4.app.AppCtx;
 import pasa.cbentley.framework.core.src4.app.AppliAbstract;
@@ -15,12 +17,14 @@ import pasa.cbentley.framework.coreui.src4.tech.IBOCanvasHost;
 import pasa.cbentley.framework.coreui.src4.utils.ViewState;
 import pasa.cbentley.framework.gui.src4.canvas.CanvasAppliInputGui;
 import pasa.cbentley.framework.gui.src4.canvas.CanvasResultDrawable;
+import pasa.cbentley.framework.gui.src4.canvas.ICanvasDrawable;
 import pasa.cbentley.framework.gui.src4.canvas.InputConfig;
 import pasa.cbentley.framework.gui.src4.canvas.InputStateDrawable;
 import pasa.cbentley.framework.gui.src4.canvas.TopLevelCtrl;
 import pasa.cbentley.framework.gui.src4.cmd.CmdInstanceDrawable;
 import pasa.cbentley.framework.gui.src4.cmd.MCmdGuiNewStart;
 import pasa.cbentley.framework.gui.src4.cmd.ViewCommandListener;
+import pasa.cbentley.framework.gui.src4.core.FigDrawable;
 import pasa.cbentley.framework.gui.src4.core.IDToDrawable;
 import pasa.cbentley.framework.gui.src4.core.StyleClass;
 import pasa.cbentley.framework.gui.src4.ctx.CanvasGuiCtx;
@@ -84,14 +88,14 @@ public abstract class AppliGui extends AppliAbstract {
       return new IDToDrawable(gc);
    }
 
-   public ICanvasAppli createCanvas(int id, ByteObject tech, Object params) {
-      if (tech == null) {
+   public ICanvasAppli createCanvas(int id, ByteObject techCanvasHost, Object params) {
+      if (techCanvasHost == null) {
          return getCanvasDefault();
       } else {
          if (id <= 0) {
             if (root0 == null) {
                //there can only be one root?
-               root0 = new CanvasAppliInputGui(gc, tech);
+               root0 = new CanvasAppliInputGui(gc, techCanvasHost);
                return root0;
             } else {
                //throw new IllegalStateException("Root0 is already created");
@@ -100,7 +104,7 @@ public abstract class AppliGui extends AppliAbstract {
          } else if (id == 1) {
             if (root1 == null) {
                //there can only be one root?
-               root1 = new CanvasAppliInputGui(gc, tech);
+               root1 = new CanvasAppliInputGui(gc, techCanvasHost);
                return root1;
             } else {
                return null;
@@ -108,7 +112,7 @@ public abstract class AppliGui extends AppliAbstract {
             }
          } else if (id == 2) {
             //this canvas... how do distinguish from several?
-            CanvasAppliInputGui ide = new CanvasAppliInputGui(gc, tech);
+            CanvasAppliInputGui ide = new CanvasAppliInputGui(gc, techCanvasHost);
             if (root1 == null) {
                throw new IllegalStateException();
             }
@@ -124,14 +128,14 @@ public abstract class AppliGui extends AppliAbstract {
    private ICanvasAppli getCanvasDefault() {
       if (root0 == null) {
          //do we create it here? we load it from save state. the AppManager will look up the Canvas ID in the current screen config
-         ByteObject techCanvas = gc.getCUC().createBOCanvasHostDefault();
-         techCanvas.set2(IBOCanvasHost.TCANVAS_OFFSET_03_ID2, IBOCanvasHost.TCANVAS_ID_1_ROOT);
+         ByteObject techCanvasHost = gc.getCUC().createBOCanvasHostDefault();
+         techCanvasHost.set2(IBOCanvasHost.TCANVAS_OFFSET_03_ID2, IBOCanvasHost.TCANVAS_ID_1_ROOT);
          //title and icon are taken from the LaunchValues no.
          //they are localized
-         techCanvas.set2(IBOCanvasHost.TCANVAS_OFFSET_07_ICON_ID2, 0);
-         techCanvas.set2(IBOCanvasHost.TCANVAS_OFFSET_08_TITLE_ID_ID2, 0);
+         techCanvasHost.set2(IBOCanvasHost.TCANVAS_OFFSET_07_ICON_ID2, 0);
+         techCanvasHost.set2(IBOCanvasHost.TCANVAS_OFFSET_08_TITLE_ID_ID2, 0);
          //TODO problem when root. root MUST always be shown on start up ?
-         root0 = (CanvasAppliInputGui) createCanvas(1, techCanvas, null);
+         root0 = (CanvasAppliInputGui) createCanvas(1, techCanvasHost, null);
       }
       return root0;
    }
@@ -263,6 +267,17 @@ public abstract class AppliGui extends AppliAbstract {
 
    }
 
+   private IDrawable firstDrawableCreated;
+
+   public IDrawable getCreated() {
+      return firstDrawableCreated;
+   }
+
+   /**
+    */
+   protected void showCanvasDefault() {
+      super.showCanvasDefault();
+   }
    /**
     * Not started in headless mode, console only.
     * <br>
@@ -270,23 +285,48 @@ public abstract class AppliGui extends AppliAbstract {
     * {@link GuiCtx} code is using {@link CmdCtx} paradigm, so everything action is a command.
     * {@link MCmdGuiNewStart}
     * 
-    * {@link AppliAbstract#amsAppStart} has been called already.
+    * {@link AppliAbstract#amsAppStart} has been called already and the Canvas are shown
     * 
-    * Decides what kind of MasterCanvas to use. Basic or with Menu or something else.
     */
    protected void subAppStarted() {
 
-      CanvasAppliInputGui canvasView = gc.getCanvasRoot();
-      InputStateDrawable isd = (InputStateDrawable) canvasView.getEvCtrl().getState();
-      CanvasResultDrawable srd = canvasView.getRepaintCtrlDraw().getSD();
-      InputConfig ic = new InputConfig(gc, canvasView, isd, srd);
+      //TODO check if started from scratch or with saved state.
+      
+      ICanvasDrawable canvasRoot = gc.getCanvasRoot();
+      InputStateDrawable isd = (InputStateDrawable) canvasRoot.getEvCtrl().getState();
+      CanvasResultDrawable srd = canvasRoot.getRepaintCtrlDraw().getSD();
+      InputConfig ic = new InputConfig(gc, canvasRoot, isd, srd);
+      IDrawable draw = null;
+      try {
+         draw = getFirstDrawable();
 
-      IDrawable draw = getFirstDrawable();
+      } catch (Exception e) {
+         //
+         //#debug
+         toDLog().pEx("Subclass failed to create FirstDrawable", this, AppliGui.class, "subAppStarted@289", e);
 
-      draw.shShowDrawableOver(ic);
+         toDLog().pEx("Generating Error Drawable", null, AppliGui.class, "subAppStarted@289", e);
+
+         int gradColor = IColorsBase.BASE_10_GREEN_DARK;
+         ByteObject grad = gc.getDC().getGradientFactory().getGradient(gradColor, 50, ITechGradient.GRADIENT_TYPE_ELLIPSE_04_BOT_FLAMME);
+         int color = IColorsBase.BASE_20_CORAL_LIGHT;
+         ByteObject rect = gc.getDC().getFigureFactory().getFigEllipse(color, grad);
+
+         ByteObject style = gc.getDefaultStyles().getStyle2Pad5Border1M();
+         StyleClass sc = new StyleClass(gc, style);
+         FigDrawable fd = new FigDrawable(gc, sc, rect);
+         fd.setSizePixels(50, 70);
+         fd.setXY(5, 5);
+         draw = fd;
+
+      }
+      firstDrawableCreated = draw;
+
+      //#debug
+      toDLog().pInit("CanvasView after FirstDrawable is created", canvasRoot, AppliGui.class, "subAppStarted@289", LVL_05_FINE, false);
 
       //set GUI State from saved view state. send CMD App Start
-      //gc.getViewCommandListener().processCmd(ICmdsView.VCMD_00_LAST_LOGIN);
+      gc.getViewCommandListener().processCmd(ICmdsView.VCMD_00_LAST_LOGIN);
 
    }
 

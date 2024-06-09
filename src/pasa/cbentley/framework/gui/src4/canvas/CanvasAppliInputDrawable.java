@@ -31,7 +31,7 @@ import pasa.cbentley.framework.input.src4.CanvasResult;
  * @author Charles Bentley
  *
  */
-public abstract class CanvasDrawable extends CanvasAppliInput implements IDrawable {
+public abstract class CanvasAppliInputDrawable extends CanvasAppliInput implements IDrawable, ICanvasDrawable {
 
    private CanvasGuiCtx cac;
 
@@ -50,7 +50,7 @@ public abstract class CanvasDrawable extends CanvasAppliInput implements IDrawab
     * @param gc
     * @param mi
     */
-   public CanvasDrawable(GuiCtx gc, ByteObject mi) {
+   public CanvasAppliInputDrawable(GuiCtx gc, ByteObject mi) {
       super(gc.getIC(), mi);
       this.gc = gc;
       uiid = gc.getRepo().nextUIID();

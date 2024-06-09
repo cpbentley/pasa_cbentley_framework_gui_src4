@@ -53,6 +53,6 @@ public class SearchPrefixRunnable implements Runnable {
       gc.getNavigator().navInsert(ic,controlledSD, INavTech.NAV_2_DOWN, predictionTable);
       //TODO flag so Down command from caret context goes to the prediction table
       controlledSD.setStateNav(ITechDrawable.NAV_06_OVERRIDE_DOWN, true);
-      predictionTable.shShowDrawable(ic, ITechCanvasDrawable.SHOW_TYPE_1_OVER);
+      predictionTable.shShowDrawable(ic, ITechCanvasDrawable.SHOW_TYPE_1_OVER_TOP);
    }
 }

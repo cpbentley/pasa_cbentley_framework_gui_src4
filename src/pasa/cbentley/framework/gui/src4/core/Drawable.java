@@ -254,12 +254,7 @@ public class Drawable extends ObjectGC implements IDrawable, IBOStyle, IStringab
    protected int[]                  holes;
 
    /**
-    * Could be null. in which case, size of drawable is simple pixels.
-    * Size was computed by the caller.
-    * 
-    * {@link IDrawable#}
-    * 
-    * One Object for every drawable. it contains its position and size
+    * One instance for every drawable. it contains its position and size
     */
    protected LayouterEngineDrawable layEngine;
 
@@ -696,7 +691,7 @@ public class Drawable extends ObjectGC implements IDrawable, IBOStyle, IStringab
    public void draw(GraphicsX g) {
       int x = getX();
       //#debug
-      toDLog().pDraw(ToStringStaticGui.toStringStates(this), this, Drawable.class, "draw", LVL_05_FINE, true);
+      toDLog().pDraw(ToStringStaticGui.toStringStates(this), this, Drawable.class, "draw@699", LVL_05_FINE, true);
 
       //#mdebug
       if (g == null) {
@@ -2023,7 +2018,7 @@ public class Drawable extends ObjectGC implements IDrawable, IBOStyle, IStringab
       initDrawableSub();
       initStyleUnload();
 
-      //now that style has been init with cstyle if required
+      //now that style has been initialized with cstyle if required
       //lets compute style areas
       int dw = getDrawnWidth();
       int dh = getDrawnHeight();
@@ -2112,11 +2107,16 @@ public class Drawable extends ObjectGC implements IDrawable, IBOStyle, IStringab
    public void setSizerW_Pref() {
       this.setSizerW(gc.getLAC().getSizerFactory().getSizerPrefLazy());
    }
-   
+
    public void setSizerH_Pref() {
       this.setSizerH(gc.getLAC().getSizerFactory().getSizerPrefLazy());
    }
-   
+
+   public void setSizer_WH_Pref() {
+      setSizerW_Pref();
+      setSizerH_Pref();
+   }
+
    public void setPixelsW(int w) {
       layEngine.setOverrideW(w);
    }
@@ -2153,14 +2153,6 @@ public class Drawable extends ObjectGC implements IDrawable, IBOStyle, IStringab
 
    }
 
-   /**
-    * Modifies the H sizer and directly call the initSize method
-    * @param sizerH
-    */
-   public void initSizerH(ByteObject sizerH) {
-      layEngine.getLay().setSizerH(sizerH);
-      initSize();
-   }
 
    /**
     * Compute functional positions if any.
@@ -2210,14 +2202,7 @@ public class Drawable extends ObjectGC implements IDrawable, IBOStyle, IStringab
       }
    }
 
-   /**
-    * Init the width, keep the actual height definition 
-    * @param sizerW
-    */
-   public void initSizerW(ByteObject sizerW) {
-      layEngine.getLay().setSizerW(sizerW);
-      initSize();
-   }
+
 
    /**
     * Invalidate the layout by setting false to {@link ITechDrawable#STATE_05_LAYOUTED} so that
@@ -2236,7 +2221,8 @@ public class Drawable extends ObjectGC implements IDrawable, IBOStyle, IStringab
     */
    public void invalidateLayout() {
       //#debug
-      toDLog().pInit("Layout Invalided", this, Drawable.class, "invalidateLayout", LVL_03_FINEST, true);
+      toDLog().pInit("", this, Drawable.class, "invalidateLayout@2239", LVL_03_FINEST, true);
+
       setStateFlag(STATE_05_LAYOUTED, false);
       setStateFlag(STATE_26_POSITIONED, false);
    }
@@ -2304,6 +2290,10 @@ public class Drawable extends ObjectGC implements IDrawable, IBOStyle, IStringab
          this.setStateFlag(STATE_18_OPAQUE_COMPUTED, true);
          return b;
       }
+   }
+
+   public void computeOpaqueState() {
+
    }
 
    public void layoutInvalidate() {
@@ -3063,6 +3053,11 @@ public class Drawable extends ObjectGC implements IDrawable, IBOStyle, IStringab
       layEngine.getLay().setSizerH(h);
    }
 
+   public void setSizerHContent(ByteObject sizerH) {
+      layEngine.getLay().setSizerH(sizerH);
+      layEngine.setContentSizerH(true);
+   }
+
    /**
     * Sets reference. Does not compute anything
     * @param w
@@ -3281,8 +3276,7 @@ public class Drawable extends ObjectGC implements IDrawable, IBOStyle, IStringab
    public void setXY(int x, int y) {
       layEngine.setXY(x, y);
    }
-   
-   
+
    public void initSizeWithPixels(int w, int h) {
       this.setSizePixels(w, h);
       this.initSize();
@@ -3495,7 +3489,7 @@ public class Drawable extends ObjectGC implements IDrawable, IBOStyle, IStringab
    }
 
    public void toString(Dctx dc) {
-      dc.root(this, Drawable.class, 3360);
+      dc.root(this, Drawable.class, 3500);
       toStringPrivate(dc);
       super.toString(dc.sup());
       dc.append(" x=" + getX() + " y=" + getY());

@@ -1,7 +1,14 @@
 package pasa.cbentley.framework.gui.src4.ctx;
 
 import pasa.cbentley.core.src4.ctx.IToStringFlags;
+import pasa.cbentley.framework.drawx.src4.ctx.DrwCtx;
 
+/**
+ * Flags that modifies how ToString methods include some information for {@link GuiCtx} classes.
+ * 
+ * @author Charles Bentley
+ *
+ */
 public interface IToStringFlagsGui extends IToStringFlags {
 
    public static final int D_FLAG_01_STYLE                   = 1 << 0;

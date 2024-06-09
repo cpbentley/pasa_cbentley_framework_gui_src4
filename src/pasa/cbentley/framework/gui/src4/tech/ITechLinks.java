@@ -5,7 +5,7 @@ import pasa.cbentley.core.src4.interfaces.ITech;
 import pasa.cbentley.framework.drawx.src4.string.interfaces.IBOFigString;
 import pasa.cbentley.framework.gui.src4.core.StyleClass;
 import pasa.cbentley.framework.gui.src4.core.ViewPane;
-import pasa.cbentley.framework.gui.src4.factories.interfaces.IBOStringData;
+import pasa.cbentley.framework.gui.src4.factories.interfaces.IBOStrAuxData;
 import pasa.cbentley.framework.gui.src4.factories.interfaces.IBOViewPane;
 import pasa.cbentley.framework.gui.src4.string.StringDrawable;
 import pasa.cbentley.framework.gui.src4.string.StringEditControl;
@@ -22,8 +22,8 @@ public interface ITechLinks extends ITech {
    public static final int  LINK_40_BO_STRING_FIGURE                  = 40;
 
    /**
-    * {@link IBOStringData}
-    * <li> {@link IBOStringData#SDATA_OFFSET_02_PRESET_CONFIG1}
+    * {@link IBOStrAuxData}
+    * <li> {@link IBOStrAuxData#SDATA_OFFSET_02_PRESET_CONFIG1}
     */
    public static final int  LINK_41_BO_STRING_DATA                    = 41;
 

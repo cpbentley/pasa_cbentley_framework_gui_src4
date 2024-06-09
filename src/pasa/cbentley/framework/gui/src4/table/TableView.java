@@ -2674,7 +2674,7 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
       } else if (d == modelRow.titlesView) {
          //#debug
          toDLog().pInit("Row Titles Height", sizerH, TableView.class, "initInject");
-         modelCol.titlesView.initSizerH(sizerH);
+         modelCol.titlesView.setSizerH(sizerH);
          return true;
       }
       return false;

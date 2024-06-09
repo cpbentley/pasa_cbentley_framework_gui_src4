@@ -1,6 +1,7 @@
 package pasa.cbentley.framework.gui.src4.cmd;
 
 import pasa.cbentley.core.src4.logging.Dctx;
+import pasa.cbentley.framework.cmd.src4.ctx.CmdCtx;
 import pasa.cbentley.framework.cmd.src4.engine.CmdInstance;
 import pasa.cbentley.framework.cmd.src4.engine.CmdNode;
 import pasa.cbentley.framework.cmd.src4.engine.MCmd;
@@ -18,18 +19,23 @@ import pasa.cbentley.framework.gui.src4.interfaces.IDrawable;
  */
 public class CmdInstanceDrawable extends CmdInstance {
 
-   private String         actionString;
+   private String                actionString;
 
-   private CmdInstanceDrawable    childCmd;
+   private CmdInstanceDrawable   childCmd;
 
-   private IDrawable      d;
+   private IDrawable             d;
 
-   protected CmdInstanceDrawable  parentCmd;
+   protected CmdInstanceDrawable parentCmd;
 
-   protected final GuiCtx gc;
+   protected final GuiCtx        gc;
 
    public CmdInstanceDrawable(GuiCtx gc, int vcmdID) {
       super(gc.getCC(), vcmdID);
+      this.gc = gc;
+   }
+
+   public CmdInstanceDrawable(GuiCtx gc, MCmd c) {
+      super(gc.getCC(), c);
       this.gc = gc;
    }
 
@@ -63,7 +69,7 @@ public class CmdInstanceDrawable extends CmdInstance {
    }
 
    public ExecutionContextGui getDExCtx() {
-      return (ExecutionContextGui) exeCtx;
+      return (ExecutionContextGui) getExCtx();
    }
 
    public InputConfig getIC() {
@@ -138,14 +144,21 @@ public class CmdInstanceDrawable extends CmdInstance {
 
    //#mdebug
    public void toString(Dctx dc) {
-      dc.root(this, "CmdDrawable");
+      dc.root(this, CmdInstanceDrawable.class, 141);
+      toStringPrivate(dc);
       super.toString(dc.sup());
+
    }
 
-   public void toString1Line(Dctx sb) {
-      sb.root1Line(this, "CmdDrawable");
-      sb.append(" ");
-      super.toString1LineHelper(sb);
+   public void toString1Line(Dctx dc) {
+      dc.root1Line(this, CmdInstanceDrawable.class);
+      toStringPrivate(dc);
+      super.toString1Line(dc.sup1Line());
+   }
+
+   private void toStringPrivate(Dctx dc) {
+
    }
    //#enddebug
+
 }

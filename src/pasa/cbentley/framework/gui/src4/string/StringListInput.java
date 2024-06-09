@@ -325,7 +325,7 @@ public class StringListInput extends StringDrawable implements IEventConsumer {
             listView.addEventListener(this, ITechTable.EVENT_ID_00_SELECT);
          }
          //show it over
-         listView.shShowDrawable(ic, ITechCanvasDrawable.SHOW_TYPE_1_OVER);
+         listView.shShowDrawable(ic, ITechCanvasDrawable.SHOW_TYPE_1_OVER_TOP);
          ic.srActionDoneRepaint();
       }
    }

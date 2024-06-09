@@ -38,6 +38,10 @@ public class CanvasBOHelper implements IBOCanvasAppliGui {
       return getTechCanvasAppli().get1(CANVAS_APP_DRW_OFFSET_07_DEBUG_MODE1);
    }
 
+   public void setDebugMode(int mode) {
+      getTechCanvasAppli().set1(CANVAS_APP_DRW_OFFSET_07_DEBUG_MODE1, mode);
+   }
+
    public int getMenuBarPosition() {
       return getTechCanvasAppli().get1(CANVAS_APP_DRW_OFFSET_04_MENU_BAR_POSITION1);
    }
@@ -46,6 +50,5 @@ public class CanvasBOHelper implements IBOCanvasAppliGui {
       boolean useMenuBar = getTechCanvasAppli().hasFlag(CANVAS_APP_DRW_OFFSET_01_FLAG1, CANVAS_APP_DRW_FLAG_4_USE_MENU_BAR);
       return useMenuBar;
    }
-   
 
 }

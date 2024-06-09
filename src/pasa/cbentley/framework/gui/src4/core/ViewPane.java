@@ -3,6 +3,7 @@ package pasa.cbentley.framework.gui.src4.core;
 import pasa.cbentley.byteobjects.src4.core.ByteObject;
 import pasa.cbentley.core.src4.interfaces.C;
 import pasa.cbentley.core.src4.logging.Dctx;
+import pasa.cbentley.core.src4.structs.BufferObject;
 import pasa.cbentley.core.src4.structs.IntBuffer;
 import pasa.cbentley.framework.coreui.src4.utils.ViewState;
 import pasa.cbentley.framework.drawx.src4.engine.GraphicsX;
@@ -389,7 +390,7 @@ public class ViewPane extends Drawable implements ITechViewPane, ITechDrawable, 
       this.toStringSetName("ViewPane");
 
       //#debug
-      toDLog().pInitBig("Created", this, ViewPane.class, "constructor@400");
+      toDLog().pInitBig("Created", this, ViewPane.class, "constructor@392");
 
    }
 
@@ -842,6 +843,7 @@ public class ViewPane extends Drawable implements ITechViewPane, ITechDrawable, 
 
    public IDrawable getDrawableFromSattelites(int x, int y, ExecutionContextGui ex) {
       IDrawable d = null;
+      IDrawable[] satellites = getSattelites();
       for (int i = 0; i < satellites.length; i++) {
          //to avoid array access check flag
          if (isNotNull(i)) {
@@ -852,6 +854,27 @@ public class ViewPane extends Drawable implements ITechViewPane, ITechDrawable, 
          }
       }
       return d;
+   }
+
+   public IDrawable[] getSattelites() {
+      BufferObject bo = new BufferObject(gc.getUC(), 10);
+      bo.addNotNull(headerBottom);
+      bo.addNotNull(headerBottomClose);
+      bo.addNotNull(headerLeft);
+      bo.addNotNull(headerLeftClose);
+      bo.addNotNull(headerRight);
+      bo.addNotNull(headerRightClose);
+      bo.addNotNull(headerTop);
+      bo.addNotNull(headerTopClose);
+
+      bo.addNotNull(scrollBarHole);
+      bo.addNotNull(scrollBarHoles);
+      bo.addNotNull(vScrollBar);
+      bo.addNotNull(hScrollBar);
+
+      IDrawable[] ar = new IDrawable[bo.getSize()];
+      bo.getClonedTrimmed(ar);
+      return ar;
    }
 
    public void rebuild() {
@@ -1865,6 +1888,45 @@ public class ViewPane extends Drawable implements ITechViewPane, ITechDrawable, 
       layDimensionHeaderHoles();
       layDimensionHolesScrollBar();
 
+   }
+
+   /**
+    * For {@link ViewDrawable#getSatteliteFlag(IDrawable)}
+    * 
+    * <li> {@link ITechViewPane#SAT_FLAG_00_V_SB}
+    * <li> {@link ITechViewPane#SAT_FLAG_01_H_SB}
+    * <li> {@link ITechViewPane#SAT_FLAG_02_TOP}
+    * <li> {@link ITechViewPane#SAT_FLAG_03_TOP_CLOSE}
+    * <li> {@link ITechViewPane#SAT_FLAG_04_BOT}
+    * 
+    * @param d
+    * @return
+    */
+   public int getSatteliteFlag(IDrawable d) {
+      if (d == vScrollBar) {
+         return ITechViewPane.SAT_FLAG_00_V_SB;
+      } else if (d == hScrollBar) {
+         return ITechViewPane.SAT_FLAG_01_H_SB;
+      } else if (d == headerTop) {
+         return ITechViewPane.SAT_FLAG_02_TOP;
+      } else if (d == headerTopClose) {
+         return ITechViewPane.SAT_FLAG_03_TOP_CLOSE;
+      } else if (d == headerBottom) {
+         return ITechViewPane.SAT_FLAG_04_BOT;
+      } else if (d == headerBottomClose) {
+         return ITechViewPane.SAT_FLAG_05_BOT_CLOSE;
+      } else if (d == headerLeft) {
+         return ITechViewPane.SAT_FLAG_05_BOT_CLOSE;
+      } else if (d == headerLeftClose) {
+         return ITechViewPane.SAT_FLAG_07_LEFT_CLOSE;
+      } else if (d == headerRight) {
+         return ITechViewPane.SAT_FLAG_08_RIGHT;
+      } else if (d == headerRightClose) {
+         return ITechViewPane.SAT_FLAG_09_RIGHT_CLOSE;
+      } else if (d == headerRightClose) {
+         return ITechViewPane.SAT_FLAG_09_RIGHT_CLOSE;
+      }
+      return 0;
    }
 
    private void initScrollBarHoriz() {
@@ -4581,7 +4643,7 @@ public class ViewPane extends Drawable implements ITechViewPane, ITechDrawable, 
    }
 
    private void toStringPrivate(Dctx dc) {
-
+      dc.appendWithSpace(" for [" + viewedDrawable.toStringGetName() + "]");
    }
 
    private void toStringScrollbars(Dctx dc) {
@@ -4602,4 +4664,5 @@ public class ViewPane extends Drawable implements ITechViewPane, ITechDrawable, 
       }
    }
    //#enddebug
+
 }

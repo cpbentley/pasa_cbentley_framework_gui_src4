@@ -100,8 +100,8 @@ public interface IConfigAppGui extends IConfigApp {
     * Should it display a drawable with debug information
     * <li>{@link ITechCanvasDrawable#DEBUG_0_NONE}
     * <li>{@link ITechCanvasDrawable#DEBUG_1_LIGHT}
-    * <li>{@link ITechCanvasDrawable#DEBUG_2_COMPLETE}
-    * <li>{@link ITechCanvasDrawable#DEBUG_3_2COMPLETE}
+    * <li>{@link ITechCanvasDrawable#DEBUG_2_COMPLETE_1LINE}
+    * <li>{@link ITechCanvasDrawable#DEBUG_3_COMPLETE_2LINES}
     * @return
     */
    public int getDebugMode();

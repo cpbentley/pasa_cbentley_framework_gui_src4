@@ -112,7 +112,7 @@ public class RequestStringInput extends ObjectGC implements ICommandable {
       this.icon = icon;
       this.ci = ci;
 
-      sd.shShowDrawable((InputConfig) ci.getFeedback(), ITechCanvasDrawable.SHOW_TYPE_1_OVER);
+      sd.shShowDrawable((InputConfig) ci.getFeedback(), ITechCanvasDrawable.SHOW_TYPE_1_OVER_TOP);
    }
 
    //#mdebug

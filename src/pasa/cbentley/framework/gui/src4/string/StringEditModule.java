@@ -18,8 +18,8 @@ import pasa.cbentley.framework.gui.src4.core.DrawableInjected;
 import pasa.cbentley.framework.gui.src4.core.StyleClass;
 import pasa.cbentley.framework.gui.src4.ctx.GuiCtx;
 import pasa.cbentley.framework.gui.src4.ctx.IEventsGui;
-import pasa.cbentley.framework.gui.src4.factories.interfaces.IBOStringData;
-import pasa.cbentley.framework.gui.src4.factories.interfaces.IBOStringEdit;
+import pasa.cbentley.framework.gui.src4.factories.interfaces.IBOStrAuxData;
+import pasa.cbentley.framework.gui.src4.factories.interfaces.IBOStrAuxEdit;
 import pasa.cbentley.framework.gui.src4.interfaces.IDrawListener;
 import pasa.cbentley.framework.gui.src4.interfaces.IDrawable;
 import pasa.cbentley.framework.gui.src4.interfaces.ITechDrawable;
@@ -84,7 +84,7 @@ import pasa.cbentley.powerdata.spec.src4.guicontrols.TrieTranslationSearch;
  * @author Charles-Philip Bentley
  *
  */
-public class StringEditModule implements IDrawListener, IBOStringData, IStringable, IEventsGui {
+public class StringEditModule implements IDrawListener, IBOStrAuxData, IStringable, IEventsGui {
 
    public static long            caretBlinkMillisOff = 600;
 
@@ -243,7 +243,7 @@ public class StringEditModule implements IDrawListener, IBOStringData, IStringab
       } else {
          c = StringUtils.toLowerCase(c);
       }
-      int maxChar = stringDrawable.getBOStringData().get1(IBOStringData.SDATA_OFFSET_05_MAX_SIZE1);
+      int maxChar = stringDrawable.getBOStringData().get1(IBOStrAuxData.SDATA_OFFSET_05_MAX_SIZE1);
       //
       if (maxChar == 0 || stringDrawable.getLen() < maxChar) {
          stringDrawable.addChar(caretIndex, c);
@@ -339,7 +339,7 @@ public class StringEditModule implements IDrawListener, IBOStringData, IStringab
       if (isCaretEndOfLine()) {
          drawMyCaret(g, x, y, figW, figH);
       } else {
-         if (editTech.hasFlag(IBOStringEdit.SEDIT_OFFSET_01_FLAG, IBOStringEdit.SEDIT_FLAG_1_CARET_BG)) {
+         if (editTech.hasFlag(IBOStrAuxEdit.SEDIT_OFFSET_01_FLAG, IBOStrAuxEdit.SEDIT_FLAG_1_CARET_BG)) {
             //first draw the caret figure in the Background
             drawMyCaret(g, x, y, figW, figH);
             //and then the character
@@ -487,7 +487,7 @@ public class StringEditModule implements IDrawListener, IBOStringData, IStringab
       currentKey = key;
       //when a same key is pressed is fast, the next char in the key charset is shown 
       long diff = System.currentTimeMillis() - lastKeyTimestamp;
-      long time = (getEditTech().get1(IBOStringEdit.SEDIT_OFFSET_06_SPEED_NUMPAD1) * 10);
+      long time = (getEditTech().get1(IBOStrAuxEdit.SEDIT_OFFSET_06_SPEED_NUMPAD1) * 10);
       if (isGoToNextChar || key != lastPressedKey || diff > time) {
          isGoToNextChar = true;
          lastPressedKey = key;
@@ -527,7 +527,7 @@ public class StringEditModule implements IDrawListener, IBOStringData, IStringab
     * Then adds a new character if key event match.
     * <br>
     * Behavior depends on {@link FrameworkCtx} and 
-    * {@link IBOStringEdit#SEDIT_FLAG_8_KEYBOARD}
+    * {@link IBOStrAuxEdit#SEDIT_FLAG_8_KEYBOARD}
     * <br>
     * <br>
     * @param ic

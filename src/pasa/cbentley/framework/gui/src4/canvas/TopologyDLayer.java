@@ -128,53 +128,45 @@ public class TopologyDLayer extends ObjectGC {
    }
 
    /**
-    * Deals with the visuals of {@link Drawable} transition. 
-    * <br>
-    * <br>
+    * Deals with the visuals of a {@link Drawable} transition. 
     * 
-    * <br>
-    * <br>
     * <b>Type</b>:
-    * <li> {@link ITechCanvasDrawable#SHOW_TYPE_0_REPLACE}
-    * <li> {@link ITechCanvasDrawable#SHOW_TYPE_1_OVER}
+    * <li> {@link ITechCanvasDrawable#SHOW_TYPE_0_REPLACE_BOTTOM}
+    * <li> {@link ITechCanvasDrawable#SHOW_TYPE_1_OVER_TOP}
     * <li> {@link ITechCanvasDrawable#SHOW_TYPE_2_OVER_INACTIVE}
-    * <br>
-    * In case of Replace, keep an history for the {@link CmdController#CMD_HISTORY_BACK} to work on.
-    * Replaced {@link IDrawable} gets hidden (exit animation) while new {@link IDrawable} is drawn (entry animation)
-    * <br>
-    * <br>
-    * Topology
-    * <br>
-    * @param view
+    * 
+    * 
+    * TODO In case of Replace, keep an history for the {@link CmdController#CMD_HISTORY_BACK} to work on.
+    * Replaced {@link IDrawable} gets hidden (exit animation) while new {@link IDrawable} is drawn (entry animation).
+    * 
+    * Check if already shown
+    * 
+    * @param view {@link IDrawable}
     * @param type
     * 
     */
    public void addDLayer(IDrawable view, int type) {
-      //avoid checking null by checking nu
-      if(dlayerNextEmpty == 0) {
-         dlayers[0] = view;
-         dlayerNextEmpty = 1;
-         return;
-      }
+      //#debug
+      gc.checkNull(view);
       
       switch (type) {
-         case ITechCanvasDrawable.SHOW_TYPE_0_REPLACE:
+         case ITechCanvasDrawable.SHOW_TYPE_0_REPLACE_BOTTOM:
             //active exit animation of old drawable.
-            dlayers[0].notifyEvent(ITechDrawable.EVENT_02_NOTIFY_HIDE);
+            IDrawable old = dlayers[0];
+            if(old != null) {
+               old.notifyEvent(ITechDrawable.EVENT_02_NOTIFY_HIDE);
+            }
             //just add the child as the root
             dlayers[0] = view;
             dlayerNextEmpty = 1;
             //about the be shown
-            DrawableUtilz.aboutToShow(view);
             break;
-         case ITechCanvasDrawable.SHOW_TYPE_1_OVER:
+         case ITechCanvasDrawable.SHOW_TYPE_1_OVER_TOP:
             addEnsureLayer(view);
             //about the be shown
-            DrawableUtilz.aboutToShow(view);
             break;
          case ITechCanvasDrawable.SHOW_TYPE_2_OVER_INACTIVE:
-            dlayers[dlayerNextEmpty] = view;
-            dlayerNextEmpty++;
+            addEnsureLayer(view);
             for (int i = 0; i < dlayerNextEmpty; i++) {
                dlayers[i].setStateStyle(ITechDrawable.STATE_19_HIDDEN_OVER, true);
             }
@@ -182,9 +174,12 @@ public class TopologyDLayer extends ObjectGC {
          default:
             throw new IllegalArgumentException();
       }
+      
+      view.notifyEvent(ITechDrawable.EVENT_01_NOTIFY_SHOW);
    }
 
    /**
+    * Physically moves the {@link IDrawable} in the top layer of this {@link TopologyDLayer}.
     * 
     * @param d
     */
@@ -238,7 +233,7 @@ public class TopologyDLayer extends ObjectGC {
     */
    public void drawLayers(GraphicsX g) {
       //#debug
-      toDLog().pDraw("#numLayers:" + dlayerNextEmpty, this, TopologyDLayer.class, "drawLayers", LVL_05_FINE, true);
+      toDLog().pDraw("#layers:" + dlayerNextEmpty, this, TopologyDLayer.class, "drawLayers@241", LVL_05_FINE, true);
 
       g.setTranslationShift(vc.getX(), vc.getY());
       g.clipSet(0, 0, vc.getWidth(), vc.getHeight());
@@ -366,10 +361,9 @@ public class TopologyDLayer extends ObjectGC {
 
    /**
     * Returns the index of this {@link IDrawable} in this topology.
-    * <br>
-    * -1 if not inside.
+    * 
     * @param d
-    * @return
+    * @return the index of the {@link IDrawable}, -1 if not located in this {@link TopologyDLayer}.
     */
    public int isContained(IDrawable d) {
       for (int i = 0; i < dlayerNextEmpty; i++) {
@@ -669,7 +663,8 @@ public class TopologyDLayer extends ObjectGC {
    }
 
    private void toStringPrivate(Dctx dc) {
-      dc.appendVarWithSpace("#Background Layers", numBgs);
+      dc.appendVarWithSpace("#layers", dlayerNextEmpty);
+      dc.appendVarWithSpace("#bgLayers", numBgs);
    }
 
    public void toString1Line(Dctx dc) {

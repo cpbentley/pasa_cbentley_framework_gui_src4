@@ -1,5 +1,6 @@
 package pasa.cbentley.framework.gui.src4.ctx.config;
 
+import pasa.cbentley.core.src4.ctx.IConfigU;
 import pasa.cbentley.core.src4.ctx.UCtx;
 import pasa.cbentley.core.src4.interfaces.C;
 import pasa.cbentley.framework.core.src4.app.ConfigAppAbstract;
@@ -7,7 +8,7 @@ import pasa.cbentley.framework.coreui.src4.tech.ITechInputConstants;
 import pasa.cbentley.framework.drawx.src4.tech.ITechGraphicsX;
 import pasa.cbentley.framework.gui.src4.interfaces.ITechCanvasDrawable;
 
-public abstract class ConfigAppGuiAbstractFlat extends ConfigAppAbstract implements IConfigAppGui {
+public abstract class ConfigAppGuiAbstractFlat extends ConfigAppAbstract implements IConfigAppGui, IConfigU {
 
    public ConfigAppGuiAbstractFlat(UCtx uc, String name) {
       super(uc, name);
@@ -16,6 +17,11 @@ public abstract class ConfigAppGuiAbstractFlat extends ConfigAppAbstract impleme
    public int getThemeID() {
       return 0;
    }
+   
+   protected void cloneMeSet(ConfigAppAbstract config) {
+      super.cloneMeSet(config);
+   }
+
 
    public boolean isOneThumb() {
       return false;
@@ -58,6 +64,30 @@ public abstract class ConfigAppGuiAbstractFlat extends ConfigAppAbstract impleme
 
    public boolean isUsingMenuBar() {
       return false;
+   }
+
+   public String getDefaultEncoding() {
+      return "UTF-8";
+   }
+
+   public boolean isEraseSettingsAll() {
+      return false;
+   }
+
+   public boolean isForceExceptions() {
+      return false;
+   }
+
+   public boolean isIgnoreSettingsAll() {
+      return false;
+   }
+
+   public boolean toStringIsUsingClassLinks() {
+      return false;
+   }
+
+   public int toStringGetBytesOn1Line() {
+      return 0;
    }
 
    /**

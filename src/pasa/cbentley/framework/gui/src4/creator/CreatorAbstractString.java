@@ -4,8 +4,8 @@ import pasa.cbentley.byteobjects.src4.core.ByteObject;
 import pasa.cbentley.framework.coredraw.src4.interfaces.ITechFont;
 import pasa.cbentley.framework.gui.src4.ctx.GuiCtx;
 import pasa.cbentley.framework.gui.src4.factories.DrawableStringFactory;
-import pasa.cbentley.framework.gui.src4.factories.interfaces.IBOStringData;
-import pasa.cbentley.framework.gui.src4.factories.interfaces.IBOStringEdit;
+import pasa.cbentley.framework.gui.src4.factories.interfaces.IBOStrAuxData;
+import pasa.cbentley.framework.gui.src4.factories.interfaces.IBOStrAuxEdit;
 import pasa.cbentley.framework.gui.src4.tech.ITechStringDrawable;
 
 public abstract class CreatorAbstractString extends CreatorAbstract {
@@ -41,13 +41,14 @@ public abstract class CreatorAbstractString extends CreatorAbstract {
       int size = ITechFont.SIZE_3_MEDIUM;
       int color = getRepo().getContent1();
 
+      ByteObject format = dc.getStringAuxFactory().getStrAuxFormat_NiceWordNormalTrim();
+      ByteObject specials = dc.getStringAuxFactory().getStrAuxSpecials_NewLineWorkSingleSpaceTab();
       ByteObject effects = null;
       ByteObject mask = null;
       ByteObject scale = null;
       ByteObject anchor = null;
       ByteObject bo = facFigure.getString(null, face, style, size, color, effects, mask, scale, anchor);
 
-      facFigure.setFigStringRegularScroll(bo);
       return bo;
    }
 
@@ -58,20 +59,21 @@ public abstract class CreatorAbstractString extends CreatorAbstract {
       int size = ITechFont.SIZE_3_MEDIUM;
       int color = getRepo().getContent1();
 
+      ByteObject format = dc.getStringAuxFactory().getStrAuxFormat_NiceWordNormalTrim();
+      ByteObject specials = dc.getStringAuxFactory().getStrAuxSpecials_NewLineWorkSingleSpaceTab();
       ByteObject effects = null;
       ByteObject mask = null;
       ByteObject scale = null;
       ByteObject anchor = null;
       ByteObject bo = facFigure.getString(null, face, style, size, color, effects, mask, scale, anchor);
 
-      facFigure.setFigStringRegularScroll(bo);
       return bo;
    }
 
    public ByteObject getBOStringEdit() {
       ByteObject tech = fac.getBOStringEditDefault();
       int symbolTable = 1;
-      tech.set1(IBOStringEdit.SEDIT_OFFSET_09_SYMBOL_TABLE1, symbolTable);
+      tech.set1(IBOStrAuxEdit.SEDIT_OFFSET_09_SYMBOL_TABLE1, symbolTable);
       return tech;
    }
 

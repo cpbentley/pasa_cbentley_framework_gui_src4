@@ -48,8 +48,13 @@ public interface IUIView {
    public static final int SC_6_EMPTY      = 6;
 
    /**
+    * 
+    */
+   public static final int SC_7_ROOT       = 7;
+
+   /**
     * Any appli must set all those style class
     */
-   public static final int SC_BASE_MAX     = 7;
+   public static final int SC_BASE_MAX     = 8;
 
 }

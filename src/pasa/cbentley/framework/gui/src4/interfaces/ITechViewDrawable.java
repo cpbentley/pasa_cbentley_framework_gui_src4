@@ -218,7 +218,7 @@ public interface ITechViewDrawable extends ITech {
    /**
     * Specifically prevents scrolling.
     */
-   public static final int FLAG_GENE_28_NOT_SCROLLABLE             = 1 << 27;
+   public static final int FLAG_GENE_28_NOT_SCROLLABLE               = 1 << 27;
 
    /**
     * Shrink Drawable Width to preferred width when former is bigger.
@@ -228,7 +228,7 @@ public interface ITechViewDrawable extends ITech {
     * <br>
     * Shrink flags are configured in the subclass Tech Param.
     */
-   public static final int FLAG_GENE_29_SHRINKABLE_W               = 1 << 28;
+   public static final int FLAG_GENE_29_SHRINKABLE_W                 = 1 << 28;
 
    /**
     * Shrink Drawable height to preferred height when former is bigger.
@@ -236,7 +236,7 @@ public interface ITechViewDrawable extends ITech {
     * <br>
     * When both EXpandable and Shrinkable. Nothing is done.
     */
-   public static final int FLAG_GENE_30_SHRINKABLE_H               = 1 << 29;
+   public static final int FLAG_GENE_30_SHRINKABLE_H                 = 1 << 29;
 
    /**
     * When preferred size is smaller than drawable size, drawable expands its preferred size to drawable size.
@@ -249,11 +249,11 @@ public interface ITechViewDrawable extends ITech {
     * Fill the gap left by COLL_FILL policy or ratio. Why not asking Column policy?
     * 
     */
-   public static final int FLAG_GENE_31_EXPANDABLE_W               = 1 << 30;
+   public static final int FLAG_GENE_31_EXPANDABLE_W                 = 1 << 30;
 
    /**
     * 
     */
-   public static final int FLAG_GENE_32_EXPANDABLE_H               = 1 << 31;
+   public static final int FLAG_GENE_32_EXPANDABLE_H                 = 1 << 31;
 
 }

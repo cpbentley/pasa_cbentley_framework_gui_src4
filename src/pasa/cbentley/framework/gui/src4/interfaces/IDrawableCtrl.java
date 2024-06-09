@@ -60,7 +60,7 @@ public interface IDrawableCtrl {
    public void shShowDrawable(InputConfig ic, IDrawable view, int type);
 
    /**
-    * Draws {@link IDrawable} using {@link ITechCanvasDrawable#SHOW_TYPE_1_OVER}.
+    * Draws {@link IDrawable} using {@link ITechCanvasDrawable#SHOW_TYPE_1_OVER_TOP}.
     * <br>
     * on the {@link ViewContext} of the Drawable.
     * <br>

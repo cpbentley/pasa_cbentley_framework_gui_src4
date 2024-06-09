@@ -19,12 +19,12 @@ public interface ITechCanvasDrawable extends ITech {
    /**
     * 1 line of text
     */
-   public static final int DEBUG_2_COMPLETE              = 2;
+   public static final int DEBUG_2_COMPLETE_1LINE        = 2;
 
    /**
     * 2 lines of text
     */
-   public static final int DEBUG_3_2COMPLETE             = 3;
+   public static final int DEBUG_3_COMPLETE_2LINES       = 3;
 
    public static final int KEY_STATUS_3_COMPLETE         = 3;
 
@@ -202,42 +202,50 @@ public interface ITechCanvasDrawable extends ITech {
    public static final int CMD_PRO_2                     = 2;
 
    /**
-    * Replace as single layer.
-    * <br>
-    * <br>
+    * Replaces the bottom layer {@link IDrawable} with the new {@link IDrawable}.
+    * 
     * All previous DLayer have their exit animation run together.
-    * <br>
-    * Old active is hidden
+    * 
+    * Old layer state is now hidden
+    * <p>
+    * A {@link IDrawable} shown with this directive gets its entry animation played.
+    * </p>
     */
-   public static final int SHOW_TYPE_0_REPLACE            = 0;
+   public static final int SHOW_TYPE_0_REPLACE_BOTTOM    = 0;
 
    /**
-    * Draws new {@link IDrawable} over the active {@link IDrawable}.
-    * <br>
-    * Typical of popup {@link IDrawable}.
-    * Old active Drawable stays active
-    * If new drawable completely hides the old, it gets a special state {@link ITechDrawable#STATE_19_HIDDEN_OVER}.
-    * <br>
+    * <p>
+    * Draws new {@link IDrawable} over the active {@link IDrawable} on a new layer.
+    * This is used for a popup {@link IDrawable}. Other layers are not modified and kept active.
+    * </p>
+    * 
+    * <p>
+    * TODO If new drawable completely hides the old, it gets a special state {@link ITechDrawable#STATE_19_HIDDEN_OVER}.
     * When reappearing, will entry animation be fired up? We don't always want that.
-    * <br>
     * Depends on the animation. When animation is constrained to Drawable area, then it is
     * possible.
     * One side Transition where only new Drawable executes its Entry/Exit animations.
+    * </p>
+    * <p>
+    * A {@link IDrawable} shown with this directive gets its entry animation played.
+    * </p>
     */
-   public static final int SHOW_TYPE_1_OVER               = 1;
+   public static final int SHOW_TYPE_1_OVER_TOP          = 1;
 
    /**
-    * Stops below.
-    * <br>
-    * Could use a Style state.
-    * Equivalent of activated modal option in J2SE.
-    * <br>
-    * <br>
-    * In this mode it may be desirable to draw a visual cue telling that layer below and its {@link IDrawable} are not selectable anymore.
-    * <br>
-    * A {@link IDrawable} shown in this manner will gets its entry animation played.
+    * Same as {@link ITechCanvasDrawable#SHOW_TYPE_1_OVER_TOP} but all layers below
+    * are inactive and cannot be interacted. It is the equivalent of activated modal option in J2SE.
+    * 
+    * <p>
+    * TODO Could use a Style state.
+    * TODO In this mode it may be desirable to draw a visual cue telling that layer below and its {@link IDrawable} are not selectable anymore.
+    * </p>
+    * 
+    * <p>
+    * A {@link IDrawable} shown with this directive gets its entry animation played.
+    * </p>
     */
-   public static final int SHOW_TYPE_2_OVER_INACTIVE      = 2;
+   public static final int SHOW_TYPE_2_OVER_INACTIVE     = 2;
 
    public static final int CMD_EVENT_4_UIEVENT           = 4;
 

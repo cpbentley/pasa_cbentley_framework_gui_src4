@@ -1,7 +1,7 @@
 package pasa.cbentley.framework.gui.src4.nav;
 
 import pasa.cbentley.core.src4.logging.Dctx;
-import pasa.cbentley.framework.cmd.src4.cmd.CmdAbstract;
+import pasa.cbentley.framework.cmd.src4.cmd.MCmdAbstract;
 import pasa.cbentley.framework.cmd.src4.ctx.CmdCtx;
 import pasa.cbentley.framework.cmd.src4.engine.CmdInstance;
 import pasa.cbentley.framework.cmd.src4.interfaces.ICmdsCmd;
@@ -77,7 +77,7 @@ import pasa.cbentley.framework.input.src4.InputState;
  * @author Charles Bentley
 
  */
-public class NavigationCmd extends CmdAbstract implements INavTech {
+public class NavigationCmd extends MCmdAbstract implements INavTech {
 
    protected final GuiCtx gc;
 
@@ -147,7 +147,7 @@ public class NavigationCmd extends CmdAbstract implements INavTech {
       IDrawable nav = null;
 
       //navigation command was selected in a Menu
-      if (ci.trigger == cc.getMenuTrigger()) {
+      if (ci.getTrigger() == cc.getMenuTrigger()) {
          nav = fc.getItemInKeyFocus();
       } else if (isPointerTrigger()) {
          //how do we know here what nav
@@ -201,7 +201,7 @@ public class NavigationCmd extends CmdAbstract implements INavTech {
 
    }
 
-   public CmdAbstract createInstance(CmdInstance ci) {
+   public MCmdAbstract createInstance(CmdInstance ci) {
       // TODO Auto-generated method stub
       return null;
    }
@@ -280,7 +280,7 @@ public class NavigationCmd extends CmdAbstract implements INavTech {
     * @return
     */
    public boolean isPointerTrigger() {
-      int val = ci.trigger.getLastTriggerCode();
+      int val = ci.getTrigger().getLastTriggerCode();
       int type = CmdTrigger.getUnitType(val);
       return type == IInput.DEVICE_1_MOUSE || type == IInput.DEVICE_3_FINGER;
    }

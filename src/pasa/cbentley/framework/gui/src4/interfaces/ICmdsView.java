@@ -91,6 +91,10 @@ public interface ICmdsView extends ICmdsCmd {
     */
    public static final int VCMD_14_MOVE_DRAG          = A_SID_VCMD_A + 14;
 
+   public static final int VCMD_15_CANVAS_DEBUGGER    = A_SID_VCMD_A + 15;
+
+   public static final int VCMD_17_MENU_BAR           = A_SID_VCMD_A + 17;
+
    /**
     * Generic command for reading a number from keyboard
     */

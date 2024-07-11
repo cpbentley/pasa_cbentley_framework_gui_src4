@@ -266,7 +266,7 @@ public class ScrollBar extends Drawable implements IBOScrollBar, IDrawableListen
       toStringSetName("Scrollbar " + (hasTechFlag(SB_FLAG_1_VERT) ? "Vertical" : "Horizontal"));
 
       //#debug
-      toDLog().pInit(toStringGetName()+ " ", this, ScrollBar.class, "Created@268", LVL_05_FINE, true);
+      toDLog().pInit(toStringGetName() + " ", this, ScrollBar.class, "Created@268", LVL_05_FINE, true);
    }
 
    protected void actionUnselectTopBot(InputConfig ic) {
@@ -704,7 +704,7 @@ public class ScrollBar extends Drawable implements IBOScrollBar, IDrawableListen
 
    public ScrollConfig getConfig() {
       //#mdebug
-      if(scrollConfig == null) {
+      if (scrollConfig == null) {
          throw new NullPointerException();
       }
       //#enddebug
@@ -855,7 +855,7 @@ public class ScrollBar extends Drawable implements IBOScrollBar, IDrawableListen
       }
       return 0;
    }
-   
+
    public int getShiftXRight() {
       if (hasTechFlag(SB_FLAG_3_WRAPPER)) {
          if (!hasTechFlag(SB_FLAG_1_VERT)) {
@@ -915,7 +915,6 @@ public class ScrollBar extends Drawable implements IBOScrollBar, IDrawableListen
    }
 
    public StyleClass getStyleClassForChildren() {
-
       return this.styleClass;
    }
 
@@ -1009,24 +1008,25 @@ public class ScrollBar extends Drawable implements IBOScrollBar, IDrawableListen
       return size;
    }
 
+   public void initSize() {
+      //potentially called when used as a a stand alone drawable.
+      super.initSize();
+   }
+
    /**
     * Initialize the {@link ScrollBar} dimension using the boundary box system.  
-    * <br>
-    * <br>
+    * 
+    * 
     * After calling this method, those methods returns a correct value
     * <li> {@link ScrollBar#getSbSpaceConsumedHorizMin()}
     * <li> {@link ScrollBar#getSbSpaceConsumedVertMin()}
-    * <br>
-    * <br>
+    * 
     * Dw and Dh are set for animation purpose. 
     * 
     * Fit the smallest rectangle possible to include all Scrollbar items.
     * 
-    * <br>
     * In wrapper mode {@link IBOScrollBar#SB_FLAG_3_WRAPPER}, {@link IDrawable#getHoles()} return the middle hole
     * not used by the {@link ScrollBar}.
-    * <br>
-    * <br>
     * 
     * @param width boundary box width. Must be positive.
     * @param height boundary box height. Must be positive.
@@ -1055,11 +1055,17 @@ public class ScrollBar extends Drawable implements IBOScrollBar, IDrawableListen
          initSizeSBBlock(width, height);
 
       }
+      
+      super.initStyleCache();
+      
       setStateFlag(ITechDrawable.STATE_05_LAYOUTED, true);
+      
+      
    }
 
    private void initBlock(int x, int y, int w, int h) {
       blockFigure.setSizePixels(w, h);
+      blockFigure.initSize();
       blockFigure.setXY(x, y);
    }
 
@@ -1230,6 +1236,7 @@ public class ScrollBar extends Drawable implements IBOScrollBar, IDrawableListen
          } else {
             blockBgFigure.setSizePixels(numPixelsForBlock, size3);
          }
+         blockBgFigure.initSize();
       }
       //the block figure
    }
@@ -1287,6 +1294,9 @@ public class ScrollBar extends Drawable implements IBOScrollBar, IDrawableListen
          topLeftFigure.setSizePixels(lrCW, lrCH);
          botRightFigure.setSizePixels(lrCW, lrCH);
       }
+      
+      topLeftFigure.initSize();
+      botRightFigure.initSize();
    }
 
    public boolean isHorizontal() {

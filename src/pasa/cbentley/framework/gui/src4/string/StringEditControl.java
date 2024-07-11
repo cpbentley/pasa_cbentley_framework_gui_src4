@@ -679,7 +679,7 @@ public class StringEditControl extends TableView implements IDrawListener, IBOSt
          //set the 
          ByteObject style = d.getStyle();
          ByteObject txt = getStyleOp().getContentStyle(style);
-         IMFont f = gc.getDC().getFxStringOperator().getStringFont(txt);
+         IMFont f = gc.getDC().getStrAuxOperator().getStringFont(txt);
          int height = getContentH(); //height will be content height
          //height +=  + MStyle.getPadH(getStyle());
          boolean isStyleIncluded = true;
@@ -861,7 +861,7 @@ public class StringEditControl extends TableView implements IDrawListener, IBOSt
          Stringer st = controlledSD.getStringer();
          pr.caretInit = editModule.caretIndex - 1;
          for (int i = pr.caretInit; i >= 0; i--) {
-            char ca = st.getCharAtRelative(i);
+            char ca = st.getCharSourceAtRelative(i);
             if (ca != ' ' || ca != '.') {
                prefix = ca + prefix;
             } else {

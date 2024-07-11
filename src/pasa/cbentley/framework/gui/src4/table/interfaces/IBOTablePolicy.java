@@ -47,11 +47,11 @@ public interface IBOTablePolicy extends IByteObject {
 
    public static final int BASIC_SIZE_TABLE_POLICY = A_OBJECT_BASIC_SIZE + 3;
 
-   public static final int TP_FLAG_1COL_POLICY     = 1;
+   public static final int TP_FLAG_1_COL_POLICY     = 1;
 
-   public static final int TP_FLAG_2ROW_POLICY     = 2;
+   public static final int TP_FLAG_2_ROW_POLICY     = 2;
 
-   public static final int TP_FLAG_3SPANNING       = 4;
+   public static final int TP_FLAG_3_SPANNING       = 4;
 
    public static final int TP_OFFSET_1FLAG         = A_OBJECT_BASIC_SIZE;
 
@@ -63,21 +63,21 @@ public interface IBOTablePolicy extends IByteObject {
     * <br>
     * Model size does not have an influence.
     */
-   public static final int TABLE_TYPE_0STRICT      = 0;
+   public static final int TABLE_TYPE_0_STRICT      = 0;
 
    /**
     * Master Col.
     * <li>Policy decides number of columns.
     * <li>Model size decides number of row.
     */
-   public static final int TABLE_TYPE_1GENERIC_COL = 1;
+   public static final int TABLE_TYPE_1_GENERIC_COL = 1;
 
    /**
     * Master Row.
     * <li>Policy decides number of rows.
     * <li>Model size decides number of columns.
     */
-   public static final int TABLE_TYPE_2GENERIC_ROW = 2;
+   public static final int TABLE_TYPE_2_GENERIC_ROW = 2;
 
    /**
     * Master Column.
@@ -87,7 +87,7 @@ public interface IBOTablePolicy extends IByteObject {
     * <li>Content width decides number of columns, which is computed first
     * <li>number of rows decided by policy or model.
     */
-   public static final int TABLE_TYPE_3FLOW_COL    = 3;
+   public static final int TABLE_TYPE_3_FLOW_COL    = 3;
 
    /**
     * Master Row. 
@@ -96,6 +96,6 @@ public interface IBOTablePolicy extends IByteObject {
     * <li>Content height decides number of rows.
     * <li>number of columns decided by policy or model.
     */
-   public static final int TABLE_TYPE_4FLOW_ROW    = 4;
+   public static final int TABLE_TYPE_4_FLOW_ROW    = 4;
 
 }

@@ -29,8 +29,9 @@ import pasa.cbentley.framework.drawx.src4.engine.GraphicsX;
 import pasa.cbentley.framework.drawx.src4.engine.RgbCache;
 import pasa.cbentley.framework.drawx.src4.engine.RgbImage;
 import pasa.cbentley.framework.drawx.src4.factories.interfaces.IBOFigure;
-import pasa.cbentley.framework.drawx.src4.string.FxStringOperator;
+import pasa.cbentley.framework.drawx.src4.string.StringAuxOperator;
 import pasa.cbentley.framework.drawx.src4.style.IBOStyle;
+import pasa.cbentley.framework.drawx.src4.style.ITechStyleCache;
 import pasa.cbentley.framework.drawx.src4.style.StyleCache;
 import pasa.cbentley.framework.drawx.src4.style.StyleOperator;
 import pasa.cbentley.framework.gui.src4.anim.AnimManager;
@@ -181,6 +182,26 @@ public class Drawable extends ObjectGC implements IDrawable, IBOStyle, IStringab
    protected int                    behaviors;
 
    /**
+    * Technical style. For a basic drawable, it will always use {@link ITechLinks#LINK_10_BASE_TECH}.
+    * Can be null.
+    * <br>
+    * <br>
+    * Sub class who want to differentiate from others have to create.
+    * Tech gets to be controlled by the {@link StyleClass}/
+    * <br>
+    * Contains the Behaviors and View Genes.
+    * <br>
+    * Who can modify it???? 
+    * <br>
+    * <br>
+    * Since a tech definition might be used by several users, dynamically changing its content
+    * is discouraged.
+    */
+   protected ByteObject             boStringDrawable;
+
+   //#enddebug
+
+   /**
     * {@link RgbCache} pixel level cache.
     * <br>
     * <br>
@@ -196,8 +217,6 @@ public class Drawable extends ObjectGC implements IDrawable, IBOStyle, IStringab
     * {@link MemController} may flush the cache content.
     */
    protected RgbImage               cache;
-
-   //#enddebug
 
    /**
     * Cache type is decided by this class when Caching behavior is set.
@@ -265,7 +284,7 @@ public class Drawable extends ObjectGC implements IDrawable, IBOStyle, IStringab
 
    /**
     * {@link IDrawListener} or {@link Drawable} controlling the positioning.
-    * <br>
+    * 
     * Never null. Will be {@link ViewContext}
     */
    protected IDrawable              parent;
@@ -340,24 +359,6 @@ public class Drawable extends ObjectGC implements IDrawable, IBOStyle, IStringab
     */
    protected int                    styleStates;
 
-   /**
-    * Technical style. For a basic drawable, it will always use {@link ITechLinks#LINK_10_BASE_TECH}.
-    * Can be null.
-    * <br>
-    * <br>
-    * Sub class who want to differentiate from others have to create.
-    * Tech gets to be controlled by the {@link StyleClass}/
-    * <br>
-    * Contains the Behaviors and View Genes.
-    * <br>
-    * Who can modify it???? 
-    * <br>
-    * <br>
-    * Since a tech definition might be used by several users, dynamically changing its content
-    * is discouraged.
-    */
-   protected ByteObject             boStringDrawable;
-
    private int                      uiid;
 
    /**
@@ -376,12 +377,10 @@ public class Drawable extends ObjectGC implements IDrawable, IBOStyle, IStringab
    private int                      zindex          = -1;
 
    /**
-    * When the {@link StyleClass} is null, the root {@link StyleClass} is used.
-    * <br>
-    * <br>
-    * By default the drawable will belong to the master canvas appli {@link ViewContext}
-    * @param sc
-    * @param parent
+    * Creates a drawable that belongs to the application {@link ViewContext} of the root Canvas.
+    * 
+    * @param gc
+    * @param sc cannot be null
     */
    public Drawable(GuiCtx gc, StyleClass sc) {
       this(gc, sc, gc.getCanvasRoot().getVCAppli());
@@ -880,6 +879,13 @@ public class Drawable extends ObjectGC implements IDrawable, IBOStyle, IStringab
          drawDrawableBg(g);
          drawDrawableContent(g, getContentX(), getContentY(), getContentW(), getContentH());
          drawDrawableFg(g);
+
+         //#mdebug
+         if (gc.toStringHasFlagDraw(IToStringFlagsDraw.FLAG_DRAW_03_DRAWABLE_BOUNDARY)) {
+            g.setColor(255, 0, 100);
+            g.drawRect(getX(), getY(), getDrawnWidth(), getDrawnHeight());
+         }
+         //#enddebug
       }
    }
 
@@ -902,14 +908,18 @@ public class Drawable extends ObjectGC implements IDrawable, IBOStyle, IStringab
     */
    void drawDrawableAnimated(GraphicsX g) {
       //draw bg
-      int[] areas = this.getStyleAreas();
-      getStyleOp().drawStyleBg(style, g, areas);
+      int x = this.getPozeX();
+      int y = this.getPozeY();
+      int[] styleAreas = this.getStyleAreas();
+      ByteObject style = this.styleCache.getStyle();
+      StyleOperator styleOp = getStyleOp();
+      styleOp.drawStyleBg(style, g, styleAreas, x, y);
 
       if (da.animated[0] != null) {
          da.animated[0].drawDrawable(g);
       } else {
          //otherwise draw it normally.
-         getStyleOp().drawStyleFigure(style, g, STYLE_OFFSET_2_FLAGB, STYLE_FLAGB_1_BG, areas, 1);
+         styleOp.drawStyleFigure(style, g, STYLE_OFFSET_2_FLAGB, STYLE_FLAGB_1_BG, styleAreas, 1);
       }
       if (da.animated[9] != null) {
          da.animated[9].drawDrawable(g);
@@ -971,10 +981,23 @@ public class Drawable extends ObjectGC implements IDrawable, IBOStyle, IStringab
     * @param g
     */
    public void drawDrawableBg(GraphicsX g) {
+      int x = this.getPozeX();
+      int y = this.getPozeY();
+      this.drawDrawableBg(g, x, y);
+   }
+
+   public void drawDrawableBg(GraphicsX g, int x, int y) {
       int[] styleAreas = this.getStyleAreas();
       ByteObject style = this.styleCache.getStyle();
       StyleOperator styleOp = getStyleOp();
-      styleOp.drawStyleBg(style, g, styleAreas);
+      styleOp.drawStyleBg(style, g, styleAreas, x, y);
+   }
+
+   public void drawDrawableFg(GraphicsX g, int x, int y) {
+      int[] styleAreas = this.getStyleAreas();
+      ByteObject style = this.styleCache.getStyle();
+      StyleOperator styleOp = getStyleOp();
+      styleOp.drawStyleFg(style, g, styleAreas, x, y);
    }
 
    /**
@@ -988,8 +1011,8 @@ public class Drawable extends ObjectGC implements IDrawable, IBOStyle, IStringab
     * @param h
     */
    public void drawDrawableBg(GraphicsX g, int x, int y, int w, int h) {
-      int[] styleAreas = styleCache.createStyleArea(x, y, w, h);
       StyleOperator styleOp = getStyleOp();
+      int[] styleAreas = styleOp.getStyleAreasFull(x, y, w, h, style, this);
       styleOp.drawStyleBg(style, g, styleAreas);
    }
 
@@ -1031,12 +1054,14 @@ public class Drawable extends ObjectGC implements IDrawable, IBOStyle, IStringab
     * @param g
     */
    public void drawDrawableFg(GraphicsX g) {
-      int[] styleAreas = this.getStyleAreas();
-      getStyleOp().drawStyleFg(style, g, styleAreas);
+      int x = this.getPozeX();
+      int y = this.getPozeY();
+      this.drawDrawableFg(g, x, y);
    }
 
    public void drawDrawableFg(GraphicsX g, int x, int y, int w, int h) {
-      int[] styleAreas = styleCache.createStyleArea(x, y, w, h);
+      StyleOperator styleOp = getStyleOp();
+      int[] styleAreas = styleOp.getStyleAreasFull(x, y, w, h, style, this);
       getStyleOp().drawStyleFg(style, g, styleAreas);
    }
 
@@ -1437,8 +1462,8 @@ public class Drawable extends ObjectGC implements IDrawable, IBOStyle, IStringab
       return null;
    }
 
-   protected FxStringOperator getOpStringFx() {
-      return gc.getDC().getFxStringOperator();
+   protected StringAuxOperator getOpStringFx() {
+      return gc.getDC().getStrAuxOperator();
    }
 
    /**
@@ -1446,10 +1471,6 @@ public class Drawable extends ObjectGC implements IDrawable, IBOStyle, IStringab
     */
    public IDrawable getParent() {
       return parent;
-   }
-
-   public StyleCache getStyleCache() {
-      return styleCache;
    }
 
    /**
@@ -1593,10 +1614,17 @@ public class Drawable extends ObjectGC implements IDrawable, IBOStyle, IStringab
       return getY() + vc.getScreenY();
    }
 
+   /**
+    * Height Size of the actual content without the margin, border and padding
+    * @return
+    */
    public int getSizeContentHeight() {
       return layEngine.getContentH();
    }
-
+   /**
+    * Width size of the actual content without the margin, border and padding.
+    * @return
+    */
    public int getSizeContentWidth() {
       return layEngine.getContentW();
    }
@@ -1617,6 +1645,14 @@ public class Drawable extends ObjectGC implements IDrawable, IBOStyle, IStringab
       return getFontStyle().getWidthWeigh();
    }
 
+   public int getSizeH(int sizeType) {
+      return getSizePropertyValueH(sizeType);
+   }
+
+   /**
+    * The preferred height of this Drawable.
+    * That is preferred content size with style values.
+    */
    public int getSizePreferredHeight() {
       //we don't have ph here at this lvl
       return layEngine.getH();
@@ -1624,14 +1660,6 @@ public class Drawable extends ObjectGC implements IDrawable, IBOStyle, IStringab
 
    public int getSizePreferredWidth() {
       return layEngine.getW();
-   }
-
-   public int getSizeW(int sizeType) {
-      return getSizePropertyValueW(sizeType);
-   }
-
-   public int getSizeH(int sizeType) {
-      return getSizePropertyValueH(sizeType);
    }
 
    public int getSizePropertyValueH(int property) {
@@ -1716,6 +1744,10 @@ public class Drawable extends ObjectGC implements IDrawable, IBOStyle, IStringab
       return layEngine.getW();
    }
 
+   public int getSizeW(int sizeType) {
+      return getSizePropertyValueW(sizeType);
+   }
+
    public int getSizeX(int sizeType) {
       int x = getPozeXComputed();
       switch (sizeType) {
@@ -1752,15 +1784,36 @@ public class Drawable extends ObjectGC implements IDrawable, IBOStyle, IStringab
    }
 
    /**
-    * Return the style areas with current x,y position and computed drawn width/height
+    * Shortcut to {@link StyleCache#getStyleAreas()}
     * @return
     */
    public int[] getStyleAreas() {
-      int x = getX();
-      int y = getY();
-      int dw = getDrawnWidth();
-      int dh = getDrawnHeight();
-      return styleCache.getStyleAreas(x, y, dw, dh);
+      if (!hasState(STATE_05_LAYOUTED)) {
+         this.initSize();
+      }
+      return styleCache.getStyleAreas();
+   }
+
+   /**
+    * Returns a newly computed copy of the style areas with current x,y position and computed drawn width/height.
+    * 
+    * <p>
+    * Structure of int[] array specified by {@link StyleCache#getStyleAreas()}
+    * </p>
+    * Does not use any cached values.
+    * 
+    * @return
+    */
+   public int[] getStyleAreasFor(int x, int y, int w, int h) {
+      int relX = ITechStyleCache.RELATIVE_TYPE_0_MARGIN;
+      int relY = ITechStyleCache.RELATIVE_TYPE_0_MARGIN;
+      int relW = ITechStyleCache.RELATIVE_TYPE_0_MARGIN;
+      int relH = ITechStyleCache.RELATIVE_TYPE_0_MARGIN;
+      return gc.getDC().getStyleOperator().getStyleAreas(x, y, w, h, style, this, null, relW, relH, relX, relY);
+   }
+
+   public StyleCache getStyleCache() {
+      return styleCache;
    }
 
    /**
@@ -1984,56 +2037,6 @@ public class Drawable extends ObjectGC implements IDrawable, IBOStyle, IStringab
    }
 
    /**
-    * Init with previous Sizing values.
-    * Sets {@link ITechDrawable#STATE_30_LAYOUTING}
-    * Returns true if the rectangle has changed.
-    * Does not compute position of self. this is the job of the caller who knows where to position.
-    * <br>
-    * Computes its dimension and then the positions of its children {@link Drawable}s.
-    * <br>
-    * Flag Behavior is set when Drawable dimension depends on Children. In that case,
-    * children sizers {@link ISizer#ET_LINK_0_PARENT} will default on ViewContext 
-    * <br>
-    * <br>
-    * Reminder. Logical Positions are computed on demand. usually just before the draw
-    * Setting a raw x
-    */
-   public void initSize() {
-      setStateFlag(STATE_30_LAYOUTING, true);
-      //compute pixel size based
-      //might not have changed but context has changed!
-      int oldDw = getDw();
-      int oldDh = getDh();
-
-      if (!hasState(STATE_06_STYLED)) {
-         styleValidate();
-      }
-
-      initStyleLoad(); //load init style
-
-      setStateFlagPrivate(STATE_08_NO_RELAYOUTING, false);
-
-      layEngine.layoutUpdateSizeCheck();
-
-      initDrawableSub();
-      initStyleUnload();
-
-      //now that style has been initialized with cstyle if required
-      //lets compute style areas
-      int dw = getDrawnWidth();
-      int dh = getDrawnHeight();
-      styleCache.computeStyleDimensions(dw, dh);
-
-      //set flag just before sending event
-      setStateFlag(STATE_05_LAYOUTED, true);
-      setStateFlag(STATE_30_LAYOUTING, false);
-
-      if (pactor != null && (getDw() != oldDw || getDh() != oldDh)) {
-         pactor.notifyEvent(this, EVENT_12_SIZE_CHANGED, null);
-      }
-   }
-
-   /**
     * Initialize the drawable width and height of the {@link Drawable} using {@link ITechDrawable#DIMENSION_API} semantics.
     * <br>
     * <br>
@@ -2104,39 +2107,6 @@ public class Drawable extends ObjectGC implements IDrawable, IBOStyle, IStringab
 
    }
 
-   public void setSizerW_Pref() {
-      this.setSizerW(gc.getLAC().getSizerFactory().getSizerPrefLazy());
-   }
-
-   public void setSizerH_Pref() {
-      this.setSizerH(gc.getLAC().getSizerFactory().getSizerPrefLazy());
-   }
-
-   public void setSizer_WH_Pref() {
-      setSizerW_Pref();
-      setSizerH_Pref();
-   }
-
-   public void setPixelsW(int w) {
-      layEngine.setOverrideW(w);
-   }
-
-   public void setPixelsH(int h) {
-      layEngine.setOverrideH(h);
-   }
-
-   public void setSizePixels(int w, int h) {
-      layEngine.setOverrideW(w);
-      layEngine.setOverrideH(h);
-   }
-
-   public void setSizePixelsInitSize(int w, int h) {
-      layEngine.setOverrideW(w);
-      layEngine.setOverrideH(h);
-
-      this.initSize();
-   }
-
    /**
     * When {@link LayouterEngineDrawable} request context, sub class must update it.
     * To be overriden by subclass
@@ -2152,7 +2122,6 @@ public class Drawable extends ObjectGC implements IDrawable, IBOStyle, IStringab
    protected void initDrawableSub() {
 
    }
-
 
    /**
     * Compute functional positions if any.
@@ -2171,6 +2140,98 @@ public class Drawable extends ObjectGC implements IDrawable, IBOStyle, IStringab
    public void initPosition() {
       layoutUpdatePositionCheck();
       setStateFlag(STATE_26_POSITIONED, true);
+   }
+
+   /**
+    * Init with previous Sizing values.
+    * Sets {@link ITechDrawable#STATE_30_LAYOUTING}
+    * Returns true if the rectangle has changed.
+    * Does not compute position of self. this is the job of the caller who knows where to position.
+    * <br>
+    * Computes its dimension and then the positions of its children {@link Drawable}s.
+    * <br>
+    * Flag Behavior is set when Drawable dimension depends on Children. In that case,
+    * children sizers {@link ISizer#ET_LINK_0_PARENT} will default on ViewContext 
+    * <br>
+    * <br>
+    * Reminder. Logical Positions are computed on demand. usually just before the draw
+    * Setting a raw x
+    */
+   public void initSize() {
+      setStateFlag(STATE_30_LAYOUTING, true);
+      //compute pixel size based
+      //might not have changed but context has changed!
+      int oldDw = getDw();
+      int oldDh = getDh();
+
+      if (!hasState(STATE_06_STYLED)) {
+         styleValidate();
+      }
+
+      initStyleLoad(); //load init style
+
+      setStateFlagPrivate(STATE_08_NO_RELAYOUTING, false);
+
+      //dw and dh are computing
+      layEngine.layoutUpdateSizeCheck();
+      //dw and dh are computed
+
+      initDrawableSub();
+
+      initStyleUnload(); // ?
+
+      initStyleCache();
+
+      //set flag just before sending event
+      setStateFlag(STATE_05_LAYOUTED, true);
+      setStateFlag(STATE_30_LAYOUTING, false);
+
+      if (pactor != null && (getDw() != oldDw || getDh() != oldDh)) {
+         pactor.notifyEvent(this, EVENT_12_SIZE_CHANGED, null);
+      }
+   }
+
+   protected void initStyleCache() {
+      //now that style has been initialized with cstyle if required
+      //lets compute style areas
+      int dw = getDrawnWidth();
+      int dh = getDrawnHeight();
+      int typeRelativeW = layEngine.getTypeSizerW();
+      int typeRelativeH = layEngine.getTypeSizerH();
+      int typeRelativeX = layEngine.getTypePozerX();
+      int typeRelativeY = layEngine.getTypePozerY();
+
+      styleCache.computeStyleDimensions(dw, dh, typeRelativeW, typeRelativeH, typeRelativeX, typeRelativeY);
+
+      //if modified
+      if (typeRelativeW == ITechStyleCache.RELATIVE_TYPE_0_MARGIN) {
+         //no change to dw
+      } else if (typeRelativeW == ITechStyleCache.RELATIVE_TYPE_1_BORDER) {
+         this.setDw(styleCache.getStyleWMargin() + dw);
+      } else if (typeRelativeW == ITechStyleCache.RELATIVE_TYPE_2_PADDING) {
+         this.setDw(styleCache.getStyleWBorderMargin() + dw);
+      } else if (typeRelativeW == ITechStyleCache.RELATIVE_TYPE_3_CONTENT) {
+         this.setDw(styleCache.getStyleWAll() + dw);
+      } else {
+         throw new IllegalArgumentException();
+      }
+
+      if (typeRelativeH == ITechStyleCache.RELATIVE_TYPE_0_MARGIN) {
+         //no change to dh
+      } else if (typeRelativeH == ITechStyleCache.RELATIVE_TYPE_1_BORDER) {
+         this.setDh(styleCache.getStyleHMargin() + dh);
+      } else if (typeRelativeH == ITechStyleCache.RELATIVE_TYPE_2_PADDING) {
+         this.setDh(styleCache.getStyleHBorderMargin() + dh);
+      } else if (typeRelativeH == ITechStyleCache.RELATIVE_TYPE_3_CONTENT) {
+         this.setDh(styleCache.getStyleHAll() + dh);
+      } else {
+         throw new IllegalArgumentException();
+      }
+   }
+
+   public void initSizeWithPixels(int w, int h) {
+      this.setSizePixels(w, h);
+      this.initSize();
    }
 
    /**
@@ -2201,8 +2262,6 @@ public class Drawable extends ObjectGC implements IDrawable, IBOStyle, IStringab
          styleValidate();
       }
    }
-
-
 
    /**
     * Invalidate the layout by setting false to {@link ITechDrawable#STATE_05_LAYOUTED} so that
@@ -2248,13 +2307,6 @@ public class Drawable extends ObjectGC implements IDrawable, IBOStyle, IStringab
       setStateFlag(STATE_06_STYLED, false);
    }
 
-   public void rebuild() {
-      this.layoutInvalidate();
-      this.invalidateStyleClass();
-      this.initSize();
-      this.initPosition();
-   }
-
    /**
     * Do the drawable dimensions match those of the rgb cache?
     * @param rgb
@@ -2273,27 +2325,30 @@ public class Drawable extends ObjectGC implements IDrawable, IBOStyle, IStringab
    }
 
    /**
-    * Compute or returns {@link ITechDrawable#STATE_17_OPAQUE}
-    * <br>
-    * <br>
-    * Sets {@link ITechDrawable#STATE_18_OPAQUE_COMPUTED}.
-    * <br>
-    * <br>
+    * Returns {@link ITechDrawable#STATE_17_OPAQUE}
+    * 
+    * If it was not computed by {@link Drawable#computeOpaqueFlag()}
+    * it assumes it is not opaque.
     * @return
     */
    public boolean isOpaque() {
+      return this.hasState(STATE_17_OPAQUE);
+   }
+
+   /**
+    * Sets {@link ITechDrawable#STATE_18_OPAQUE_COMPUTED}.
+    * @return
+    */
+   public boolean computeOpaqueFlag() {
       if (this.hasState(STATE_18_OPAQUE_COMPUTED)) {
          return this.hasState(STATE_17_OPAQUE);
       } else {
-         boolean b = getStyleOp().isOpaqueBgLayersStyle(style, getStyleAreas());
+         int[] styleAreas = getStyleAreas();
+         boolean b = getStyleOp().isOpaqueBgLayersStyle(style, styleAreas);
          this.setStateFlag(STATE_17_OPAQUE, b);
          this.setStateFlag(STATE_18_OPAQUE_COMPUTED, true);
          return b;
       }
-   }
-
-   public void computeOpaqueState() {
-
    }
 
    public void layoutInvalidate() {
@@ -2859,6 +2914,22 @@ public class Drawable extends ObjectGC implements IDrawable, IBOStyle, IStringab
 
    }
 
+   /**
+    * Calls in order
+    * <li> {@link Drawable#layoutInvalidate()}
+    * <li> {@link Drawable#invalidateStyleClass()}
+    * <li> {@link Drawable#initSize()}
+    * <li> {@link Drawable#initPosition()}
+    */
+   public void rebuild() {
+      this.layoutInvalidate();
+      this.invalidateStyleClass();
+      //if 
+      this.layEngine.rebuild();
+      this.initSize();
+      this.initPosition();
+   }
+
    public void removeDrawable(InputConfig ic, IDrawable newFocus) {
       vc.getDrawCtrlAppli().removeDrawable(ic, this, newFocus);
    }
@@ -3032,7 +3103,75 @@ public class Drawable extends ObjectGC implements IDrawable, IBOStyle, IStringab
    }
 
    public void setParent(IDrawable d) {
+      if (d == null) {
+         throw new NullPointerException();
+      }
       parent = d;
+   }
+
+   public void setPixelsH(int h) {
+      layEngine.setOverrideH(h);
+   }
+
+   public void setPixelsW(int w) {
+      layEngine.setOverrideW(w);
+   }
+
+   /**
+    * <li> {@link ITechDrawable#SIZER_TYPE_0_MARGIN_FULL}
+    * <li> {@link ITechDrawable#SIZER_TYPE_1_BORDER}
+    * <li> {@link ITechDrawable#SIZER_TYPE_2_PADDING}
+    * <li> {@link ITechDrawable#SIZER_TYPE_3_CONTENT}
+    * @param typeW
+    * @param typeH
+    */
+   public void setPozerTypes(int typeX, int typeY) {
+      layEngine.setRelativePozerX(typeX);
+      layEngine.setRelativePozerY(typeY);
+   }
+
+   public void setSizePixels(int w, int h) {
+      layEngine.setOverrideW(w);
+      layEngine.setOverrideH(h);
+   }
+
+   public void setSizePixelsAsSizers(int w, int h) {
+      SizerFactory sizerFactory = gc.getLAC().getSizerFactory();
+      ByteObject sizerPixelW = sizerFactory.getSizerPixel(w);
+      this.setSizerW(sizerPixelW);
+      ByteObject sizerPixelH = sizerFactory.getSizerPixel(h);
+      this.setSizerH(sizerPixelH);
+   }
+
+   public void setSizePixelsInitSize(int w, int h) {
+      layEngine.setOverrideW(w);
+      layEngine.setOverrideH(h);
+
+      this.initSize();
+   }
+
+   public void setSizer_WH_Pref() {
+      setSizerW_Pref();
+      setSizerH_Pref();
+   }
+
+   /**
+    * Sets reference. Does not compute anything
+    * @param h
+    */
+   public void setSizerH(ByteObject h) {
+      layEngine.setSizerH(h);
+   }
+
+   public void setSizerH_Pref() {
+      SizerFactory sizerFactory = gc.getLAC().getSizerFactory();
+      ByteObject sizerPrefLazy = sizerFactory.getSizerPrefLazy();
+      this.setSizerH(sizerPrefLazy);
+   }
+
+   public void setSizerHContent(ByteObject sizerH) {
+      layEngine.setSizerH(sizerH);
+      layEngine.setRelativeSizerH(ITechStyleCache.RELATIVE_TYPE_3_CONTENT);
    }
 
    /**
@@ -3046,16 +3185,16 @@ public class Drawable extends ObjectGC implements IDrawable, IBOStyle, IStringab
    }
 
    /**
-    * Sets reference. Does not compute anything
-    * @param h
+    * <li> {@link ITechDrawable#SIZER_TYPE_0_MARGIN_FULL}
+    * <li> {@link ITechDrawable#SIZER_TYPE_1_BORDER}
+    * <li> {@link ITechDrawable#SIZER_TYPE_2_PADDING}
+    * <li> {@link ITechDrawable#SIZER_TYPE_3_CONTENT}
+    * @param typeW
+    * @param typeH
     */
-   public void setSizerH(ByteObject h) {
-      layEngine.getLay().setSizerH(h);
-   }
-
-   public void setSizerHContent(ByteObject sizerH) {
-      layEngine.getLay().setSizerH(sizerH);
-      layEngine.setContentSizerH(true);
+   public void setSizerTypes(int typeW, int typeH) {
+      layEngine.setRelativeSizerW(typeW);
+      layEngine.setRelativeSizerH(typeH);
    }
 
    /**
@@ -3063,7 +3202,27 @@ public class Drawable extends ObjectGC implements IDrawable, IBOStyle, IStringab
     * @param w
     */
    public void setSizerW(ByteObject w) {
-      layEngine.getLay().setSizerW(w);
+      layEngine.setSizerW(w);
+   }
+
+   public void setSizerW_Pref() {
+      this.setSizerW(gc.getLAC().getSizerFactory().getSizerPrefLazy());
+   }
+
+   public void setRelativePozerX(int typePozerX) {
+      layEngine.setRelativePozerX(typePozerX);
+   }
+
+   public void setRelativePozerY(int typePozerY) {
+      layEngine.setRelativePozerY(typePozerY);
+   }
+
+   public void setRelativeSizerH(int typeSizerH) {
+      layEngine.setRelativeSizerH(typeSizerH);
+   }
+
+   public void setRelativeSizerW(int typeSizerW) {
+      layEngine.setRelativeSizerW(typeSizerW);
    }
 
    /**
@@ -3277,11 +3436,6 @@ public class Drawable extends ObjectGC implements IDrawable, IBOStyle, IStringab
       layEngine.setXY(x, y);
    }
 
-   public void initSizeWithPixels(int w, int h) {
-      this.setSizePixels(w, h);
-      this.initSize();
-   }
-
    /**
     * Sets x and y and call {@link Drawable#initPosition()}
     * @param x
@@ -3457,17 +3611,15 @@ public class Drawable extends ObjectGC implements IDrawable, IBOStyle, IStringab
 
    /**
     * Changes the active style and therefore the {@link StyleClass}. 
-    * <br>
-    * <br>
-    * Construct {@link IAnimable} from style definition.
     * 
+    * <p>
+    * Animation:
+    * Construct {@link IAnimable} from style definition.
     * The state styles of the old root style are copied to the new merged style.
-    * <br>
-    * <br>
     * This method is called when the flag {@link ITechDrawable#STATE_06_STYLED} is set to true
-    * <br>
-    * <br>
     * When animation entry appears in a style update, it has no effect.
+    * </p>
+    * 
     * 
     */
    public void styleValidate() {
@@ -3489,18 +3641,10 @@ public class Drawable extends ObjectGC implements IDrawable, IBOStyle, IStringab
    }
 
    public void toString(Dctx dc) {
-      dc.root(this, Drawable.class, 3500);
+      dc.root(this, Drawable.class, 3630);
       toStringPrivate(dc);
       super.toString(dc.sup());
-      dc.append(" x=" + getX() + " y=" + getY());
-      dc.append(" dw=" + getDw());
-      if (getDw() != getDrawnWidth()) {
-         dc.append("[" + getDrawnWidth() + "]");
-      }
-      dc.append(" dh=" + getDh());
-      if (getDh() != getDrawnHeight()) {
-         dc.append("[" + getDrawnHeight() + "]");
-      }
+
       if (holes != null) {
          dc.append("Holes=");
          for (int i = 0; i < holes.length; i = +4) {
@@ -3606,7 +3750,15 @@ public class Drawable extends ObjectGC implements IDrawable, IBOStyle, IStringab
    }
 
    private void toStringPrivate(Dctx dc) {
-
+      dc.append(" x=" + getX() + " y=" + getY());
+      dc.append(" dw=" + getDw());
+      if (getDw() != getDrawnWidth()) {
+         dc.append("[" + getDrawnWidth() + "]");
+      }
+      dc.append(" dh=" + getDh());
+      if (getDh() != getDrawnHeight()) {
+         dc.append("[" + getDrawnHeight() + "]");
+      }
    }
    //#enddebug
 }

@@ -6,10 +6,12 @@ import pasa.cbentley.core.src4.interfaces.C;
 import pasa.cbentley.core.src4.logging.Dctx;
 import pasa.cbentley.core.src4.logging.IStringable;
 import pasa.cbentley.framework.coredraw.src4.interfaces.IMFont;
+import pasa.cbentley.framework.drawx.src4.ctx.ToStringStaticDrawx;
 import pasa.cbentley.framework.drawx.src4.style.IBOStyle;
 import pasa.cbentley.framework.drawx.src4.style.StyleCache;
 import pasa.cbentley.framework.gui.src4.canvas.ViewContext;
 import pasa.cbentley.framework.gui.src4.ctx.GuiCtx;
+import pasa.cbentley.framework.gui.src4.ctx.ToStringStaticGui;
 import pasa.cbentley.framework.gui.src4.interfaces.IDrawable;
 import pasa.cbentley.framework.gui.src4.interfaces.ITechDrawable;
 import pasa.cbentley.layouter.src4.engine.LayoutOperator;
@@ -43,28 +45,32 @@ public class LayouterEngineDrawable extends LayouterEngineRead implements ITechL
 
    protected final GuiCtx gc;
 
-   protected int          minusH;
+   protected int      minusH;
 
    /**
     * Number of pixels that are substracted from dw.
     */
-   protected int          minusW;
-
-   private boolean        isContentSizerW;
-
-   private boolean        isContentSizerH;
+   protected int      minusW;
 
    /**
     * Never null. However, caching can be disabled
     */
-   private StyleCache     styleCache;
+   private StyleCache styleCache;
 
    /**
     * Value computed from
     */
-   protected int          styleH;
+   protected int      styleH;
 
-   protected int          styleW;
+   protected int      styleW;
+
+   private int            typePozerX;
+
+   private int            typePozerY;
+
+   private int            typeSizerH;
+
+   private int            typeSizerW;
 
    public LayouterEngineDrawable(GuiCtx gc, Drawable drawable) {
       super(gc.getDC().getLAC(), drawable);
@@ -203,6 +209,22 @@ public class LayouterEngineDrawable extends LayouterEngineRead implements ITechL
       return getSizeWComputed();
    }
 
+   public int getTypePozerX() {
+      return typePozerX;
+   }
+
+   public int getTypePozerY() {
+      return typePozerY;
+   }
+
+   public int getTypeSizerH() {
+      return typeSizerH;
+   }
+
+   public int getTypeSizerW() {
+      return typeSizerW;
+   }
+
    /**
     * Current drawable width.
     * <br>
@@ -241,6 +263,14 @@ public class LayouterEngineDrawable extends LayouterEngineRead implements ITechL
       rect.incrH(incr);
    }
 
+   public void rebuild() {
+      if(isManualOverrideW()) {
+         this.rect.setW(originalOverrideW);
+      }
+      if(isManualOverrideH()) {
+         this.rect.setH(originalOverrideH);
+      }
+   }
    public void incrDw(int incr) {
       rect.incrW(incr);
    }
@@ -279,6 +309,22 @@ public class LayouterEngineDrawable extends LayouterEngineRead implements ITechL
 
    public void setPwAsDw() {
       rect.setPwAsDw();
+   }
+
+   public void setRelativePozerX(int typePozerX) {
+      this.typePozerX = typePozerX;
+   }
+
+   public void setRelativePozerY(int typePozerY) {
+      this.typePozerY = typePozerY;
+   }
+
+   public void setRelativeSizerH(int typeSizerH) {
+      this.typeSizerH = typeSizerH;
+   }
+
+   public void setRelativeSizerW(int typeSizerW) {
+      this.typeSizerW = typeSizerW;
    }
 
    public void setX(int x) {
@@ -362,6 +408,10 @@ public class LayouterEngineDrawable extends LayouterEngineRead implements ITechL
       toStringPrivate(dc);
       dc.appendVarWithSpace("isContextualW", isContextualW());
       dc.appendVarWithSpace("isContextualH", isContextualH());
+      dc.appendVarWithSpace("typeSizerW", ToStringStaticDrawx.toStringRelativeType(typeSizerW));
+      dc.appendVarWithSpace("typeSizerH", ToStringStaticDrawx.toStringRelativeType(typeSizerH));
+      dc.appendVarWithSpace("typePozerX", ToStringStaticDrawx.toStringRelativeType(typePozerX));
+      dc.appendVarWithSpace("typePozerY", ToStringStaticDrawx.toStringRelativeType(typePozerY));
       dc.append(")");
       dc.append(" Max=(" + getSizeMaxW() + "," + getSizeMaxH());
       dc.append(")");
@@ -382,20 +432,4 @@ public class LayouterEngineDrawable extends LayouterEngineRead implements ITechL
 
    }
    //#enddebug
-
-   public boolean isContentSizerH() {
-      return isContentSizerH;
-   }
-
-   public void setContentSizerH(boolean isContentSizerH) {
-      this.isContentSizerH = isContentSizerH;
-   }
-
-   public boolean isContentSizerW() {
-      return isContentSizerW;
-   }
-
-   public void setContentSizerW(boolean isContentSizerW) {
-      this.isContentSizerW = isContentSizerW;
-   }
 }

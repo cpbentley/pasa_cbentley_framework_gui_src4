@@ -237,8 +237,7 @@ public class PinBoardDrawable extends ViewDrawable {
       layEngine.setPw(pw);
       layEngine.setPh(ph);
 
-      addStyleToPrefSize();
-
+      
       //update positions
       for (int i = 0; i < nextempty; i++) {
          if (drawables[i] != null) {

@@ -852,12 +852,12 @@ public class CmdMenuBar extends TableView implements IEventConsumer, ICmdsView {
          int w = 0;
          int h = 0;
          ByteObject polh = tabc.getButtonLine(true, w, h);
-         super.updateTablePolicy(polh);
+         super.doUpdateTablePolicy(polh);
          horiz = true;
       } else if (horiz && !v) {
          //set horizontal
          ByteObject polh = tabc.getMenuPolicy();
-         super.updateTablePolicy(polh);
+         super.doUpdateTablePolicy(polh);
          horiz = false;
       }
    }

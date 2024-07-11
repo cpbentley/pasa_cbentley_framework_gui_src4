@@ -101,27 +101,41 @@ public interface ITechViewDrawable extends ITech {
    public static final int FLAG_VSTATE_09_                           = 1 << 8;
 
    /**
-    * Set to true when content pw follows the ViewPort's width at all times.
+    * Set to true when content's preferred width is forced set to the ViewPort's width at all times.
     * <p>
     * Specific case of {@link ITechViewDrawable#FLAG_VSTATE_12_CONTENT_W_DEPENDS_VIEWPORT}, where not only it depends, but it is matched exactly.
     * <br>
-    * Horizontal scrolling is thus impossible since pw is equal to dw. 
+    * Horizontal scrolling is thus impossible since pw is equal to dw. So when true, this flag prevents the creation of a horizontal scrollbar
     * </p>
+    * 
     * <p>
     * Makes {@link ViewDrawable} malleable with {@link ViewDrawable#isMalleable()}.
     * </p>
+    * 
     * <p>
     * Case of a {@link TableView} with {@link ITechCell#TYPE_1_FLOW}.
+    * </p>
+    * 
+    * <p>
+    * Setting both flags to true prevents the creation of any scrollbars.
+    * <li> {@link ITechViewDrawable#FLAG_VSTATE_10_CONTENT_PW_VIEWPORT_DW}
+    * <li> {@link ITechViewDrawable#FLAG_VSTATE_11_CONTENT_PH_VIEWPORT_DH}
     * </p>
     */
    public static final int FLAG_VSTATE_10_CONTENT_PW_VIEWPORT_DW     = 1 << 9;
 
    /**
-    * Same as {@link ITechViewDrawable#FLAG_VSTATE_10_CONTENT_PW_VIEWPORT_DW}
-    * Both states set is not useful.<br>
-    * Prevents the creation of a scrollbar
-    * <br>
+    * Set to true when content's preferred height is forced set to the ViewPort's height at all times.
+    * 
+    * <p>
     * Make {@link ViewDrawable} malleable with {@link ViewDrawable#isMalleable()}.
+    * </p>
+    * 
+    * <p>
+    * Setting both flags to true prevents the creation of any scrollbars.
+    * <li> {@link ITechViewDrawable#FLAG_VSTATE_10_CONTENT_PW_VIEWPORT_DW}
+    * <li> {@link ITechViewDrawable#FLAG_VSTATE_11_CONTENT_PH_VIEWPORT_DH}
+    * </p>
     */
    public static final int FLAG_VSTATE_11_CONTENT_PH_VIEWPORT_DH     = 1 << 10;
 

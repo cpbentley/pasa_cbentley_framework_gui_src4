@@ -66,6 +66,7 @@ import pasa.cbentley.framework.gui.src4.utils.DrawableMapper;
 import pasa.cbentley.framework.gui.src4.utils.DrawableUtilz;
 import pasa.cbentley.framework.input.src4.InputState;
 import pasa.cbentley.framework.input.src4.gesture.GestureDetector;
+import pasa.cbentley.layouter.src4.ctx.IBOTypesLayout;
 
 /**
  * Structure for displaying drawables in a table grid fashion. 
@@ -421,6 +422,11 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
       }
    }
 
+   /**
+    * Technical parameters for the {@link TableView}.
+    */
+   protected ByteObject     boTable;
+
    private int[]            colPolicies;
 
    /**
@@ -485,6 +491,8 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
 
    /**
     * Can be null? NO!
+    * 
+    * {@link CellModel} from ?
     */
    private CellModel        modelCol;
 
@@ -579,11 +587,6 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
    private int              tableType;
 
    /**
-    * Technical parameters for the {@link TableView}.
-    */
-   protected ByteObject     boTable;
-
-   /**
     * Maps model index to grid index.<br>
     * Only needed for exotic fill orders or when spanning occurs.
     * <br>
@@ -625,15 +628,17 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
       super(gc, sc);
       modelCol = new CellModel(gc);
       modelRow = new CellModel(gc);
-      if (policyTable != null) {
-         initPolicy(policyTable);
-      }
-      aHelpersInitialization();
-      setDataModel(model);
+
       //check nullities and set default values if absent. (
       if (policyTable == null) {
          policyTable = gc.getTablePolicyFactory().getMenuSubPolicy();
       }
+
+      initPolicy(policyTable);
+
+      aHelpersInitialization();
+      setDataModel(model);
+
    }
 
    /**
@@ -707,11 +712,7 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
       emptyBluePrint.setParent(this);
       //#debug
       emptyBluePrint.toStringSetName("Empty Table Cell");
-      updateStyleClass();
-   }
-
-   public DrawableMapper getMapper() {
-      return mapperObjectDrawable;
+      doUpdateStyleClass();
    }
 
    /**
@@ -978,7 +979,7 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
     * 
     */
    private void buildSpanning() {
-      if (policyTable != null && policyTable.hasFlag(IBOTablePolicy.TP_OFFSET_1FLAG, IBOTablePolicy.TP_FLAG_3SPANNING)) {
+      if (policyTable != null && policyTable.hasFlag(IBOTablePolicy.TP_OFFSET_1FLAG, IBOTablePolicy.TP_FLAG_3_SPANNING)) {
          int numTotalCols = modelCol.numCells;
          int numTotalRows = modelRow.numCells;
          span = new int[numTotalCols * numTotalRows];
@@ -1108,6 +1109,92 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
       int rowAbs = getAbsRowFromIndex(topLeftIndex);
       colAbs = numTotalCols - colAbs;
       return rowAbs * numTotalCols + colAbs;
+   }
+
+   /**
+    * Compute the {@link IDrawable} flag based on the table structure.
+    * <br>
+    * <br>
+    * Called at every init
+    * <br>
+    * Navigation may be disabled with
+    * <li> {@link IBOTableView#T_FLAGX_1_NO_SELECTION}
+    * 
+    */
+   private void doUpdateNavFlag() {
+      boolean navH = false;
+      boolean navV = false;
+      boolean selectAble = false;
+      if (!hasTechX(T_FLAGX_1_NO_SELECTION)) {
+         selectAble = true;
+         if (modelCol.numCells > 1) {
+            navH = true;
+         }
+         if (modelRow.numCells > 1) {
+            navV = true;
+         }
+      }
+      setBehaviorFlag(ITechDrawable.BEHAVIOR_27_NAV_HORIZONTAL, navH);
+      setBehaviorFlag(ITechDrawable.BEHAVIOR_26_NAV_VERTICAL, navV);
+      setBehaviorFlag(ITechDrawable.BEHAVIOR_28_NAV_SELECTABLE, selectAble);
+
+   }
+
+   /**
+    * Called during construction or when {@link StyleClass} is changed
+    */
+   protected void doUpdateStyleClass() {
+      //TODO ATTENTION. Model provides a TECH. in which case the tech from the styleClass is never
+      // used
+      boTable = styleClass.getByteObject(ITechLinks.LINK_80_BO_TABLEVIEW);
+      // take default Tech
+      if (boTable == null) {
+         boTable = gc.getTablePolicyFactory().getBOTableDefault();
+      }
+      if (hasTechM(T_FLAGM_7_CLOCK_VERTICAL)) {
+         setBehaviorFlag(ITechDrawable.BEHAVIOR_29_NAV_CLOCK_VERTICAL, true);
+      }
+      if (hasTechM(T_FLAGM_6_CLOCK_HORIZ)) {
+         setBehaviorFlag(ITechDrawable.BEHAVIOR_30_NAV_CLOCK_HORIZONTAL, true);
+      }
+      tableCellStyleClass = styleClass.getStyleClass(ITechLinks.LINK_81_STYLE_CLASS_TABLE_CELL);
+      //style class for mapper
+      mapperObjectDrawable.setStyleClass(tableCellStyleClass);
+
+      figureOverlay = styleClass.getByteObject(ITechLinks.LINK_84_STYLE_TABLE_OVERLAY_FIGURE);
+      emptyBluePrint.setStyleClass(styleClass);
+   }
+
+   protected void doUpdateTablePolicy(ByteObject policyTable) {
+      invalidateLayout();
+      initPolicy(policyTable);
+   }
+
+   private void doUpdateTitleStyles() {
+      if (modelRow.titlesView != null) {
+         StyleClass titleRowStyleClass = styleClass.getStyleClass(ITechLinks.LINK_83_STYLE_TABLE_ROW_TITLE);
+         modelRow.titlesView.setStyleClass(titleRowStyleClass);
+      }
+      if (modelCol.titlesView != null) {
+         StyleClass titleRowStyleClass = styleClass.getStyleClass(ITechLinks.LINK_82_STYLE_TABLE_COL_TITLE);
+         modelCol.titlesView.setStyleClass(titleRowStyleClass);
+      }
+   }
+
+   /**
+    * Based on model size and number of columns, initialized number of rows
+    * Call this method when the number of column has been computed
+    */
+   private int doUpdateTotalColRows(int numOpposite) {
+      //when no data in the model?
+      if (numOpposite == 0)
+         return 0;
+      int modulo = getSize() % numOpposite;
+      int numTotal = (getSize() / numOpposite);
+      if (modulo != 0) {
+         numTotal++;
+      }
+      return numTotal;
    }
 
    /**
@@ -1392,6 +1479,63 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
    }
 
    /**
+    * Match a temporary {@link Config} to {@link ScrollConfig} X and Y. Then
+    * draw that config at x,y on {@link GraphicsX}. <br>
+    * <br>
+    * Case when cell sizes are variable, depending on start increment and
+    * number of visible increments in the {@link Config}<br>
+    * <br>
+    * If the {@link ScrollConfig} are the root ones used by ViewPane, draw
+    * using the current {@link Config}.
+    * 
+    * @param g
+    * @param x
+    * @param y
+    * @param scX
+    * @param scY
+    */
+   //   void drawViewDrawableContentVar(GraphicsX g, int x, int y, ScrollConfig scX, ScrollConfig scY) {
+   //      Config scroll = null;
+   //      if (scX != null) {
+   //         // convert situation to the Config using the
+   //         switch (scX.getTypeUnit()) {
+   //            case IViewPane.SCROLL_TYPE_0_PIXEL_UNIT:
+   //               //
+   //               x -= scX.getSIStart();
+   //               break;
+   //            case IViewPane.SCROLL_TYPE_1_LOGIC_UNIT:
+   //               break;
+   //            case IViewPane.SCROLL_TYPE_2_PAGE_UNIT:
+   //               break;
+   //            default:
+   //               throw new IllegalArgumentException();
+   //         }
+   //      }
+   //      if (scY != null) {
+   //         switch (scY.getTypeUnit()) {
+   //            case IViewPane.SCROLL_TYPE_0_PIXEL_UNIT:
+   //               y -= scY.getSIStart();
+   //               break;
+   //            case IViewPane.SCROLL_TYPE_1_LOGIC_UNIT:
+   //               break;
+   //            case IViewPane.SCROLL_TYPE_2_PAGE_UNIT:
+   //               break;
+   //            default:
+   //               throw new IllegalArgumentException();
+   //         }
+   //      }
+   //      if (scroll != null) {
+   //         def = scroll;
+   //      }
+   //      computeCoordinatesColumns(def);
+   //      computeCoordinatesRows(def);
+   //      // matches the configurations to the Table config
+   //      // System.out.println("TableView.drawViewDrawableContent " + x + "," +
+   //      // y);
+   //      drawViewDrawableContent(g, def, x, y);
+   //   }
+
+   /**
     * Match a temporary {@link Config} to {@link ScrollConfig} X and Y. Then draw that config at x,y on {@link GraphicsX}. 
     * <br>
     * <br>
@@ -1555,63 +1699,6 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
          }
       }
    }
-
-   /**
-    * Match a temporary {@link Config} to {@link ScrollConfig} X and Y. Then
-    * draw that config at x,y on {@link GraphicsX}. <br>
-    * <br>
-    * Case when cell sizes are variable, depending on start increment and
-    * number of visible increments in the {@link Config}<br>
-    * <br>
-    * If the {@link ScrollConfig} are the root ones used by ViewPane, draw
-    * using the current {@link Config}.
-    * 
-    * @param g
-    * @param x
-    * @param y
-    * @param scX
-    * @param scY
-    */
-   //   void drawViewDrawableContentVar(GraphicsX g, int x, int y, ScrollConfig scX, ScrollConfig scY) {
-   //      Config scroll = null;
-   //      if (scX != null) {
-   //         // convert situation to the Config using the
-   //         switch (scX.getTypeUnit()) {
-   //            case IViewPane.SCROLL_TYPE_0_PIXEL_UNIT:
-   //               //
-   //               x -= scX.getSIStart();
-   //               break;
-   //            case IViewPane.SCROLL_TYPE_1_LOGIC_UNIT:
-   //               break;
-   //            case IViewPane.SCROLL_TYPE_2_PAGE_UNIT:
-   //               break;
-   //            default:
-   //               throw new IllegalArgumentException();
-   //         }
-   //      }
-   //      if (scY != null) {
-   //         switch (scY.getTypeUnit()) {
-   //            case IViewPane.SCROLL_TYPE_0_PIXEL_UNIT:
-   //               y -= scY.getSIStart();
-   //               break;
-   //            case IViewPane.SCROLL_TYPE_1_LOGIC_UNIT:
-   //               break;
-   //            case IViewPane.SCROLL_TYPE_2_PAGE_UNIT:
-   //               break;
-   //            default:
-   //               throw new IllegalArgumentException();
-   //         }
-   //      }
-   //      if (scroll != null) {
-   //         def = scroll;
-   //      }
-   //      computeCoordinatesColumns(def);
-   //      computeCoordinatesRows(def);
-   //      // matches the configurations to the Table config
-   //      // System.out.println("TableView.drawViewDrawableContent " + x + "," +
-   //      // y);
-   //      drawViewDrawableContent(g, def, x, y);
-   //   }
 
    /**
     * In All cases generates a {@link ITechTable#EVENT_ID_00_SELECT} .
@@ -1807,6 +1894,14 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
       return d;
    }
 
+   /**
+    * Can be null if no model genetics was set.
+    * @return
+    */
+   public ByteObject getModelGenetics() {
+      return modelGenetics;
+   }
+
    private int getGeneticSize(boolean isRow) {
       int index = (!isRow) ? GENE_OFFSET_03_WIDTH2 : GENE_OFFSET_04_HEIGHT2;
       int size = modelGenetics.get2(index);
@@ -1865,6 +1960,10 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
          total += getArrayFirstValOrIndex(sizes, i);
       }
       return total;
+   }
+
+   public DrawableMapper getMapper() {
+      return mapperObjectDrawable;
    }
 
    public CellModel getModelCol() {
@@ -2609,6 +2708,37 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
       return boTable.hasFlag(T_OFFSET_03_FLAGY, flag);
    }
 
+   //   public void initScrollingConfig2(ScrollConfig scX, ScrollConfig scY) {
+   //
+   //      if (scX != null) {
+   //         if (scX.getTypeUnit() == IViewPane.SCROLL_TYPE_1_LOGIC_UNIT) {
+   //            int sizeTotal = getContentW();
+   //            int siTotal = modelCol.getScrollTotal();
+   //            if (hasHelperFlag(HELPER_FLAG_08_ALL_COLS_SAME_SIZE)) {
+   //
+   //               scX.initConfigLogic(modelCol.workCellSizes[0], sizeTotal, siTotal, getSizeGridV());
+   //            } else {
+   //               scX.initConfigLogic(modelCol.workCellSizes, sizeTotal, siTotal, getSizeGridV());
+   //            }
+   //         } else {
+   //            DrawableUtilz.initConfigX(this, scX);
+   //         }
+   //      }
+   //      if (scY != null) {
+   //         if (scY.getTypeUnit() == IViewPane.SCROLL_TYPE_1_LOGIC_UNIT) {
+   //            int siTotal = modelRow.getScrollTotal();
+   //            if (hasHelperFlag(HELPER_FLAG_09_ALL_ROWS_SAME_SIZE)) {
+   //               scY.initConfigLogic(modelRow.workCellSizes[0], getContentH(), siTotal, getSizeGridH());
+   //            } else {
+   //               scY.initConfigLogic(modelRow.workCellSizes, getContentH(), siTotal, getSizeGridH());
+   //            }
+   //         } else {
+   //            DrawableUtilz.initConfigY(this, scY);
+   //         }
+   //      }
+   //      //DrawableUtilz.debugScrollConfigs("TableView#initScrollingConfig", scX, scY);
+   //   }
+
    private void initConfigWorkSizes() {
       modelCol.initWorkSizes();
       modelRow.initWorkSizes();
@@ -2725,37 +2855,6 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
       }
       return max;
    }
-
-   //   public void initScrollingConfig2(ScrollConfig scX, ScrollConfig scY) {
-   //
-   //      if (scX != null) {
-   //         if (scX.getTypeUnit() == IViewPane.SCROLL_TYPE_1_LOGIC_UNIT) {
-   //            int sizeTotal = getContentW();
-   //            int siTotal = modelCol.getScrollTotal();
-   //            if (hasHelperFlag(HELPER_FLAG_08_ALL_COLS_SAME_SIZE)) {
-   //
-   //               scX.initConfigLogic(modelCol.workCellSizes[0], sizeTotal, siTotal, getSizeGridV());
-   //            } else {
-   //               scX.initConfigLogic(modelCol.workCellSizes, sizeTotal, siTotal, getSizeGridV());
-   //            }
-   //         } else {
-   //            DrawableUtilz.initConfigX(this, scX);
-   //         }
-   //      }
-   //      if (scY != null) {
-   //         if (scY.getTypeUnit() == IViewPane.SCROLL_TYPE_1_LOGIC_UNIT) {
-   //            int siTotal = modelRow.getScrollTotal();
-   //            if (hasHelperFlag(HELPER_FLAG_09_ALL_ROWS_SAME_SIZE)) {
-   //               scY.initConfigLogic(modelRow.workCellSizes[0], getContentH(), siTotal, getSizeGridH());
-   //            } else {
-   //               scY.initConfigLogic(modelRow.workCellSizes, getContentH(), siTotal, getSizeGridH());
-   //            }
-   //         } else {
-   //            DrawableUtilz.initConfigY(this, scY);
-   //         }
-   //      }
-   //      //DrawableUtilz.debugScrollConfigs("TableView#initScrollingConfig", scX, scY);
-   //   }
 
    /**
     * Iterate over columns inside a row and initialize drawables with height and setupColSizes that have been pre-computed. 
@@ -2880,196 +2979,6 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
    }
 
    /**
-    * Init the table policy.
-    * <br>
-    * <br>
-    * When null, defaults to defaults
-    * <br>
-    * <br>
-    * 
-    * @param policyTable
-    */
-   protected void initPolicy(ByteObject policyTable) {
-      if (policyTable == null) {
-         throw new NullPointerException("Null Table Policy. You must link at least one!");
-      }
-      this.policyTable = policyTable;
-      ByteObject[] param = policyTable.getSubs();
-      ByteObject policyCol = param[0];
-      if (policyCol == null) {
-         throw new NullPointerException("policy Col");
-      }
-      LitteralStringOperator lsf = gc.getBOC().getLitteralStringOperator();
-      if (policyCol.hasFlag(CELLP_OFFSET_03_FLAGP, CELLP_FLAGP_7_TITLE_STRING_DEF)) {
-         modelCol.setTitles(lsf.getLitteralArrayString(policyCol.getSubFirst(TYPE_008_LIT_ARRAY_STRING)));
-      }
-      modelCol.policy = policyCol;
-      ByteObject policyRow = param[1];
-
-      if (policyRow == null) {
-         throw new NullPointerException("policy Row");
-      }
-
-      if (policyRow.hasFlag(CELLP_OFFSET_03_FLAGP, CELLP_FLAGP_7_TITLE_STRING_DEF)) {
-         modelRow.setTitles(lsf.getLitteralArrayString(policyRow.getSubFirst(TYPE_008_LIT_ARRAY_STRING)));
-      }
-      modelRow.policy = policyRow;
-
-   }
-
-   /**
-    * Variable cell sizes depend on value
-    */
-   private void initPreferredSizeFromCellSizes(int width, int height) {
-      try {
-         //first compute number of cells
-         setupNumColRows();
-
-         // once number of cells is known
-         //layout the space used by row numbers and column titles
-         setupTitlesRow();
-         setupTitlesCol();
-
-         // setupSizes();
-         setupPolicyType2();
-         // post: symbolized cell sizes are know.
-
-         // Config work size are taken from setupsize
-         //initConfigWorkSizes(u);
-         initConfigWorkSizes();
-
-         buildSpanning();
-         buildGridIndexModel();
-
-         // compute one time for variable size cells. symbolized/variable sizes compute
-         modelCol.computeSetupVariableCellSizes(width);
-         modelRow.computeSetupVariableCellSizes(height);
-         // once sizes are known
-         // computeVisibleRowsInit(u, getContentH());
-         // computeVisibleColsInit(u, getContentW());
-
-         // computeCellCoordinates(u);
-         //compute span
-         addSpanningToConfig();
-         updateNavFlag();
-
-         if (hasTechF(T_FLAGF_1_SELECT_KEPT_WITHOUT_FOCUS_KEY)) {
-            setSelectionState();
-         }
-      } catch (Exception e) {
-         //#debug
-         e.printStackTrace();
-         //#debug
-         throw new RuntimeException("In the TableView Compute Config method. Debug Stop");
-      }
-
-      // computes the preferred sizes based on the configuration
-      int pw = IntUtils.sum(modelCol.workCellSizes);
-      pw += getSizeGridV() * (modelCol.numCells - 1);
-
-      //fix pw
-
-      int ph = IntUtils.sum(modelRow.workCellSizes);
-      ph += getSizeGridH() * (modelRow.numCells - 1);
-      layEngine.setPh(ph);
-      layEngine.setPw(pw);
-      
-      layEngine.layoutInvalidateSize();
-   }
-
-   /**
-    * <br>
-    * <br>
-    * What mechanism does not break the UI?
-    * <br>
-    * <br>
-    * {@link TableView#getContentH()} is computed because {@link ViewDrawable#initViewDrawable(LayouterEngineDrawable)} has been called
-    * to know if a ViewPane was needed.
-    * <br>
-    * <br>
-    * In some instances for logical units, the number of frames is used instead of the number of columns.
-    * <br>
-    * SET,AVERAGE,STRONG gives 3 columns but 2 frames. A Frame is an aggregate of columns that form an single scrolling increment.
-    * Frames are logical scrolling increments instead of cells. Case of Fixed Frame.
-    * 
-    * Variable Frame give SET,AVERAGE - AVERAGE - STRONG
-    * <br>
-    * Variable size frames for example with {@link ITechCell#CELL_4_FILL_AVERAGE}
-    * <br>
-    * <br>
-    * Fixed Frames is for all pratical purposes equal to {@link ITechViewPane#SCROLL_TYPE_2_PAGE_UNIT}
-    */
-   public void initScrollingConfig(ScrollConfig scX, ScrollConfig scY) {
-      if (scX != null) {
-         if (modelCol.frames != null) {
-            scX.setScrollUnit(SCROLL_TYPE_2_PAGE_UNIT);
-            int sizeTotal = getContentW();
-            int siTotal = modelCol.getScrollTotal();
-            siTotal = modelCol.frames.length / 2;
-            scX.initConfigLogic(sizeTotal, sizeTotal, siTotal, modelCol.sepSize);
-         } else if (scX.getTypeUnit() == SCROLL_TYPE_1_LOGIC_UNIT) {
-            int sizeTotal = getContentW();
-            int siTotal = modelCol.getScrollTotal();
-            int sepSize = modelCol.sepSize;
-            if (modelCol.hasHelperFlag(CELL_H_FLAG_08_ALL_CELLS_SAME_SIZE)) {
-               scX.initConfigLogic(modelCol.workCellSizes[0], sizeTotal, siTotal, sepSize);
-            } else {
-               scX.initConfigLogic(modelCol.workCellSizes, sizeTotal, siTotal, sepSize);
-            }
-         } else {
-            DrawableUtilz.initConfigX(this, scX);
-         }
-      }
-      if (scY != null) {
-         if (modelRow.frames != null) {
-            scY.setScrollUnit(SCROLL_TYPE_2_PAGE_UNIT);
-            int sizeTotal = getContentH();
-            int siTotal = modelRow.getScrollTotal();
-            siTotal = modelRow.frames.length / 2;
-            scY.initConfigLogic(sizeTotal, sizeTotal, siTotal, modelRow.sepSize);
-         } else if (scY.getTypeUnit() == SCROLL_TYPE_1_LOGIC_UNIT) {
-            int sizeTotal = getContentH();
-            int siTotal = modelRow.getScrollTotal();
-            int sepSize = modelRow.sepSize;
-            if (modelRow.hasHelperFlag(CELL_H_FLAG_08_ALL_CELLS_SAME_SIZE)) {
-               scY.initConfigLogic(modelRow.workCellSizes[0], sizeTotal, siTotal, sepSize);
-            } else {
-               scY.initConfigLogic(modelRow.workCellSizes, sizeTotal, siTotal, sepSize);
-            }
-         } else {
-            DrawableUtilz.initConfigY(this, scY);
-         }
-      }
-      //DrawableUtilz.debugScrollConfigs("TableView#initScrollingConfig", scX, scY);
-   }
-
-   protected void initViewDrawable(LayouterEngineDrawable ds) {
-      checkNullities();
-      setHelperCellFlags();
-
-      int width = ds.getW();
-      int height = ds.getH();
-      initPreferredSizeFromCellSizes(width, height);
-
-      //depending on the sizer, dw and dh
-
-      //now compute the style size. how when sizing of padding/border/margin is contextual?
-      //contextual on what? proportional to draw size or preferred size?
-
-      if (layEngine.isPwOrPhEqualsZero()) {
-         // at this stage if pw or ph is zero we have an empty table.
-         // the ViewDrawable will deal with it according to the tech params
-      }
-   }
-
-   /**
-    * Called when a ViewPort is created or changed
-    */
-   protected void initViewPortSub(int width, int height) {
-      initPreferredSizeFromCellSizes(width, height);
-   }
-
-   /**
     * Method computes the current cell configuration {@link Config} and thus the preferred width and height.
     * <br>
     * <br>
@@ -3161,6 +3070,207 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
    //      //      }
    //      //setDwDh(width, height);
    //   }
+
+   /**
+    * Init the table policy.
+    * <br>
+    * <br>
+    * When null, defaults to defaults
+    * <br>
+    * <br>
+    * 
+    * @param policyTable
+    */
+   protected void initPolicy(ByteObject policyTable) {
+      if (policyTable == null) {
+         throw new NullPointerException("Null Table Policy. You must link at least one!");
+      }
+      this.policyTable = policyTable;
+      ByteObject[] param = policyTable.getSubs();
+      ByteObject policyCol = param[0];
+      if (policyCol == null) {
+         throw new NullPointerException("policy Col");
+      }
+      LitteralStringOperator lsf = gc.getBOC().getLitteralStringOperator();
+      if (policyCol.hasFlag(CELLP_OFFSET_03_FLAGP, CELLP_FLAGP_7_TITLE_STRING_DEF)) {
+         modelCol.setTitles(lsf.getLitteralArrayString(policyCol.getSubFirst(TYPE_008_LIT_ARRAY_STRING)));
+      }
+      modelCol.policy = policyCol;
+      ByteObject policyRow = param[1];
+
+      if (policyRow == null) {
+         throw new NullPointerException("policy Row");
+      }
+
+      if (policyRow.hasFlag(CELLP_OFFSET_03_FLAGP, CELLP_FLAGP_7_TITLE_STRING_DEF)) {
+         modelRow.setTitles(lsf.getLitteralArrayString(policyRow.getSubFirst(TYPE_008_LIT_ARRAY_STRING)));
+      }
+      modelRow.policy = policyRow;
+
+   }
+
+   /**
+    * Variable cell sizes depend on value
+    */
+   private void initPreferredSizeFromCellSizes(int width, int height) {
+      try {
+         //first compute number of cells
+         setupNumColRows();
+
+         // once number of cells is known
+         //layout the space used by row numbers and column titles
+         setupTitlesRow();
+         setupTitlesCol();
+
+         // setupSizes();
+         setupPolicyTypeRoot();
+         // post: symbolized cell sizes are know.
+
+         // Config work size are taken from setupsize
+         //initConfigWorkSizes(u);
+         initConfigWorkSizes();
+
+         buildSpanning();
+         buildGridIndexModel();
+
+         // compute one time for variable size cells. symbolized/variable sizes compute
+         modelCol.computeSetupVariableCellSizes(width);
+         modelRow.computeSetupVariableCellSizes(height);
+         // once sizes are known
+         // computeVisibleRowsInit(u, getContentH());
+         // computeVisibleColsInit(u, getContentW());
+
+         // computeCellCoordinates(u);
+         //compute span
+         addSpanningToConfig();
+         doUpdateNavFlag();
+
+         if (hasTechF(T_FLAGF_1_SELECT_KEPT_WITHOUT_FOCUS_KEY)) {
+            setSelectionState();
+         }
+      } catch (Exception e) {
+         //#debug
+         e.printStackTrace();
+         //#debug
+         throw new RuntimeException("In the TableView Compute Config method. Debug Stop");
+      }
+
+      // computes the preferred sizes based on the configuration
+      int pw = computeContentPw();
+
+      //fix pw
+
+      int ph = computeContentPh();
+
+      layEngine.setPh(ph);
+      layEngine.setPw(pw);
+
+      layEngine.layoutInvalidateSize();
+   }
+
+   public int computeContentPh() {
+      int ph = IntUtils.sum(modelRow.workCellSizes);
+      ph += getSizeGridH() * (modelRow.numCells - 1);
+      return ph;
+   }
+   
+   public int computeContentPw() {
+      int pw = IntUtils.sum(modelCol.workCellSizes);
+      pw += getSizeGridV() * (modelCol.numCells - 1);
+      return pw;
+   }
+   
+   /**
+    * <br>
+    * <br>
+    * What mechanism does not break the UI?
+    * <br>
+    * <br>
+    * {@link TableView#getContentH()} is computed because {@link ViewDrawable#initViewDrawable(LayouterEngineDrawable)} has been called
+    * to know if a ViewPane was needed.
+    * <br>
+    * <br>
+    * In some instances for logical units, the number of frames is used instead of the number of columns.
+    * <br>
+    * SET,AVERAGE,STRONG gives 3 columns but 2 frames. A Frame is an aggregate of columns that form an single scrolling increment.
+    * Frames are logical scrolling increments instead of cells. Case of Fixed Frame.
+    * 
+    * Variable Frame give SET,AVERAGE - AVERAGE - STRONG
+    * <br>
+    * Variable size frames for example with {@link ITechCell#CELL_4_FILL_AVERAGE}
+    * <br>
+    * <br>
+    * Fixed Frames is for all pratical purposes equal to {@link ITechViewPane#SCROLL_TYPE_2_PAGE_UNIT}
+    */
+   public void initScrollingConfig(ScrollConfig scX, ScrollConfig scY) {
+      if (scX != null) {
+         if (modelCol.frames != null) {
+            scX.setScrollUnit(SCROLL_TYPE_2_PAGE_UNIT);
+            int sizeTotal = getContentW();
+            int siTotal = modelCol.getScrollTotal();
+            siTotal = modelCol.frames.length / 2;
+            scX.initConfigLogic(sizeTotal, sizeTotal, siTotal, modelCol.sepSize);
+         } else if (scX.getTypeUnit() == SCROLL_TYPE_1_LOGIC_UNIT) {
+            int sizeTotal = getContentW();
+            int siTotal = modelCol.getScrollTotal();
+            int sepSize = modelCol.sepSize;
+            if (modelCol.hasHelperFlag(CELL_H_FLAG_08_ALL_CELLS_SAME_SIZE)) {
+               scX.initConfigLogic(modelCol.workCellSizes[0], sizeTotal, siTotal, sepSize);
+            } else {
+               scX.initConfigLogic(modelCol.workCellSizes, sizeTotal, siTotal, sepSize);
+            }
+         } else {
+            DrawableUtilz.initConfigX(this, scX);
+         }
+      }
+      if (scY != null) {
+         if (modelRow.frames != null) {
+            scY.setScrollUnit(SCROLL_TYPE_2_PAGE_UNIT);
+            int sizeTotal = getContentH();
+            int siTotal = modelRow.getScrollTotal();
+            siTotal = modelRow.frames.length / 2;
+            scY.initConfigLogic(sizeTotal, sizeTotal, siTotal, modelRow.sepSize);
+         } else if (scY.getTypeUnit() == SCROLL_TYPE_1_LOGIC_UNIT) {
+            int sizeTotal = getContentH();
+            int siTotal = modelRow.getScrollTotal();
+            int sepSize = modelRow.sepSize;
+            if (modelRow.hasHelperFlag(CELL_H_FLAG_08_ALL_CELLS_SAME_SIZE)) {
+               scY.initConfigLogic(modelRow.workCellSizes[0], sizeTotal, siTotal, sepSize);
+            } else {
+               scY.initConfigLogic(modelRow.workCellSizes, sizeTotal, siTotal, sepSize);
+            }
+         } else {
+            DrawableUtilz.initConfigY(this, scY);
+         }
+      }
+      //DrawableUtilz.debugScrollConfigs("TableView#initScrollingConfig", scX, scY);
+   }
+
+   protected void initViewDrawable(LayouterEngineDrawable ds) {
+      checkNullities();
+      setHelperCellFlags();
+
+      int width = ds.getW();
+      int height = ds.getH();
+      initPreferredSizeFromCellSizes(width, height);
+
+      //depending on the sizer, dw and dh
+
+      //now compute the style size. how when sizing of padding/border/margin is contextual?
+      //contextual on what? proportional to draw size or preferred size?
+
+      if (layEngine.isPwOrPhEqualsZero()) {
+         // at this stage if pw or ph is zero we have an empty table.
+         // the ViewDrawable will deal with it according to the tech params
+      }
+   }
+
+   /**
+    * Called when a ViewPort is created or changed
+    */
+   protected void initViewPortSub(int width, int height) {
+      initPreferredSizeFromCellSizes(width, height);
+   }
 
    /**
     * Within this {@link Drawable}, what are the drawable that intersect with given area
@@ -3955,19 +4065,6 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
    }
 
    /**
-    * <li> {@link ITechTable#HELPER_FLAG_01_STRONG_ROWS}
-    * <li> {@link ITechTable#HELPER_FLAG_02_SINGLE_CONFIG}
-    * <li> {@link ITechTable#HELPER_FLAG_03_CAP_OVERSIZE}
-    * <li> {@link ITechTable#HELPER_FLAG_05_YCOORDS_ONLY}
-    * <li> {@link ITechTable#HELPER_FLAG_06_MODEL_MASK}
-    * @param flag
-    * @param v
-    */
-   public void setHelperFlag(int flag, boolean v) {
-      helpers = BitUtils.setFlag(helpers, flag, v);
-   }
-
-   /**
    * 
    */
    public void setHelperCellFlags() {
@@ -3996,6 +4093,19 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
       // this.setViewFlag(ViewDrawable.VIEWSTATE_2_CONTENT_HEIGHT_FOLLOWS_VIEWPORT,
       // hasHelperFlag(HELPER_FLAG_02VARIABLE_ROWSIZES));
 
+   }
+
+   /**
+    * <li> {@link ITechTable#HELPER_FLAG_01_STRONG_ROWS}
+    * <li> {@link ITechTable#HELPER_FLAG_02_SINGLE_CONFIG}
+    * <li> {@link ITechTable#HELPER_FLAG_03_CAP_OVERSIZE}
+    * <li> {@link ITechTable#HELPER_FLAG_05_YCOORDS_ONLY}
+    * <li> {@link ITechTable#HELPER_FLAG_06_MODEL_MASK}
+    * @param flag
+    * @param v
+    */
+   public void setHelperFlag(int flag, boolean v) {
+      helpers = BitUtils.setFlag(helpers, flag, v);
    }
 
    public void setMapper(DrawableMapper mapper) {
@@ -4199,8 +4309,8 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
 
    public void setStyleClass(StyleClass sc) {
       super.setStyleClass(sc);
-      updateStyleClass();
-      updateTitleStyles();
+      doUpdateStyleClass();
+      doUpdateTitleStyles();
       //
    }
 
@@ -4337,30 +4447,31 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
    }
 
    private void setupNumColRows() {
+
       int numTotalCols = modelCol.policy.get2(CELLP_OFFSET_05_CELL_NUM2);
       int numTotalRows = modelRow.policy.get2(CELLP_OFFSET_05_CELL_NUM2);
 
       if (numTotalCols == 0 && numTotalRows == 0) {
          // check policyCol to know which is the strongest.
          if (modelRow.policy.hasFlag(CELLP_OFFSET_02_FLAG, CELLP_FLAG_5_STRONG_FLOW)) {
-            tableType = IBOTablePolicy.TABLE_TYPE_4FLOW_ROW; //strong rows
+            tableType = IBOTablePolicy.TABLE_TYPE_4_FLOW_ROW; //strong rows
             setHelperFlag(HELPER_FLAG_01_STRONG_ROWS, true);
          } else {
-            tableType = IBOTablePolicy.TABLE_TYPE_3FLOW_COL; //strong columns
+            tableType = IBOTablePolicy.TABLE_TYPE_3_FLOW_COL; //strong columns
          }
          //those values will be updated by setup when cell sizes are computed
          numTotalCols = 1;
          numTotalRows = 1;
       } else if (numTotalCols != 0 && numTotalRows == 0) {
-         tableType = IBOTablePolicy.TABLE_TYPE_1GENERIC_COL; // strong columns
-         numTotalRows = updateTotalColRows(numTotalCols);
+         tableType = IBOTablePolicy.TABLE_TYPE_1_GENERIC_COL; // strong columns
+         numTotalRows = doUpdateTotalColRows(numTotalCols);
       } else if (numTotalRows != 0 && numTotalCols == 0) {
          setHelperFlag(HELPER_FLAG_01_STRONG_ROWS, true);
-         tableType = IBOTablePolicy.TABLE_TYPE_2GENERIC_ROW; // strong row
-         numTotalCols = updateTotalColRows(numTotalRows);
+         tableType = IBOTablePolicy.TABLE_TYPE_2_GENERIC_ROW; // strong row
+         numTotalCols = doUpdateTotalColRows(numTotalRows);
       } else {
          // type
-         tableType = IBOTablePolicy.TABLE_TYPE_0STRICT;
+         tableType = IBOTablePolicy.TABLE_TYPE_0_STRICT;
       }
       modelCol.setNumCells(numTotalCols);
       modelRow.setNumCells(numTotalRows);
@@ -4384,7 +4495,7 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
       }
    }
 
-   private void setupPolicyType2() {
+   private void setupPolicyTypeRoot() {
       // compute from model number of rows
       //future 
       int gridV = getSizeGridV();
@@ -4396,9 +4507,9 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
 
       //must first compute an
       switch (tableType) {
-         case IBOTablePolicy.TABLE_TYPE_0STRICT:
-         case IBOTablePolicy.TABLE_TYPE_1GENERIC_COL:
-         case IBOTablePolicy.TABLE_TYPE_3FLOW_COL:
+         case IBOTablePolicy.TABLE_TYPE_0_STRICT:
+         case IBOTablePolicy.TABLE_TYPE_1_GENERIC_COL:
+         case IBOTablePolicy.TABLE_TYPE_3_FLOW_COL:
             //first the column
             setupPolicyType(false, modelCol, gridV, cw);
             setupPolicyType(true, modelRow, gridH, ch);
@@ -4406,8 +4517,8 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
             setupPolicyTypeImplicit(false, modelCol, modelRow, gridV, cw);
             setupPolicyTypeImplicit(true, modelRow, modelCol, gridH, ch);
             break;
-         case IBOTablePolicy.TABLE_TYPE_2GENERIC_ROW:
-         case IBOTablePolicy.TABLE_TYPE_4FLOW_ROW:
+         case IBOTablePolicy.TABLE_TYPE_2_GENERIC_ROW:
+         case IBOTablePolicy.TABLE_TYPE_4_FLOW_ROW:
             // first compute setup heights. must be strict/ratio/
             setupPolicyType(true, modelRow, gridH, ch);
             // number of columns is unknown. will be 1 or more. depends on
@@ -4426,13 +4537,13 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
 
       //end switch
       switch (tableType) {
-         case IBOTablePolicy.TABLE_TYPE_3FLOW_COL:
+         case IBOTablePolicy.TABLE_TYPE_3_FLOW_COL:
             //re compute row number based on col number
-            modelRow.setNumCells(updateTotalColRows(modelCol.numCells));
+            modelRow.setNumCells(doUpdateTotalColRows(modelCol.numCells));
             break;
-         case IBOTablePolicy.TABLE_TYPE_4FLOW_ROW:
+         case IBOTablePolicy.TABLE_TYPE_4_FLOW_ROW:
             //re compute the number of weak columns
-            modelCol.setNumCells(updateTotalColRows(modelRow.numCells));
+            modelCol.setNumCells(doUpdateTotalColRows(modelRow.numCells));
             break;
          default:
             break;
@@ -4469,6 +4580,8 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
             break;
       }
    }
+
+   //#mdebug
 
    /**
     * <br>
@@ -4526,7 +4639,8 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
       // when size is zero or negative, take each, min, maximum or etalon. no
       // other choice
       // when size is zero, take maximum
-      int size = cm.policy.get4(CELLP_OFFSET_09_SIZE4);
+      ByteObject policy = cm.getPolicy();
+      int size = getSizeFromPolicy(policy, isRow);
       if (size > 0) {
          int divisor = size + sepSize;
          // when divisor is small, the number of column may be too much
@@ -4546,12 +4660,31 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
       if (isRow) {
          setFlagView(ITechViewDrawable.FLAG_VSTATE_11_CONTENT_PH_VIEWPORT_DH, true);
          setFlagView(ITechViewDrawable.FLAG_VSTATE_13_CONTENT_H_DEPENDS_VIEWPORT, true);
+         //we might think we need this flag. but ? TODO
+         //setFlagView(ITechViewDrawable.FLAG_VSTATE_06_NO_EAT_W_MUST_EXPAND, true);
       } else {
          setFlagView(ITechViewDrawable.FLAG_VSTATE_10_CONTENT_PW_VIEWPORT_DW, true);
          setFlagView(ITechViewDrawable.FLAG_VSTATE_12_CONTENT_W_DEPENDS_VIEWPORT, true);
       }
    }
 
+   private int getSizeFromPolicy(ByteObject policy, boolean isRow) {
+      int size = policy.get4(CELLP_OFFSET_09_SIZE4);
+      if (modelGenetics != null) {
+         size = getGeneticSize(isRow);
+      } else {
+         //
+         if(policy.hasFlag(CELLP_OFFSET_04_FLAGZ, CELLP_FLAGZ_8_SIZER)) {
+            ByteObject sizer = policy.getSubFirst(IBOTypesLayout.FTYPE_3_SIZER);
+            if(isRow) {
+               size = gc.getLAC().getLayoutOperator().getPixelSizeH(sizer, this);
+            } else {
+               size = gc.getLAC().getLayoutOperator().getPixelSizeW(sizer, this);
+            }
+         }
+      }
+      return size;
+   }
    private void setupTypeGeneric(boolean isRow, CellModel cm, int totalSize, int sepSize) {
       ByteObject policy = cm.policy;
       int[] setupSizes = new int[cm.numCells];
@@ -4574,10 +4707,7 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
       if (policy.hasFlag(CELLP_OFFSET_04_FLAGZ, CELLP_FLAGZ_2_SIZES)) {
          sizes = policy.getValuesFlag(CELLP_BASIC_SIZE, CELLP_OFFSET_04_FLAGZ, CELLP_FLAGZ_2_SIZES);
       } else {
-         int size = policy.get4(CELLP_OFFSET_09_SIZE4);
-         if (modelGenetics != null) {
-            size = getGeneticSize(isRow);
-         }
+         int size = getSizeFromPolicy(policy, isRow);
          sizes = new int[] { size };
       }
       int[] frames = null;
@@ -4649,8 +4779,6 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
       cm.policies = new int[] { ITechCell.CELL_1_EXPLICIT_SET };
    }
 
-   //#mdebug
-
    protected void setViewPortFlag(boolean isRow) {
       if (isRow) {
          setFlagView(ITechViewDrawable.FLAG_VSTATE_13_CONTENT_H_DEPENDS_VIEWPORT, true);
@@ -4678,6 +4806,8 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
       }
 
    }
+
+   //#enddebug
 
    /**
     * Change the X,Y coordinate of Table and of all its cells/planetaries. 
@@ -4827,8 +4957,6 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
       }
    }
 
-   //#enddebug
-
    public void toString1Line(Dctx dc) {
       dc.root1Line(this, TableView.class);
       toStringPrivate(dc);
@@ -4908,92 +5036,6 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
       } else {
          return "[Null Selected Drawable]";
       }
-   }
-
-   /**
-    * Compute the {@link IDrawable} flag based on the table structure.
-    * <br>
-    * <br>
-    * Called at every init
-    * <br>
-    * Navigation may be disabled with
-    * <li> {@link IBOTableView#T_FLAGX_1_NO_SELECTION}
-    * 
-    */
-   private void updateNavFlag() {
-      boolean navH = false;
-      boolean navV = false;
-      boolean selectAble = false;
-      if (!hasTechX(T_FLAGX_1_NO_SELECTION)) {
-         selectAble = true;
-         if (modelCol.numCells > 1) {
-            navH = true;
-         }
-         if (modelRow.numCells > 1) {
-            navV = true;
-         }
-      }
-      setBehaviorFlag(ITechDrawable.BEHAVIOR_27_NAV_HORIZONTAL, navH);
-      setBehaviorFlag(ITechDrawable.BEHAVIOR_26_NAV_VERTICAL, navV);
-      setBehaviorFlag(ITechDrawable.BEHAVIOR_28_NAV_SELECTABLE, selectAble);
-
-   }
-
-   /**
-    * Called during construction or when {@link StyleClass} is changed
-    */
-   protected void updateStyleClass() {
-      //TODO ATTENTION. Model provides a TECH. in which case the tech from the styleClass is never
-      // used
-      boTable = styleClass.getByteObject(ITechLinks.LINK_80_BO_TABLEVIEW);
-      // take default Tech
-      if (boTable == null) {
-         boTable = gc.getTablePolicyFactory().getBOTableDefault();
-      }
-      if (hasTechM(T_FLAGM_7_CLOCK_VERTICAL)) {
-         setBehaviorFlag(ITechDrawable.BEHAVIOR_29_NAV_CLOCK_VERTICAL, true);
-      }
-      if (hasTechM(T_FLAGM_6_CLOCK_HORIZ)) {
-         setBehaviorFlag(ITechDrawable.BEHAVIOR_30_NAV_CLOCK_HORIZONTAL, true);
-      }
-      tableCellStyleClass = styleClass.getStyleClass(ITechLinks.LINK_81_STYLE_CLASS_TABLE_CELL);
-      //style class for mapper
-      mapperObjectDrawable.setStyleClass(tableCellStyleClass);
-
-      figureOverlay = styleClass.getByteObject(ITechLinks.LINK_84_STYLE_TABLE_OVERLAY_FIGURE);
-      emptyBluePrint.setStyleClass(styleClass);
-   }
-
-   protected void updateTablePolicy(ByteObject policyTable) {
-      invalidateLayout();
-      initPolicy(policyTable);
-   }
-
-   private void updateTitleStyles() {
-      if (modelRow.titlesView != null) {
-         StyleClass titleRowStyleClass = styleClass.getStyleClass(ITechLinks.LINK_83_STYLE_TABLE_ROW_TITLE);
-         modelRow.titlesView.setStyleClass(titleRowStyleClass);
-      }
-      if (modelCol.titlesView != null) {
-         StyleClass titleRowStyleClass = styleClass.getStyleClass(ITechLinks.LINK_82_STYLE_TABLE_COL_TITLE);
-         modelCol.titlesView.setStyleClass(titleRowStyleClass);
-      }
-   }
-
-   /**
-    * Based on model size and number of columns, initialized number of rows
-    * Call this method when the number of column has been computed
-    */
-   private int updateTotalColRows(int numOpposite) {
-      //when no data in the model?
-      if (numOpposite == 0)
-         return 0;
-      int modulo = getSize() % numOpposite;
-      int numTotal = (getSize() / numOpposite);
-      if (modulo != 0) {
-         numTotal++;
-      }
-      return numTotal;
    }
 
 }

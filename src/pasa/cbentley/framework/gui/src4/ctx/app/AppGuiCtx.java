@@ -47,15 +47,23 @@ public abstract class AppGuiCtx extends AppCtx implements ITechCtxSettingsAppGui
    public int getBOCtxSettingSize() {
       return ITechCtxSettingsAppGui.CTX_GUI_BASIC_SIZE;
    }
-   
+
    protected void matchConfig(IConfigBO config, ByteObject settings) {
       super.matchConfig(configApp, settings);
-      
+
       IConfigAppGui configApp = (IConfigAppGui) config;
       settings.setFlag(CTX_APP_OFFSET_02_FLAGX, CTX_APP_FLAGX_2_DRAG_DROP, configApp.isAppDragDropEnabled());
+
+      settings.setFlag(CTX_GUI_OFFSET_01_FLAG1, CTX_GUI_FLAG_3_ONE_THUMB, configApp.isOneThumb());
+      settings.setFlag(CTX_GUI_OFFSET_01_FLAG1, CTX_GUI_FLAG_2_USER_MENU_BAR, configApp.isUsingMenuBar());
+
+      settings.set1(CTX_GUI_OFFSET_02_VIEW_THEME_ID2, configApp.getThemeID());
+
+      settings.set1(CTX_GUI_OFFSET_04_MENU_BAR_POSITION1, configApp.getMenuBarPosition());
+      settings.set1(CTX_GUI_OFFSET_05_DEBUG_BAR_POSITION1, configApp.getDebugBarPosition());
+      settings.set1(CTX_GUI_OFFSET_07_DEBUG_MODE1, configApp.getDebugMode());
    }
 
-   
    public DrwCtx getDC() {
       return gc.getDC();
    }

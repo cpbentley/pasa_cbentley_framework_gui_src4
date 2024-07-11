@@ -9,6 +9,7 @@ import pasa.cbentley.framework.gui.src4.table.interfaces.IBOTablePolicy;
 import pasa.cbentley.framework.gui.src4.table.interfaces.IBOTableSpan;
 import pasa.cbentley.framework.gui.src4.table.interfaces.IBOTableView;
 import pasa.cbentley.framework.gui.src4.table.interfaces.ITechCell;
+import pasa.cbentley.layouter.src4.engine.SizerFactory;
 
 public class TablePolicyFactory extends BOAbstractFactory implements IBOTablePolicy, IBOTableView {
 
@@ -59,7 +60,7 @@ public class TablePolicyFactory extends BOAbstractFactory implements IBOTablePol
     * @param h
     * @return {@link IBOTablePolicy}
     */
-   public ByteObject getFlowHoriz(int w, int h) {
+   public ByteObject createTableFlowHoriz(int w, int h) {
       //flow column
       ByteObject policyCol = getCellPolicyFactory().getFlow(w, true);
       policyCol.setFlag(IBOCellPolicy.CELLP_OFFSET_02_FLAG, IBOCellPolicy.CELLP_FLAG_7_OVERSIZE, false);
@@ -130,11 +131,22 @@ public class TablePolicyFactory extends BOAbstractFactory implements IBOTablePol
       return policyTable;
    }
 
-   public ByteObject getSimpleXColsManyRows(int[] policies, int[] sizesCol) {
-      ByteObject policyCol = getCellPolicyFactory().getGeneric(policies, sizesCol);
+   public ByteObject createTableXColsManyRows(int[] policies, int[] sizesCol, ByteObject sizerRow) {
+      TableCellPolicyFactory cellPolicyFactory = getCellPolicyFactory();
+      ByteObject policyCol = cellPolicyFactory.getGeneric(policies, sizesCol);
       policyCol.setFlag(IBOCellPolicy.CELLP_OFFSET_02_FLAG, IBOCellPolicy.CELLP_FLAG_7_OVERSIZE, false);
       //as many rows are wanted, one logical size
-      ByteObject policyRow = getCellPolicyFactory().getGeneric(0, -1);
+      ByteObject policyRow = cellPolicyFactory.getGeneric(0, sizerRow);
+      ByteObject policyTable = getTablePolicy(policyCol, policyRow);
+      return policyTable;
+   }
+
+   public ByteObject getSimpleXColsManyRows(int[] policies, int[] sizesCol) {
+      TableCellPolicyFactory cellPolicyFactory = getCellPolicyFactory();
+      ByteObject policyCol = cellPolicyFactory.getGeneric(policies, sizesCol);
+      policyCol.setFlag(IBOCellPolicy.CELLP_OFFSET_02_FLAG, IBOCellPolicy.CELLP_FLAG_7_OVERSIZE, false);
+      //as many rows are wanted, one logical size
+      ByteObject policyRow = cellPolicyFactory.getGeneric(0, -1);
       ByteObject policyTable = getTablePolicy(policyCol, policyRow);
       return policyTable;
    }
@@ -148,11 +160,26 @@ public class TablePolicyFactory extends BOAbstractFactory implements IBOTablePol
       return policyTable;
    }
 
+   /**
+    * 
+    * @param x
+    * @param sizeCol
+    * @return
+    */
    public ByteObject getSimpleXColsManyRows(int x, int sizeCol) {
       ByteObject policyCol = getCellPolicyFactory().getGeneric(x, sizeCol);
       policyCol.setFlag(IBOCellPolicy.CELLP_OFFSET_02_FLAG, IBOCellPolicy.CELLP_FLAG_7_OVERSIZE, false);
       //as many rows are wanted, one logical size
       ByteObject policyRow = getCellPolicyFactory().getGeneric(0, -1);
+      ByteObject policyTable = getTablePolicy(policyCol, policyRow);
+      return policyTable;
+   }
+
+   public ByteObject createTableXColsManyRows(int x, int sizeCol, int sizeRows) {
+      ByteObject policyCol = getCellPolicyFactory().getGeneric(x, sizeCol);
+      policyCol.setFlag(IBOCellPolicy.CELLP_OFFSET_02_FLAG, IBOCellPolicy.CELLP_FLAG_7_OVERSIZE, false);
+      //as many rows are wanted, one logical size
+      ByteObject policyRow = getCellPolicyFactory().getGeneric(0, sizeRows);
       ByteObject policyTable = getTablePolicy(policyCol, policyRow);
       return policyTable;
    }
@@ -198,20 +225,27 @@ public class TablePolicyFactory extends BOAbstractFactory implements IBOTablePol
    }
 
    /**
-    * 
+    * No span specification
     * @param colPol
     * @param rowPol
-    * @return
+    * @return {@link IBOTypesGui#TYPE_GUI_04_TABLE_POLICY}
     */
    public ByteObject getTablePolicy(ByteObject colPol, ByteObject rowPol) {
       return getTablePolicy(colPol, rowPol, null);
    }
 
+   /**
+    * 
+    * @param colPol
+    * @param rowPol
+    * @param spans
+    * @return {@link IBOTypesGui#TYPE_GUI_04_TABLE_POLICY}
+    */
    public ByteObject getTablePolicy(ByteObject colPol, ByteObject rowPol, ByteObject[] spans) {
       ByteObject p = getBOFactory().createByteObject(IBOTypesGui.TYPE_GUI_04_TABLE_POLICY, BASIC_SIZE_TABLE_POLICY);
       ByteObject[] ar = null;
       if (spans != null) {
-         p.setFlag(TP_OFFSET_1FLAG, TP_FLAG_3SPANNING, true);
+         p.setFlag(TP_OFFSET_1FLAG, TP_FLAG_3_SPANNING, true);
          int num = spans.length;
          ar = new ByteObject[num + 2];
          ar[0] = colPol;
@@ -226,13 +260,115 @@ public class TablePolicyFactory extends BOAbstractFactory implements IBOTablePol
       return p;
    }
 
+   /**
+    * 
+    * @return
+    */
    public ByteObject createTableFlowHorizPrefContent() {
-      return null;
+      TableCellPolicyFactory cellPolicyFac = getCellPolicyFactory();
+      boolean isStrongRow = false;
+      ByteObject sizerW = gc.getLAC().getSizerFactory().getSizerPref();
+      ByteObject policyCol = cellPolicyFac.getFlow(sizerW, isStrongRow);
+      policyCol.setFlag(IBOCellPolicy.CELLP_OFFSET_02_FLAG, IBOCellPolicy.CELLP_FLAG_7_OVERSIZE, false);
+      //as many rows are wanted, one logical size
+      ByteObject sizerH = gc.getLAC().getSizerFactory().getSizerPref();
+      //TODO. sizerH is for content
+      ByteObject policyRow = cellPolicyFac.getGeneric(0, sizerH);
+
+      //first cell decides the size of all other cell.
+
+      //option eahc cell can have its own
+      ByteObject policyTable = getTablePolicy(policyCol, policyRow);
+      return policyTable;
    }
 
+   public ByteObject createTableFlowHorizLogic1() {
+      TableCellPolicyFactory cellPolicyFac = getCellPolicyFactory();
+      boolean isStrongRow = false;
+      ByteObject sizerW = gc.getLAC().getSizerFactory().getSizerLogicUnit(1);
+      ByteObject policyCol = cellPolicyFac.getFlow(sizerW, isStrongRow);
+      policyCol.setFlag(IBOCellPolicy.CELLP_OFFSET_02_FLAG, IBOCellPolicy.CELLP_FLAG_7_OVERSIZE, false);
+      //as many rows are wanted, one logical size
+      ByteObject sizerH = gc.getLAC().getSizerFactory().getSizerLogicUnit(1);
+      //TODO. sizerH is for content
+      ByteObject policyRow = cellPolicyFac.getGeneric(0, sizerH);
+
+      ByteObject policyTable = getTablePolicy(policyCol, policyRow);
+      return policyTable;
+   }
+
+   /**
+    * A Table whose cells are aligned one by one on a row. rows are created when necessary.
+    * @param sizerW
+    * @param sizerH
+    * @return
+    */
    public ByteObject createTableFlowHoriz(ByteObject sizerW, ByteObject sizerH) {
-      // TODO Auto-generated method stub
-      return null;
+      TableCellPolicyFactory cellPolicyFac = getCellPolicyFactory();
+      boolean isStrongRow = false;
+      ByteObject policyCol = cellPolicyFac.getFlow(sizerW, isStrongRow);
+      policyCol.setFlag(IBOCellPolicy.CELLP_OFFSET_02_FLAG, IBOCellPolicy.CELLP_FLAG_7_OVERSIZE, false);
+      ByteObject policyRow = cellPolicyFac.getGeneric(0, sizerH);
+
+      ByteObject policyTable = getTablePolicy(policyCol, policyRow);
+      return policyTable;
+   }
+
+   /**
+    * 
+    * @return
+    */
+   public ByteObject createTableFlowVertical() {
+      SizerFactory sizerFactory = gc.getLAC().getSizerFactory();
+      ByteObject sizerW = sizerFactory.getSizerPref();
+      ByteObject sizerH = sizerFactory.getSizerPref();
+
+      return createTableFlowVertical(sizerW, sizerH);
+   }
+
+   public ByteObject createTableFlowVertical(int w, int h) {
+      TableCellPolicyFactory cellPolicyFactory = getCellPolicyFactory();
+      ByteObject policyCol = cellPolicyFactory.getGeneric(0, w);
+      policyCol.setFlag(IBOCellPolicy.CELLP_OFFSET_02_FLAG, IBOCellPolicy.CELLP_FLAG_7_OVERSIZE, false);
+      //as many rows are wanted, one logical size
+      ByteObject policyRow = cellPolicyFactory.getFlow(h, true);
+      ByteObject policyTable = getTablePolicy(policyCol, policyRow);
+      return policyTable;
+   }
+
+   /**
+    * A policy where cells are aligned on each column.. columns are created when necessary.
+    * @param sizerW
+    * @param sizerH
+    * @return
+    */
+   public ByteObject createTableFlowVertical(ByteObject sizerW, ByteObject sizerH) {
+      TableCellPolicyFactory cellPolicyFac = getCellPolicyFactory();
+      boolean isStrongRow = false;
+      ByteObject policyCol = cellPolicyFac.getFlow(sizerW, isStrongRow);
+      policyCol.setFlag(IBOCellPolicy.CELLP_OFFSET_02_FLAG, IBOCellPolicy.CELLP_FLAG_7_OVERSIZE, false);
+      ByteObject policyRow = cellPolicyFac.getGeneric(0, sizerH);
+
+      ByteObject policyTable = getTablePolicy(policyCol, policyRow);
+      return policyTable;
+   }
+
+   public ByteObject createTableWeakStrong(ByteObject rowSizer) {
+      int[] policies = new int[] { ITechCell.CELL_5_FILL_WEAK, ITechCell.CELL_3_FILL_STRONG };
+      int[] sizes = new int[] { 0, 60 };
+      return createTableXColsManyRows(policies, sizes, rowSizer);
+   }
+
+   public ByteObject createTableSizeWeakSize(ByteObject colSizerLeft, ByteObject colSizerRight, ByteObject rowSizer) {
+      int[] policies = new int[] { ITechCell.CELL_1_EXPLICIT_SET, ITechCell.CELL_5_FILL_WEAK, ITechCell.CELL_1_EXPLICIT_SET };
+      int[] sizes = new int[] { 0, 60 };
+      return createTableXColsManyRows(policies, sizes, rowSizer);
+   }
+
+   public ByteObject createTableSetWeakSet(int sizeLeft, int sizeRight, ByteObject rowSizer) {
+      int[] policies = new int[] { ITechCell.CELL_1_EXPLICIT_SET, ITechCell.CELL_5_FILL_WEAK, ITechCell.CELL_1_EXPLICIT_SET };
+      int[] sizes = new int[] { sizeLeft, 0, sizeRight };
+      return createTableXColsManyRows(policies, sizes, rowSizer);
    }
 
    public ByteObject getTwoColumns() {

@@ -25,27 +25,17 @@ public class ObjectGC implements IStringable {
    }
 
    //#mdebug
-   public String toStringGetName() {
-      return debugName;
-   }
-
-
-   public void toStringSetName(String name) {
-      debugName = name;
-   }
-   //#enddebug
-
-   //#mdebug
    public IDLog toDLog() {
       return toStringGetUCtx().toDLog();
    }
+
 
    public String toString() {
       return Dctx.toString(this);
    }
 
    public void toString(Dctx dc) {
-      dc.root(this, ObjectGC.class, 45);
+      dc.root(this, ObjectGC.class, 38);
       toStringPrivate(dc);
    }
 
@@ -56,6 +46,11 @@ public class ObjectGC implements IStringable {
    public void toString1Line(Dctx dc) {
       dc.root1Line(this, ObjectGC.class);
       toStringPrivate(dc);
+   }
+
+   //#mdebug
+   public String toStringGetName() {
+      return debugName;
    }
 
    public UCtx toStringGetUCtx() {
@@ -70,6 +65,10 @@ public class ObjectGC implements IStringable {
       if (debugName != null) {
          dc.appendBracketedWithSpace(debugName);
       }
+   }
+
+   public void toStringSetName(String name) {
+      debugName = name;
    }
 
    //#enddebug

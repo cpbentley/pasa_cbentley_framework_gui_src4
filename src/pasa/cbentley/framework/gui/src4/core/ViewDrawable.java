@@ -6,9 +6,9 @@ import pasa.cbentley.core.src4.logging.Dctx;
 import pasa.cbentley.core.src4.stator.StatorReader;
 import pasa.cbentley.core.src4.stator.StatorWriter;
 import pasa.cbentley.core.src4.utils.BitUtils;
+import pasa.cbentley.core.src4.utils.IntUtils;
 import pasa.cbentley.framework.cmd.src4.engine.CmdInstance;
 import pasa.cbentley.framework.coreui.src4.tech.ITechGestures;
-import pasa.cbentley.framework.coreui.src4.utils.ViewState;
 import pasa.cbentley.framework.drawx.src4.engine.GraphicsX;
 import pasa.cbentley.framework.drawx.src4.engine.RgbImage;
 import pasa.cbentley.framework.drawx.src4.string.StringMetrics;
@@ -18,6 +18,7 @@ import pasa.cbentley.framework.gui.src4.canvas.InputConfig;
 import pasa.cbentley.framework.gui.src4.canvas.PointerGestureDrawable;
 import pasa.cbentley.framework.gui.src4.canvas.ViewContext;
 import pasa.cbentley.framework.gui.src4.ctx.GuiCtx;
+import pasa.cbentley.framework.gui.src4.ctx.IToStringFlagsDraw;
 import pasa.cbentley.framework.gui.src4.ctx.IToStringFlagsGui;
 import pasa.cbentley.framework.gui.src4.ctx.ToStringStaticGui;
 import pasa.cbentley.framework.gui.src4.factories.interfaces.IBOViewPane;
@@ -109,12 +110,16 @@ public class ViewDrawable extends Drawable implements ITechViewDrawable, ITechVi
       return DrawableUtilz.isInside(ic, viewPane.getViewPortXAbs(), viewPane.getViewPortYAbs(), viewPane.getViewPortWidth(), viewPane.getViewPortHeight());
    }
 
+   protected int      flagsGene;
+
    /**
     * Specific state for the {@link ViewDrawable} class, related to {@link ViewPane}.
     */
    protected int      flagsView;
 
-   protected int      flagsGene;
+   protected int      unShrankH;
+
+   protected int      unShrankW;
 
    /**
     * The implicit view pane. It will manage drawable headers and scrollbars.
@@ -138,6 +143,10 @@ public class ViewDrawable extends Drawable implements ITechViewDrawable, ITechVi
     * 
     */
    protected ViewPane viewPane;
+
+   private int expandW;
+
+   private int expandH;
 
    /**
     * Creates a blank ViewDrawable. No content
@@ -169,34 +178,66 @@ public class ViewDrawable extends Drawable implements ITechViewDrawable, ITechVi
    protected void activateShrinkExpandFlags() {
       int pw = layEngine.getPw();
       int dw = getDw();
+      boolean isShrinkW = false;
       if (pw < dw) {
-         if (layEngine.hasFlagSizerW(IBOSizer.SIZER_FLAG_2_ALLOW_SHRINK)) {
-            setDw(pw);
-         }
          if (hasFlagGene(FLAG_GENE_29_SHRINKABLE_W)) {
+            isShrinkW = true;
+         } else if (layEngine.hasFlagSizerW(IBOSizer.SIZER_FLAG_2_ALLOW_SHRINK)) {
+            isShrinkW = true;
+         }
+         if (isShrinkW) {
+            if (unShrankW != 0) { //make sure its the first time. we want to keep the original
+               unShrankW = dw;
+            }
             setDw(pw);
          }
       } else {
-         if(this.hasFlagView(FLAG_VSTATE_06_NO_EAT_W_MUST_EXPAND)) {
+         if (this.hasFlagView(FLAG_VSTATE_06_NO_EAT_W_MUST_EXPAND)) {
+            //we must expand
+            isShrinkW = true;
+            expandW = pw - dw;
             setDw(pw);
          }
       }
+    
       int ph = layEngine.getPh();
       int dh = getDh();
+      boolean isShrinkH = false;
       if (ph < dh) {
          if (layEngine.hasFlagSizerH(IBOSizer.SIZER_FLAG_2_ALLOW_SHRINK)) {
-            setDh(ph);
+            isShrinkH = true;
          }
          if (hasFlagGene(FLAG_GENE_30_SHRINKABLE_H)) {
+            isShrinkH = true;
+         }
+         if (isShrinkH) {
+            if (unShrankH != 0) { //make sure its the first time. we want to keep the original
+               unShrankH = dh;
+            }
             setDh(ph);
          }
       } else {
-         if(this.hasFlagView(FLAG_VSTATE_07_NO_EAT_H_MUST_EXPAND)) {
+         if (this.hasFlagView(FLAG_VSTATE_07_NO_EAT_H_MUST_EXPAND)) {
+            isShrinkH = true;
+            expandH = ph - dh;
             setDh(ph);
          }
+      }
+ 
+      if (isShrinkH || isShrinkW) {
+         super.styleCache.invalidateValues();
+         super.initStyleCache();
       }
    }
 
+   public int computeContentPh() {
+      return 0;
+   }
+   
+   public int computeContentPw() {
+      return 0;
+   }
+   
    /**
     * Method called by Stringer?
     * <br>
@@ -205,17 +246,18 @@ public class ViewDrawable extends Drawable implements ITechViewDrawable, ITechVi
     * When style dimension is relative preferred size ?
     */
    public void addStyleToPrefSize() {
-      int styleHConsumed = getStyleHConsumed();
       int styleWConsumed = getStyleWConsumed();
-      layEngine.incrPh(styleHConsumed);
+      int styleHConsumed = getStyleHConsumed();
+
       layEngine.incrPw(styleWConsumed);
+      layEngine.incrPh(styleHConsumed);
    }
 
    public void addStyleToSizeDrawn() {
-      int styleHConsumed = getStyleHConsumed();
       int styleWConsumed = getStyleWConsumed();
-      layEngine.incrDh(styleHConsumed);
+      int styleHConsumed = getStyleHConsumed();
       layEngine.incrDw(styleWConsumed);
+      layEngine.incrDh(styleHConsumed);
    }
 
    public void commandAction(CmdInstance cmd) {
@@ -266,6 +308,13 @@ public class ViewDrawable extends Drawable implements ITechViewDrawable, ITechVi
          drawViewDrawableContentCtrl(g, getContentX(), getContentY(), null, null);
          drawDrawableFg(g);
       }
+
+      //#mdebug
+      if (gc.toStringHasFlagDraw(IToStringFlagsDraw.FLAG_DRAW_04_VIEW_DRAWABLE_BOUNDARY)) {
+         g.setColor(255, 0, 50);
+         g.drawRect(getX() - 1, getY() - 1, getDrawnWidth() + 1, getDrawnHeight() + 1);
+      }
+      //#enddebug
    }
 
    /**
@@ -359,6 +408,25 @@ public class ViewDrawable extends Drawable implements ITechViewDrawable, ITechVi
    }
 
    /**
+    * Only draws the style elements of décoration
+    * @param g
+    * @param scX
+    * @param scY
+    */
+   public void drawViewDrawableDeco(GraphicsX g, int x, int y, ScrollConfig scX, ScrollConfig scY) {
+
+   }
+
+   /**
+    * When state no content is set, how to size drawable?
+    * Minimum sizer by sizer ?
+    * By Parent Sizer?
+    */
+   public void emptyW() {
+      boStringDrawable.get1(IBODrawable.DTECH_OFFSET_02_FLAGX);
+   }
+
+   /**
     * Draws style layers on ViewPort area using style of {@link Drawable}. When {@link ViewPane} is null, draws normally.
     * <br>
     * <br>
@@ -400,13 +468,14 @@ public class ViewDrawable extends Drawable implements ITechViewDrawable, ITechVi
    //   }
 
    /**
-    * Only draws the style elements of décoration
-    * @param g
-    * @param scX
-    * @param scY
+    * 
     */
-   public void drawViewDrawableDeco(GraphicsX g, int x, int y, ScrollConfig scX, ScrollConfig scY) {
-
+   public void eraseDrawableContent(GraphicsX g) {
+      if (viewPane != null) {
+         g.fillRect(getContentX(), getContentY(), getContentW(), getContentH());
+      } else {
+         g.fillRect(getX(), getY(), getDw(), getDh());
+      }
    }
 
    /**
@@ -441,26 +510,6 @@ public class ViewDrawable extends Drawable implements ITechViewDrawable, ITechVi
    //         drawDrawableStyledViewPort(g, x, y, scx, scy);
    //      }
    //   }
-
-   /**
-    * When state no content is set, how to size drawable?
-    * Minimum sizer by sizer ?
-    * By Parent Sizer?
-    */
-   public void emptyW() {
-      boStringDrawable.get1(IBODrawable.DTECH_OFFSET_02_FLAGX);
-   }
-
-   /**
-    * 
-    */
-   public void eraseDrawableContent(GraphicsX g) {
-      if (viewPane != null) {
-         g.fillRect(getContentX(), getContentY(), getContentW(), getContentH());
-      } else {
-         g.fillRect(getX(), getY(), getDw(), getDh());
-      }
-   }
 
    /**
     * Return the actual {@link Drawable#dh} value.<br>
@@ -576,18 +625,6 @@ public class ViewDrawable extends Drawable implements ITechViewDrawable, ITechVi
       return getDh();
    }
 
-   /**
-    * Returns masked data telling us if 
-    * @param d
-    * @return 0 if d is not a sattelite of this {@link ViewDrawable}
-    */
-   public int getSatteliteFlag(IDrawable d) {
-      if(viewPane == null) {
-         return 0;
-      } else {
-         return viewPane.getSatteliteFlag(d);
-      }
-   }
    /**
     * The number of pixels consumed horizontally by the component. 
     * <br>
@@ -728,6 +765,19 @@ public class ViewDrawable extends Drawable implements ITechViewDrawable, ITechVi
       return getSizePreferredWidth();
    }
 
+   /**
+    * Returns masked data telling us if 
+    * @param d
+    * @return 0 if d is not a sattelite of this {@link ViewDrawable}
+    */
+   public int getSatteliteFlag(IDrawable d) {
+      if (viewPane == null) {
+         return 0;
+      } else {
+         return viewPane.getSatteliteFlag(d);
+      }
+   }
+
    public ScrollConfig getSChorizontal() {
       if (viewPane != null) {
          return viewPane.getScrollConfigHorizontal();
@@ -742,16 +792,24 @@ public class ViewDrawable extends Drawable implements ITechViewDrawable, ITechVi
       return null;
    }
 
+   public int getShrankH() {
+      return unShrankH;
+   }
+
+   public int getShrankW() {
+      return unShrankW;
+   }
+
    public int getSizeContentWidth() {
       return layEngine.getContentW();
    }
 
-   public int getSizePreferredWidth() {
-      return layEngine.getPw();
-   }
-
    public int getSizePreferredHeight() {
       return layEngine.getPh();
+   }
+
+   public int getSizePreferredWidth() {
+      return layEngine.getPw();
    }
 
    public int getSizePropertyValueH(int sizeType) {
@@ -885,6 +943,10 @@ public class ViewDrawable extends Drawable implements ITechViewDrawable, ITechVi
       return getDw();
    }
 
+   public boolean hasFlagGene(int flag) {
+      return (flagsGene & flag) == flag;
+   }
+
    /**
     * <li>
     * @param flag
@@ -892,10 +954,6 @@ public class ViewDrawable extends Drawable implements ITechViewDrawable, ITechVi
     */
    public boolean hasFlagView(int flag) {
       return (flagsView & flag) == flag;
-   }
-
-   public boolean hasFlagGene(int flag) {
-      return (flagsGene & flag) == flag;
    }
 
    /**
@@ -972,6 +1030,8 @@ public class ViewDrawable extends Drawable implements ITechViewDrawable, ITechVi
          //the viewpane starts with all the values except viewdrawable style if applied
          int viewPaneInitWidth = getDw();
          int viewPaneInitHeigh = getDh(); //or increased by Expand Planets
+
+         //viewpane initSize is not called. so the computation of stylearea
          viewPane.initViewPane(viewPaneInitWidth, viewPaneInitHeigh);
       } else {
          viewPane = null;
@@ -981,9 +1041,13 @@ public class ViewDrawable extends Drawable implements ITechViewDrawable, ITechVi
       if (viewPane == null) {
          //viewdrawable first compute their preferred size without the style in case there is a viewpane
          //that will change the style dynamics.
+         //we must now computed 
+
          //when viewpane is null, preferred size is equal to drawn size
          addStyleToPrefSize();
          //Note: ViewPane deals with Shrinking by itself (How?). if not there, shrink.
+         //Shrinking modifies dw and dh, potentially invalidating style size computations that
+         //rely on dw and/or dh
          activateShrinkExpandFlags();
       }
       //when 
@@ -1072,6 +1136,13 @@ public class ViewDrawable extends Drawable implements ITechViewDrawable, ITechVi
    //      }
    //      //unload init style if any
    //   }
+
+   public void initPosition() {
+      super.initPosition();
+      if (viewPane != null) {
+         viewPane.initPosition();
+      }
+   }
 
    /**
     * Populate {@link ScrollConfig}s for a normal configuration.
@@ -1203,14 +1274,6 @@ public class ViewDrawable extends Drawable implements ITechViewDrawable, ITechVi
    protected void initViewPortSub(int width, int height) {
 
    }
-
-   public void initPosition() {
-      super.initPosition();
-      if (viewPane != null) {
-         viewPane.initPosition();
-      }
-   }
-
 
    public void invalidateLayout() {
       super.invalidateLayout();
@@ -1535,6 +1598,13 @@ public class ViewDrawable extends Drawable implements ITechViewDrawable, ITechVi
       }
    }
 
+   public void rebuild() {
+      if (viewPane != null) {
+         viewPane.rebuild();
+      }
+      super.rebuild();
+   }
+
    /**
     * Search for {@link IDrawable} in sattelite and remove it structurally.
     * <br>
@@ -1569,6 +1639,20 @@ public class ViewDrawable extends Drawable implements ITechViewDrawable, ITechVi
          }
          viewPane.initScrollingConfigs();
       }
+   }
+
+   public void setFlagGene(int flag, boolean value) {
+      if (flag == FLAG_VSTATE_02_REPAINTING_CONTENT) {
+         //throw new NullPointerException();
+      }
+      flagsGene = BitUtils.setFlag(flagsGene, flag, value);
+   }
+
+   public void setFlagView(int flag, boolean value) {
+      if (flag == FLAG_VSTATE_02_REPAINTING_CONTENT) {
+         //throw new NullPointerException();
+      }
+      flagsView = BitUtils.setFlag(flagsView, flag, value);
    }
 
    /**
@@ -1614,66 +1698,6 @@ public class ViewDrawable extends Drawable implements ITechViewDrawable, ITechVi
    }
 
    /**
-    * {@link ViewDrawable#setHeader(IDrawable, int, int)} with 
-    * <li> {@link C#POS_0_TOP};
-    * <li> {@link ITechViewPane#PLANET_MODE_0_EAT}
-    * @param d
-    */
-   public void setHeaderEatTop(IDrawable d) {
-      this.setHeader(d, C.POS_0_TOP, ITechViewPane.PLANET_MODE_0_EAT);
-   }
-
-   public void setHeaderEatCloseTop(IDrawable d) {
-      this.setHeaderClose(d, C.POS_0_TOP, ITechViewPane.PLANET_MODE_0_EAT);
-   }
-
-   public void setHeaderEatCloseBot(IDrawable d) {
-      this.setHeaderClose(d, C.POS_1_BOT, ITechViewPane.PLANET_MODE_0_EAT);
-   }
-
-   public void setHeaderEatCloseLeft(IDrawable d) {
-      this.setHeaderClose(d, C.POS_2_LEFT, ITechViewPane.PLANET_MODE_0_EAT);
-   }
-
-   public void setHeaderEatCloseRight(IDrawable d) {
-      this.setHeaderClose(d, C.POS_3_RIGHT, ITechViewPane.PLANET_MODE_0_EAT);
-   }
-
-   public void setHeadersNull() {
-      if (viewPane != null) {
-         viewPane.setHeadersNull();
-      }
-   }
-
-   public void setHeaderEatBot(IDrawable d) {
-      this.setHeader(d, C.POS_1_BOT, ITechViewPane.PLANET_MODE_0_EAT);
-   }
-
-   public void setHeaderExpandTop(IDrawable d) {
-      this.setHeader(d, C.POS_0_TOP, ITechViewPane.PLANET_MODE_1_EXPAND);
-   }
-
-   public void setHeaderExpandBot(IDrawable d) {
-      this.setHeader(d, C.POS_1_BOT, ITechViewPane.PLANET_MODE_1_EXPAND);
-   }
-
-   public void setHeaderEatLeft(IDrawable d) {
-      this.setHeader(d, C.POS_2_LEFT, ITechViewPane.PLANET_MODE_0_EAT);
-   }
-
-   public void setHeaderEatRight(IDrawable d) {
-      this.setHeader(d, C.POS_3_RIGHT, ITechViewPane.PLANET_MODE_0_EAT);
-   }
-
-   public void setHeaderExpandLeft(IDrawable d) {
-      this.setHeader(d, C.POS_2_LEFT, ITechViewPane.PLANET_MODE_1_EXPAND);
-   }
-
-   public void setHeaderExpandRight(IDrawable d) {
-      this.setHeader(d, C.POS_3_RIGHT, ITechViewPane.PLANET_MODE_1_EXPAND);
-   }
-
-   /**
     * 
     * @param d
     * @param pos
@@ -1692,6 +1716,30 @@ public class ViewDrawable extends Drawable implements ITechViewDrawable, ITechVi
       invalidateLayout();
    }
 
+   public void setHeaderCloseBot(IDrawable d) {
+      this.setHeaderClose(d, C.POS_1_BOT);
+   }
+
+   public void setHeaderCloseBotEx(IDrawable d) {
+      this.setHeaderClose(d, C.POS_1_BOT, ITechViewPane.PLANET_MODE_1_EXPAND);
+   }
+
+   public void setHeaderCloseLeft(IDrawable d) {
+      this.setHeaderClose(d, C.POS_2_LEFT);
+   }
+
+   public void setHeaderCloseLeftEx(IDrawable d) {
+      this.setHeaderClose(d, C.POS_2_LEFT, ITechViewPane.PLANET_MODE_1_EXPAND);
+   }
+
+   public void setHeaderCloseRight(IDrawable d) {
+      this.setHeaderClose(d, C.POS_3_RIGHT);
+   }
+
+   public void setHeaderCloseRightEx(IDrawable d) {
+      this.setHeaderClose(d, C.POS_3_RIGHT, ITechViewPane.PLANET_MODE_1_EXPAND);
+   }
+
    public void setHeaderCloseTop(IDrawable d) {
       this.setHeaderClose(d, C.POS_0_TOP);
    }
@@ -1700,28 +1748,58 @@ public class ViewDrawable extends Drawable implements ITechViewDrawable, ITechVi
       this.setHeaderClose(d, C.POS_0_TOP, ITechViewPane.PLANET_MODE_1_EXPAND);
    }
 
-   public void setHeaderCloseBotEx(IDrawable d) {
-      this.setHeaderClose(d, C.POS_1_BOT, ITechViewPane.PLANET_MODE_1_EXPAND);
+   public void setHeaderEatBot(IDrawable d) {
+      this.setHeader(d, C.POS_1_BOT, ITechViewPane.PLANET_MODE_0_EAT);
    }
 
-   public void setHeaderCloseLeftEx(IDrawable d) {
-      this.setHeaderClose(d, C.POS_2_LEFT, ITechViewPane.PLANET_MODE_1_EXPAND);
+   public void setHeaderEatCloseBot(IDrawable d) {
+      this.setHeaderClose(d, C.POS_1_BOT, ITechViewPane.PLANET_MODE_0_EAT);
    }
 
-   public void setHeaderCloseRightEx(IDrawable d) {
-      this.setHeaderClose(d, C.POS_3_RIGHT, ITechViewPane.PLANET_MODE_1_EXPAND);
+   public void setHeaderEatCloseLeft(IDrawable d) {
+      this.setHeaderClose(d, C.POS_2_LEFT, ITechViewPane.PLANET_MODE_0_EAT);
    }
 
-   public void setHeaderCloseBot(IDrawable d) {
-      this.setHeaderClose(d, C.POS_1_BOT);
+   public void setHeaderEatCloseRight(IDrawable d) {
+      this.setHeaderClose(d, C.POS_3_RIGHT, ITechViewPane.PLANET_MODE_0_EAT);
    }
 
-   public void setHeaderCloseLeft(IDrawable d) {
-      this.setHeaderClose(d, C.POS_2_LEFT);
+   public void setHeaderEatCloseTop(IDrawable d) {
+      this.setHeaderClose(d, C.POS_0_TOP, ITechViewPane.PLANET_MODE_0_EAT);
    }
 
-   public void setHeaderCloseRight(IDrawable d) {
-      this.setHeaderClose(d, C.POS_3_RIGHT);
+   public void setHeaderEatLeft(IDrawable d) {
+      this.setHeader(d, C.POS_2_LEFT, ITechViewPane.PLANET_MODE_0_EAT);
+   }
+
+   public void setHeaderEatRight(IDrawable d) {
+      this.setHeader(d, C.POS_3_RIGHT, ITechViewPane.PLANET_MODE_0_EAT);
+   }
+
+   /**
+    * {@link ViewDrawable#setHeader(IDrawable, int, int)} with 
+    * <li> {@link C#POS_0_TOP};
+    * <li> {@link ITechViewPane#PLANET_MODE_0_EAT}
+    * @param d
+    */
+   public void setHeaderEatTop(IDrawable d) {
+      this.setHeader(d, C.POS_0_TOP, ITechViewPane.PLANET_MODE_0_EAT);
+   }
+
+   public void setHeaderExpandBot(IDrawable d) {
+      this.setHeader(d, C.POS_1_BOT, ITechViewPane.PLANET_MODE_1_EXPAND);
+   }
+
+   public void setHeaderExpandLeft(IDrawable d) {
+      this.setHeader(d, C.POS_2_LEFT, ITechViewPane.PLANET_MODE_1_EXPAND);
+   }
+
+   public void setHeaderExpandRight(IDrawable d) {
+      this.setHeader(d, C.POS_3_RIGHT, ITechViewPane.PLANET_MODE_1_EXPAND);
+   }
+
+   public void setHeaderExpandTop(IDrawable d) {
+      this.setHeader(d, C.POS_0_TOP, ITechViewPane.PLANET_MODE_1_EXPAND);
    }
 
    /**
@@ -1739,12 +1817,10 @@ public class ViewDrawable extends Drawable implements ITechViewDrawable, ITechVi
 
    }
 
-   public void stateReadFrom(StatorReader state) {
-      super.stateReadFrom(state);
-   }
-
-   public void stateWriteTo(StatorWriter state) {
-      super.stateWriteTo(state);
+   public void setHeadersNull() {
+      if (viewPane != null) {
+         viewPane.setHeadersNull();
+      }
    }
 
    /**
@@ -1755,13 +1831,6 @@ public class ViewDrawable extends Drawable implements ITechViewDrawable, ITechVi
    public void setPreferredSize(int w, int h) {
       layEngine.setPh(h);
       layEngine.setPw(w);
-   }
-
-   public void rebuild() {
-      if(viewPane != null) {
-         viewPane.rebuild();
-      }
-      super.rebuild();
    }
 
    /**
@@ -1851,20 +1920,6 @@ public class ViewDrawable extends Drawable implements ITechViewDrawable, ITechVi
       }
    }
 
-   public void setFlagView(int flag, boolean value) {
-      if (flag == FLAG_VSTATE_02_REPAINTING_CONTENT) {
-         //throw new NullPointerException();
-      }
-      flagsView = BitUtils.setFlag(flagsView, flag, value);
-   }
-
-   public void setFlagGene(int flag, boolean value) {
-      if (flag == FLAG_VSTATE_02_REPAINTING_CONTENT) {
-         //throw new NullPointerException();
-      }
-      flagsGene = BitUtils.setFlag(flagsGene, flag, value);
-   }
-
    /**
     * Sets both x and y coordinate
     * The Drawable will draw its content and viewpane at this coordinate
@@ -1874,6 +1929,14 @@ public class ViewDrawable extends Drawable implements ITechViewDrawable, ITechVi
          viewPane.setXY(x, y);
       }
       super.setXY(x, y);
+   }
+
+   public void stateReadFrom(StatorReader state) {
+      super.stateReadFrom(state);
+   }
+
+   public void stateWriteTo(StatorWriter state) {
+      super.stateWriteTo(state);
    }
 
    //#mdebug
@@ -1894,7 +1957,15 @@ public class ViewDrawable extends Drawable implements ITechViewDrawable, ITechVi
       dc.append(',');
       dc.append(getContentH());
 
+      dc.appendVarWithNewLine("expandW", expandW);
+      dc.appendVarWithSpace("expandH", expandH);
+     
+      dc.appendVarWithSpace("unShrankW", unShrankW);
+      dc.appendVarWithSpace("unShrankH", unShrankH);
       ///
+      dc.appendVarWithNewLine("computeContentPw", computeContentPw());
+      dc.appendVarWithSpace("computeContentPh", computeContentPh());
+      
       dc.append(" ");
       if (viewPane != null) {
          dc.append("Actual=(" + getActualDrawableW() + "," + getActualDrawableH());
@@ -1924,18 +1995,18 @@ public class ViewDrawable extends Drawable implements ITechViewDrawable, ITechVi
       }
    }
 
-   private void toStringPrivate(Dctx dc) {
-      if(viewPane == null) {
-         dc.appendWithSpace("No ViewPane");
-      } else {
-         dc.appendWithSpace("With ViewPane");
-      }
-   }
-
    public void toString1Line(Dctx dc) {
       dc.root1Line(this, ViewDrawable.class);
       toStringPrivate(dc);
       super.toString1Line(dc.sup1Line());
+   }
+
+   private void toStringPrivate(Dctx dc) {
+      if (viewPane == null) {
+         dc.appendWithSpace("No ViewPane");
+      } else {
+         dc.appendWithSpace("With ViewPane");
+      }
    }
 
    //#enddebug

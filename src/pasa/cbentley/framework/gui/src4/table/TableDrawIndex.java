@@ -57,7 +57,7 @@ public class TableDrawIndex extends TableView {
    /**
     * Model: Color values to be displayed.
     */
-   int[]           colors;
+   private int[]           colors;
 
    /**
     * Style to be used
@@ -87,7 +87,7 @@ public class TableDrawIndex extends TableView {
       super(gc, sc, policy);
       if (colors == null)
          throw new NullPointerException();
-      this.colors = colors;
+      this.setColors(colors);
       this.modelGenetics = modelGenetics;
       //TODO full repaint does not call ViewPane move
       //Besides how to not make a full repaint? getModelDrawable
@@ -106,7 +106,7 @@ public class TableDrawIndex extends TableView {
     * Draw index and bg color for that cell.
     */
    private void drawModelIndex(GraphicsX g, int x, int y, int w, int h, int index) {
-      if (index >= colors.length) {
+      if (index >= getColors().length) {
          return;
       }
       //if selectable
@@ -116,7 +116,7 @@ public class TableDrawIndex extends TableView {
          g.fillRect(x, y, w, h);
          g.setColor(IColors.FULLY_OPAQUE_RED);
       } else {
-         g.setColor(colors[index]);
+         g.setColor(getColors()[index]);
          g.fillRect(x, y, w, h);
          g.setColor(0);
       }
@@ -128,7 +128,7 @@ public class TableDrawIndex extends TableView {
    }
 
    public int getSize() {
-      return colors.length;
+      return getColors().length;
    }
 
    /**
@@ -172,5 +172,13 @@ public class TableDrawIndex extends TableView {
 
    }
    //#enddebug
+
+   public int[] getColors() {
+      return colors;
+   }
+
+   public void setColors(int[] colors) {
+      this.colors = colors;
+   }
 
 }

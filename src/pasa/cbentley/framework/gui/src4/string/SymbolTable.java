@@ -114,7 +114,6 @@ public class SymbolTable extends TableView {
 
       StyleClass scHeader = styleClass.getStyleClass(LINK_HEADER_STYLE);
 
-      doUpdateCharArray();
       trailer = new StringDrawable(gc, scHeader, "");
 
       headerTopTitle = new StringDrawable(gc, scHeader, "Table of Symbols");
@@ -123,6 +122,8 @@ public class SymbolTable extends TableView {
       setHeader(headerBotTitle, C.POS_1_BOT, ITechViewPane.PLANET_MODE_0_EAT);
 
       setHelperFlag(ITechTable.HELPER_FLAG_20_SPECIAL_REPAINT, true);
+
+      doUpdateCharArray();
    }
 
    protected void cmdNextPlane(InputConfig ic) {
@@ -233,7 +234,11 @@ public class SymbolTable extends TableView {
    }
 
    public int getSize() {
-      return myChars.length;
+      if (myChars == null) {
+         return 0;
+      } else {
+         return myChars.length;
+      }
    }
 
    /**
@@ -244,7 +249,7 @@ public class SymbolTable extends TableView {
     * How does work 0
     */
    public ByteObject getSymbolPolicy(TablePolicyFactory tableFac) {
-      return tableFac.getFlowHoriz(0, 15);
+      return tableFac.createTableFlowHoriz(0, 15);
    }
 
    public boolean hasPointState(int index, int state) {
@@ -343,6 +348,8 @@ public class SymbolTable extends TableView {
       toStringPrivate(dc);
       super.toString(dc.sup());
       dc.nlLvl(modelGenetics, "modelGenetics");
+
+      dc.nlLvl("myChars", myChars, 50);
    }
 
    public void toString1Line(Dctx dc) {

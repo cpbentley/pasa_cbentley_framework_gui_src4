@@ -636,6 +636,7 @@ public class ViewPane extends Drawable implements ITechViewPane, ITechDrawable, 
       if (isStyleAppliedToViewPane()) {
          drawDrawableBg(g);
       }
+      StyleOperator styleOp = getStyleOp();
 
       if (isStyleAppliedToViewPort()) {
          //viewport style is applied to viewDrawable
@@ -643,9 +644,9 @@ public class ViewPane extends Drawable implements ITechViewPane, ITechDrawable, 
          int decoY = cy - getViewPortStyleHTopConsumed();
          int decoW = getViewPortWidthWithoutStyle();
          int decoH = getViewPortHeightWithoutStyle();
-         int[] styleAreas = styleCacheViewPort.createStyleArea(decoX, decoY, decoW, decoH);
+
          ByteObject style = styleCacheViewPort.getStyle();
-         StyleOperator styleOp = getStyleOp();
+         int[] styleAreas = styleOp.getStyleAreasFull(decoX, decoY, decoW, decoH, style, styleCacheViewPort.getLayoutable(), styleCacheViewPort);
          styleOp.drawStyleBg(style, g, styleAreas);
       }
       // we must draw the content before planetaries who may be drawn in overlay
@@ -657,9 +658,8 @@ public class ViewPane extends Drawable implements ITechViewPane, ITechDrawable, 
          int decoY = cy - getViewPortStyleHTopConsumed();
          int decoW = getViewPortWidthWithoutStyle();
          int decoH = getViewPortHeightWithoutStyle();
-         int[] styleAreas = styleCacheViewPort.createStyleArea(decoX, decoY, decoW, decoH);
          ByteObject style = styleCacheViewPort.getStyle();
-         StyleOperator styleOp = getStyleOp();
+         int[] styleAreas = styleOp.getStyleAreasFull(decoX, decoY, decoW, decoH, style, styleCacheViewPort.getLayoutable(), styleCacheViewPort);
          styleOp.drawStyleFg(style, g, styleAreas);
       }
 
@@ -1783,6 +1783,10 @@ public class ViewPane extends Drawable implements ITechViewPane, ITechDrawable, 
       throw new RuntimeException();
    }
 
+   public void initSize() {
+      throw new RuntimeException();
+   }
+
    /**
     * Immateriality is not around a specific axis.
     * <br>
@@ -2145,8 +2149,8 @@ public class ViewPane extends Drawable implements ITechViewPane, ITechDrawable, 
             setDh(getDh() - shrinkViewPortH);
             setDh(getDh() - shrinkVisualH);
          }
-         setDh(getDh() + getExpansionPixelsH());
          setDw(getDw() + getExpansionPixelsW());
+         setDh(getDh() + getExpansionPixelsH());
 
          //a shrink influence every sattelites but won't change scrollbar existence
          //initViewPaneSattelites();
@@ -2159,6 +2163,8 @@ public class ViewPane extends Drawable implements ITechViewPane, ITechDrawable, 
       //int newH = this.getDh();
       //viewedDrawable.setDrawableSize(newW, newH, true);
 
+      super.initStyleCache();
+      
       //after the up
       if (vScrollBar != null) {
          viewedDrawable.setFlagView(FLAG_VSTATE_24_SCROLLED_V, true);
@@ -4483,7 +4489,9 @@ public class ViewPane extends Drawable implements ITechViewPane, ITechDrawable, 
          } else {
             engine.setOverrideH(h);
          }
-         engine.layoutUpdateSizeCheck();
+         //once engine is configured, we can call initSize
+         d.initSize();
+         //engine.layoutUpdateSizeCheck(); removed 21 june 2024 cuz of style areas
       }
    }
 

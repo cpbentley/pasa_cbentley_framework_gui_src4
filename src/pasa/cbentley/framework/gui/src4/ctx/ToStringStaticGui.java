@@ -641,15 +641,15 @@ public class ToStringStaticGui extends ToStringStaticBase {
 
    public static String toStringTableType(int type) {
       switch (type) {
-         case IBOTablePolicy.TABLE_TYPE_2GENERIC_ROW:
+         case IBOTablePolicy.TABLE_TYPE_2_GENERIC_ROW:
             return "GENERIC_ROW";
-         case IBOTablePolicy.TABLE_TYPE_1GENERIC_COL:
+         case IBOTablePolicy.TABLE_TYPE_1_GENERIC_COL:
             return "GENERIC_COL";
-         case IBOTablePolicy.TABLE_TYPE_4FLOW_ROW:
+         case IBOTablePolicy.TABLE_TYPE_4_FLOW_ROW:
             return "FLOW_ROW";
-         case IBOTablePolicy.TABLE_TYPE_3FLOW_COL:
+         case IBOTablePolicy.TABLE_TYPE_3_FLOW_COL:
             return "FLOW_COL";
-         case IBOTablePolicy.TABLE_TYPE_0STRICT:
+         case IBOTablePolicy.TABLE_TYPE_0_STRICT:
             return "STRICT";
          default:
             return "UNKOWN";
@@ -669,6 +669,7 @@ public class ToStringStaticGui extends ToStringStaticBase {
             return "UNKNOWN " + type;
       }
    }
+
 
    public static String toStringTypeBO(final int type) {
       switch (type) {
@@ -805,6 +806,7 @@ public class ToStringStaticGui extends ToStringStaticBase {
       }
    }
 
+   
    public static void toStringViewStates(ViewDrawable d, Dctx sb) {
       sb.append("ViewState=[");
       int oc = sb.getCount();

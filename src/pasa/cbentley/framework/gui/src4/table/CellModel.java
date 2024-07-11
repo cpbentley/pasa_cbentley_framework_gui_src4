@@ -1,7 +1,6 @@
 package pasa.cbentley.framework.gui.src4.table;
 
 import pasa.cbentley.byteobjects.src4.core.ByteObject;
-import pasa.cbentley.core.src4.ctx.UCtx;
 import pasa.cbentley.core.src4.logging.Dctx;
 import pasa.cbentley.core.src4.logging.IStringable;
 import pasa.cbentley.core.src4.utils.BitUtils;
@@ -12,6 +11,7 @@ import pasa.cbentley.framework.gui.src4.core.Drawable;
 import pasa.cbentley.framework.gui.src4.core.ScrollConfig;
 import pasa.cbentley.framework.gui.src4.core.ViewDrawable;
 import pasa.cbentley.framework.gui.src4.ctx.GuiCtx;
+import pasa.cbentley.framework.gui.src4.ctx.ObjectGC;
 import pasa.cbentley.framework.gui.src4.string.StringDrawable;
 import pasa.cbentley.framework.gui.src4.table.interfaces.IBOCellPolicy;
 import pasa.cbentley.framework.gui.src4.table.interfaces.ITableUtils;
@@ -24,17 +24,17 @@ import pasa.cbentley.framework.gui.src4.utils.DrawableUtilz;
  * @author Charles-Philip Bentley
  *
  */
-public class CellModel implements IStringable, ITechCell, IBOCellPolicy, ITableUtils {
+public class CellModel extends ObjectGC implements IStringable, ITechCell, IBOCellPolicy, ITableUtils {
 
-   int                    consumedPixels;
+   int              consumedPixels;
 
-   int                    firstCellAbs;
+   int              firstCellAbs;
 
    /**
     * Cell flags. 
     * <li> Selectability : {@link CellModel#CELL_FLAG_1_UNSELECTABLE} 
     */
-   int[]                  flags;
+   int[]            flags;
 
    /**
     * SET,AVERAGE,STRONG = [0,2,2,1]
@@ -43,50 +43,48 @@ public class CellModel implements IStringable, ITechCell, IBOCellPolicy, ITableU
     * 
     * index of first cell in frame
     */
-   int[]                  frames;
-
-   protected final GuiCtx gc;
+   int[]            frames;
 
    /**
     * Coalesce some information about the cell model
     */
-   int                    helperFlags;
+   int              helperFlags;
 
    /**
     * The number of increments difference between old selection and new selection
     * <br>
     */
-   public int             incrementChange          = 0;
+   public int       incrementChange          = 0;
 
    /**
     * 
     */
-   int                    lastCellAbs;
+   int              lastCellAbs;
 
-   int                    numCells;
+   int              numCells;
 
-   int                    numFrames;
+   int              numFrames;
 
-   int                    numFullVisibleCells;
+   int              numFullVisibleCells;
 
-   int                    numVisibleCells;
+   int              numVisibleCells;
 
-   public int             oldSelectedCellAbs;
+   public int       oldSelectedCellAbs;
 
    /**
     * Always top left
     */
-   int                    partiallyVisibleCellAbs  = -1;
+   int              partiallyVisibleCellAbs  = -1;
 
    /**
     * Always bot right
     */
-   int                    partiallyVisibleCellAbs2 = -1;
+   int              partiallyVisibleCellAbs2 = -1;
 
    /**
     * Index pointed by pointer
     */
-   public int             pointedIndexAbs;
+   public int       pointedIndexAbs;
 
    /**
     * Inner Table Row Policies that govern behavior during updates. 
@@ -115,15 +113,15 @@ public class CellModel implements IStringable, ITechCell, IBOCellPolicy, ITableU
     * {@link ITechCell#CELL_3_FILL_STRONG} has been converted to ViewPort's
     * pixel height
     */
-   int[]                  policies;
+   int[]            policies;
 
-   ByteObject             policy;
+   ByteObject       policy;
 
-   int[]                  positions;
+   int[]            positions;
 
-   int                    rootCellAbs;
+   int              rootCellAbs;
 
-   int                    selectedCellAbs;
+   int              selectedCellAbs;
 
    /**
     * The vector change in Cell Units.
@@ -131,11 +129,11 @@ public class CellModel implements IStringable, ITechCell, IBOCellPolicy, ITableU
     * <li>When positive, we have a move to the right/bottom
     * <li>When negative, we have a move to the left/top
     */
-   public int             selectionCellVectorChange;
+   public int       selectionCellVectorChange;
 
-   int                    sepSize;
+   int              sepSize;
 
-   ByteObject[]           setupSizers;
+   ByteObject[]     setupSizers;
 
    /**
     * Setupsizes are computed by the {@link TableView#computeConfig(Config)}
@@ -161,7 +159,7 @@ public class CellModel implements IStringable, ITechCell, IBOCellPolicy, ITableU
     * For a column with policy {@link ITechCell#CELL_4_FILL_AVERAGE}, the setupSize is computed according to the root selected position. If not
     * visible, it is kept to 0
     */
-   int[]                  setupSizes;
+   int[]            setupSizes;
 
    /**
     * Structural style for the row cosizes cells. 
@@ -171,30 +169,30 @@ public class CellModel implements IStringable, ITechCell, IBOCellPolicy, ITableU
     * <br>
     * Read from ?
     */
-   ByteObject[]           styles                   = null;
+   ByteObject[]     styles                   = null;
 
-   String[]               titles;
+   String[]         titles;
 
-   int[]                  titlesInt;
+   int[]            titlesInt;
 
    /**
    * 
    */
-   StringDrawable[]       titleStringDrawables;
+   StringDrawable[] titleStringDrawables;
 
    /**
     * Container for the whole column/row of cell titles 
     */
-   Drawable               titlesView;
+   Drawable         titlesView;
 
-   public int             transitionType;
+   public int       transitionType;
 
-   int                    undrawnBotRight;
+   int              undrawnBotRight;
 
    /**
     * Pixels undrawn for the first logical increment. Not counting hidden increments and separators.
     */
-   int                    undrawnTopLeft;
+   int              undrawnTopLeft;
 
    /**
     * Semantics with a {@link ITechViewPane#SCROLL_TYPE_1_LOGIC_UNIT} .
@@ -214,16 +212,15 @@ public class CellModel implements IStringable, ITechCell, IBOCellPolicy, ITableU
     * <br>
     * Used only when {@link CellModel#H}
     */
-   public boolean         useMaster                = true;
+   public boolean   useMaster                = true;
 
    /**
     * Can be null?
     */
-   int[]                  workCellSizes;
+   int[]            workCellSizes;
 
    public CellModel(GuiCtx gc) {
-      this.gc = gc;
-
+      super(gc);
    }
 
    /**
@@ -842,6 +839,9 @@ public class CellModel implements IStringable, ITechCell, IBOCellPolicy, ITableU
       return positions[cellAbs];
    }
 
+   public ByteObject getPolicy() {
+      return policy;
+   }
    public int getScrollTotal() {
       if (frames != null) {
          return frames.length / 2;
@@ -1189,46 +1189,32 @@ public class CellModel implements IStringable, ITechCell, IBOCellPolicy, ITableU
    }
 
    //#mdebug
-   public String toString() {
-      return Dctx.toString(this);
+   public void toString(Dctx dc) {
+      dc.root(this, CellModel.class, 1192);
+      toStringPrivate(dc);
+      super.toString(dc.sup());
+
+      dc.nl();
+      dc.appendVarWithSpace("sepSize", sepSize);
+      dc.appendVarWithSpace("Pixels Consumed", consumedPixels);
+      dc.nl();
+      dc.append("First=" + firstCellAbs + " last=" + lastCellAbs + " root=" + rootCellAbs + " master=" + useMaster);
+      dc.nl();
+      dc.append("selected=" + selectedCellAbs);
+      dc.append(" oldselected=" + oldSelectedCellAbs);
+      dc.nl();
+      dc.append("partialIndex [" + partiallyVisibleCellAbs + "," + partiallyVisibleCellAbs2 + "]");
+      dc.nl();
+      dc.append("undrawn=[" + undrawnTopLeft + "<->" + undrawnBotRight + "]");
+      dc.nlFrontTitle(positions, "Coordinates");
+      dc.nlFrontTitle(workCellSizes, "Work Cell Sizes");
+      dc.nlFrontTitle(setupSizes, "Setup Cell Sizes");
    }
 
-   public void toString(Dctx sb) {
-      sb.append("#CellModel");
-      sb.nl();
-      sb.append("numCells=" + numCells);
-      sb.append(" sepSize=" + sepSize);
-      sb.append(" visibleCells=" + numVisibleCells);
-      sb.append(" visibleFullyCells=" + numFullVisibleCells);
-      sb.append(" pixel Consumed=" + consumedPixels);
-      sb.nl();
-      sb.append("First=" + firstCellAbs + " last=" + lastCellAbs + " root=" + rootCellAbs + " master=" + useMaster);
-      sb.nl();
-      sb.append("selected=" + selectedCellAbs);
-      sb.append(" oldselected=" + oldSelectedCellAbs);
-      sb.nl();
-      sb.append("partialIndex [" + partiallyVisibleCellAbs + "," + partiallyVisibleCellAbs2 + "]");
-      sb.nl();
-      sb.append("undrawn=[" + undrawnTopLeft + "<->" + undrawnBotRight + "]");
-      sb.nlFrontTitle(positions, "Coordinates");
-      sb.nlFrontTitle(workCellSizes, "Work Cell Sizes");
-      sb.nlFrontTitle(setupSizes, "Setup Cell Sizes");
-   }
-
-   public String toString1Line() {
-      return Dctx.toString1Line(this);
-   }
-
-   public void toString1Line(Dctx sb) {
-      sb.root(this, "CellModel");
-      sb.append(" numCells=" + numCells);
-      sb.append(" visibleCells=" + numVisibleCells);
-      sb.append(" cellAbs=[" + firstCellAbs + "," + lastCellAbs + "]");
-      sb.append(" selected=" + selectedCellAbs);
-   }
-
-   public UCtx toStringGetUCtx() {
-      return gc.getUC();
+   public void toString1Line(Dctx dc) {
+      dc.root1Line(this, CellModel.class);
+      toStringPrivate(dc);
+      super.toString1Line(dc.sup1Line());
    }
 
    public void toStringHelperFlags(Dctx sb) {
@@ -1240,6 +1226,12 @@ public class CellModel implements IStringable, ITechCell, IBOCellPolicy, ITableU
       debugHelperFlag(sb, CELL_H_FLAG_14_VARIABLE_SETUP_SIZE, "VariableSetup");
       debugHelperFlag(sb, CELL_H_FLAG_17_OVERSIZE, "Oversize");
 
+   }
+
+   private void toStringPrivate(Dctx dc) {
+      dc.appendVarWithSpace("numCells", numCells);
+      dc.appendVarWithSpace("numVisibleCells", numVisibleCells);
+      dc.appendVarWithSpace("numFullVisibleCells", numFullVisibleCells);
    }
 
    //#enddebug

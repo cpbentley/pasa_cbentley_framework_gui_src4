@@ -3,9 +3,11 @@ package pasa.cbentley.framework.gui.src4.table.interfaces;
 import pasa.cbentley.byteobjects.src4.core.ByteObject;
 import pasa.cbentley.byteobjects.src4.core.interfaces.IByteObject;
 import pasa.cbentley.framework.datamodel.src4.table.ITableModel;
+import pasa.cbentley.framework.drawx.src4.style.ITechStyleCache;
 import pasa.cbentley.framework.gui.src4.core.StyleClass;
 import pasa.cbentley.framework.gui.src4.ctx.IBOTypesGui;
 import pasa.cbentley.framework.gui.src4.table.TableView;
+import pasa.cbentley.layouter.src4.tech.IBOSizer;
 
 /**
  * {@link IBOCellPolicy} defines the structure of a column to enable the efficient display of large tables on a small screen. 
@@ -77,7 +79,7 @@ public interface IBOCellPolicy extends IByteObject {
     * 1 byte for frame
     * 
     */
-   public static final int CELLP_BASIC_SIZE         = A_OBJECT_BASIC_SIZE + 18;
+   public static final int CELLP_BASIC_SIZE               = A_OBJECT_BASIC_SIZE + 18;
 
    /**
     * When set this CellSize policy is for cosize height.
@@ -225,11 +227,20 @@ public interface IBOCellPolicy extends IByteObject {
    public static final int CELLP_FLAGZ_5_FRAMES           = 1 << 4;
 
    /**
-    * Defines array of structural styles
+    * 
     */
-   public static final int CELLP_FLAGZ_8_SIZER                  = 1 << 7;
    public static final int CELLP_FLAGZ_6                  = 1 << 5;
+
+   /**
+    * 
+    */
    public static final int CELLP_FLAGZ_7                  = 1 << 6;
+
+   /**
+    * There is one {@link IBOSizer}. {@link IBOCellPolicy#CELLP_OFFSET_09_SIZE4} is ignored.
+    * 
+    */
+   public static final int CELLP_FLAGZ_8_SIZER            = 1 << 7;
 
    /**
     * The Major Type of the Cell CoSize Policy.
@@ -301,13 +312,18 @@ public interface IBOCellPolicy extends IByteObject {
 
    /**
     * Single policy value for all cells.
-    * <br>
     * 
-    * <br>Default to value <b>0</b> which is {@link ITechCell#CELL_0_IMPLICIT_SET}
-    * <br>
-    * <br>
-    * For example when {@link IBOCellPolicy#OFFSET_13COL_POLICY1} is set to {@link ITechCell#CELL_1_EXPLICIT_SET},
-    *  the framework will use either {@link IBOCellPolicy#OFFSET_09WIDTH4} or {@link IBOCellPolicy#FLAGZ_2COL_SIZES} when defined.
+    * <p>
+    * <li> {@link ITechCell#CELL_0_IMPLICIT_SET} -> Default to value
+    * <li> {@link ITechCell#CELL_1_EXPLICIT_SET}
+    * <li> {@link ITechCell#CELL_2_RATIO}
+    * <li> {@link ITechCell#CELL_3_FILL_STRONG}
+    * <li> {@link ITechCell#CELL_4_FILL_AVERAGE}
+    * <li> {@link ITechCell#CELL_5_FILL_WEAK}
+    * <li> {@link ITechCell#CELL_6_FRAME_SEPARATOR}
+    * <li> {@link ITechCell#CELL_7_OTHER_COLUMN}
+    * </p>
+    * 
     */
    public static final int CELLP_OFFSET_07_POLICY1        = A_OBJECT_BASIC_SIZE + 7;
 
@@ -334,6 +350,14 @@ public interface IBOCellPolicy extends IByteObject {
     * 
     */
    public static final int CELLP_OFFSET_09_SIZE4          = A_OBJECT_BASIC_SIZE + 9;
+
+   /**
+    * <li> {@link ITechStyleCache#RELATIVE_TYPE_0_MARGIN}
+    * <li> {@link ITechStyleCache#RELATIVE_TYPE_1_BORDER}
+    * <li> {@link ITechStyleCache#RELATIVE_TYPE_2_PADDING}
+    * <li> {@link ITechStyleCache#RELATIVE_TYPE_3_CONTENT}
+    */
+   public static final int CELLP_OFFSET_10_RELATIVE1      = A_OBJECT_BASIC_SIZE + 9;
 
    /**
     * 

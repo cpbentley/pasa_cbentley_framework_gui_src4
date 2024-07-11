@@ -575,7 +575,7 @@ public class GuiCtx extends ABOCtx implements ITechCtxSettingsAppGui {
       }
       if (id >= classes.length) {
          //#debug
-         toDLog().pInit1("StyleClass ID not valid " + id, null, GuiCtx.class, "getStyleClass@378");
+         toDLog().pInit1("StyleClass ID not valid " + id + ". Returning for ID=0", null, GuiCtx.class, "getStyleClass@578");
          //#debug
          if (uc.getConfigU().isForceExceptions()) {
             throw new IllegalStateException("Style classes not initialized to support id " + id);
@@ -669,16 +669,7 @@ public class GuiCtx extends ABOCtx implements ITechCtxSettingsAppGui {
    }
 
    protected void matchConfig(IConfigBO config, ByteObject settings) {
-      IConfigAppGui configG = (IConfigAppGui) config;
-      settings.setFlag(CTX_GUI_OFFSET_01_FLAG1, CTX_GUI_FLAG_3_ONE_THUMB, configG.isOneThumb());
-      settings.setFlag(CTX_GUI_OFFSET_01_FLAG1, CTX_GUI_FLAG_2_USER_MENU_BAR, configG.isUsingMenuBar());
-
-      settings.set1(CTX_GUI_OFFSET_02_VIEW_THEME_ID2, configG.getThemeID());
-
-      settings.set1(CTX_GUI_OFFSET_04_MENU_BAR_POSITION1, configG.getMenuBarPosition());
-      settings.set1(CTX_GUI_OFFSET_05_DEBUG_BAR_POSITION1, configG.getDebugBarPosition());
-      settings.set1(CTX_GUI_OFFSET_07_DEBUG_MODE1, configG.getDebugMode());
-
+      IConfigGui configG = (IConfigGui) config;
    }
 
    /**

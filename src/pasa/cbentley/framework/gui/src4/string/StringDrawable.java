@@ -43,12 +43,8 @@ import pasa.cbentley.layouter.src4.tech.ITechLayout;
 
 /**
  * 
- * Draws a String using : 
- * <li> char[] array
- * <li> String
- * <li>Scaled single Char using {@link IDrwTypes#TYPE_DRWX_11_TEXT_EFFECTS}
- * <br>
- * <br>
+ * Draws a String into the {@link Drawable} framework using a {@link Stringer}.
+ * 
  * <li> Read only {@link ITechStringDrawable#S_ACTION_MODE_0_READ}
  * <li> chars are Selectable {@link ITechStringDrawable#S_ACTION_MODE_1_SELECT}
  * <li> chars are editable and selectable {@link ITechStringDrawable#S_ACTION_MODE_2_EDIT}
@@ -1107,7 +1103,7 @@ public class StringDrawable extends ViewDrawable implements IBOStrAuxData, IDraw
    }
 
    public void setCharAt(int i, char c) {
-      stringer.setCharAt(i, c);
+      stringer.getEditor().setCharAt(i, c);
    }
 
    public void setChars(char[] c, int offset, int len) {

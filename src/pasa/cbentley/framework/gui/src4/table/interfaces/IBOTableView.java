@@ -90,7 +90,15 @@ public interface IBOTableView extends IByteObject {
    public static final int T_FLAG_6_APPEND_REAL_TITLE                = 1 << 5;
 
    /**
-    * if set, separator of size given in the tech is applied
+    * <p>
+    * Draws gird lines when flag {@link IBOTableView#T_FLAG_7_DRAW_GRID} is true and
+    * grid sizes are different than zero
+    * 
+    * <li> {@link IBOTableView#T_OFFSET_05_HGRID_SIZE1}
+    * <li> {@link IBOTableView#T_OFFSET_06_VGRID_SIZE1}
+    * </p>
+    * 
+    * The figure for drawing the grid is TODO
     */
    public static final int T_FLAG_7_DRAW_GRID                        = 1 << 6;
 
@@ -375,7 +383,11 @@ public interface IBOTableView extends IByteObject {
    public static final int T_OFFSET_05_HGRID_SIZE1                   = T_BASE_OFFSET + 4;
 
    /**
-    * Number of pixels separating two columns of cells
+    * Number of pixels separating two columns of cells.
+    * 
+    * <p>
+    * Draws vertical lines when flag {@link IBOTableView#T_FLAG_7_DRAW_GRID} is true
+    * </p>
     */
    public static final int T_OFFSET_06_VGRID_SIZE1                   = T_BASE_OFFSET + 5;
 

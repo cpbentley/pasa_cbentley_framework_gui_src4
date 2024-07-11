@@ -20,8 +20,6 @@ import pasa.cbentley.framework.gui.src4.utils.DrawableUtilz;
 
 public interface ITechDrawable extends IByteObject {
 
-
-
    public static final int DTECH_BEHAVIOR_FLAG_B_1_EMPTY_HIDE    = 1 << 0;
 
    public static final int DTECH_BEHAVIOR_FLAG_B_2_EMPTY_DEF     = 1 << 1;
@@ -190,14 +188,13 @@ public interface ITechDrawable extends IByteObject {
     * Content is supposed to be cached for repetitive draws.
     */
    public static final int BEHAVIOR_22_TIP_HEAVY_CONTENT         = 1 << 21;
-   
-   
+
    /**
     * The drawable content espouses the {@link IBOStyle} fx. i.e {@link IBOStyle} overrides.
     * 
     * A {@link FigDrawable} will change the base color of its figure.
     */
-   public static final int GENE_01_STYLED                          = 1 << 20;
+   public static final int GENE_01_STYLED                        = 1 << 20;
 
    /**
     * Set when Parent wants to control event of their child drawable.
@@ -854,5 +851,6 @@ public interface ITechDrawable extends IByteObject {
     * this last style overrides previous styles item definitions.
     */
    public static final int STYLE_12_CUSTOM                       = 1 << 11;
+
 
 }

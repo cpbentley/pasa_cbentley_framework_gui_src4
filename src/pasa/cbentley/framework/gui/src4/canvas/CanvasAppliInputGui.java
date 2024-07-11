@@ -280,17 +280,22 @@ public class CanvasAppliInputGui extends CanvasAppliInput implements IDrawableLi
       vcRoot = new ViewContext(gc, canvasGC);
       vcRoot.toStringSetDebugName("vcRoot");
 
+      vcContent = new ViewContext(gc, canvasGC, vcRoot);
+      vcContent.toStringSetDebugName("vcContent");
+
       int width = getWidth();
       int height = getHeight();
+
       vcRoot.setWidth(width);
       vcRoot.setHeight(height);
+
+      vcContent.setWidth(width);
+      vcContent.setHeight(height);
 
       //#debug
       toDLog().pInit("ViewContext Root with first W and H " + width + " ," + height, vcRoot, CanvasAppliInputGui.class, "constructHelpersDrawable@324", LVL_05_FINE, true);
 
-      vcContent = new ViewContext(gc, canvasGC, vcRoot);
-      vcContent.toStringSetDebugName("vcContent");
-
+      //by default assume no debug bar or menu bar. 
       StyleClass scEmpty = gc.getStyleClass(IUIView.SC_7_ROOT);
       topoViewDrawableRoot = new TopoViewDrawable(gc, scEmpty, vcRoot, vcContent);
 

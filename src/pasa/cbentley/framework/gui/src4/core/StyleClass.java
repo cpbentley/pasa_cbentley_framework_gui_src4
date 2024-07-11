@@ -39,7 +39,7 @@ import pasa.cbentley.framework.gui.src4.tech.ITechLinks;
  * A class can be shared between {@link IDrawable}s.
  * <br>
  * <br>
- * The designer creates a root {@link ByteObject} style and different sub styles ({@link IBOTypesDrawX#TYPE_DRWX_12_STYLE}).
+ * The designer creates a root {@link ByteObject} style and different sub styles ({@link IBOTypesDrawX#TYPE_DRWX_08_STYLE}).
  * 
  * From these, {@link StyleClass} create variations of the root style. 
  * <br>
@@ -514,6 +514,7 @@ public class StyleClass extends ObjectGC implements IStringable, IStatorable {
       }
       if (o == null) {
          StyleClass sc = gc.getDefaultSC();
+         sc.toStringSetName("default for linkID "+ linkID);
          if (this != sc) {
             o = sc.getStyleClass(linkID);
          }

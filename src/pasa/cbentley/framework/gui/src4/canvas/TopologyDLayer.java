@@ -2,23 +2,25 @@ package pasa.cbentley.framework.gui.src4.canvas;
 
 import pasa.cbentley.core.src4.ctx.UCtx;
 import pasa.cbentley.core.src4.logging.Dctx;
-import pasa.cbentley.core.src4.logging.IDLog;
-import pasa.cbentley.core.src4.logging.IStringable;
 import pasa.cbentley.core.src4.structs.IntBuffer;
 import pasa.cbentley.core.src4.utils.Geo2dUtils;
 import pasa.cbentley.framework.cmd.src4.ctx.CmdCtx;
-import pasa.cbentley.framework.coreui.src4.tech.IInput;
+import pasa.cbentley.framework.core.ui.src4.input.InputState;
+import pasa.cbentley.framework.core.ui.src4.tech.IInput;
 import pasa.cbentley.framework.drawx.src4.engine.GraphicsX;
 import pasa.cbentley.framework.gui.src4.core.Drawable;
+import pasa.cbentley.framework.gui.src4.core.PinBoardDrawable;
 import pasa.cbentley.framework.gui.src4.ctx.GuiCtx;
 import pasa.cbentley.framework.gui.src4.ctx.ObjectGC;
+import pasa.cbentley.framework.gui.src4.exec.ExecutionContextCanvasGui;
+import pasa.cbentley.framework.gui.src4.exec.OutputStateCanvasGui;
 import pasa.cbentley.framework.gui.src4.interfaces.IAnimable;
-import pasa.cbentley.framework.gui.src4.interfaces.ITechCanvasDrawable;
 import pasa.cbentley.framework.gui.src4.interfaces.IDrawable;
+import pasa.cbentley.framework.gui.src4.interfaces.ITechCanvasDrawable;
 import pasa.cbentley.framework.gui.src4.interfaces.ITechDrawable;
+import pasa.cbentley.framework.gui.src4.table.TableView;
 import pasa.cbentley.framework.gui.src4.utils.DrawableArrays;
 import pasa.cbentley.framework.gui.src4.utils.DrawableUtilz;
-import pasa.cbentley.framework.input.src4.InputState;
 import pasa.cbentley.framework.input.src4.ctx.IFlagsToStringInput;
 
 /**
@@ -324,11 +326,12 @@ public class TopologyDLayer extends ObjectGC {
       return false;
    }
 
-   public boolean intercepts(InputConfig icc) {
+   public boolean intercepts(ExecutionContextCanvasGui ec) {
       if (nextEmptyIntercepts != 0) {
          for (int i = 0; i < nextEmptyIntercepts; i++) {
-            intercepts[i].manageInput(icc);
-            if (icc.isActionDone()) {
+            intercepts[i].manageInput(ec);
+            InputConfig ic = ec.getInputConfig();
+            if (ic.isActionDone()) {
                return true;
             }
          }
@@ -396,12 +399,13 @@ public class TopologyDLayer extends ObjectGC {
 
    /**
     * Is the event accepted
-    * @param ic
+    * @param ec TODO
     * @param d
     * @return
     */
-   private boolean isKeyEventAccepted(InputConfig ic, IDrawable d) {
+   private boolean isKeyEventAccepted(ExecutionContextCanvasGui ec, IDrawable d) {
       if (d != null) {
+         InputConfig ic = ec.getInputConfig();
          if (!ic.isActionDone()) {
             //nothing goes down. so buggy.
             //if (gc.getFocusCtrl().getItemInKeyFocus() == d) {
@@ -412,91 +416,97 @@ public class TopologyDLayer extends ObjectGC {
       return false;
    }
 
-   public void manageInput(InputConfig ic) {
-      InputState is = ic.getInputState();
+   public void manageInput(ExecutionContextCanvasGui ec) {
+      InputState is = ec.getInputState();
+      InputConfig ic = ec.getInputConfig();
       //#debug
       toDLog().pFlow("Current BEvent", is.getEventCurrent(), TopologyDLayer.class, "manageInput@line414", LVL_03_FINEST, true);
       //
       if (is.isGestured()) {
-         manageGestureInput(ic);
+         manageGestureInput(ec);
       } else if (is.isTypeRepeat()) {
-         manageRepeatInput(ic);
+         manageRepeatInput(ec);
       } else if (is.isTypeDevice()) {
          if (is.isTypeDeviceKeyboard()) {
-            manageKeyInput(ic);
+            manageKeyInput(ec);
          } else if (is.isTypeDevicePointer()) {
-            managePointerInput(ic);
+            managePointerInput(ec);
          }
       } else {
-         manageOtherInput(ic);
+         manageOtherInput(ec);
       }
    }
 
    /**
     * Start with the highest
-    * @param ic
+    * @param ec TODO
     */
-   public void manageKeyInput(InputConfig ic) {
-      InputState is = ic.getInputState();
+   public void manageKeyInput(ExecutionContextCanvasGui ec) {
+      InputState is = ec.getInputState();
       //#debug
       toDLog().pFlow("KeyCode=", is.getLastDeviceEvent(), TopologyDLayer.class, "manageKeyInput", LVL_03_FINEST, true);
       for (int i = dlayerNextEmpty - 1; i >= 0; i--) {
-         if (isKeyEventAccepted(ic, dlayers[i])) {
-            dlayers[i].manageKeyInput(ic);
+         if (isKeyEventAccepted(ec, dlayers[i])) {
+            dlayers[i].manageKeyInput(ec);
          }
       }
    }
 
-   public void manageRepeatInput(InputConfig ic) {
-      InputState is = ic.getInputState();
+   public void manageRepeatInput(ExecutionContextCanvasGui ec) {
+      InputState is = ec.getInputState();
       //#debug
       toDLog().pFlow("RepeatEvent=", is.getRepeatEvent(), TopologyDLayer.class, "manageRepeatInput@line451", LVL_03_FINEST, true);
 
       for (int i = dlayerNextEmpty - 1; i >= 0; i--) {
-         if (isKeyEventAccepted(ic, dlayers[i])) {
-            dlayers[i].manageRepeatInput(ic);
+         if (isKeyEventAccepted(ec, dlayers[i])) {
+            dlayers[i].manageRepeatInput(ec);
          }
       }
    }
 
-   public void manageOtherInput(InputConfig ic) {
-      InputState is = ic.getInputState();
+   public void manageOtherInput(ExecutionContextCanvasGui ec) {
+      InputState is = ec.getInputState();
       //#debug
       toDLog().pFlow("KeyCode=", is.getLastDeviceEvent(), TopologyDLayer.class, "manageOtherInput", LVL_03_FINEST, true);
 
       for (int i = dlayerNextEmpty - 1; i >= 0; i--) {
-         if (isKeyEventAccepted(ic, dlayers[i])) {
-            dlayers[i].manageOtherInput(ic);
+         if (isKeyEventAccepted(ec, dlayers[i])) {
+            dlayers[i].manageOtherInput(ec);
          }
       }
    }
 
-   public void manageGestureInput(InputConfig ic) {
-      InputState is = ic.getInputState();
+   public void manageGestureInput(ExecutionContextCanvasGui ec) {
+      InputState is = ec.getInputState();
       //#debug
       toDLog().pFlow("KeyCode=", is.getLastDeviceEvent(), TopologyDLayer.class, "manageGestureInput", LVL_03_FINEST, true);
 
       for (int i = dlayerNextEmpty - 1; i >= 0; i--) {
-         if (isKeyEventAccepted(ic, dlayers[i])) {
-            dlayers[i].manageGestureInput(ic);
+         if (isKeyEventAccepted(ec, dlayers[i])) {
+            dlayers[i].manageGestureInput(ec);
          }
       }
    }
 
    /**
     * Manages the input for all layers
-    * @param ic
+    * @param ec TODO
     */
-   public void managePointerInput(InputConfig ic) {
+   public void managePointerInput(ExecutionContextCanvasGui ec) {
+      OutputStateCanvasGui os = ec.getOutputStateCanvasGui();
       for (int i = dlayerNextEmpty - 1; i >= 0; i--) {
-         if (ic.isPointerEventAccepted(dlayers[i])) {
-            dlayers[i].managePointerInput(ic);
-            return;
+         IDrawable drawable = dlayers[i];
+         if(drawable != null) {
+            if(!os.isActionDone()) {
+               if(DrawableUtilz.isInside(ec, drawable)) {
+                  drawable.managePointerInput(ec);
+               }
+            }
          }
       }
       //when move, check for a move out 
-      if (ic.is.getMode() == IInput.MOD_3_MOVED && !ic.isActionDone()) {
-         gc.getFocusCtrl().newFocusPointerPress(ic, null);
+      if (ec.getInputStateDrawable().getMode() == IInput.MOD_3_MOVED && !os.isActionDone()) {
+         gc.getFocusCtrl().newFocusPointerPress(ec, null);
       }
    }
 
@@ -514,7 +524,7 @@ public class TopologyDLayer extends ObjectGC {
     * @param y
     * @return
     */
-   public IDrawable getDrawable(int x, int y, ExecutionContextGui ex) {
+   public IDrawable getDrawable(int x, int y, ExecutionContextCanvasGui ex) {
       for (int i = dlayerNextEmpty - 1; i >= 0; i--) {
          IDrawable d = dlayers[i];
          if (d != null) {

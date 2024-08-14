@@ -5,30 +5,32 @@ import pasa.cbentley.core.src4.logging.Dctx;
 import pasa.cbentley.core.src4.logging.IDLog;
 import pasa.cbentley.core.src4.logging.IStringable;
 import pasa.cbentley.framework.cmd.src4.engine.CmdInstance;
-import pasa.cbentley.framework.coreui.src4.ctx.ToStringStaticCoreUi;
-import pasa.cbentley.framework.coreui.src4.event.RepeatEvent;
-import pasa.cbentley.framework.coreui.src4.exec.ExecutionContext;
-import pasa.cbentley.framework.coreui.src4.interfaces.IActionFeedback;
-import pasa.cbentley.framework.coreui.src4.tech.ITechCodes;
-import pasa.cbentley.framework.coreui.src4.tech.IInput;
-import pasa.cbentley.framework.coreui.src4.tech.ITechInputFeedback;
+import pasa.cbentley.framework.core.ui.src4.ctx.ToStringStaticCoreUi;
+import pasa.cbentley.framework.core.ui.src4.event.RepeatEvent;
+import pasa.cbentley.framework.core.ui.src4.exec.ExecutionContext;
+import pasa.cbentley.framework.core.ui.src4.input.InputState;
+import pasa.cbentley.framework.core.ui.src4.interfaces.IActionFeedback;
+import pasa.cbentley.framework.core.ui.src4.tech.IInput;
+import pasa.cbentley.framework.core.ui.src4.tech.ITechCodes;
+import pasa.cbentley.framework.core.ui.src4.tech.ITechInputFeedback;
 import pasa.cbentley.framework.drawx.src4.engine.GraphicsX;
-import pasa.cbentley.framework.gui.src4.cmd.CmdInstanceDrawable;
+import pasa.cbentley.framework.gui.src4.cmd.CmdInstanceGui;
 import pasa.cbentley.framework.gui.src4.core.Drawable;
 import pasa.cbentley.framework.gui.src4.core.ViewDrawable;
 import pasa.cbentley.framework.gui.src4.ctx.GuiCtx;
+import pasa.cbentley.framework.gui.src4.exec.InputStateCanvasGui;
+import pasa.cbentley.framework.gui.src4.exec.OutputStateCanvasGui;
 import pasa.cbentley.framework.gui.src4.interfaces.IDrawable;
 import pasa.cbentley.framework.gui.src4.interfaces.ITechDrawable;
 import pasa.cbentley.framework.gui.src4.utils.DrawableUtilz;
-import pasa.cbentley.framework.input.src4.CanvasResult;
-import pasa.cbentley.framework.input.src4.InputState;
+import pasa.cbentley.framework.input.src4.engine.OutputStateCanvas;
 
 /**
  * 
  * Aggregates for the View module
- * <li> {@link InputStateDrawable} is a {@link InputState}
+ * <li> {@link InputStateCanvasGui} is a {@link InputState}
  * <li> {@link CmdInstance}
- * <li> {@link CanvasResultDrawable} is a {@link CanvasResult}
+ * <li> {@link OutputStateCanvasGui} is a {@link OutputStateCanvas}
  * <li> {@link ExecutionContext}
  * <br>
  * 
@@ -42,8 +44,7 @@ import pasa.cbentley.framework.input.src4.InputState;
  */
 public class InputConfig implements IStringable, IInput, IActionFeedback {
 
-   private CmdInstanceDrawable     ci;
-
+ 
    //#debug
    private IDrawable               d;
 
@@ -51,27 +52,29 @@ public class InputConfig implements IStringable, IInput, IActionFeedback {
 
    private GuiCtx                  gc;
 
-   public InputStateDrawable       is;
+   private InputStateCanvasGui       is;
 
-   public CanvasResultDrawable     sr;
+   private OutputStateCanvasGui     sr;
 
    protected final ICanvasDrawable canvas;
 
-   public InputConfig(GuiCtx gc, ICanvasDrawable canvas, InputStateDrawable isd, CanvasResultDrawable srd) {
+   public OutputStateCanvasGui getCRD() {
+      return getCanvasResultDrawable();
+   }
+
+   public InputStateCanvasGui getISD() {
+      return getInputStateDrawable();
+   }
+
+   public InputConfig(GuiCtx gc, ICanvasDrawable canvas, InputStateCanvasGui isd, OutputStateCanvasGui srd) {
       this.canvas = canvas;
-      is = isd;
-      sr = srd;
+      setInputStateDrawable(isd);
+      setCanvasResultDrawable(srd);
       this.gc = gc;
    }
 
-   public InputStateDrawable getInputState() {
-      return is;
-   }
-
-   public CmdInstanceDrawable createCmd(int cmdid) {
-      CmdInstanceDrawable cd = new CmdInstanceDrawable(gc, cmdid);
-      cd.setFeedback(this);
-      return cd;
+   public InputStateCanvasGui getInputState() {
+      return getInputStateDrawable();
    }
 
    public GuiCtx getGC() {
@@ -87,32 +90,16 @@ public class InputConfig implements IStringable, IInput, IActionFeedback {
    }
 
    public void actionDone(Object o, int type) {
-      sr.actionDone(o, type);
+      getCanvasResultDrawable().actionDone(o, type);
    }
 
-   public void cmdActionOnDrawable(IDrawable d) {
-      if (ci != null) {
-         ci.actionDone();
-      }
-      sr.setActionDoneRepaint(d);
-   }
-
-   public CmdInstanceDrawable getCmdInstance() {
-      return ci;
-   }
-
-   public void checkCmdInstanceNotNull() {
-      if(ci == null) {
-         throw new NullPointerException();
-      }
-   }
 
    public int getDraggedDiffX() {
-      return is.getDraggedDiffX();
+      return getInputStateDrawable().getDraggedDiffX();
    }
 
    public int getDraggedDiffY() {
-      return is.getDraggedDiffY();
+      return getInputStateDrawable().getDraggedDiffY();
    }
 
    /**
@@ -122,7 +109,7 @@ public class InputConfig implements IStringable, IInput, IActionFeedback {
     * @return value is positive or negative depending on direction
     */
    public int getDraggedVectorX() {
-      return is.getDraggedVectorX();
+      return getInputStateDrawable().getDraggedVectorX();
    }
 
    /**
@@ -131,7 +118,7 @@ public class InputConfig implements IStringable, IInput, IActionFeedback {
     * @return
     */
    public int getDraggedVectorY() {
-      return is.getDraggedVectorY();
+      return getInputStateDrawable().getDraggedVectorY();
    }
 
    public ExecutionContext getEx() {
@@ -139,7 +126,7 @@ public class InputConfig implements IStringable, IInput, IActionFeedback {
    }
 
    public int getIdKeyBut() {
-      return is.getKeyCode();
+      return getInputStateDrawable().getKeyCode();
    }
 
    /**
@@ -148,7 +135,7 @@ public class InputConfig implements IStringable, IInput, IActionFeedback {
     * @return
     */
    public int getKeyModSequence(int last) {
-      return is.getKeyModSequence(last);
+      return getInputStateDrawable().getKeyModSequence(last);
    }
 
    /**
@@ -162,7 +149,7 @@ public class InputConfig implements IStringable, IInput, IActionFeedback {
     * @return
     */
    public int getKeyNum() {
-      return is.getKeyNum();
+      return getInputStateDrawable().getKeyNum();
    }
 
    /**
@@ -170,7 +157,7 @@ public class InputConfig implements IStringable, IInput, IActionFeedback {
     * @return
     */
    public int getPressedKeyCounter() {
-      return is.getPressedKeyNum();
+      return getInputStateDrawable().getPressedKeyNum();
    }
 
    public boolean is0() {
@@ -186,7 +173,7 @@ public class InputConfig implements IStringable, IInput, IActionFeedback {
    }
 
    public void debugSrActionDoneRepaint(String actionStr) {
-      sr.debugSetActionDoneRepaint(actionStr);
+      getCanvasResultDrawable().debugSetActionDoneRepaint(actionStr);
    }
 
    public boolean is1P() {
@@ -258,31 +245,31 @@ public class InputConfig implements IStringable, IInput, IActionFeedback {
    }
 
    public boolean isActionDone() {
-      return sr.isActionDone();
+      return getCanvasResultDrawable().isActionDone();
    }
 
    public boolean isActive(int key) {
-      return is.isActive(key);
+      return getInputStateDrawable().isActive(key);
    }
 
    public boolean isCancel() {
-      return is.isCancel();
+      return getInputStateDrawable().isCancel();
    }
 
    public boolean isCancelP() {
-      return is.isCancelP();
+      return getInputStateDrawable().isCancelP();
    }
 
    public boolean isDown() {
-      return is.isDown();
+      return getInputStateDrawable().isDown();
    }
 
    public boolean isDownActive() {
-      return is.isDownActive();
+      return getInputStateDrawable().isDownActive();
    }
 
    public boolean isDownP() {
-      return is.isDownP();
+      return getInputStateDrawable().isDownP();
    }
 
    /**
@@ -291,11 +278,11 @@ public class InputConfig implements IStringable, IInput, IActionFeedback {
     * @return
     */
    public boolean isDragged(IDrawable viewedDrawable) {
-      return is.isDragged(viewedDrawable);
+      return getInputStateDrawable().isDragged(viewedDrawable);
    }
 
    public boolean isDraggedDragged() {
-      return is.isDraggedDragged();
+      return getInputStateDrawable().isDraggedDragged();
    }
 
    /**
@@ -306,7 +293,7 @@ public class InputConfig implements IStringable, IInput, IActionFeedback {
     * @return
     */
    public boolean isDraggedPointer0Button0() {
-      return is.isDragged();
+      return getInputStateDrawable().isDragged();
    }
 
    /**
@@ -317,15 +304,15 @@ public class InputConfig implements IStringable, IInput, IActionFeedback {
     * @return
     */
    public boolean isFastTyped(int key) {
-      return is.isLastKeyFastTyped(key);
+      return getInputStateDrawable().isLastKeyFastTyped(key);
    }
 
    public boolean isFire() {
-      return is.isFire();
+      return getInputStateDrawable().isFire();
    }
 
    public boolean isFireP() {
-      return is.isFireP();
+      return getInputStateDrawable().isFireP();
    }
 
    /**
@@ -339,11 +326,7 @@ public class InputConfig implements IStringable, IInput, IActionFeedback {
     * @return
     */
    public boolean isGestured() {
-      return is.isGestured();
-   }
-
-   public boolean isInside(IDrawable d) {
-      return DrawableUtilz.isInside(this, d);
+      return getInputStateDrawable().isGestured();
    }
 
    /**
@@ -352,58 +335,51 @@ public class InputConfig implements IStringable, IInput, IActionFeedback {
     * @return
     */
    public boolean isKeyTyped() {
-      return is.isKeyTyped();
+      return getInputStateDrawable().isKeyTyped();
    }
 
    public boolean isKeyTyped(int key) {
-      return is.isKeyTyped(key);
+      return getInputStateDrawable().isKeyTyped(key);
    }
 
    public boolean isKeyTypedAlone(int key) {
-      return is.isKeyTypedAlone(key);
+      return getInputStateDrawable().isKeyTypedAlone(key);
    }
 
    public boolean isLeft() {
-      return is.isLeft();
+      return getInputStateDrawable().isLeft();
    }
 
    public boolean isLeftActive() {
-      return is.isLeftActive();
+      return getInputStateDrawable().isLeftActive();
    }
 
    public boolean isLeftP() {
-      return is.isLeftP();
+      return getInputStateDrawable().isLeftP();
    }
 
    public boolean isMinusP() {
-      return is.isMinusP();
+      return getInputStateDrawable().isMinusP();
    }
 
    public boolean isMoved() {
-      return is.isModMoved();
+      return getInputStateDrawable().isModMoved();
    }
 
    public boolean isNavKey() {
-      return is.isNavKey();
+      return getInputStateDrawable().isNavKey();
    }
 
    public boolean isPhotoP() {
-      return is.isPhotoP();
+      return getInputStateDrawable().isPhotoP();
    }
 
    public boolean isPinched() {
-      return is.isPinched();
+      return getInputStateDrawable().isPinched();
    }
 
    public boolean isPlusP() {
-      return is.isPlusP();
-   }
-
-   public boolean isPointerEventAccepted(IDrawable d) {
-      if (!this.isActionDone() && d != null && DrawableUtilz.isInside(this, d)) {
-         return true;
-      }
-      return false;
+      return getInputStateDrawable().isPlusP();
    }
 
    /**
@@ -424,7 +400,7 @@ public class InputConfig implements IStringable, IInput, IActionFeedback {
     * @return
     */
    public boolean isPoundP() {
-      return is.isPoundP();
+      return getInputStateDrawable().isPoundP();
    }
 
    /**
@@ -432,7 +408,7 @@ public class InputConfig implements IStringable, IInput, IActionFeedback {
     * @return
     */
    public boolean isPressed() {
-      return is.isModPressed();
+      return getInputStateDrawable().isModPressed();
    }
 
    /**
@@ -440,7 +416,7 @@ public class InputConfig implements IStringable, IInput, IActionFeedback {
     * @return
     */
    public boolean isPressedDouble() {
-      return is.isPressedDouble();
+      return getInputStateDrawable().isPressedDouble();
    }
 
    /**
@@ -451,7 +427,7 @@ public class InputConfig implements IStringable, IInput, IActionFeedback {
     * @return
     */
    public boolean isPressedKeyboard0(int key) {
-      return is.isPressedKeyboard0(key);
+      return getInputStateDrawable().isPressedKeyboard0(key);
    }
 
    /**
@@ -459,7 +435,7 @@ public class InputConfig implements IStringable, IInput, IActionFeedback {
     * @return
     */
    public boolean isPressedReleasedDouble() {
-      return is.isPressedReleasedDouble();
+      return getInputStateDrawable().isPressedReleasedDouble();
    }
 
    /**
@@ -468,7 +444,7 @@ public class InputConfig implements IStringable, IInput, IActionFeedback {
     * @return
     */
    public boolean isReleaseAround(int value) {
-      return is.isReleaseAround(value);
+      return getInputStateDrawable().isReleaseAround(value);
    }
 
    /**
@@ -478,15 +454,15 @@ public class InputConfig implements IStringable, IInput, IActionFeedback {
     * @return
     */
    public boolean isReleased() {
-      return is.isModReleased();
+      return getInputStateDrawable().isModReleased();
    }
 
    public boolean isRight() {
-      return is.isRight();
+      return getInputStateDrawable().isRight();
    }
 
    public boolean isRightActive() {
-      return is.isRightActive();
+      return getInputStateDrawable().isRightActive();
    }
 
    public boolean isRightP() {
@@ -494,11 +470,11 @@ public class InputConfig implements IStringable, IInput, IActionFeedback {
    }
 
    public boolean isSequencedPressed(int key1, int key2) {
-      return is.isSequencedPressedKeyboard0(key1, key2);
+      return getInputStateDrawable().isSequencedPressedKeyboard0(key1, key2);
    }
 
    public boolean isSequencedTyped(int key1, int key2) {
-      return is.isSequencedTypedKeyboard0(key1, key2);
+      return getInputStateDrawable().isSequencedTypedKeyboard0(key1, key2);
    }
 
    /**
@@ -506,11 +482,11 @@ public class InputConfig implements IStringable, IInput, IActionFeedback {
     * @return
     */
    public boolean isSoftLeftP() {
-      return is.isSoftLeftP();
+      return getInputStateDrawable().isSoftLeftP();
    }
 
    public boolean isSoftRightP() {
-      return is.isSoftRightP();
+      return getInputStateDrawable().isSoftRightP();
    }
 
    /**
@@ -518,7 +494,7 @@ public class InputConfig implements IStringable, IInput, IActionFeedback {
     * @return
     */
    public boolean isStarP() {
-      return is.isStarP();
+      return getInputStateDrawable().isStarP();
    }
 
    /**
@@ -527,50 +503,50 @@ public class InputConfig implements IStringable, IInput, IActionFeedback {
     * @return
     */
    public boolean isTriggerStar(int key) {
-      return is.isTriggerStar(key);
+      return getInputStateDrawable().isTriggerStar(key);
    }
 
    public boolean isUp() {
-      return is.isUp();
+      return getInputStateDrawable().isUp();
    }
 
    public boolean isUpActive() {
-      return is.isUpActive();
+      return getInputStateDrawable().isUpActive();
    }
 
    public boolean isUpP() {
-      return is.isUpP();
+      return getInputStateDrawable().isUpP();
    }
 
    public boolean isWheeled() {
-      return is.isWheeled();
+      return getInputStateDrawable().isWheeled();
    }
 
    //#enddebug
 
    public boolean isZeroP() {
-      return is.isZeroP();
+      return getInputStateDrawable().isZeroP();
    }
 
    public void requestRepetition() {
-      RepeatEvent er = is.createRepeatEventLastDevicePress();
-      is.getInputRequestRoot().requestRepetition(er);
+      RepeatEvent er = getInputStateDrawable().createRepeatEventLastDevicePress();
+      getInputStateDrawable().getInputRequestRoot().requestRepeat(er);
    }
 
    public void setActionDoneRepaintMessage(IDrawable msg, int timeout, int anchor) {
-      sr.setActionDoneRepaintMessage(msg, timeout, anchor);
+      getCanvasResultDrawable().setActionDoneRepaintMessage(msg, timeout, anchor);
    }
 
    public void setActionDoneRepaintMessage(String string, int timeout, int anchor) {
-      sr.setActionDoneRepaintMessage(string, timeout, anchor);
+      getCanvasResultDrawable().setActionDoneRepaintMessage(string, timeout, anchor);
    }
 
    public void setActionString(String string) {
-      sr.setActionString(string);
+      getCanvasResultDrawable().setActionString(string);
    }
 
    public void srActionDone() {
-      sr.setActionDone();
+      getCanvasResultDrawable().setActionDone();
    }
 
    /**
@@ -582,11 +558,11 @@ public class InputConfig implements IStringable, IInput, IActionFeedback {
     * However when UP and DOWN are pressed together, they may generated 2 action done on the same loop
     */
    public void srActionDoneRepaint() {
-      sr.setActionDoneRepaint();
+      getCanvasResultDrawable().setActionDoneRepaint();
    }
 
    public void srActionDoneRepaint(boolean done, boolean repaint) {
-      sr.setActionDoneRepaint(done, repaint);
+      getCanvasResultDrawable().setActionDoneRepaint(done, repaint);
    }
 
    /**
@@ -612,7 +588,7 @@ public class InputConfig implements IStringable, IInput, IActionFeedback {
     * @param drawable
     */
    public void srActionDoneRepaint(IDrawable drawable) {
-      sr.setActionDoneRepaint(drawable);
+      getCanvasResultDrawable().setActionDoneRepaint(drawable);
    }
 
    /**
@@ -621,7 +597,7 @@ public class InputConfig implements IStringable, IInput, IActionFeedback {
     * @param string
     */
    public void srActionDoneRepaintMessage(String string) {
-      sr.setActionDoneRepaintMessage(string);
+      getCanvasResultDrawable().setActionDoneRepaintMessage(string);
    }
 
    /**
@@ -639,7 +615,7 @@ public class InputConfig implements IStringable, IInput, IActionFeedback {
     * @param str
     */
    public void srActionDoneRepaintMessage(String string, int timeout) {
-      sr.setActionDoneRepaintMessage(string, timeout);
+      getCanvasResultDrawable().setActionDoneRepaintMessage(string, timeout);
    }
 
    /**
@@ -649,22 +625,22 @@ public class InputConfig implements IStringable, IInput, IActionFeedback {
     * @param is
     */
    public void srActionDoneRepaintSpecial(IDrawable d) {
-      sr.setActionDoneRepaintSpecial(d);
+      getCanvasResultDrawable().setActionDoneRepaintSpecial(d);
    }
 
    public void srActionRepaint(IDrawable drawable) {
-      sr.setActionDoneRepaint(drawable);
+      getCanvasResultDrawable().setActionDoneRepaint(drawable);
    }
 
    public void srMenuRepaint() {
-      sr.srMenuRepaint();
+      getCanvasResultDrawable().srMenuRepaint();
    }
 
    /**
     * Force a full flush of all cache
     */
    public void srRenewLayout() {
-      sr.srRenewLayout();
+      getCanvasResultDrawable().srRenewLayout();
    }
 
    public void toCheckPointer(Drawable drawable) {
@@ -702,7 +678,7 @@ public class InputConfig implements IStringable, IInput, IActionFeedback {
    }
 
    public String toStringMod() {
-      return ToStringStaticCoreUi.toStringMod(is.getMode());
+      return ToStringStaticCoreUi.toStringMod(getInputStateDrawable().getMode());
    }
    //#enddebug
 
@@ -710,6 +686,22 @@ public class InputConfig implements IStringable, IInput, IActionFeedback {
 
    private void toStringPrivate(Dctx dc) {
 
+   }
+
+   public InputStateCanvasGui getInputStateDrawable() {
+      return is;
+   }
+
+   public void setInputStateDrawable(InputStateCanvasGui is) {
+      this.is = is;
+   }
+
+   public OutputStateCanvasGui getCanvasResultDrawable() {
+      return sr;
+   }
+
+   public void setCanvasResultDrawable(OutputStateCanvasGui sr) {
+      this.sr = sr;
    }
 
 }

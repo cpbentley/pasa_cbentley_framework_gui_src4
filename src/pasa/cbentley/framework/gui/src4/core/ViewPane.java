@@ -1,25 +1,25 @@
 package pasa.cbentley.framework.gui.src4.core;
 
 import pasa.cbentley.byteobjects.src4.core.ByteObject;
+import pasa.cbentley.byteobjects.src4.objects.move.FunctionMove;
+import pasa.cbentley.byteobjects.src4.objects.move.ITechMoveFunction;
 import pasa.cbentley.core.src4.interfaces.C;
 import pasa.cbentley.core.src4.logging.Dctx;
 import pasa.cbentley.core.src4.structs.BufferObject;
 import pasa.cbentley.core.src4.structs.IntBuffer;
-import pasa.cbentley.framework.coreui.src4.utils.ViewState;
+import pasa.cbentley.framework.core.ui.src4.utils.ViewState;
 import pasa.cbentley.framework.drawx.src4.engine.GraphicsX;
 import pasa.cbentley.framework.drawx.src4.engine.RgbImage;
 import pasa.cbentley.framework.drawx.src4.style.StyleCache;
 import pasa.cbentley.framework.drawx.src4.style.StyleOperator;
-import pasa.cbentley.framework.gui.src4.anim.move.FunctionMove;
-import pasa.cbentley.framework.gui.src4.anim.move.ITechMoveFunction;
 import pasa.cbentley.framework.gui.src4.anim.move.Move;
 import pasa.cbentley.framework.gui.src4.anim.move.MoveGhost;
-import pasa.cbentley.framework.gui.src4.canvas.ExecutionContextGui;
 import pasa.cbentley.framework.gui.src4.canvas.InputConfig;
 import pasa.cbentley.framework.gui.src4.canvas.PointerGestureDrawable;
 import pasa.cbentley.framework.gui.src4.canvas.ViewContext;
 import pasa.cbentley.framework.gui.src4.ctx.GuiCtx;
 import pasa.cbentley.framework.gui.src4.ctx.IToStringFlagsGui;
+import pasa.cbentley.framework.gui.src4.exec.ExecutionContextCanvasGui;
 import pasa.cbentley.framework.gui.src4.factories.interfaces.IBOScrollBar;
 import pasa.cbentley.framework.gui.src4.factories.interfaces.IBOViewPane;
 import pasa.cbentley.framework.gui.src4.interfaces.IAnimable;
@@ -421,14 +421,14 @@ public class ViewPane extends Drawable implements ITechViewPane, ITechDrawable, 
     * This method is called after the planetaries have been sized.
     * <br>
     */
-   private boolean applyBehaviorShrinking() {
+   protected boolean applyBehaviorShrinking() {
       boolean isShrinkVP = false;
       if (boViewPane.get4Bits1(VP_OFFSET_06_VISUAL_LEFT_OVER1) == VISUAL_2_SHRINK) {
          //check the ph of the current visible increments.
          viewedDrawable.getViewPortDecoW();
       }
       //
-      if (viewedDrawable.hasFlagView(FLAG_GENE_29_SHRINKABLE_W)) {
+      if (viewedDrawable.hasFlagGeneShrinkableW()) {
          int dw = viewedDrawable.getDrawnWidth();
          int decoW = getSpaceConsumedViewPaneHoriz();
          int pw = viewedDrawable.getPreferredWidth();
@@ -442,7 +442,7 @@ public class ViewPane extends Drawable implements ITechViewPane, ITechDrawable, 
             shrinkViewPortW = 0;
          }
       }
-      if (viewedDrawable.hasFlagView(FLAG_GENE_30_SHRINKABLE_H)) {
+      if (viewedDrawable.hasFlagGeneShrinkableH()) {
          int dh = viewedDrawable.getDrawnHeight();
          int decoH = getSpaceConsumedViewPaneVertical();
          int ph = viewedDrawable.getPreferredHeight();
@@ -542,16 +542,17 @@ public class ViewPane extends Drawable implements ITechViewPane, ITechDrawable, 
     * <br>
     * @param ic
     */
-   protected void draggingViewPane(InputConfig ic) {
+   protected void draggingViewPane(ExecutionContextCanvasGui ec) {
+      InputConfig ic = ec.getInputConfig();
       if (ic.isDraggedPointer0Button0()) {
-         GestureDetector pg = ic.is.getOrCreateGesture(this);
+         GestureDetector pg = ic.getInputStateDrawable().getOrCreateGesture(this);
          int nx = pg.getPressed(PointerGestureDrawable.ID_0_X) + ic.getDraggedVectorX();
          int ny = pg.getPressed(PointerGestureDrawable.ID_1_Y) + ic.getDraggedVectorY();
          viewedDrawable.setXY(nx, ny);
          ic.srActionDoneRepaint(viewedDrawable);
       } else if (ic.isReleased()) {
-         GestureDetector pg = ic.is.getOrCreateGesture(this);
-         pg.simpleRelease(ic.is);
+         GestureDetector pg = ic.getInputStateDrawable().getOrCreateGesture(this);
+         pg.simpleRelease(ic.getInputStateDrawable());
       }
    }
 
@@ -832,7 +833,7 @@ public class ViewPane extends Drawable implements ITechViewPane, ITechDrawable, 
       return y;
    }
 
-   public IDrawable getDrawable(int x, int y, ExecutionContextGui ex) {
+   public IDrawable getDrawable(int x, int y, ExecutionContextCanvasGui ex) {
       if (isInsideViewPort(x, y)) {
          return viewedDrawable.getDrawableViewPort(x, y, ex);
       } else {
@@ -841,7 +842,7 @@ public class ViewPane extends Drawable implements ITechViewPane, ITechDrawable, 
       }
    }
 
-   public IDrawable getDrawableFromSattelites(int x, int y, ExecutionContextGui ex) {
+   public IDrawable getDrawableFromSattelites(int x, int y, ExecutionContextCanvasGui ex) {
       IDrawable d = null;
       IDrawable[] satellites = getSattelites();
       for (int i = 0; i < satellites.length; i++) {
@@ -916,12 +917,11 @@ public class ViewPane extends Drawable implements ITechViewPane, ITechDrawable, 
     */
    public int getExpansionPixelsH() {
       int expansionHPixels = 0;
+
       if (isScrollBarVertExpand()) {
          if (vScrollBar != null) {
             expansionHPixels += vScrollBar.getSbSpaceConsumedVertMin();
          }
-      }
-      if (isScrollBarHorizExpand()) {
          if (hScrollBar != null) {
             expansionHPixels += hScrollBar.getSbSpaceConsumedVertMin();
          }
@@ -944,11 +944,11 @@ public class ViewPane extends Drawable implements ITechViewPane, ITechDrawable, 
    public int getExpansionPixelsW() {
       int expansionWPixels = 0;
       if (isScrollBarVertExpand()) {
+      }
+      if (isScrollBarHorizExpand()) {
          if (vScrollBar != null) {
             expansionWPixels += vScrollBar.getSbSpaceConsumedHorizMin();
          }
-      }
-      if (isScrollBarHorizExpand()) {
          if (hScrollBar != null) {
             expansionWPixels += hScrollBar.getSbSpaceConsumedHorizMin();
          }
@@ -1192,7 +1192,7 @@ public class ViewPane extends Drawable implements ITechViewPane, ITechDrawable, 
             break;
       }
 
-      FunctionMove mf = new FunctionMove(gc, ITechMoveFunction.TYPE_MOVE_0_ASAP, xo, yo, xd, yd);
+      FunctionMove mf = new FunctionMove(gc.getBOC(), ITechMoveFunction.TYPE_MOVE_0_ASAP, xo, yo, xd, yd);
       mf.setIncrementType(ITechMoveFunction.INCREMENT_1_FIB);
       return mf;
    }
@@ -1205,7 +1205,7 @@ public class ViewPane extends Drawable implements ITechViewPane, ITechDrawable, 
     * @param trail
     * @return
     */
-   private MoveGhost getMoveGhostHoriz(InputConfig ic, int moveSize, int moveSizeIncr, FunctionMove mf, int trail, ScrollConfig base) {
+   private MoveGhost getMoveGhostHoriz(ExecutionContextCanvasGui ec, int moveSize, int moveSizeIncr, FunctionMove mf, int trail, ScrollConfig base) {
       ScrollConfig opposite = getScrollConfigVertical();
       if (moveHoriz != null) {
          if (moveHoriz.hasAnimFlag(IAnimable.ANIM_13_STATE_FINISHED)) {
@@ -1580,8 +1580,6 @@ public class ViewPane extends Drawable implements ITechViewPane, ITechDrawable, 
          if (vScrollBar != null) {
             val -= vScrollBar.getSbSpaceConsumedVertMin();
          }
-      }
-      if (isScrollBarHorizEat()) {
          if (hScrollBar != null) {
             val -= hScrollBar.getSbSpaceConsumedVertMin();
          }
@@ -1679,8 +1677,6 @@ public class ViewPane extends Drawable implements ITechViewPane, ITechDrawable, 
          if (hScrollBar != null) {
             val -= hScrollBar.getSbSpaceConsumedHorizMin();
          }
-      }
-      if (isScrollBarVertEat()) {
          if (vScrollBar != null) {
             val -= vScrollBar.getSbSpaceConsumedHorizMin();
          }
@@ -1799,7 +1795,7 @@ public class ViewPane extends Drawable implements ITechViewPane, ITechDrawable, 
     */
    private void initFullHBar() {
       initScrollBarHoriz();
-      if (boViewPane.get2Bits1(VP_OFFSET_05_SCROLLBAR_MODE1) == PLANET_MODE_3_IMMATERIAL) {
+      if (boViewPane.get2Bits1(VP_OFFSET_05_SCROLLBAR_MODE1) == PLANET_MODE_3_GHOST) {
          hScrollBar.setBehaviorFlag(BEHAVIOR_16_IMMATERIAL, true);
       }
       if (boViewPane.hasFlag(VP_OFFSET_03_FLAGY, VP_FLAGY_5_SB_INVISIBLE_HORIZ)) {
@@ -1827,7 +1823,7 @@ public class ViewPane extends Drawable implements ITechViewPane, ITechDrawable, 
     */
    private void initFullVBar() {
       initScrollbarVert();
-      if (boViewPane.get2Bits2(VP_OFFSET_05_SCROLLBAR_MODE1) == PLANET_MODE_3_IMMATERIAL) {
+      if (boViewPane.get2Bits2(VP_OFFSET_05_SCROLLBAR_MODE1) == PLANET_MODE_3_GHOST) {
          vScrollBar.setBehaviorFlag(BEHAVIOR_16_IMMATERIAL, true);
       }
       if (boViewPane.hasFlag(VP_OFFSET_03_FLAGY, VP_FLAGY_6_SB_INVISIBLE_VERT)) {
@@ -2112,8 +2108,16 @@ public class ViewPane extends Drawable implements ITechViewPane, ITechDrawable, 
 
       //diminish styling for the scrollbar
       if (isStyleAppliedToViewPane()) {
-         width -= getViewPaneStyleWConsumed();
-         height -= getViewPaneStyleHConsumed();
+         int viewPaneStyleWConsumed = getViewPaneStyleWConsumed();
+         width -= viewPaneStyleWConsumed;
+         if (width <= 0) {
+            throw new IllegalStateException("viewPortWidthOriginal=" + viewPortWidthOriginal + " viewPaneStyleWConsumed=" + viewPaneStyleWConsumed);
+         }
+         int viewPaneStyleHConsumed = getViewPaneStyleHConsumed();
+         height -= viewPaneStyleHConsumed;
+         if (height <= 0) {
+            throw new IllegalStateException("viewPortHeightOriginal=" + viewPortHeightOriginal + " viewPaneStyleHConsumed=" + viewPaneStyleHConsumed);
+         }
       }
       //viewpane is fully constrained by default but follow its own dimension rules for expansion
       //so by default viewport dimension is the same but remove viewpane style
@@ -2127,33 +2131,43 @@ public class ViewPane extends Drawable implements ITechViewPane, ITechDrawable, 
       initSattelitesDimension();
 
       //since ViewPane is a Drawable. Dimension of ViewPane includes everything!
-      int vdW = viewedDrawable.getDrawnWidth();
-      int vdH = viewedDrawable.getDrawnHeight();
-      setDw(vdW);
-      setDh(vdH);
-
+      this.setSizeFromViewDrawable();
       //do the viewport of the ViewDrawable and update ViewPane if changes in preferred size.
       initViewPort();
 
       //if no viewpane. add style to preferred size
 
       //once we have a final results.. see if we can shrink anything. which do the process again
-      boolean hasShrink = initViewPaneShrink();
-      if (hasShrink) {
+      boolean shrink = initVisualShrink();
+      //after sizing 
+      boolean shrinkB = applyBehaviorShrinking();
+
+      if (shrink || shrinkB) {
          //the following code adjust drawable width if the ViewPane shrank the ViewPort areas.
          if (shrinkViewPortW != 0) {
-            setDw(getDw() - shrinkViewPortW);
-            setDw(getDw() - shrinkVisualW);
+            viewedDrawable.decrementDw(shrinkViewPortW);
+         }
+         if (shrinkVisualW != 0) {
+            viewedDrawable.decrementDh(shrinkVisualW);
          }
          if (shrinkViewPortH != 0) {
-            setDh(getDh() - shrinkViewPortH);
-            setDh(getDh() - shrinkVisualH);
+            viewedDrawable.decrementDh(shrinkViewPortH);
          }
-         setDw(getDw() + getExpansionPixelsW());
-         setDh(getDh() + getExpansionPixelsH());
-
+         if (shrinkVisualH != 0) {
+            viewedDrawable.decrementDh(shrinkVisualH);
+         }
+         //         int expansionPixelsW = getExpansionPixelsW();
+         //         if (expansionPixelsW != 0) {
+         //            viewedDrawable.incrementDw(expansionPixelsW);
+         //         }
+         //         int expansionPixelsH = getExpansionPixelsH();
+         //         if (expansionPixelsH != 0) {
+         //            //increment only the difference bet
+         //            viewedDrawable.incrementDh(expansionPixelsH);
+         //         }
+         this.setSizeFromViewDrawable();
          //a shrink influence every sattelites but won't change scrollbar existence
-         //initViewPaneSattelites();
+         this.initSattelitesDimension();
       }
 
       //update the viewedDrawable visible drawable dimension. this does not generate a style compute update
@@ -2164,7 +2178,7 @@ public class ViewPane extends Drawable implements ITechViewPane, ITechDrawable, 
       //viewedDrawable.setDrawableSize(newW, newH, true);
 
       super.initStyleCache();
-      
+
       //after the up
       if (vScrollBar != null) {
          viewedDrawable.setFlagView(FLAG_VSTATE_24_SCROLLED_V, true);
@@ -2184,21 +2198,19 @@ public class ViewPane extends Drawable implements ITechViewPane, ITechDrawable, 
       gc.getNavigator().setNavCtx(viewedDrawable, viewedDrawable.hasFlagView(FLAG_VSTATE_22_SCROLLED));
    }
 
-   /**
-    * shrinking is done once the final is done.
-    * <br>
-    * <br>
-    * if sizers allow it: i.e sattelites sizers are not in preferred mode
-    * <br>
-    * or preferred size allows shrinking. only then shrink
-    */
-   private boolean initViewPaneShrink() {
-      //
-      boolean shrink = initVisualShrink();
-      //after sizing 
-      boolean shrinkB = applyBehaviorShrinking();
+   public void setSizeFromViewDrawable() {
+      int vdw = viewedDrawable.getDrawnWidth();
+      int vdh = viewedDrawable.getDrawnHeight();
+      this.layEngine.setH(vdh);
+      this.layEngine.setW(vdw);
+   }
 
-      return shrink || shrinkB;
+   protected void setDh(int dh) {
+      throw new RuntimeException();
+   }
+
+   protected void setDw(int dw) {
+      throw new RuntimeException();
    }
 
    private void initViewPort() {
@@ -2370,8 +2382,8 @@ public class ViewPane extends Drawable implements ITechViewPane, ITechDrawable, 
       return !hasTech(VP_FLAG_3_SCROLLBAR_MASTER);
    }
 
-   public boolean isInsideViewPort(InputConfig ic) {
-      return DrawableUtilz.isInside(ic, getViewPortXAbs(), getViewPortYAbs(), getViewPortWidth(), getViewPortHeight());
+   public boolean isInsideViewPort(ExecutionContextCanvasGui ec) {
+      return DrawableUtilz.isInside(ec, getViewPortXAbs(), getViewPortYAbs(), getViewPortWidth(), getViewPortHeight());
    }
 
    public boolean isInsideViewPort(int x, int y) {
@@ -2501,7 +2513,7 @@ public class ViewPane extends Drawable implements ITechViewPane, ITechDrawable, 
    }
 
    private boolean isScrollBarHorizImmaterial() {
-      return boViewPane.get2Bits1(VP_OFFSET_05_SCROLLBAR_MODE1) == PLANET_MODE_3_IMMATERIAL;
+      return boViewPane.get2Bits1(VP_OFFSET_05_SCROLLBAR_MODE1) == PLANET_MODE_3_GHOST;
    }
 
    private boolean isScrollBarHorizNotOverlay() {
@@ -2528,7 +2540,7 @@ public class ViewPane extends Drawable implements ITechViewPane, ITechDrawable, 
 
    private boolean isScrollBarVertImmaterial() {
       int val = boViewPane.get2Bits2(VP_OFFSET_05_SCROLLBAR_MODE1);
-      return (val == PLANET_MODE_3_IMMATERIAL);
+      return (val == PLANET_MODE_3_GHOST);
    }
 
    /**
@@ -2560,7 +2572,7 @@ public class ViewPane extends Drawable implements ITechViewPane, ITechDrawable, 
          return true;
       }
       int viewPortWidth2 = getViewPortWidth();
-      int preferredContentWidth = viewedDrawable.getPreferredContentWidth();
+      int preferredContentWidth = viewedDrawable.getSizePreferredContentWidth();
 
       boolean isScrollNeeded = viewPortWidth2 < preferredContentWidth;
 
@@ -2591,7 +2603,7 @@ public class ViewPane extends Drawable implements ITechViewPane, ITechDrawable, 
       }
 
       int viewPortHeight2 = getViewPortHeight();
-      int preferredContentHeight = viewedDrawable.getPreferredContentHeight();
+      int preferredContentHeight = viewedDrawable.getSizePreferredContentHeight();
 
       boolean isScrollNeeded = viewPortHeight2 < preferredContentHeight;
 
@@ -3522,7 +3534,7 @@ public class ViewPane extends Drawable implements ITechViewPane, ITechDrawable, 
       }
    }
 
-   protected void manageAnimHoriz(InputConfig ic, ScrollConfig scX, boolean isLeft) {
+   protected void manageAnimHoriz(ExecutionContextCanvasGui ic, ScrollConfig scX, boolean isLeft) {
       int moveSizePixel = scX.getPixelSizeLastMove();
       int moveSizeIncr = scX.getLastEffectiveChange();
       if (isLeft) {
@@ -3532,7 +3544,7 @@ public class ViewPane extends Drawable implements ITechViewPane, ITechDrawable, 
       }
    }
 
-   protected void manageAnimVert(InputConfig ic, ScrollConfig scY, boolean isUp) {
+   protected void manageAnimVert(ExecutionContextCanvasGui ic, ScrollConfig scY, boolean isUp) {
       int moveSizePixel = scY.getPixelSizeLastMove();
       int moveSizeIncr = scY.getLastEffectiveChange();
       if (isUp) {
@@ -3543,21 +3555,21 @@ public class ViewPane extends Drawable implements ITechViewPane, ITechDrawable, 
    }
 
    /**
-    * Called by {@link ViewDrawable#manageKeyInput(InputConfig)}. 
+    * Called by {@link ViewDrawable#manageKeyInput(ExecutionContextCanvasGui)}. 
     * <br>
     * <br>Thus implementation may decide to manage everything themselves. 
     * <br>
-    * This method delegates to {@link ScrollBar#manageKeyInput(InputConfig)}. 
+    * This method delegates to {@link ScrollBar#manageKeyInput(ExecutionContextCanvasGui)}. 
     * <br>
     * <br>
     * {@link ViewPane#navigateDown(InputConfig)} is not called in this line of code.
     */
-   public void manageKeyInput(InputConfig ic) {
+   public void manageKeyInput(ExecutionContextCanvasGui ec) {
       if (vScrollBar != null) {
-         vScrollBar.manageKeyInput(ic);
+         vScrollBar.manageKeyInput(ec);
       }
       if (hScrollBar != null) {
-         hScrollBar.manageKeyInput(ic);
+         hScrollBar.manageKeyInput(ec);
       }
    }
 
@@ -3580,31 +3592,32 @@ public class ViewPane extends Drawable implements ITechViewPane, ITechDrawable, 
     * <br>
     * <br>
     */
-   public void managePointerInput(InputConfig ic) {
+   public void managePointerInput(ExecutionContextCanvasGui ec) {
       //System.out.println("#ViewPane#managePointerInput " + ic.x + "," + ic.y);
 
       //the following if checks if previous event is on a scrollbar and redirects it . is it still needed?
+      InputConfig ic = ec.getInputConfig();
       if (ic.isDragged(viewedDrawable)) {
-         viewedDrawable.managePointerInputViewPort(ic);
+         viewedDrawable.managePointerInputViewPort(ec);
          return;
       } else if (ic.isDragged(this)) {
-         draggingViewPane(ic);
+         draggingViewPane(ec);
       }
       //check the overlayed headers and scollbars
       if (viewedDrawable.hasFlagView(ViewDrawable.FLAG_VSTATE_03_VIEWPANE_OVERLAY)) {
-         managePointerSattelite(ic);
+         managePointerSattelite(ec);
          if (ic.isActionDone()) {
             //cancel what was done in slaved?
             return;
          }
       }
       //then forward event to ViewDrawable
-      if (isInsideViewPort(ic)) {
-         viewedDrawable.managePointerInputViewPort(ic);
+      if (isInsideViewPort(ec)) {
+         viewedDrawable.managePointerInputViewPort(ec);
          return;
       } else {
          //else try to see if any sattelite process the event 
-         managePointerSattelite(ic);
+         managePointerSattelite(ec);
          if (!ic.isActionDone()) {
             //ask Drawable ViewPane to do it
             //System.out.println("#ViewPane calls Drawable#managePointerInput");
@@ -3619,13 +3632,13 @@ public class ViewPane extends Drawable implements ITechViewPane, ITechDrawable, 
     * @param ic
     * @param d
     */
-   private void managePointerInputHelper(InputConfig ic, IDrawable d) {
-      if (d != null && DrawableUtilz.isInside(ic, d)) {
-         d.managePointerInput(ic);
+   private void managePointerInputHelper(ExecutionContextCanvasGui ec, IDrawable d) {
+      if (d != null && DrawableUtilz.isInside(ec, d)) {
+         d.managePointerInput(ec);
       }
    }
 
-   private IDrawable managePointerInputHelper(int x, int y, IDrawable d, ExecutionContextGui ex) {
+   private IDrawable managePointerInputHelper(int x, int y, IDrawable d, ExecutionContextCanvasGui ex) {
       if (d != null && DrawableUtilz.isInside(x, y, d)) {
          return d.getDrawable(x, y, ex);
       }
@@ -3636,18 +3649,18 @@ public class ViewPane extends Drawable implements ITechViewPane, ITechDrawable, 
     * A Sattelite maybe slaved to ViewDrawable in which case, all events go straight to ViewDrawable.
     * <br>
     * <br>
-    * The base {@link IDrawable#managePointerInput(InputConfig)} is not called.
-    * @param ic
+    * The base {@link IDrawable#managePointerInput(ExecutionContextCanvasGui)} is not called.
+    * @param ec
     */
-   protected void managePointerSattelite(InputConfig ic) {
-      managePointerInputHelper(ic, vScrollBar);
-      managePointerInputHelper(ic, hScrollBar);
-      managePointerInputHelper(ic, headerTop);
-      managePointerInputHelper(ic, headerTopClose);
-      managePointerInputHelper(ic, headerBottom);
-      managePointerInputHelper(ic, headerLeft);
-      managePointerInputHelper(ic, headerRight);
-      managePointerInputHelper(ic, scrollBarHole);
+   protected void managePointerSattelite(ExecutionContextCanvasGui ec) {
+      managePointerInputHelper(ec, vScrollBar);
+      managePointerInputHelper(ec, hScrollBar);
+      managePointerInputHelper(ec, headerTop);
+      managePointerInputHelper(ec, headerTopClose);
+      managePointerInputHelper(ec, headerBottom);
+      managePointerInputHelper(ec, headerLeft);
+      managePointerInputHelper(ec, headerRight);
+      managePointerInputHelper(ec, scrollBarHole);
 
       //if attached to a dragger adapter
       //      if (DrawableUtilz.isInside(ic, scrollBarHole)) {
@@ -3660,12 +3673,12 @@ public class ViewPane extends Drawable implements ITechViewPane, ITechDrawable, 
       //      }
       if (headerHoles != null) {
          for (int i = 0; i < headerHoles.length; i++) {
-            managePointerInputHelper(ic, headerHoles[i]);
+            managePointerInputHelper(ec, headerHoles[i]);
          }
       }
       if (scrollBarHoles != null) {
          for (int i = 0; i < scrollBarHoles.length; i++) {
-            managePointerInputHelper(ic, scrollBarHoles[i]);
+            managePointerInputHelper(ec, scrollBarHoles[i]);
          }
       }
    }
@@ -3744,7 +3757,7 @@ public class ViewPane extends Drawable implements ITechViewPane, ITechDrawable, 
       return val;
    }
 
-   void moveAnim(InputConfig ic, int moveSize, int trail, int moveAngle, int siStartMod, boolean horiz) {
+   void moveAnim(ExecutionContextCanvasGui ic, int moveSize, int trail, int moveAngle, int siStartMod, boolean horiz) {
       ScrollConfig sc = (horiz) ? getScrollConfigVertical() : getScrollConfigHorizontal();
       ScrollConfig scClone = sc.cloneModVisible(siStartMod, Math.abs(siStartMod));
       ScrollConfig opposite = (horiz) ? getScrollConfigHorizontal() : getScrollConfigVertical();
@@ -3779,7 +3792,7 @@ public class ViewPane extends Drawable implements ITechViewPane, ITechDrawable, 
     * @param moveSiVisible absolute increment of number of visible increment of the move
     * @param moveSiPixelSize pixel amplitude of the move
     */
-   private void moveAnimGhostHorizLeft(InputConfig ic, int moveSiStart, int moveSiVisible, int moveSiPixelSize) {
+   private void moveAnimGhostHorizLeft(ExecutionContextCanvasGui ic, int moveSiStart, int moveSiVisible, int moveSiPixelSize) {
       ScrollConfig opposite = getScrollConfigVertical();
       initMoveGhost();
       //already modified
@@ -3853,7 +3866,7 @@ public class ViewPane extends Drawable implements ITechViewPane, ITechDrawable, 
     * @param moveSiVisible
     * @param moveSiPixelSize
     */
-   private void moveAnimGhostVertDown(InputConfig ic, int moveSiStartIncr, int moveSiVisible, int moveSiPixelSize) {
+   private void moveAnimGhostVertDown(ExecutionContextCanvasGui ic, int moveSiStartIncr, int moveSiVisible, int moveSiPixelSize) {
       ScrollConfig opposite = getScrollConfigHorizontal();
       initMoveGhost();
       //already modified
@@ -3936,7 +3949,7 @@ public class ViewPane extends Drawable implements ITechViewPane, ITechDrawable, 
     * @param moveSiVisible
     * @param moveSiPixelSize
     */
-   private void moveAnimGhostVertUp(InputConfig ic, int moveSiStartIncr, int moveSiVisible, int moveSiPixelSize) {
+   private void moveAnimGhostVertUp(ExecutionContextCanvasGui ic, int moveSiStartIncr, int moveSiVisible, int moveSiPixelSize) {
       ScrollConfig opposite = getScrollConfigHorizontal();
       initMoveGhost();
       //already modified
@@ -3964,7 +3977,7 @@ public class ViewPane extends Drawable implements ITechViewPane, ITechDrawable, 
     * @param moveSize
     * @param moveSizeIncr
     */
-   void moveAnimZDown(InputConfig ic, int moveSize, int moveSizeIncr) {
+   void moveAnimZDown(ExecutionContextCanvasGui ic, int moveSize, int moveSizeIncr) {
       //the base Scrolling config has already been updated. so -1
       moveAnimGhostVertDown(ic, -1, moveSizeIncr, moveSize);
       //moveAnim(ic, moveSize, MoveGhost.TRAIL_0_UP, C.ANGLE_RIGHT_0, moveSizeIncr, false);
@@ -3975,16 +3988,16 @@ public class ViewPane extends Drawable implements ITechViewPane, ITechDrawable, 
     * Pixel/Logic/Page must be matched increments?
     * @param moveSize the number of pixels to the left have to move
     */
-   void moveAnimZLeft(InputConfig ic, int moveSize, int moveSizeIncr) {
+   void moveAnimZLeft(ExecutionContextCanvasGui ic, int moveSize, int moveSizeIncr) {
       moveAnimGhostHorizLeft(ic, -moveSizeIncr, moveSizeIncr, moveSize);
       //moveAnim(ic, moveSize, MoveGhost.TRAIL_3_RIGHT, C.ANGLE_LEFT_180, -moveSizeIncr, true);
    }
 
-   void moveAnimZRight(InputConfig ic, int moveSize, int moveSizeIncr) {
+   void moveAnimZRight(ExecutionContextCanvasGui ic, int moveSize, int moveSizeIncr) {
       moveAnim(ic, moveSize, ITechMoveFunction.TRAIL_2_LEFT, C.ANGLE_RIGHT_0, moveSizeIncr, true);
    }
 
-   void moveAnimZUp(InputConfig ic, int moveSizePixel, int moveSizeIncr) {
+   void moveAnimZUp(ExecutionContextCanvasGui ic, int moveSizePixel, int moveSizeIncr) {
       ScrollConfig base = getScrollConfigVertical();
       moveAnimGhostVertUp(ic, 0, moveSizeIncr, moveSizePixel);
       // moveAnim(ic, moveSize, MoveGhost.TRAIL_1_DOWN, C.ANGLE_RIGHT_0, -moveSizeIncr, false);
@@ -3998,7 +4011,7 @@ public class ViewPane extends Drawable implements ITechViewPane, ITechDrawable, 
     * <br>
     * @param newStart the new start increment
     */
-   public void moveSetX(InputConfig ic, int newStart) {
+   public void moveSetX(ExecutionContextCanvasGui ic, int newStart) {
       ScrollConfig scX = getScrollConfigHorizontal();
       if (scX != null) {
          scX.setSIStartNoEx(newStart);
@@ -4010,7 +4023,7 @@ public class ViewPane extends Drawable implements ITechViewPane, ITechDrawable, 
     * Updates visual hooks on scrollbar
     * @param vy
     */
-   public void moveSetY(InputConfig ic, int vy) {
+   public void moveSetY(ExecutionContextCanvasGui ic, int vy) {
       ScrollConfig scY = getScrollConfigVertical();
       if (scY != null) {
          //SystemLog.printFlow("#ViewPane#moveSetY " + vy);
@@ -4024,7 +4037,7 @@ public class ViewPane extends Drawable implements ITechViewPane, ITechDrawable, 
     * 
     * @param vx the number of increments to move the X axis. Semantics depends on {@link ScrollConfig}.
     */
-   public void moveX(InputConfig ic, int vx) {
+   public void moveX(ExecutionContextCanvasGui ic, int vx) {
       ScrollConfig scX = getScrollConfigHorizontal();
       if (scX != null && vx != 0) {
          scX.move(vx);
@@ -4046,7 +4059,7 @@ public class ViewPane extends Drawable implements ITechViewPane, ITechDrawable, 
     * Modifies the vertical {@link ScrollConfig} by setting the starting increment.
     * @param vy
     */
-   public void moveY(InputConfig ic, int vy) {
+   public void moveY(ExecutionContextCanvasGui ic, int vy) {
       ScrollConfig scY = getScrollConfigVertical();
       if (scY != null) {
          scY.move(vy);
@@ -4067,29 +4080,29 @@ public class ViewPane extends Drawable implements ITechViewPane, ITechDrawable, 
     * <br>
     * <br>
     */
-   public void navigateDown(InputConfig ic) {
+   public void navigateDown(ExecutionContextCanvasGui ic) {
       if (vScrollBar != null) {
          vScrollBar.navigateDown(ic);
       }
    }
 
-   public void navigateLeft(InputConfig ic) {
+   public void navigateLeft(ExecutionContextCanvasGui ic) {
       if (hScrollBar != null) {
          hScrollBar.navigateLeft(ic);
       }
    }
 
-   public void navigateRight(InputConfig ic) {
+   public void navigateRight(ExecutionContextCanvasGui ic) {
       if (hScrollBar != null) {
          hScrollBar.navigateRight(ic);
       }
    }
 
-   public void navigateSelect(InputConfig ic) {
+   public void navigateSelect(ExecutionContextCanvasGui ic) {
       //nothing to select here
    }
 
-   public void navigateUp(InputConfig ic) {
+   public void navigateUp(ExecutionContextCanvasGui ic) {
       if (vScrollBar != null) {
          vScrollBar.navigateUp(ic);
       }
@@ -4343,22 +4356,22 @@ public class ViewPane extends Drawable implements ITechViewPane, ITechDrawable, 
 
    private void setImmaterialHeaders() {
       if (headerRight != null) {
-         if (boViewPane.get2Bits4(VP_OFFSET_04_HEADER_PLANET_MODE1) == PLANET_MODE_3_IMMATERIAL) {
+         if (boViewPane.get2Bits4(VP_OFFSET_04_HEADER_PLANET_MODE1) == PLANET_MODE_3_GHOST) {
             headerRight.setBehaviorFlag(BEHAVIOR_16_IMMATERIAL, true);
          }
       }
       if (headerLeft != null) {
-         if (boViewPane.get2Bits3(VP_OFFSET_04_HEADER_PLANET_MODE1) == PLANET_MODE_3_IMMATERIAL) {
+         if (boViewPane.get2Bits3(VP_OFFSET_04_HEADER_PLANET_MODE1) == PLANET_MODE_3_GHOST) {
             headerRight.setBehaviorFlag(BEHAVIOR_16_IMMATERIAL, true);
          }
       }
       if (headerTop != null) {
-         if (boViewPane.get2Bits1(VP_OFFSET_04_HEADER_PLANET_MODE1) == PLANET_MODE_3_IMMATERIAL) {
+         if (boViewPane.get2Bits1(VP_OFFSET_04_HEADER_PLANET_MODE1) == PLANET_MODE_3_GHOST) {
             headerRight.setBehaviorFlag(BEHAVIOR_16_IMMATERIAL, true);
          }
       }
       if (headerBottom != null) {
-         if (boViewPane.get2Bits2(VP_OFFSET_04_HEADER_PLANET_MODE1) == PLANET_MODE_3_IMMATERIAL) {
+         if (boViewPane.get2Bits2(VP_OFFSET_04_HEADER_PLANET_MODE1) == PLANET_MODE_3_GHOST) {
             headerRight.setBehaviorFlag(BEHAVIOR_16_IMMATERIAL, true);
          }
       }

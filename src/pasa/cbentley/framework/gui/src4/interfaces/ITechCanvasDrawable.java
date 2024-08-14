@@ -9,6 +9,20 @@ public interface ITechCanvasDrawable extends ITech {
 
    public static final int ANCHOR                        = ITechGraphics.TOP | ITechGraphics.LEFT;
 
+   /**
+    * 
+    */
+   public static final int CMD_EVENT_4_UIEVENT           = 4;
+
+   /**
+    * 
+    */
+   public static final int CMD_PRO_0_REPO_NODE_UI        = 0;
+
+   public static final int CMD_PRO_1_REPO_UI_NODE        = 1;
+
+   public static final int CMD_PRO_2_UI_NODE_REPO        = 2;
+
    public static final int DEBUG_0_NONE                  = 0;
 
    /**
@@ -26,8 +40,6 @@ public interface ITechCanvasDrawable extends ITech {
     */
    public static final int DEBUG_3_COMPLETE_2LINES       = 3;
 
-   public static final int KEY_STATUS_3_COMPLETE         = 3;
-
    /**
     * 
     */
@@ -36,6 +48,8 @@ public interface ITechCanvasDrawable extends ITech {
    public static final int KEY_STATUS_1_OVERLAY_ANIMATED = 1;
 
    public static final int KEY_STATUS_2_OVERLAY_TIMED    = 2;
+
+   public static final int KEY_STATUS_3_COMPLETE         = 3;
 
    /**
     * Double Buffer for Animations
@@ -193,15 +207,6 @@ public interface ITechCanvasDrawable extends ITech {
    public static final int SCREEN_3_RIGHT_ROTATED        = 3;
 
    /**
-    * 
-    */
-   public static final int CMD_PRO_0                     = 0;
-
-   public static final int CMD_PRO_1                     = 1;
-
-   public static final int CMD_PRO_2                     = 2;
-
-   /**
     * Replaces the bottom layer {@link IDrawable} with the new {@link IDrawable}.
     * 
     * All previous DLayer have their exit animation run together.
@@ -246,7 +251,5 @@ public interface ITechCanvasDrawable extends ITech {
     * </p>
     */
    public static final int SHOW_TYPE_2_OVER_INACTIVE     = 2;
-
-   public static final int CMD_EVENT_4_UIEVENT           = 4;
 
 }

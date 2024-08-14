@@ -2,6 +2,7 @@ package pasa.cbentley.framework.gui.src4.canvas;
 
 import pasa.cbentley.core.src4.interfaces.C;
 import pasa.cbentley.framework.gui.src4.ctx.GuiCtx;
+import pasa.cbentley.framework.gui.src4.exec.ExecutionContextCanvasGui;
 import pasa.cbentley.framework.gui.src4.interfaces.IDrawable;
 import pasa.cbentley.framework.gui.src4.interfaces.INavigational;
 import pasa.cbentley.framework.gui.src4.interfaces.ITechCanvasDrawable;
@@ -127,7 +128,7 @@ public class CanvasDrawControl {
     * @param d
     * @param newFocus the drawable which will get the focus
     */
-   public void removeDrawable(InputConfig ic, IDrawable d, IDrawable newFocus) {
+   public void removeDrawable(ExecutionContextCanvasGui ec, IDrawable d, IDrawable newFocus) {
       //can you remove from another thread? NOPE. 
       TopologyDLayer topo = d.getVC().getTopo();
 
@@ -141,7 +142,9 @@ public class CanvasDrawControl {
          //take highest in top
          next = topo.getTop();
       }
-      gc.getFocusCtrl().newFocusKey(ic, next);
+      gc.getFocusCtrl().newFocusKey(ec, next);
+      
+      InputConfig ic = ec.getInputConfig();
       ic.srActionDoneRepaint(d);
       ic.srActionDoneRepaint(next);
 
@@ -151,7 +154,7 @@ public class CanvasDrawControl {
     * Gives back the key focus and command menu to the drawable below it
     * @param d
     */
-   public void shHideDrawable(InputConfig ic, IDrawable d) {
+   public void shHideDrawable(ExecutionContextCanvasGui ec, IDrawable d) {
       removeDrawable(null, d, null);
    }
 
@@ -173,8 +176,8 @@ public class CanvasDrawControl {
     * @param view
     * @param type
     */
-   public void shShowDrawable(InputConfig ic, IDrawable view, int type) {
-      shShowDrawable(ic, view, type, true, true);
+   public void shShowDrawable(ExecutionContextCanvasGui ec, IDrawable view, int type) {
+      shShowDrawable(ec, view, type, true, true);
    }
 
    /**
@@ -194,12 +197,12 @@ public class CanvasDrawControl {
     * @param cmds
     * @param focus
     */
-   public void shShowDrawable(InputConfig ic, IDrawable view, int type, boolean cmds, boolean focus) {
+   public void shShowDrawable(ExecutionContextCanvasGui ec, IDrawable view, int type, boolean cmds, boolean focus) {
       //#debug
       canvas.doThreadGUI();
 
       if (focus) {
-         gc.getFocusCtrl().newFocusKey(ic, view);
+         gc.getFocusCtrl().newFocusKey(ec, view);
       }
 
       //topolgy will sort out the type
@@ -216,20 +219,20 @@ public class CanvasDrawControl {
     * <br>
     * @param d
     */
-   public void shShowDrawableOver(InputConfig ic, IDrawable d) {
-      shShowDrawable(ic, d, ITechCanvasDrawable.SHOW_TYPE_1_OVER_TOP, true, true);
+   public void shShowDrawableOver(ExecutionContextCanvasGui ec, IDrawable d) {
+      shShowDrawable(ec, d, ITechCanvasDrawable.SHOW_TYPE_1_OVER_TOP, true, true);
    }
 
-   public void shShowDrawableOverCmds(InputConfig ic, IDrawable d) {
-      shShowDrawable(ic, d, ITechCanvasDrawable.SHOW_TYPE_1_OVER_TOP, true, true);
+   public void shShowDrawableOverCmds(ExecutionContextCanvasGui ec, IDrawable d) {
+      shShowDrawable(ec, d, ITechCanvasDrawable.SHOW_TYPE_1_OVER_TOP, true, true);
    }
 
-   public void shShowDrawableOverNoCmds(InputConfig ic, IDrawable d) {
-      shShowDrawable(ic, d, ITechCanvasDrawable.SHOW_TYPE_1_OVER_TOP, false, true);
+   public void shShowDrawableOverNoCmds(ExecutionContextCanvasGui ec, IDrawable d) {
+      shShowDrawable(ec, d, ITechCanvasDrawable.SHOW_TYPE_1_OVER_TOP, false, true);
    }
 
-   public void shShowDrawableOverNoFocus(InputConfig ic, IDrawable d) {
-      shShowDrawable(ic, d, ITechCanvasDrawable.SHOW_TYPE_1_OVER_TOP, true, false);
+   public void shShowDrawableOverNoFocus(ExecutionContextCanvasGui ec, IDrawable d) {
+      shShowDrawable(ec, d, ITechCanvasDrawable.SHOW_TYPE_1_OVER_TOP, true, false);
    }
 
 }

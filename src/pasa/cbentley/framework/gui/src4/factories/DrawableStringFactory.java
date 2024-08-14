@@ -2,7 +2,7 @@ package pasa.cbentley.framework.gui.src4.factories;
 
 import pasa.cbentley.byteobjects.src4.core.BOAbstractFactory;
 import pasa.cbentley.byteobjects.src4.core.ByteObject;
-import pasa.cbentley.byteobjects.src4.objects.pointer.IBOMergeMask;
+import pasa.cbentley.byteobjects.src4.objects.pointer.IBOMerge;
 import pasa.cbentley.core.src4.logging.Dctx;
 import pasa.cbentley.framework.drawx.src4.ctx.IBOTypesDrawX;
 import pasa.cbentley.framework.drawx.src4.string.interfaces.IBOStrAux;
@@ -66,7 +66,7 @@ public class DrawableStringFactory extends BOAbstractFactory implements IBOStrAu
     * @return
     */
    public ByteObject getBOStringData(int preset) {
-      ByteObject bo = new ByteObject(boc, IBOTypesGui.TYPE_124_STRING_DATA, SDATA_BASIC_SIZE);
+      ByteObject bo = createStrAuxData();
       bo.set1(IBOStrAuxData.SDATA_OFFSET_02_PRESET_CONFIG1, preset);
       return bo;
    }
@@ -81,7 +81,7 @@ public class DrawableStringFactory extends BOAbstractFactory implements IBOStrAu
     * @return
     */
    public ByteObject getBOStringData(int stringType, int mode) {
-      ByteObject bo = new ByteObject(boc, IBOTypesGui.TYPE_124_STRING_DATA, SDATA_BASIC_SIZE);
+      ByteObject bo = createStrAuxData();
       bo.set1(IBOStrAuxData.SDATA_OFFSET_02_PRESET_CONFIG1, stringType);
       bo.set1(IBOStrAuxData.SDATA_OFFSET_06_ACTION_MODE1, mode);
       return bo;
@@ -107,7 +107,7 @@ public class DrawableStringFactory extends BOAbstractFactory implements IBOStrAu
     * <li>{@link ITechStringDrawable#S_ACTION_MODE_2_EDIT}
     * </p>
     * 
-    * @param stringType {@link IBOStrAuxData#SDATA_OFFSET_02_PRESET_CONFIG1}
+    * @param presetConfig {@link IBOStrAuxData#SDATA_OFFSET_02_PRESET_CONFIG1}
     * @param mode {@link IBOStrAuxData#SDATA_OFFSET_06_ACTION_MODE1}
     * @param maxSize {@link IBOStrAuxData#SDATA_OFFSET_05_MAX_SIZE1}
     * @param inputType {@link IBOStrAuxData#SDATA_OFFSET_04_DATA_TYPE1}
@@ -115,8 +115,8 @@ public class DrawableStringFactory extends BOAbstractFactory implements IBOStrAu
     * <br>
     * @return
     */
-   public ByteObject getBOStringData(int stringType, int mode, int maxSize, int inputType) {
-      return getBOStringData(stringType, mode, maxSize, inputType, Symbs.CHAR_SET_0_DEFAULT);
+   public ByteObject getBOStringData(int presetConfig, int mode, int maxSize, int inputType) {
+      return getBOStringData(presetConfig, mode, maxSize, inputType, Symbs.CHAR_SET_0_DEFAULT);
    }
 
    /**
@@ -154,8 +154,7 @@ public class DrawableStringFactory extends BOAbstractFactory implements IBOStrAu
     * @return
     */
    public ByteObject getBOStringDataEmpty() {
-      ByteObject bo = new ByteObject(boc, IBOTypesGui.TYPE_124_STRING_DATA, SDATA_BASIC_SIZE);
-      return bo;
+      return createStrAuxData();
    }
 
    /**
@@ -192,10 +191,10 @@ public class DrawableStringFactory extends BOAbstractFactory implements IBOStrAu
     * @return
     */
    public ByteObject getBOStringDataTransparentCharSet(int charset) {
-      ByteObject bo = new ByteObject(boc, IBOTypesGui.TYPE_124_STRING_DATA, SDATA_BASIC_SIZE);
+      ByteObject bo = createStrAuxData();
       bo.set1(IBOStrAuxData.SDATA_OFFSET_03_CHARSET_ID1, charset);
 
-      gc.getDC().getMergeMaskFactory().setMergeMask(bo, IBOMergeMask.MERGE_MASK_OFFSET_5VALUES1, IBOMergeMask.MERGE_MASK_FLAG5_2);
+      gc.getDC().getMergeMaskFactory().setMergeMask(bo, IBOMerge.MERGE_MASK_OFFSET_05_VALUES1, IBOMerge.MERGE_MASK_FLAG5_2);
       return bo;
    }
 
@@ -232,8 +231,7 @@ public class DrawableStringFactory extends BOAbstractFactory implements IBOStrAu
     * @return
     */
    public ByteObject getBOStringEditEmpty() {
-      ByteObject bo = new ByteObject(boc, IBOTypesGui.TYPE_125_STRING_EDIT_TECH, SEDIT_BASIC_SIZE);
-      return bo;
+      return createStrAuxEdit();
    }
 
    /**

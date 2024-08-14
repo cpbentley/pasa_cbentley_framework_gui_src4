@@ -8,12 +8,12 @@ import pasa.cbentley.framework.cmd.src4.interfaces.ICommandable;
 import pasa.cbentley.framework.datamodel.src4.table.ObjectTableModel;
 import pasa.cbentley.framework.drawx.src4.engine.RgbImage;
 import pasa.cbentley.framework.gui.src4.canvas.InputConfig;
-import pasa.cbentley.framework.gui.src4.cmd.CmdInstanceDrawable;
+import pasa.cbentley.framework.gui.src4.cmd.CmdInstanceGui;
 import pasa.cbentley.framework.gui.src4.core.StyleClass;
 import pasa.cbentley.framework.gui.src4.ctx.GuiCtx;
+import pasa.cbentley.framework.gui.src4.exec.ExecutionContextCanvasGui;
 import pasa.cbentley.framework.gui.src4.factories.interfaces.IBOStrAuxData;
-import pasa.cbentley.framework.gui.src4.interfaces.ITechCanvasDrawable;
-import pasa.cbentley.framework.gui.src4.interfaces.ICmdsView;
+import pasa.cbentley.framework.gui.src4.interfaces.ICmdsGui;
 import pasa.cbentley.framework.gui.src4.interfaces.IDrawable;
 import pasa.cbentley.framework.gui.src4.interfaces.IUIView;
 import pasa.cbentley.framework.gui.src4.menu.NestedMenus;
@@ -42,7 +42,7 @@ import pasa.cbentley.framework.gui.src4.tech.ITechViewPane;
  * @author Charles-Philip
  *
  */
-public class TableLayoutView extends TableView implements IBOStrAuxData, ICommandable, ICmdsView {
+public class TableLayoutView extends TableView implements IBOStrAuxData, ICommandable, ICmdsGui {
 
    public static final int SC_TITLE_LINK_43 = 43;
 
@@ -55,7 +55,7 @@ public class TableLayoutView extends TableView implements IBOStrAuxData, IComman
     * <br>
     * OK / CANCEL
     */
-   private CmdInstanceDrawable     executionCtx;
+   private CmdInstanceGui     executionCtx;
 
    private ICommandable    icon;
 
@@ -99,11 +99,12 @@ public class TableLayoutView extends TableView implements IBOStrAuxData, IComman
     * Form parsing is done by the caller
     */
    public void commandAction(CmdInstance cmd) {
-      if (cmd.cmdID == CMD_04_OK) {
+      if (cmd.getCmdID() == CMD_04_OK) {
          ci.paramO = this;
          icon.commandAction(ci);
       } else {
-         hideMe((InputConfig) ci.getFeedback());
+         ExecutionContextCanvasGui ec = (ExecutionContextCanvasGui) ci.getExecutionContext();
+         hideMe(ec);
       }
    }
 
@@ -215,7 +216,7 @@ public class TableLayoutView extends TableView implements IBOStrAuxData, IComman
 
    }
 
-   public void setExecutionCtx(CmdInstanceDrawable cd) {
+   public void setExecutionCtx(CmdInstanceGui cd) {
       executionCtx = cd;
    }
 

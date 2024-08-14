@@ -1,6 +1,7 @@
-package pasa.cbentley.framework.gui.src4.canvas;
+package pasa.cbentley.framework.gui.src4.exec;
 
 import pasa.cbentley.framework.drawx.src4.engine.GraphicsX;
+import pasa.cbentley.framework.gui.src4.canvas.TopologyDLayer;
 import pasa.cbentley.framework.gui.src4.core.Drawable;
 import pasa.cbentley.framework.gui.src4.core.ViewDrawable;
 import pasa.cbentley.framework.gui.src4.ctx.GuiCtx;
@@ -8,21 +9,25 @@ import pasa.cbentley.framework.gui.src4.interfaces.IDrawable;
 import pasa.cbentley.framework.gui.src4.interfaces.ITechDrawable;
 import pasa.cbentley.framework.gui.src4.utils.DrawableArrays;
 import pasa.cbentley.framework.gui.src4.utils.DrawableUtilz;
-import pasa.cbentley.framework.input.src4.CanvasAppliInput;
-import pasa.cbentley.framework.input.src4.CanvasResult;
+import pasa.cbentley.framework.input.src4.engine.CanvasAppliInput;
+import pasa.cbentley.framework.input.src4.engine.OutputStateCanvas;
 
-public class CanvasResultDrawable extends CanvasResult {
-   IDrawable[]       repaintDrawables = new IDrawable[5];
+public class OutputStateCanvasGui extends OutputStateCanvas {
+   IDrawable[]            repaintDrawables = new IDrawable[5];
 
-   private int       repaintDrawablesNum;
+   private int            repaintDrawablesNum;
 
-   private IDrawable screenMsgDrawable;
+   private IDrawable      screenMsgDrawable;
 
-   public boolean    isOutside;
+   public boolean         isOutside;
 
    protected final GuiCtx gc;
 
-   public CanvasResultDrawable(GuiCtx gc, CanvasAppliInput ctrl, int cycle) {
+   public OutputStateCanvasGui(GuiCtx gc, CanvasAppliInput ctrl) {
+      this(gc, ctrl, CYCLE_0_USER_EVENT);
+   }
+
+   public OutputStateCanvasGui(GuiCtx gc, CanvasAppliInput ctrl, int cycle) {
       super(gc.getIC(), ctrl, cycle);
       this.gc = gc;
    }
@@ -215,7 +220,7 @@ public class CanvasResultDrawable extends CanvasResult {
 
    /**
     * At least one drawable has been set their state styles with
-    * {@link IDrawable#managePointerStateStyle(mordan.controller.InputConfig)}
+    * {@link IDrawable#managePointerStateStyle(ExecutionContextCanvasGui)}
     * @return
     */
    public boolean isDrawableStatesSet() {
@@ -231,9 +236,7 @@ public class CanvasResultDrawable extends CanvasResult {
     * @param b
     */
    public void setOutsideDrawable(boolean b) {
-      isOutside =b;
+      isOutside = b;
    }
-
-  
 
 }

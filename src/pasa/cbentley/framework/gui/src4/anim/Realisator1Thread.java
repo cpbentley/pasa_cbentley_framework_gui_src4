@@ -5,13 +5,13 @@ import pasa.cbentley.core.src4.interfaces.ITimeCtrl;
 import pasa.cbentley.core.src4.logging.Dctx;
 import pasa.cbentley.framework.gui.src4.anim.base.DrawableAnim;
 import pasa.cbentley.framework.gui.src4.anim.move.Move;
-import pasa.cbentley.framework.gui.src4.canvas.CanvasResultDrawable;
 import pasa.cbentley.framework.gui.src4.canvas.CanvasAppliInputGui;
-import pasa.cbentley.framework.gui.src4.canvas.RepaintCtrlGui;
+import pasa.cbentley.framework.gui.src4.canvas.RepaintHelperGui;
 import pasa.cbentley.framework.gui.src4.ctx.GuiCtx;
+import pasa.cbentley.framework.gui.src4.exec.OutputStateCanvasGui;
 import pasa.cbentley.framework.gui.src4.interfaces.IAnimable;
 import pasa.cbentley.framework.gui.src4.interfaces.IDrawable;
-import pasa.cbentley.framework.gui.src4.interfaces.ITechAnimable;
+import pasa.cbentley.framework.gui.src4.interfaces.ITechAnimableDrawable;
 
 /**
  * Control the animation repaint flow in one animation thread.
@@ -35,7 +35,7 @@ import pasa.cbentley.framework.gui.src4.interfaces.ITechAnimable;
  * <br>
  * @author Charles-Philip Bentley
  */
-public class Realisator1Thread extends Realisator implements ITechAnimable {
+public class Realisator1Thread extends Realisator implements ITechAnimableDrawable {
 
    public static final int      MAX_NUM               = 10;
 
@@ -67,7 +67,7 @@ public class Realisator1Thread extends Realisator implements ITechAnimable {
     * <br>
     * 
     */
-   private CanvasResultDrawable screenResultAnimation = null;
+   private OutputStateCanvasGui screenResultAnimation = null;
 
    private int                  sleep;
 
@@ -237,7 +237,7 @@ public class Realisator1Thread extends Realisator implements ITechAnimable {
    public void run() {
       try {
          final ITimeCtrl time = gc.getCFC().getTimeCtrl();
-         final RepaintCtrlGui rcd = canvas.getRepaintCtrlDraw();
+         final RepaintHelperGui rcd = canvas.getRepaintCtrlDraw();
          //all this is in the animation thread
          while (true) {
             if (numAnimations == 0) {

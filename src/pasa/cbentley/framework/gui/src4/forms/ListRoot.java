@@ -1,13 +1,14 @@
 package pasa.cbentley.framework.gui.src4.forms;
 
 import pasa.cbentley.core.src4.event.BusEvent;
+import pasa.cbentley.framework.core.ui.src4.tech.ITechCodes;
 import pasa.cbentley.framework.coredraw.src4.interfaces.IGraphics;
 import pasa.cbentley.framework.coredraw.src4.interfaces.IMFont;
 import pasa.cbentley.framework.coredraw.src4.interfaces.ITechGraphics;
-import pasa.cbentley.framework.coreui.src4.tech.ITechCodes;
 import pasa.cbentley.framework.gui.src4.canvas.InputConfig;
 import pasa.cbentley.framework.gui.src4.core.StyleClass;
 import pasa.cbentley.framework.gui.src4.ctx.GuiCtx;
+import pasa.cbentley.framework.gui.src4.exec.ExecutionContextCanvasGui;
 import pasa.cbentley.framework.gui.src4.string.StringDrawable;
 import pasa.cbentley.framework.gui.src4.table.TableView;
 
@@ -162,7 +163,8 @@ public class ListRoot extends StringDrawable {
       listStr.getT9().reset();
    }
 
-   public void manageKeyInput(InputConfig ic) {
+   public void manageKeyInput(ExecutionContextCanvasGui ec) {
+      InputConfig ic = ec.getInputConfig();
       keyReleased(ic.getIdKeyBut());
       //super.manageKeyInput(ic);
    }

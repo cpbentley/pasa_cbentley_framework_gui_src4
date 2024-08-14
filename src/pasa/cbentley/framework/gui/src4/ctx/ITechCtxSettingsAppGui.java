@@ -1,7 +1,7 @@
 package pasa.cbentley.framework.gui.src4.ctx;
 
 import pasa.cbentley.byteobjects.src4.core.interfaces.IBOCtxSettings;
-import pasa.cbentley.framework.core.src4.app.IBOCtxSettingsAppli;
+import pasa.cbentley.framework.core.framework.src4.app.IBOCtxSettingsAppli;
 import pasa.cbentley.framework.drawx.src4.engine.GraphicsX;
 import pasa.cbentley.framework.gui.src4.core.StyleClass;
 import pasa.cbentley.framework.gui.src4.interfaces.ITechCanvasDrawable;
@@ -102,9 +102,9 @@ public interface ITechCtxSettingsAppGui extends IBOCtxSettingsAppli {
    public static final int CTX_GUI_OFFSET_10_FONT_SCREEN_RATIO1   = OFFSET_START + 10;
 
    /**
-    * <li> {@link ITechCanvasDrawable#CMD_PRO_0}
-    * <li> {@link ITechCanvasDrawable#CMD_PRO_1}
-    * <li> {@link ITechCanvasDrawable#CMD_PRO_2}
+    * <li> {@link ITechCanvasDrawable#CMD_PRO_0_REPO_NODE_UI}
+    * <li> {@link ITechCanvasDrawable#CMD_PRO_2_UI_NODE_REPO}
+    * <li> {@link ITechCanvasDrawable#CMD_PRO_1_REPO_UI_NODE}
     * 
     */
    public static final int CTX_GUI_OFFSET_11_CMD_PROCESSING_MODE1 = OFFSET_START + 11;

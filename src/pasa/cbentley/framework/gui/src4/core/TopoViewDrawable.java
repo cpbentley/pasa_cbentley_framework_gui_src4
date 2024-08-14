@@ -2,11 +2,10 @@ package pasa.cbentley.framework.gui.src4.core;
 
 import pasa.cbentley.core.src4.logging.Dctx;
 import pasa.cbentley.framework.drawx.src4.engine.GraphicsX;
-import pasa.cbentley.framework.gui.src4.canvas.ExecutionContextGui;
-import pasa.cbentley.framework.gui.src4.canvas.InputConfig;
 import pasa.cbentley.framework.gui.src4.canvas.TopologyDLayer;
 import pasa.cbentley.framework.gui.src4.canvas.ViewContext;
 import pasa.cbentley.framework.gui.src4.ctx.GuiCtx;
+import pasa.cbentley.framework.gui.src4.exec.ExecutionContextCanvasGui;
 import pasa.cbentley.framework.gui.src4.interfaces.IDrawable;
 import pasa.cbentley.framework.gui.src4.interfaces.ITechViewDrawable;
 
@@ -46,7 +45,7 @@ public class TopoViewDrawable extends ViewDrawable {
       topology.drawLayers(g);
    }
 
-   public IDrawable getDrawableViewPort(int x, int y, ExecutionContextGui ex) {
+   public IDrawable getDrawableViewPort(int x, int y, ExecutionContextCanvasGui ex) {
       return topology.getDrawable(x, y, null);
    }
 
@@ -96,38 +95,38 @@ public class TopoViewDrawable extends ViewDrawable {
       topology.invalidateLayout();
    }
 
-   public void manageGestureInput(InputConfig ic) {
+   public void manageGestureInput(ExecutionContextCanvasGui ec) {
       //#debug
       toDLog().pFlow("", null, TopoViewDrawable.class, "manageGestureInput@line96", LVL_03_FINEST, true);
-      topology.manageGestureInput(ic);
+      topology.manageGestureInput(ec);
    }
 
-   public void manageInput(InputConfig ic) {
-      topology.manageInput(ic);
+   public void manageInput(ExecutionContextCanvasGui ec) {
+      topology.manageInput(ec);
    }
 
-   public void manageKeyInput(InputConfig ic) {
+   public void manageKeyInput(ExecutionContextCanvasGui ec) {
       //#debug
-      toDLog().pFlow("" + ic.is.getLastDeviceEvent().toString1Line(), null, TopoViewDrawable.class, "manageKeyInput@line90", LVL_03_FINEST, true);
-      topology.manageKeyInput(ic);
+      toDLog().pFlow("" + ec.getInputStateDrawable().getLastDeviceEvent().toString1Line(), null, TopoViewDrawable.class, "manageKeyInput@line90", LVL_03_FINEST, true);
+      topology.manageKeyInput(ec);
    }
 
-   public void manageOtherInput(InputConfig ic) {
+   public void manageOtherInput(ExecutionContextCanvasGui ec) {
       //#debug
       toDLog().pFlow("", null, TopoViewDrawable.class, "manageOtherInput@line96", LVL_03_FINEST, true);
-      topology.manageOtherInput(ic);
+      topology.manageOtherInput(ec);
    }
 
-   public void managePointerInput(InputConfig ic) {
+   public void managePointerInput(ExecutionContextCanvasGui ec) {
       //#debug
-      toDLog().pFlow("x=" + ic.is.getX() + " y=" + ic.is.getY(), null, TopoViewDrawable.class, "managePointerInput@line96", LVL_03_FINEST, true);
-      topology.managePointerInput(ic);
+      toDLog().pFlow("x=" + ec.getInputStateDrawable().getX() + " y=" + ec.getInputStateDrawable().getY(), null, TopoViewDrawable.class, "managePointerInput@line96", LVL_03_FINEST, true);
+      topology.managePointerInput(ec);
    }
 
-   public void manageRepeatInput(InputConfig ic) {
+   public void manageRepeatInput(ExecutionContextCanvasGui ec) {
       //#debug
       toDLog().pFlow("", null, TopoViewDrawable.class, "manageRepeatInput@line96", LVL_03_FINEST, true);
-      topology.manageRepeatInput(ic);
+      topology.manageRepeatInput(ec);
    }
 
    //#mdebug

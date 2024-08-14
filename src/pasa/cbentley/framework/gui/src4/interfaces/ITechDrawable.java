@@ -16,6 +16,7 @@ import pasa.cbentley.framework.gui.src4.core.FigDrawable;
 import pasa.cbentley.framework.gui.src4.core.ImageDrawable;
 import pasa.cbentley.framework.gui.src4.core.StyleClass;
 import pasa.cbentley.framework.gui.src4.core.ViewDrawable;
+import pasa.cbentley.framework.gui.src4.exec.ExecutionContextCanvasGui;
 import pasa.cbentley.framework.gui.src4.utils.DrawableUtilz;
 
 public interface ITechDrawable extends IByteObject {
@@ -454,7 +455,7 @@ public interface ITechDrawable extends IByteObject {
    public static final int NAV_04_TOPO_RIGHT                     = 1 << 3;
 
    /**
-    * When set, any {@link IDrawable#navigateUp(InputConfig)} by this Drawable must be sent to the topology controller.
+    * When set, any {@link IDrawable#navigateUp(ExecutionContextCanvasGui)} by this Drawable must be sent to the topology controller.
     * 
     */
    public static final int NAV_05_OVERRIDE_UP                    = 1 << 4;
@@ -812,7 +813,7 @@ public interface ITechDrawable extends IByteObject {
     * State that tracks if Drawable has the pointer focus. This style is set when pointer movement are recorded.
     * <br>
     * <br>
-    * See {@link Controller#newFocusPointerPress(mordan.controller.InputConfig, IDrawable)}
+    * See {@link Controller#newFocusPointerPress(ExecutionContextCanvasGui, IDrawable)}
     * <br>
     * <br>
     * In a Table, when a cell has pointer focus, the Table maybe have or may not. It depends if Tech design wants parent to keep

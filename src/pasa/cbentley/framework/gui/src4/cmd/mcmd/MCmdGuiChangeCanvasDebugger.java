@@ -1,28 +1,26 @@
-package pasa.cbentley.framework.gui.src4.cmd;
+package pasa.cbentley.framework.gui.src4.cmd.mcmd;
 
 import pasa.cbentley.byteobjects.src4.core.ByteObject;
 import pasa.cbentley.core.src4.event.BusEvent;
 import pasa.cbentley.core.src4.event.IEventConsumer;
 import pasa.cbentley.core.src4.i8n.IStringProducer;
-import pasa.cbentley.core.src4.i8n.LocaleID;
 import pasa.cbentley.core.src4.interfaces.C;
-import pasa.cbentley.core.src4.structs.BufferObject;
+import pasa.cbentley.core.src4.logging.Dctx;
 import pasa.cbentley.core.src4.structs.IntToObjects;
-import pasa.cbentley.core.src4.structs.IntToStrings;
 import pasa.cbentley.framework.cmd.src4.interfaces.ITechCmd;
 import pasa.cbentley.framework.datamodel.src4.table.ObjectTableModel;
 import pasa.cbentley.framework.gui.src4.canvas.CanvasDebugger;
-import pasa.cbentley.framework.gui.src4.canvas.ExecutionContextGui;
 import pasa.cbentley.framework.gui.src4.canvas.IBOCanvasAppliGui;
 import pasa.cbentley.framework.gui.src4.canvas.ICanvasDrawable;
-import pasa.cbentley.framework.gui.src4.canvas.InputConfig;
 import pasa.cbentley.framework.gui.src4.canvas.ViewContext;
+import pasa.cbentley.framework.gui.src4.cmd.CmdInstanceGui;
 import pasa.cbentley.framework.gui.src4.core.StyleClass;
 import pasa.cbentley.framework.gui.src4.core.TopoViewDrawable;
 import pasa.cbentley.framework.gui.src4.ctx.CanvasGuiCtx;
 import pasa.cbentley.framework.gui.src4.ctx.GuiCtx;
+import pasa.cbentley.framework.gui.src4.exec.ExecutionContextCanvasGui;
 import pasa.cbentley.framework.gui.src4.factories.TableCellPolicyFactory;
-import pasa.cbentley.framework.gui.src4.interfaces.ICmdsView;
+import pasa.cbentley.framework.gui.src4.interfaces.ICmdsGui;
 import pasa.cbentley.framework.gui.src4.interfaces.ITechCanvasDrawable;
 import pasa.cbentley.framework.gui.src4.interfaces.IUIView;
 import pasa.cbentley.framework.gui.src4.string.StringDrawable;
@@ -43,7 +41,7 @@ import pasa.cbentley.layouter.src4.tech.ITechLayout;
  * 
  * 
  * <p>
- * It knows how to read and write parameters on the {@link CmdInstanceDrawable}
+ * It knows how to read and write parameters on the {@link CmdInstanceGui}
  * </p>
  * 
  * 
@@ -60,7 +58,7 @@ public class MCmdGuiChangeCanvasDebugger extends MCmdGui implements IEventConsum
    private int position;
 
    public MCmdGuiChangeCanvasDebugger(GuiCtx gc) {
-      super(gc, ICmdsView.VCMD_15_CANVAS_DEBUGGER);
+      super(gc, ICmdsGui.VCMD_15_CANVAS_DEBUGGER);
    }
 
    public void consumeEvent(BusEvent e) {
@@ -68,9 +66,9 @@ public class MCmdGuiChangeCanvasDebugger extends MCmdGui implements IEventConsum
 
    }
 
-   private void execute(InputConfig ic, CmdInstanceDrawable cd, ICanvasDrawable canvas, int modeParam, int positionParam) {
+   private void execute(ExecutionContextCanvasGui ec, CmdInstanceGui cd, ICanvasDrawable canvas, int modeParam, int positionParam) {
       
-      ExecutionContextGui dExCtx = cd.getDExCtx();
+      ExecutionContextCanvasGui dExCtx = cd.getExecutionCtxGui();
       TopoViewDrawable topoViewDrawable = canvas.getTopoViewDrawable();
 
       CanvasDebugger canvasDebug = canvas.getExtras().getDebugCanvas(); //null if not already created
@@ -132,25 +130,25 @@ public class MCmdGuiChangeCanvasDebugger extends MCmdGui implements IEventConsum
       cd.actionDone(null, type);
    }
 
-   public void execute(InputConfig ic) {
+   public void execute(ExecutionContextCanvasGui ec) {
 
-      ic.checkCmdInstanceNotNull();
+      ec.checkCmdInstanceNotNull();
 
       //the cmdinstance knows on which canvas to change
 
-      CmdInstanceDrawable cd = ic.getCmdInstance();
+      CmdInstanceGui cd = ec.getCmdInstanceGui();
 
       if (!cd.isParamed()) {
          //fetch parameters from gui but we need a canvas.. table selection of canvas.. if only one canvas
          //skip the step
-         ic.sr.actionDone();
+         ec.getCanvasResultDrawable().actionDone();
 
       }
       ICanvasDrawable canvas = (ICanvasDrawable) cd.paramO;
       int mode = cd.param;
       int position = cd.param2;
 
-      execute(ic, cd, canvas, mode, position);
+      execute(ec, cd, canvas, mode, position);
    }
 
    /**
@@ -159,7 +157,7 @@ public class MCmdGuiChangeCanvasDebugger extends MCmdGui implements IEventConsum
     * @param ic
     * @param cd
     */
-   private void getGuiParam(InputConfig ic, CmdInstanceDrawable cd) {
+   private void getGuiParam(ExecutionContextCanvasGui ec, CmdInstanceGui cd) {
       IStringProducer strLoader = gc.getStrings();
       //show the table
       if (tableParamSelection == null) {
@@ -210,11 +208,11 @@ public class MCmdGuiChangeCanvasDebugger extends MCmdGui implements IEventConsum
       if (index == -1) {
          index = 0;
       }
-      tableParamSelection.shShowDrawableOver(ic);
+      tableParamSelection.shShowDrawableOver(ec);
       
       
       //give focus to selected.. uses a separate command to host the animation
-      tableParamSelection.setSelectedIndex(index, ic, true);
+      tableParamSelection.setSelectedIndex(index, ec, true);
 
       
       //create an OK/CANCEL interaction cmd ctx. modal?
@@ -228,22 +226,42 @@ public class MCmdGuiChangeCanvasDebugger extends MCmdGui implements IEventConsum
 
    }
 
-   public void setParamsToggle(CmdInstanceDrawable cd, ICanvasDrawable canvas) {
+   public void setParamsToggle(CmdInstanceGui cd, ICanvasDrawable canvas) {
       this.setParamsDirective(cd, canvas, ITechCmd.DIRECTIVE_1_TOGGLE);
    }
 
-   public void setParamsDirective(CmdInstanceDrawable cd, ICanvasDrawable canvas, int directive) {
+   public void setParamsDirective(CmdInstanceGui cd, ICanvasDrawable canvas, int directive) {
       cd.paramO = canvas;
       //directive
       cd.setDirective(directive);
       cd.setParamed();
    }
 
-   public void setParams(CmdInstanceDrawable cd, ICanvasDrawable canvas, int mode, int pos) {
+   public void setParams(CmdInstanceGui cd, ICanvasDrawable canvas, int mode, int pos) {
       cd.paramO = canvas;
       cd.param = mode;
       cd.param2 = pos;
       cd.setParamed();
    }
+
+   
+   //#mdebug
+   public void toString(Dctx dc) {
+      dc.root(this, MCmdGuiChangeCanvasDebugger.class, 260);
+      toStringPrivate(dc);
+      super.toString(dc.sup());
+   }
+
+   public void toString1Line(Dctx dc) {
+      dc.root1Line(this, MCmdGuiChangeCanvasDebugger.class, 260);
+      toStringPrivate(dc);
+      super.toString1Line(dc.sup1Line());
+   }
+
+   private void toStringPrivate(Dctx dc) {
+      
+   }
+   //#enddebug
+   
 
 }

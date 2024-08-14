@@ -1,7 +1,7 @@
 package pasa.cbentley.framework.gui.src4.forms;
 
 import pasa.cbentley.core.src4.structs.IntToStrings;
-import pasa.cbentley.framework.coredata.src4.db.IByteCache;
+import pasa.cbentley.framework.core.data.src4.db.IByteCache;
 import pasa.cbentley.framework.coredraw.src4.interfaces.IImage;
 import pasa.cbentley.framework.datamodel.src4.interfaces.IObjectStore;
 import pasa.cbentley.framework.datamodel.src4.table.ITableModel;

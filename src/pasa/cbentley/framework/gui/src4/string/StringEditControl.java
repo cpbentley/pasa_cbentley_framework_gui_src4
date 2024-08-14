@@ -7,34 +7,37 @@ import pasa.cbentley.core.src4.ctx.IEventsCore;
 import pasa.cbentley.core.src4.event.BusEvent;
 import pasa.cbentley.core.src4.event.IEventConsumer;
 import pasa.cbentley.core.src4.interfaces.C;
+import pasa.cbentley.core.src4.interfaces.IHostData;
 import pasa.cbentley.core.src4.logging.Dctx;
 import pasa.cbentley.core.src4.structs.IntToStrings;
 import pasa.cbentley.core.src4.thread.IBRunnable;
 import pasa.cbentley.core.src4.thread.PulseThread;
 import pasa.cbentley.framework.cmd.src4.interfaces.INavTech;
-import pasa.cbentley.framework.core.src4.interfaces.IBOHost;
+import pasa.cbentley.framework.core.framework.src4.interfaces.IBOHost;
+import pasa.cbentley.framework.core.ui.src4.ctx.CoreUiCtx;
+import pasa.cbentley.framework.core.ui.src4.ctx.IEventsCoreUi;
+import pasa.cbentley.framework.core.ui.src4.tech.ITechCodes;
+import pasa.cbentley.framework.core.ui.src4.tech.ITechHostDataDrawUi;
+import pasa.cbentley.framework.core.ui.src4.tech.ITechHostUI;
 import pasa.cbentley.framework.coredraw.src4.interfaces.IMFont;
-import pasa.cbentley.framework.coreui.src4.ctx.CoreUiCtx;
-import pasa.cbentley.framework.coreui.src4.ctx.IEventsCoreUI;
-import pasa.cbentley.framework.coreui.src4.tech.ITechCodes;
-import pasa.cbentley.framework.coreui.src4.tech.ITechHostUI;
 import pasa.cbentley.framework.datamodel.src4.table.ObjectTableModel;
 import pasa.cbentley.framework.drawx.src4.engine.GraphicsX;
 import pasa.cbentley.framework.drawx.src4.factories.interfaces.IBOBox;
 import pasa.cbentley.framework.drawx.src4.string.Stringer;
 import pasa.cbentley.framework.drawx.src4.style.IBOStyle;
 import pasa.cbentley.framework.gui.src4.canvas.CanvasAppliInputGui;
-import pasa.cbentley.framework.gui.src4.canvas.CanvasResultDrawable;
 import pasa.cbentley.framework.gui.src4.canvas.InputConfig;
-import pasa.cbentley.framework.gui.src4.canvas.InputStateDrawable;
 import pasa.cbentley.framework.gui.src4.canvas.BusEventGui;
-import pasa.cbentley.framework.gui.src4.canvas.RepaintCtrlGui;
+import pasa.cbentley.framework.gui.src4.canvas.RepaintHelperGui;
 import pasa.cbentley.framework.gui.src4.canvas.TopologyDLayer;
 import pasa.cbentley.framework.gui.src4.core.Drawable;
 import pasa.cbentley.framework.gui.src4.core.DrawableInjected;
 import pasa.cbentley.framework.gui.src4.core.StyleClass;
 import pasa.cbentley.framework.gui.src4.ctx.GuiCtx;
 import pasa.cbentley.framework.gui.src4.ctx.IBOTypesGui;
+import pasa.cbentley.framework.gui.src4.exec.ExecutionContextCanvasGui;
+import pasa.cbentley.framework.gui.src4.exec.InputStateCanvasGui;
+import pasa.cbentley.framework.gui.src4.exec.OutputStateCanvasGui;
 import pasa.cbentley.framework.gui.src4.factories.interfaces.IBOStrAuxEdit;
 import pasa.cbentley.framework.gui.src4.factories.interfaces.IBOStrAuxData;
 import pasa.cbentley.framework.gui.src4.factories.interfaces.IBOStrAuxEdit;
@@ -48,7 +51,7 @@ import pasa.cbentley.framework.gui.src4.table.interfaces.ITechTable;
 import pasa.cbentley.framework.gui.src4.tech.ITechLinks;
 import pasa.cbentley.framework.gui.src4.tech.ITechStringDrawable;
 import pasa.cbentley.framework.gui.src4.utils.DrawableUtilz;
-import pasa.cbentley.framework.input.src4.interfaces.ITechPaintThread;
+import pasa.cbentley.framework.input.src4.interfaces.ITechThreadPaint;
 import pasa.cbentley.powerdata.spec.src4.guicontrols.T9PrefixTrieSearch;
 import pasa.cbentley.powerdata.spec.src4.power.trie.IPowerCharTrie;
 import pasa.cbentley.powerdata.spec.src4.spec.CharTrieUtilz;
@@ -238,7 +241,7 @@ public class StringEditControl extends TableView implements IDrawListener, IBOSt
     */
    private StringDrawable     drawableT9;
 
-   private StringEditModule         editModule             = null;
+   private StringEditModule   editModule             = null;
 
    private int                indexCharSet           = 4;
 
@@ -402,9 +405,9 @@ public class StringEditControl extends TableView implements IDrawListener, IBOSt
    }
 
    public void addTrie(IPowerCharTrie c, String langID) {
-      
+
    }
-   
+
    public void addTrie(IPowerCharTrie c, int langID) {
       IPowerCharTrie[] ar = languageTries[langID];
       if (ar == null) {
@@ -494,7 +497,7 @@ public class StringEditControl extends TableView implements IDrawListener, IBOSt
          }
          ByteObject txt = getStyleOp().getContentStyle(style);
          //the background figure to draw below the selected
-         ByteObject bgFigure = getStyleOp().getStyleDrw(style, IBOStyle.STYLE_OFFSET_2_FLAGB, IBOStyle.STYLE_FLAGB_1_BG);
+         ByteObject bgFigure = getStyleOp().getStyleDrw(style, IBOStyle.STYLE_OFFSET_2_FLAG_B, IBOStyle.STYLE_FLAG_B_1_BG);
          int color = getOpStringFx().getStringColor(txt);
          IMFont f = getOpStringFx().getStringFont(txt);
          g.setFont(f);
@@ -526,7 +529,7 @@ public class StringEditControl extends TableView implements IDrawListener, IBOSt
       drawableCharSet.setStringNoUpdate(str);
       //remove TV from view and send a full repaint
       //call this when inside User Event Thread. otherwise no repaint will be made.
-      hidePopup(e.getIC());
+      hidePopup(e.getExecutionContext());
       e.setFlag(BusEvent.FLAG_1_ACTED, true);
    }
 
@@ -552,8 +555,9 @@ public class StringEditControl extends TableView implements IDrawListener, IBOSt
 
       isPredictionJustAdded = true;
 
-      predictionTable.removeDrawable(e.getIC(), null);
-      punctuationTable.shShowDrawable(e.getIC(), ITechCanvasDrawable.SHOW_TYPE_1_OVER_TOP);
+      ExecutionContextCanvasGui ec = e.getExecutionContext();
+      predictionTable.removeDrawable(ec, null);
+      punctuationTable.shShowDrawable(ec, ITechCanvasDrawable.SHOW_TYPE_1_OVER_TOP);
 
       e.setFlag(BusEvent.FLAG_1_ACTED, true);
    }
@@ -589,7 +593,8 @@ public class StringEditControl extends TableView implements IDrawListener, IBOSt
    }
 
    public int getKeyboardType() {
-      return gc.getCFC().getHostCore().getHostInt(ITechHostUI.DATA_ID_23_KEYBOARD_TYPE);
+      IHostData hd = gc.getCFC().getHost().getHostData();
+      return hd.getHostDataInt(ITechHostDataDrawUi.DATA_ID_23_KEYBOARD_TYPE);
    }
 
    /**
@@ -664,10 +669,10 @@ public class StringEditControl extends TableView implements IDrawListener, IBOSt
     * <br>
     * @param ic
     */
-   public void hidePopup(InputConfig ic) {
+   public void hidePopup(ExecutionContextCanvasGui ec) {
       if (charSetsTableView != null && !charSetsTableView.hasState(ITechDrawable.STATE_03_HIDDEN)) {
-         charSetsTableView.removeDrawable(ic, this);
-         ic.srActionDoneRepaint();
+         charSetsTableView.removeDrawable(ec, this);
+         ec.srActionDoneRepaint();
       }
    }
 
@@ -701,8 +706,9 @@ public class StringEditControl extends TableView implements IDrawListener, IBOSt
     * Deal with commands.
     * InputThread
     */
-   public void manageKeyInput(InputConfig ic) {
-      super.manageKeyInput(ic);
+   public void manageKeyInput(ExecutionContextCanvasGui ec) {
+      super.manageKeyInput(ec);
+      InputConfig ic = ec.getInputConfig();
       if (!ic.isActionDone()) {
          //edit control did not action a command
          if (ic.isPressed()) {
@@ -721,7 +727,7 @@ public class StringEditControl extends TableView implements IDrawListener, IBOSt
                }
                if (num != -1) {
                   //upgrade lock to writeLock
-                  predictionTable.setSelectedIndex(num, ic, true);
+                  predictionTable.setSelectedIndex(num, ec, true);
                   ic.srActionDoneRepaint(predictionTable);
                }
             }
@@ -732,13 +738,13 @@ public class StringEditControl extends TableView implements IDrawListener, IBOSt
             } else if (ic.isFireP()) {
                //accept?
             } else if (charProducer != null) {
-               charProducer.produce(ic, editModule);
+               charProducer.produce(ec, editModule);
             }
          }
       }
       if (isPredictionJustAdded) {
          //hide
-         punctuationTable.removeDrawable(ic, controlledSD);
+         punctuationTable.removeDrawable(ec, controlledSD);
 
       }
       //when prediction table is active, selection can occurs with keypad numbers. this only enabled when
@@ -765,7 +771,7 @@ public class StringEditControl extends TableView implements IDrawListener, IBOSt
     * <br>
     * 
     */
-   public void manageKeyInput(InputStateDrawable ic, CanvasResultDrawable srd) {
+   public void manageKeyInput(InputStateCanvasGui ic, OutputStateCanvasGui srd) {
       //when an action has already been registered
       if (srd.isActionDone()) {
          return;
@@ -789,8 +795,8 @@ public class StringEditControl extends TableView implements IDrawListener, IBOSt
     * <br>
     * 
     */
-   public void managePointerInput(InputConfig ic) {
-      super.managePointerInput(ic);
+   public void managePointerInput(ExecutionContextCanvasGui ec) {
+      super.managePointerInput(ec);
    }
 
    /**
@@ -808,21 +814,21 @@ public class StringEditControl extends TableView implements IDrawListener, IBOSt
     * When a prediction table is visible, depending on its position, a navigate down or up.
     * 
     */
-   public void navigateDown(InputConfig ic) {
-      gc.getFocusCtrl().navigateOut(ic, this, C.POS_1_BOT);
+   public void navigateDown(ExecutionContextCanvasGui ec) {
+      gc.getFocusCtrl().navigateOut(ec, this, C.POS_1_BOT);
    }
 
    /**
     * 
     */
-   public void navigateLeft(InputConfig ic) {
-      hidePopup(ic);
-      super.navigateLeft(ic);
+   public void navigateLeft(ExecutionContextCanvasGui ec) {
+      hidePopup(ec);
+      super.navigateLeft(ec);
    }
 
-   public void navigateRight(InputConfig ic) {
-      hidePopup(ic);
-      super.navigateRight(ic);
+   public void navigateRight(ExecutionContextCanvasGui ec) {
+      hidePopup(ec);
+      super.navigateRight(ec);
    }
 
    /**
@@ -831,8 +837,8 @@ public class StringEditControl extends TableView implements IDrawListener, IBOSt
     * <br>
     * 
     */
-   public void navigateUp(InputConfig ic) {
-      gc.getFocusCtrl().navigateOut(ic, this, C.POS_0_TOP);
+   public void navigateUp(ExecutionContextCanvasGui ec) {
+      gc.getFocusCtrl().navigateOut(ec, this, C.POS_0_TOP);
    }
 
    /**
@@ -889,7 +895,7 @@ public class StringEditControl extends TableView implements IDrawListener, IBOSt
     */
    public void removeControl() {
       if (getKeyboardType() == IBOHost.KB_TYPE_2_FULL_VIRTUAL) {
-         produceCoreUIEvent(IEventsCoreUI.PID_01_DEVICE_02_VIRT_KEYB_OFF);
+         produceCoreUIEvent(IEventsCoreUi.PID_01_DEVICE_02_VIRT_KEYB_OFF);
       }
       if (pulseThread.isPulseRunning()) {
          pulseThread.setPulseState(PulseThread.STATE_3_PAUSED);
@@ -902,19 +908,19 @@ public class StringEditControl extends TableView implements IDrawListener, IBOSt
    }
 
    private void produceCoreUIEvent(int eid) {
-      gc.getCUC().getEventBus().sendNewEvent(IEventsCoreUI.PID_01_DEVICE, eid, this);
+      gc.getCUC().getEventBus().sendNewEvent(IEventsCoreUi.PID_01_DEVICE, eid, this);
 
    }
 
    /**
     * This method is called either in worker thread or gui thread.
     * <br>
-    * If called in the {@link ITechPaintThread#THREAD_0_HOST_HUI}, the Runnable is called.
+    * If called in the {@link ITechThreadPaint#THREAD_0_HOST_HUI}, the Runnable is called.
     * Otherwise, the code is queued
     * <br>
     * @param prefix
     */
-   public void searchPrefix(final InputConfig ic, String prefix) {
+   public void searchPrefix(final ExecutionContextCanvasGui ic, String prefix) {
 
       //we have a special command
 
@@ -924,7 +930,7 @@ public class StringEditControl extends TableView implements IDrawListener, IBOSt
       //TODO create a new Table so we don't run into sync issues
       Runnable uiUpdate = new SearchPrefixRunnable(gc, ic, its);
       //syncrhonize once on the ScreenResult
-      RepaintCtrlGui repaintCtrlDraw = gc.getCanvasGCRoot().getCanvas().getRepaintCtrlDraw();
+      RepaintHelperGui repaintCtrlDraw = gc.getCanvasGCRoot().getCanvas().getRepaintCtrlDraw();
       repaintCtrlDraw.repaintDrawableCycleBusiness(predictionTable, uiUpdate);
 
    }
@@ -935,13 +941,13 @@ public class StringEditControl extends TableView implements IDrawListener, IBOSt
     * <br>
     * 
     */
-   protected void selectionSelectEvent(InputConfig ic) {
+   protected void selectionSelectEvent(ExecutionContextCanvasGui ec) {
       int selIndex = getSelectedIndex();
       IDrawable d = getModelDrawable(selIndex);
       if (d == drawableT9) {
          d.setStateStyle(ITechDrawable.STYLE_03_MARKED, !d.hasStateStyle(ITechDrawable.STYLE_03_MARKED));
          doPredictions();
-         ic.srActionDoneRepaint(d);
+         ec.srActionDoneRepaint(d);
       } else if (d == drawableMAJ) {
          CoreUiCtx cuc = gc.getCFC().getCUC();
          if (d.hasStateStyle(ITechDrawable.STYLE_03_MARKED)) {
@@ -951,7 +957,7 @@ public class StringEditControl extends TableView implements IDrawListener, IBOSt
             cuc.setMajOn(false);
             d.setStateStyle(ITechDrawable.STYLE_03_MARKED, true);
          }
-         ic.srActionDoneRepaint(d);
+         ec.srActionDoneRepaint(d);
       } else if (d == drawableCharSet) {
          //show menu of available charsets
          if (charSetsTableView == null) {
@@ -971,8 +977,8 @@ public class StringEditControl extends TableView implements IDrawListener, IBOSt
          //transfer key focus to the newly visible Drawable.
          //this drawable gets the vertical navigation
          drawableCharSet.setStateStyle(ITechDrawable.STYLE_05_SELECTED, false);
-         ic.srActionDoneRepaint(drawableCharSet);
-         charSetsTableView.shShowDrawable(ic, ITechCanvasDrawable.SHOW_TYPE_1_OVER_TOP);
+         ec.srActionDoneRepaint(drawableCharSet);
+         charSetsTableView.shShowDrawable(ec, ITechCanvasDrawable.SHOW_TYPE_1_OVER_TOP);
       } else if (d == drawableSpeed) {
          //show general options pane to modifies speed and stuff
       } else if (d == drawableOptions) {
@@ -990,8 +996,8 @@ public class StringEditControl extends TableView implements IDrawListener, IBOSt
             symbolTable.addEventListener(this, ITechTable.EVENT_ID_00_SELECT);
          }
          //show it over
-         symbolTable.shShowDrawable(ic, ITechCanvasDrawable.SHOW_TYPE_1_OVER_TOP);
-         ic.srActionDoneRepaint();
+         symbolTable.shShowDrawable(ec, ITechCanvasDrawable.SHOW_TYPE_1_OVER_TOP);
+         ec.srActionDoneRepaint();
       }
    }
 
@@ -1028,7 +1034,7 @@ public class StringEditControl extends TableView implements IDrawListener, IBOSt
       doPredictions();
    }
 
-   private void showControl(InputConfig ic) {
+   private void showControl(ExecutionContextCanvasGui ec) {
 
    }
 
@@ -1087,7 +1093,7 @@ public class StringEditControl extends TableView implements IDrawListener, IBOSt
 
       positionControl();
 
-      showControl(e.getIC());
+      showControl(e.getExecutionContext());
       //Controller.getMe().giveLayerFocus(this);
 
       ByteObject editTech = editModule.getEditTech();
@@ -1113,7 +1119,7 @@ public class StringEditControl extends TableView implements IDrawListener, IBOSt
 
       //asks the device virtual keyboard to appear
       if (getKeyboardType() == IBOHost.KB_TYPE_2_FULL_VIRTUAL) {
-         produceCoreUIEvent(IEventsCoreUI.PID_01_DEVICE_01_VIRT_KEYB_REQUEST);
+         produceCoreUIEvent(IEventsCoreUi.PID_01_DEVICE_01_VIRT_KEYB_REQUEST);
       }
       //Controller.getMe().getTopologyNav().positionToplogy(this, C.POS_0_TOP, sd);
       //request a repaint

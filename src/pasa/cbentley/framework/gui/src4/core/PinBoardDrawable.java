@@ -4,12 +4,13 @@ import pasa.cbentley.core.src4.event.BusEvent;
 import pasa.cbentley.core.src4.logging.Dctx;
 import pasa.cbentley.core.src4.utils.ArrayUtils;
 import pasa.cbentley.core.src4.utils.IntUtils;
-import pasa.cbentley.framework.coreui.src4.tech.ITechCodes;
+import pasa.cbentley.framework.core.ui.src4.tech.ITechCodes;
 import pasa.cbentley.framework.drawx.src4.engine.GraphicsX;
 import pasa.cbentley.framework.gui.src4.canvas.InputConfig;
 import pasa.cbentley.framework.gui.src4.canvas.PointerGestureDrawable;
 import pasa.cbentley.framework.gui.src4.canvas.TopologyDLayer;
 import pasa.cbentley.framework.gui.src4.ctx.GuiCtx;
+import pasa.cbentley.framework.gui.src4.exec.ExecutionContextCanvasGui;
 import pasa.cbentley.framework.gui.src4.interfaces.ITechCanvasDrawable;
 import pasa.cbentley.framework.gui.src4.interfaces.IDrawable;
 import pasa.cbentley.framework.gui.src4.interfaces.ITechDrawable;
@@ -52,7 +53,7 @@ public class PinBoardDrawable extends ViewDrawable {
 
    private int             draggingMode         = 0;
 
-   IDrawable[]             drawables                   = new IDrawable[5];
+   IDrawable[]             drawables            = new IDrawable[5];
 
    private int             keyFocusZIndex       = -1;
 
@@ -95,7 +96,7 @@ public class PinBoardDrawable extends ViewDrawable {
       drawables[nextempty] = d;
       xs[nextempty] = rx;
       ys[nextempty] = ry;
-      
+
       d.initSize();
       //update every time the style changes
       d.setXY(this.getContentX() + rx, this.getContentY() + ry);
@@ -108,6 +109,7 @@ public class PinBoardDrawable extends ViewDrawable {
    public int getNumDrawables() {
       return nextempty;
    }
+
    /**
     * Drags according to 3 modes
     * <li> {@link PinBoardDrawable#DRAG_MODE_0_RESIZE}
@@ -116,8 +118,9 @@ public class PinBoardDrawable extends ViewDrawable {
     * 
     * @param ic
     */
-   public void draggingProcess(InputConfig ic) {
-      GestureDetector pg = ic.is.getOrCreateGesture(this);
+   public void draggingProcess(ExecutionContextCanvasGui ec) {
+      InputConfig ic = ec.getInputConfig();
+      GestureDetector pg = ic.getInputStateDrawable().getOrCreateGesture(this);
       int pressedX = pg.getPressed(PointerGestureDrawable.ID_0_X);
       int pressedY = pg.getPressed(PointerGestureDrawable.ID_1_Y);
       //check if one has pointer focus
@@ -237,7 +240,6 @@ public class PinBoardDrawable extends ViewDrawable {
       layEngine.setPw(pw);
       layEngine.setPh(ph);
 
-      
       //update positions
       for (int i = 0; i < nextempty; i++) {
          if (drawables[i] != null) {
@@ -284,8 +286,8 @@ public class PinBoardDrawable extends ViewDrawable {
     * <br>
     * Cmd to iterate zindex between keyFocus in addition to Pointer
     */
-   public void manageKeyInput(InputConfig ic) {
-
+   public void manageKeyInput(ExecutionContextCanvasGui ec) {
+      InputConfig ic = ec.getInputConfig();
       if (ic.isSequencedPressed(ITechCodes.KEY_STAR, ITechCodes.KEY_UP)) {
          //cycle front to back most
          ArrayUtils.rotateRight(drawables, 0, nextempty);
@@ -302,13 +304,13 @@ public class PinBoardDrawable extends ViewDrawable {
 
       //event amont
       if (keyFocusZIndex >= 0 && drawables[keyFocusZIndex] != null) {
-         drawables[keyFocusZIndex].manageKeyInput(ic);
+         drawables[keyFocusZIndex].manageKeyInput(ec);
       }
       //iterate over
       for (int i = 0; i < nextempty; i++) {
          if (drawables[i] != null) {
             if (drawables[i].hasStateStyle(ITechDrawable.STYLE_06_FOCUSED_KEY)) {
-               drawables[i].manageKeyInput(ic);
+               drawables[i].manageKeyInput(ec);
                break;
             }
          }
@@ -320,27 +322,28 @@ public class PinBoardDrawable extends ViewDrawable {
     * <br>
     * That happens when Pointer is dragged.
     */
-   public void managePointerInput(InputConfig ic) {
+   public void managePointerInput(ExecutionContextCanvasGui ec) {
+      InputConfig ic = ec.getInputConfig();
       //implement dragging only when first press 
       if (hasStateStyle(ITechDrawable.STYLE_08_PRESSED)) {
          if (ic.isReleased()) {
             //compute the gesture amplitude and generate a timer for modyfing scroll config start increment 
-            GestureDetector pg = ic.is.getOrCreateGesture(this);
-            pg.simpleRelease(ic.is);
+            GestureDetector pg = ic.getInputStateDrawable().getOrCreateGesture(this);
+            pg.simpleRelease(ic.getInputStateDrawable());
             //Controller.getMe().draggedRemover(this, ic);
          }
          if (ic.isDraggedPointer0Button0()) {
-            draggingProcess(ic);
+            draggingProcess(ec);
          }
          return;
       }
 
       //drags the PinBoard when pointer is on the border
-      if (ic.isPressed() && DrawableUtilz.isInsideBorder(ic, this)) {
+      if (ic.isPressed() && DrawableUtilz.isInsideBorder(ec, this)) {
          //resize drawable
          draggingMode = DRAG_MODE_0_RESIZE;
-         GestureDetector pg = ic.is.getOrCreateGesture(this);
-         pg.simplePress(getDw(), getDh(), ic.is);
+         GestureDetector pg = ic.getInputStateDrawable().getOrCreateGesture(this);
+         pg.simplePress(getDw(), getDh(), ic.getInputStateDrawable());
          ic.srActionDoneRepaint();
          return;
       }
@@ -350,18 +353,18 @@ public class PinBoardDrawable extends ViewDrawable {
       for (int i = nextempty - 1; i >= 0; i--) {
          if (drawables[i] != null) {
             IDrawable d = drawables[i];
-            if (DrawableUtilz.isInside(ic, d)) {
-               d.managePointerInput(ic);
+            if (DrawableUtilz.isInside(ec, d)) {
+               d.managePointerInput(ec);
 
                if (!hasStateStyle(ITechDrawable.STYLE_08_PRESSED) && ic.isPressed()) {
                   //listen for draggin
                   draggingMode = DRAG_MODE_2_DRAWABLE;
-                  GestureDetector pg = ic.is.getOrCreateGesture(this);
-                  pg.simplePress(d.getX(), d.getY(), ic.is);
+                  GestureDetector pg = ic.getInputStateDrawable().getOrCreateGesture(this);
+                  pg.simplePress(d.getX(), d.getY(), ic.getInputStateDrawable());
                   ic.srActionDoneRepaint();
 
                }
-               d.managePointerInput(ic);
+               d.managePointerInput(ec);
                pointerFocusZIndex = i;
                break;
             }
@@ -373,11 +376,11 @@ public class PinBoardDrawable extends ViewDrawable {
          if (ic.isPressed()) {
             //listen for dragging on the whole PinBoard
             draggingMode = DRAG_MODE_1_PINBOARD;
-            GestureDetector pg = ic.is.getOrCreateGesture(this);
-            pg.simplePress(this.getX(), this.getY(), ic.is);
+            GestureDetector pg = ic.getInputStateDrawable().getOrCreateGesture(this);
+            pg.simplePress(this.getX(), this.getY(), ic.getInputStateDrawable());
             this.setStateStyle(ITechDrawable.STYLE_08_PRESSED, true);
          }
-         gc.getFocusCtrl().newFocusPointerPress(ic, this);
+         gc.getFocusCtrl().newFocusPointerPress(ec, this);
          ic.srActionDoneRepaint();
          return;
       }
@@ -420,13 +423,11 @@ public class PinBoardDrawable extends ViewDrawable {
       dc.root(this, PinBoardDrawable.class, 450);
       toStringPrivate(dc);
       super.toString(dc.sup());
-      
-      
+
       dc.nl();
       dc.appendVarWithSpace("draggingMode", draggingMode);
       dc.appendVarWithSpace("pointerFocusZIndex", pointerFocusZIndex);
-      
-      
+
       for (int i = 0; i < nextempty; i++) {
          if (i != nextempty - 1) {
             dc.nl();

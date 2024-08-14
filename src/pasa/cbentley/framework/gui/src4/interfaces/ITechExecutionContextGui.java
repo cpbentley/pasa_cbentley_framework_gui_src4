@@ -1,10 +1,10 @@
 package pasa.cbentley.framework.gui.src4.interfaces;
 
-import pasa.cbentley.framework.coreui.src4.exec.ITechExecutionContext;
-import pasa.cbentley.framework.gui.src4.canvas.ExecutionContextGui;
+import pasa.cbentley.framework.core.ui.src4.exec.ITechExecutionContext;
+import pasa.cbentley.framework.gui.src4.exec.ExecutionContextCanvasGui;
 
 /**
- * Defines constants for the {@link ExecutionContextGui}
+ * Defines constants for the {@link ExecutionContextCanvasGui}
  * <br>
  * <br>
  * 

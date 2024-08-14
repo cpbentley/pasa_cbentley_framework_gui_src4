@@ -1,6 +1,6 @@
 package pasa.cbentley.framework.gui.src4.interfaces;
 
-import pasa.cbentley.framework.coreui.src4.utils.ViewState;
+import pasa.cbentley.framework.core.ui.src4.utils.ViewState;
 import pasa.cbentley.framework.gui.src4.canvas.TopLevelCtrl;
 
 /**

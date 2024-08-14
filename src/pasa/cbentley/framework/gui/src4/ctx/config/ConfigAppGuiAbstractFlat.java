@@ -3,8 +3,8 @@ package pasa.cbentley.framework.gui.src4.ctx.config;
 import pasa.cbentley.core.src4.ctx.IConfigU;
 import pasa.cbentley.core.src4.ctx.UCtx;
 import pasa.cbentley.core.src4.interfaces.C;
-import pasa.cbentley.framework.core.src4.app.ConfigAppAbstract;
-import pasa.cbentley.framework.coreui.src4.tech.ITechInputConstants;
+import pasa.cbentley.framework.core.framework.src4.app.ConfigAppAbstract;
+import pasa.cbentley.framework.core.ui.src4.tech.ITechInputConstants;
 import pasa.cbentley.framework.drawx.src4.tech.ITechGraphicsX;
 import pasa.cbentley.framework.gui.src4.interfaces.ITechCanvasDrawable;
 
@@ -91,13 +91,13 @@ public abstract class ConfigAppGuiAbstractFlat extends ConfigAppAbstract impleme
    }
 
    /**
-    * <li> {@link ITechCanvasDrawable#CMD_PRO_0}
-    * <li> {@link ITechCanvasDrawable#CMD_PRO_1}
-    * <li> {@link ITechCanvasDrawable#CMD_PRO_2}        
+    * <li> {@link ITechCanvasDrawable#CMD_PRO_0_REPO_NODE_UI}
+    * <li> {@link ITechCanvasDrawable#CMD_PRO_2_UI_NODE_REPO}
+    * <li> {@link ITechCanvasDrawable#CMD_PRO_1_REPO_UI_NODE}        
     * @return
     */
    public int getCmdProcessingMode() {
-      return ITechCanvasDrawable.CMD_PRO_0;
+      return ITechCanvasDrawable.CMD_PRO_0_REPO_NODE_UI;
    }
 
    /**

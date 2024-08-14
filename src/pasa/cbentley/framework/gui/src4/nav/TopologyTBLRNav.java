@@ -4,6 +4,7 @@ import pasa.cbentley.core.src4.interfaces.C;
 import pasa.cbentley.framework.gui.src4.canvas.InputConfig;
 import pasa.cbentley.framework.gui.src4.core.Drawable;
 import pasa.cbentley.framework.gui.src4.ctx.GuiCtx;
+import pasa.cbentley.framework.gui.src4.exec.ExecutionContextCanvasGui;
 import pasa.cbentley.framework.gui.src4.interfaces.IDrawable;
 import pasa.cbentley.framework.gui.src4.interfaces.INavigational;
 import pasa.cbentley.framework.gui.src4.interfaces.ITechDrawable;
@@ -133,11 +134,11 @@ public class TopologyTBLRNav {
       return tblr;
    }
 
-   private void moveTo(InputConfig ic, IDrawable iDrawable, IDrawable nav) {
-      gc.getFocusCtrl().newFocusKey(ic, iDrawable);
+   private void moveTo(ExecutionContextCanvasGui ec, IDrawable iDrawable, IDrawable nav) {
+      gc.getFocusCtrl().newFocusKey(ec, iDrawable);
    }
 
-   public void navigateOutDown(InputConfig ic, IDrawable nav) {
+   public void navigateOutDown(ExecutionContextCanvasGui ic, IDrawable nav) {
       if (nav.hasStateNav(ITechDrawable.NAV_01_TOPO_UP)) {
          //second go up the chain
          for (int i = 0; i < d1.length; i++) {
@@ -166,7 +167,7 @@ public class TopologyTBLRNav {
     * @param ic
     * @param nav
     */
-   public void navigateOutLeft(InputConfig ic, IDrawable nav) {
+   public void navigateOutLeft(ExecutionContextCanvasGui ic, IDrawable nav) {
       //first check topology if there is something to the left so that this drawable is righted of something
       if (nav.hasStateNav(ITechDrawable.NAV_04_TOPO_RIGHT)) {
          //second go up the chain
@@ -190,7 +191,7 @@ public class TopologyTBLRNav {
 
    }
 
-   public void navigateOutRight(InputConfig ic, IDrawable nav) {
+   public void navigateOutRight(ExecutionContextCanvasGui ic, IDrawable nav) {
       //first check topology if there is something to the left so that this drawable is righted of something
       if (nav.hasStateNav(ITechDrawable.NAV_03_TOPO_LEFT)) {
          //second go up the chain
@@ -214,7 +215,7 @@ public class TopologyTBLRNav {
     * @param ic
     * @param nav
     */
-   public void navigateOutUp(InputConfig ic, IDrawable nav) {
+   public void navigateOutUp(ExecutionContextCanvasGui ic, IDrawable nav) {
       if (nav.hasStateNav(ITechDrawable.NAV_02_TOPO_DOWN)) {
          //second go up the chain
          for (int i = 0; i < d1.length; i++) {

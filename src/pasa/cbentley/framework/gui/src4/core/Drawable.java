@@ -21,8 +21,9 @@ import pasa.cbentley.framework.cmd.src4.engine.CmdInstance;
 import pasa.cbentley.framework.cmd.src4.engine.CmdNode;
 import pasa.cbentley.framework.cmd.src4.engine.MCmd;
 import pasa.cbentley.framework.cmd.src4.interfaces.ICmdListener;
+import pasa.cbentley.framework.core.ui.src4.input.InputState;
+import pasa.cbentley.framework.core.ui.src4.utils.ViewState;
 import pasa.cbentley.framework.coredraw.src4.interfaces.IMFont;
-import pasa.cbentley.framework.coreui.src4.utils.ViewState;
 import pasa.cbentley.framework.datamodel.src4.table.ObjectTableModel;
 import pasa.cbentley.framework.drawx.src4.ctx.IBOTypesDrawX;
 import pasa.cbentley.framework.drawx.src4.engine.GraphicsX;
@@ -43,19 +44,20 @@ import pasa.cbentley.framework.gui.src4.anim.definitions.AlphaChangeRgb;
 import pasa.cbentley.framework.gui.src4.anim.move.Move;
 import pasa.cbentley.framework.gui.src4.canvas.CanvasAppliInputGui;
 import pasa.cbentley.framework.gui.src4.canvas.CanvasDrawControl;
-import pasa.cbentley.framework.gui.src4.canvas.ExecutionContextGui;
 import pasa.cbentley.framework.gui.src4.canvas.FocusCtrl;
 import pasa.cbentley.framework.gui.src4.canvas.InputConfig;
-import pasa.cbentley.framework.gui.src4.canvas.RepaintCtrlGui;
+import pasa.cbentley.framework.gui.src4.canvas.RepaintHelperGui;
 import pasa.cbentley.framework.gui.src4.canvas.TopologyDLayer;
 import pasa.cbentley.framework.gui.src4.canvas.ViewContext;
-import pasa.cbentley.framework.gui.src4.cmd.CmdInstanceDrawable;
+import pasa.cbentley.framework.gui.src4.cmd.CmdInstanceGui;
 import pasa.cbentley.framework.gui.src4.ctx.GuiCtx;
 import pasa.cbentley.framework.gui.src4.ctx.IBOTypesGui;
 import pasa.cbentley.framework.gui.src4.ctx.IToStringFlagsDraw;
 import pasa.cbentley.framework.gui.src4.ctx.IToStringFlagsGui;
 import pasa.cbentley.framework.gui.src4.ctx.ObjectGC;
 import pasa.cbentley.framework.gui.src4.ctx.ToStringStaticGui;
+import pasa.cbentley.framework.gui.src4.exec.ExecutionContextCanvasGui;
+import pasa.cbentley.framework.gui.src4.factories.interfaces.IBOStrAuxData;
 import pasa.cbentley.framework.gui.src4.interfaces.IAnimable;
 import pasa.cbentley.framework.gui.src4.interfaces.ICommandDrawable;
 import pasa.cbentley.framework.gui.src4.interfaces.IDrawListener;
@@ -102,7 +104,7 @@ import pasa.cbentley.layouter.src4.tech.ITechLayout;
  * <b>Animations</b> : <br>
  * Animations are fired relative to events in the lifecycle
  * <br>
- * <li>Coordinated animations defined at the style level using {@link ByteObject#STYLE_FLAGC_6_ANIM_ENTRY}.
+ * <li>Coordinated animations defined at the style level using {@link ByteObject#STYLE_FLAG_C_6_ANIM_ENTRY}.
  * <br>
  * <li>Individual animations may also be defined at the figure of style layers with {@link IDrw#FIG_FLAG_6_ANIMATED}
  * <br>
@@ -182,26 +184,6 @@ public class Drawable extends ObjectGC implements IDrawable, IBOStyle, IStringab
    protected int                    behaviors;
 
    /**
-    * Technical style. For a basic drawable, it will always use {@link ITechLinks#LINK_10_BASE_TECH}.
-    * Can be null.
-    * <br>
-    * <br>
-    * Sub class who want to differentiate from others have to create.
-    * Tech gets to be controlled by the {@link StyleClass}/
-    * <br>
-    * Contains the Behaviors and View Genes.
-    * <br>
-    * Who can modify it???? 
-    * <br>
-    * <br>
-    * Since a tech definition might be used by several users, dynamically changing its content
-    * is discouraged.
-    */
-   protected ByteObject             boStringDrawable;
-
-   //#enddebug
-
-   /**
     * {@link RgbCache} pixel level cache.
     * <br>
     * <br>
@@ -247,9 +229,18 @@ public class Drawable extends ObjectGC implements IDrawable, IBOStyle, IStringab
 
    /**
     * Custom user Type, to which a specific translucent style may be linked.
-    * <br>
-    * <br>
     * When > 0, {@link Presentation#getCTypeStyleKey(int, int)} to look up a ctype style layer.
+    * 
+    * The bit numberal state 16 bits by default
+    * A Table may sort Drawables according to their CType
+    * 
+    * It is of the style Type differentiation such as MSG_INFO, MSG_ERROR and MSG_WARNING
+    * It often has a business meaning in direct relation to {@link ObjectTableModel#getCellCType(int)}
+    * 
+    * <p>
+    * <li> {@link Drawable#getCType()}
+    * <li> {@link Drawable#setCType(int)}
+    * </p>
     */
    protected int                    ctype           = 0;
 
@@ -311,15 +302,21 @@ public class Drawable extends ObjectGC implements IDrawable, IBOStyle, IStringab
    protected volatile int           statesVolatile  = STATE_03_HIDDEN;
 
    /**
+    * <p>
+    * Incomplete style definition that will merge with root style before 
+    * applying state styles.
+    * </p>
+    * 
+    * <p>
     * Set externally by positioning layout. Must be semi-opaque classless style.
-    * <br>
-    * <br>
-    * Reference to an incomplete style definition that will merge with root style.
-    * <br>
-    * <br>
     * A TableView might set a column based style layer.
+    * </p>
+    * 
+    * <p>
+    * It is used of the style differentiation in table columns.
+    * </p>
     */
-   protected ByteObject             structStyle;
+   protected ByteObject             styleStruct;
 
    /**
     * Style active used for drawing and computing {@link Drawable}'s dimension.
@@ -427,8 +424,8 @@ public class Drawable extends ObjectGC implements IDrawable, IBOStyle, IStringab
 
    /**
     * Allows an external object to control the code for
-    * <li> {@link IDrawable#manageKeyInput(InputConfig)}
-    * <li> {@link IDrawable#managePointerInput(InputConfig)}
+    * <li> {@link IDrawable#manageKeyInput(ExecutionContextCanvasGui)}
+    * <li> {@link IDrawable#managePointerInput(ExecutionContextCanvasGui)}
     * <br>
     * this is done through the {@link IDrawableListener} interface.
     * <br>
@@ -650,7 +647,7 @@ public class Drawable extends ObjectGC implements IDrawable, IBOStyle, IStringab
    /**
     * Does nothing
     */
-   public void commandAction(CmdInstanceDrawable cd) {
+   public void commandAction(CmdInstanceGui cd) {
 
    }
 
@@ -919,7 +916,7 @@ public class Drawable extends ObjectGC implements IDrawable, IBOStyle, IStringab
          da.animated[0].drawDrawable(g);
       } else {
          //otherwise draw it normally.
-         styleOp.drawStyleFigure(style, g, STYLE_OFFSET_2_FLAGB, STYLE_FLAGB_1_BG, styleAreas, 1);
+         styleOp.drawStyleFigure(style, g, STYLE_OFFSET_2_FLAG_B, STYLE_FLAG_B_1_BG, styleAreas, 1);
       }
       if (da.animated[9] != null) {
          da.animated[9].drawDrawable(g);
@@ -932,7 +929,7 @@ public class Drawable extends ObjectGC implements IDrawable, IBOStyle, IStringab
    private void drawDrawableAnimLayer(GraphicsX g, int w, int h, int[] areas, int index, int flagOffset, int flag) {
       FigDrawable fg1 = da.getFg(index);
       if (fg1 == null) {
-         getStyleOp().drawStyleFigure(style, g, STYLE_OFFSET_2_FLAGB, STYLE_FLAGB_1_BG, areas, 1);
+         getStyleOp().drawStyleFigure(style, g, STYLE_OFFSET_2_FLAG_B, STYLE_FLAG_B_1_BG, areas, 1);
       } else {
          fg1.draw(g);
       }
@@ -949,10 +946,10 @@ public class Drawable extends ObjectGC implements IDrawable, IBOStyle, IStringab
       int[] areas = getStyleOp().computeNewStyleAreas(getX(), getY(), w, h, style);
       if (da.hasFlag(DrawableAnimator.INNER_5_BG)) {
          //
-         drawDrawableAnimLayer(g, w, h, areas, 0, STYLE_OFFSET_2_FLAGB, STYLE_FLAGB_1_BG);
-         drawDrawableAnimLayer(g, w, h, areas, 1, STYLE_OFFSET_2_FLAGB, STYLE_FLAGB_2_BG);
-         drawDrawableAnimLayer(g, w, h, areas, 2, STYLE_OFFSET_2_FLAGB, STYLE_FLAGB_3_BG);
-         drawDrawableAnimLayer(g, w, h, areas, 3, STYLE_OFFSET_2_FLAGB, STYLE_FLAGB_4_BG);
+         drawDrawableAnimLayer(g, w, h, areas, 0, STYLE_OFFSET_2_FLAG_B, STYLE_FLAG_B_1_BG);
+         drawDrawableAnimLayer(g, w, h, areas, 1, STYLE_OFFSET_2_FLAG_B, STYLE_FLAG_B_2_BG);
+         drawDrawableAnimLayer(g, w, h, areas, 2, STYLE_OFFSET_2_FLAG_B, STYLE_FLAG_B_3_BG);
+         drawDrawableAnimLayer(g, w, h, areas, 3, STYLE_OFFSET_2_FLAG_B, STYLE_FLAG_B_4_BG);
 
       } else {
          drawDrawableBg(g);
@@ -964,10 +961,10 @@ public class Drawable extends ObjectGC implements IDrawable, IBOStyle, IStringab
          drawDrawableContent(g, getContentX(), getContentY(), getContentW(), getContentH());
       }
       if (da.hasFlag(DrawableAnimator.INNER_7_FG)) {
-         drawDrawableAnimLayer(g, w, h, areas, 4, STYLE_OFFSET_2_FLAGB, STYLE_FLAGB_5_FG);
-         drawDrawableAnimLayer(g, w, h, areas, 5, STYLE_OFFSET_2_FLAGB, STYLE_FLAGB_6_FG);
-         drawDrawableAnimLayer(g, w, h, areas, 6, STYLE_OFFSET_2_FLAGB, STYLE_FLAGB_7_FG);
-         drawDrawableAnimLayer(g, w, h, areas, 7, STYLE_OFFSET_2_FLAGB, STYLE_FLAGB_8_FG);
+         drawDrawableAnimLayer(g, w, h, areas, 4, STYLE_OFFSET_2_FLAG_B, STYLE_FLAG_B_5_FG);
+         drawDrawableAnimLayer(g, w, h, areas, 5, STYLE_OFFSET_2_FLAG_B, STYLE_FLAG_B_6_FG);
+         drawDrawableAnimLayer(g, w, h, areas, 6, STYLE_OFFSET_2_FLAG_B, STYLE_FLAG_B_7_FG);
+         drawDrawableAnimLayer(g, w, h, areas, 7, STYLE_OFFSET_2_FLAG_B, STYLE_FLAG_B_8_FG);
       } else {
          drawDrawableFg(g);
       }
@@ -1270,8 +1267,7 @@ public class Drawable extends ObjectGC implements IDrawable, IBOStyle, IStringab
    }
 
    /**
-    * The bit numberal state 16 bits by default
-    * A Table may sort Drawables according to their CType
+    *  Custom Type -> see {@link Drawable#ctype} for discussion on the nature of this field.
     * @return
     */
    public int getCType() {
@@ -1299,7 +1295,7 @@ public class Drawable extends ObjectGC implements IDrawable, IBOStyle, IStringab
     * When a child is outside the parent?, the parent will not be.
     * <br>
     * This method constructs the visible. 
-    * {@link TopologyDLayer#getDrawable(int, int, ExecutionContextGui)} gets to 
+    * {@link TopologyDLayer#getDrawable(int, int, ExecutionContextCanvasGui)} gets to 
     * direct.
     * <br>
     * When a child is outside a parent, it must be drawn as a layer.
@@ -1307,7 +1303,7 @@ public class Drawable extends ObjectGC implements IDrawable, IBOStyle, IStringab
     * By default return this. Parent is responsible to check for boundary.
     * <br>
     */
-   public IDrawable getDrawable(int x, int y, ExecutionContextGui ex) {
+   public IDrawable getDrawable(int x, int y, ExecutionContextCanvasGui ex) {
       return this;
    }
 
@@ -1503,7 +1499,7 @@ public class Drawable extends ObjectGC implements IDrawable, IBOStyle, IStringab
       return layEngine.getY();
    }
 
-   public RepaintCtrlGui getRepaintCtrlDraw() {
+   public RepaintHelperGui getRepaintCtrlDraw() {
       ViewContext viewContext = vc;
       if (viewContext == null) {
          viewContext = gc.getCanvasGCRoot().getCanvas().getVCRoot();
@@ -1621,6 +1617,7 @@ public class Drawable extends ObjectGC implements IDrawable, IBOStyle, IStringab
    public int getSizeContentHeight() {
       return layEngine.getContentH();
    }
+
    /**
     * Width size of the actual content without the margin, border and padding.
     * @return
@@ -1772,8 +1769,13 @@ public class Drawable extends ObjectGC implements IDrawable, IBOStyle, IStringab
       throw new RuntimeException("Must be implemented by subclass");
    }
 
+   /**
+    * See {@link Drawable#styleStruct} for a discussion of the nature of this field
+    * 
+    * @return mostly null unless set externally by {@link Drawable#setStyleStruct(ByteObject)}
+    */
    public ByteObject getStructStyle() {
-      return structStyle;
+      return styleStruct;
    }
 
    /**
@@ -1829,6 +1831,7 @@ public class Drawable extends ObjectGC implements IDrawable, IBOStyle, IStringab
 
    /**
     * Number of pixels consumed by the top and bottom styles layers, padding, border and margin
+    * 
     * @return
     */
    public int getStyleHConsumed() {
@@ -1993,7 +1996,15 @@ public class Drawable extends ObjectGC implements IDrawable, IBOStyle, IStringab
    public boolean hasState(int flag) {
       return (states & flag) == flag;
    }
-
+   
+   public boolean hasFlagStateStyled() {
+      return hasState(STATE_06_STYLED);
+   }
+   
+   public boolean hasFlagStateLayouted() {
+      return hasState(STATE_05_LAYOUTED);
+   }
+   
    public boolean hasStateNav(int flag) {
       return (statesNav & flag) == flag;
    }
@@ -2032,8 +2043,8 @@ public class Drawable extends ObjectGC implements IDrawable, IBOStyle, IStringab
     * Request to hide this drawable inside the execution of {@link CmdInstance}
     * @param cmd
     */
-   public void hideMe(InputConfig ic) {
-      vc.getDrawCtrlAppli().removeDrawable(ic, this, null);
+   public void hideMe(ExecutionContextCanvasGui ec) {
+      vc.getDrawCtrlAppli().removeDrawable(ec, this, null);
    }
 
    /**
@@ -2248,7 +2259,7 @@ public class Drawable extends ObjectGC implements IDrawable, IBOStyle, IStringab
    public void initStyleLoad() {
       int styleFlags = styleClass.getInitStyle();
       if (styleFlags != 0) {
-         style = styleClass.getStyle(styleFlags, ctype, structStyle);
+         style = styleClass.getStyle(styleFlags, ctype, styleStruct);
       }
 
    }
@@ -2466,25 +2477,27 @@ public class Drawable extends ObjectGC implements IDrawable, IBOStyle, IStringab
 
    /**
     * 
-    * @param ic
+    * @param ec TODO
     */
-   public void manageGestureInput(InputConfig ic) {
+   public void manageGestureInput(ExecutionContextCanvasGui ec) {
 
    }
 
-   public void manageInput(InputConfig ic) {
-      if (ic.is.isTypeDeviceKeyboard()) {
+   public void manageInput(ExecutionContextCanvasGui ec) {
+      InputState is = ec.getInputState();
+      if (is.isTypeDeviceKeyboard()) {
          //procehisss the event in the main topology
-         this.manageKeyInput(ic);
+         this.manageKeyInput(ec);
       } else {
-         this.managePointerInput(ic);
+         this.managePointerInput(ec);
       }
    }
 
    /**
     * Overrides this method
     */
-   public void manageKeyInput(InputConfig ic) {
+   public void manageKeyInput(ExecutionContextCanvasGui ec) {
+      InputConfig ic = ec.getInputConfig();
       if (parent != null && hasBehavior(BEHAVIOR_23_PARENT_EVENT_CONTROL)) {
          if (parent instanceof IDrawableListener) {
             ((IDrawableListener) parent).notifyEvent(this, EVENT_13_KEY_EVENT, ic);
@@ -2514,14 +2527,14 @@ public class Drawable extends ObjectGC implements IDrawable, IBOStyle, IStringab
     * @param cd
     * @param navEvent
     */
-   public void manageNavigate(CmdInstanceDrawable cd, int navEvent) {
+   public void manageNavigate(CmdInstanceGui cd, int navEvent) {
 
    }
 
    /**
     * All other events kinds are sent here.
     */
-   public void manageOtherInput(InputConfig ic) {
+   public void manageOtherInput(ExecutionContextCanvasGui ec) {
 
    }
 
@@ -2537,7 +2550,7 @@ public class Drawable extends ObjectGC implements IDrawable, IBOStyle, IStringab
     * Command name is recorded. The Script must work with a different window size. Therefore absolute x.y pointer
     * events are not reliable.
     * <br>
-    * By default manages state styles with {@link Drawable#managePointerStateStyle(InputConfig)}.
+    * By default manages state styles with {@link Drawable#managePointerStateStyle(ExecutionContextCanvasGui)}.
     * <br>
     * It also sets 
     * <br>
@@ -2558,8 +2571,8 @@ public class Drawable extends ObjectGC implements IDrawable, IBOStyle, IStringab
     * <li> {@link InputConfig#setSlaveDrawable(IDrawable)}
     * 
     */
-   public void managePointerInput(InputConfig ic) {
-
+   public void managePointerInput(ExecutionContextCanvasGui ec) {
+      InputConfig ic = ec.getInputConfig();
       //how do you detect several calls here?
       //#debug
       ic.toCheckPointer(this);
@@ -2579,8 +2592,8 @@ public class Drawable extends ObjectGC implements IDrawable, IBOStyle, IStringab
       if (pactor != null) {
          pactor.notifyEvent(this, EVENT_14_POINTER_EVENT, ic);
       }
-      if (!ic.sr.isDrawableStatesSet()) {
-         managePointerStateStyle(ic);
+      if (!ic.getCanvasResultDrawable().isDrawableStatesSet()) {
+         managePointerStateStyle(ec);
       }
    }
 
@@ -2592,39 +2605,37 @@ public class Drawable extends ObjectGC implements IDrawable, IBOStyle, IStringab
     * It finalize the states.
     * <br>
     * <br>
-    * It is reached by {@link Drawable#managePointerInput(InputConfig)}. In the first pass
+    * It is reached by {@link Drawable#managePointerInput(ExecutionContextCanvasGui)}. In the first pass
     * when parent is not controlling the Drawable. If controlled by parent, it is the responsibility
-    * of the parent to call the {@link Drawable#managePointerInput(InputConfig)} once the slave pointer
+    * of the parent to call the {@link Drawable#managePointerInput(ExecutionContextCanvasGui)} once the slave pointer
     * event has been processed.
     * <br>
     * <br>
     * It also tracks the Gesture/Dragged state.
-    * 
-    * @param ic
     */
-   public void managePointerStateStyle(InputConfig ic) {
+   public void managePointerStateStyle(ExecutionContextCanvasGui ec) {
       //#debug
       toDLog().pState("", this, Drawable.class, "managePointerStateStyle", LVL_05_FINE, true);
-
-      ic.is.setPointedDrawable(this);
+      InputConfig ic = ec.getInputConfig();
+      ic.getInputStateDrawable().setPointedDrawable(this);
       if (ic.isMoved()) {
          //TODO update the mouse over focused drawable
          //sometimes we don't want it to be processed.
-         gc.getFocusCtrl().newFocusPointerPress(ic, this);
+         gc.getFocusCtrl().newFocusPointerPress(ec, this);
       } else if (ic.isPressed()) {
 
          setStateStyle(STYLE_08_PRESSED, true);
          //only do the gesture ctrl flow if no gesture has already been registered.
          //ie. if the drawable is not already in the gesture
-         gc.getFocusCtrl().newFocusPointerPress(ic, this);
+         gc.getFocusCtrl().newFocusPointerPress(ec, this);
          ic.srActionDoneRepaint(this);
       } else if (ic.isReleased()) {
          setStateStyle(STYLE_08_PRESSED, false);
          setStateStyle(STYLE_09_DRAGGED, false);
          //the release is done outside the drawable but it got called because 
          //it was the draggable. so it gets a chance to set state
-         if (!DrawableUtilz.isInside(ic, this)) {
-            ic.sr.setOutsideDrawable(true);
+         if (!DrawableUtilz.isInside(ec, this)) {
+            ic.getCanvasResultDrawable().setOutsideDrawable(true);
          }
          ic.srActionDoneRepaint(this);
          //Controller.getMe().draggedRemover(this, ic);
@@ -2635,10 +2646,10 @@ public class Drawable extends ObjectGC implements IDrawable, IBOStyle, IStringab
       } else if (ic.isWheeled()) {
 
       }
-      ic.sr.setDrawableStates();
+      ic.getCanvasResultDrawable().setDrawableStates();
    }
 
-   public void manageRepeatInput(InputConfig ic) {
+   public void manageRepeatInput(ExecutionContextCanvasGui ec) {
 
    }
 
@@ -2646,7 +2657,7 @@ public class Drawable extends ObjectGC implements IDrawable, IBOStyle, IStringab
     * Call Back for DownCmd
     *
     */
-   public void navigateDown(InputConfig ic) {
+   public void navigateDown(ExecutionContextCanvasGui ec) {
 
    }
 
@@ -2658,7 +2669,7 @@ public class Drawable extends ObjectGC implements IDrawable, IBOStyle, IStringab
     * Second call, implements any second cycle stuff like cycles or other stuff.
     * @param ic
     */
-   public void navigateLeft(InputConfig ic) {
+   public void navigateLeft(ExecutionContextCanvasGui ec) {
 
    }
 
@@ -2666,7 +2677,7 @@ public class Drawable extends ObjectGC implements IDrawable, IBOStyle, IStringab
     * Implement to the right horizontal traversal
     * @param ic
     */
-   public void navigateRight(InputConfig ic) {
+   public void navigateRight(ExecutionContextCanvasGui ec) {
 
    }
 
@@ -2674,7 +2685,7 @@ public class Drawable extends ObjectGC implements IDrawable, IBOStyle, IStringab
     * 
     * @param ic
     */
-   public void navigateSelect(InputConfig ic) {
+   public void navigateSelect(ExecutionContextCanvasGui ec) {
 
    }
 
@@ -2682,7 +2693,7 @@ public class Drawable extends ObjectGC implements IDrawable, IBOStyle, IStringab
     * Call Back for Up Command
     *
     */
-   public void navigateUp(InputConfig ic) {
+   public void navigateUp(ExecutionContextCanvasGui ec) {
 
    }
 
@@ -2845,12 +2856,12 @@ public class Drawable extends ObjectGC implements IDrawable, IBOStyle, IStringab
     * <br>
     * Different from style layer based animation
     * @param type
-    * @param flag {@link IBOStyle#STYLE_FLAGC_6_ANIM_ENTRY} or {@link IBOStyle#STYLE_FLAGC_7_ANIM_MAIN}
+    * @param flag {@link IBOStyle#STYLE_FLAG_C_6_ANIM_ENTRY} or {@link IBOStyle#STYLE_FLAG_C_7_ANIM_MAIN}
     * @param style
     */
    protected void processAnim(int type, int flag, ByteObject style) {
-      if (style.hasFlag(STYLE_OFFSET_3_FLAGC, flag)) {
-         ByteObject anim = getStyleOp().getStyleDrw(style, STYLE_OFFSET_3_FLAGC, flag);
+      if (style.hasFlag(STYLE_OFFSET_3_FLAG_C, flag)) {
+         ByteObject anim = getStyleOp().getStyleDrw(style, STYLE_OFFSET_3_FLAG_C, flag);
          IAnimable ianim = gc.getAnimFactory().createDrawableAnimable(anim, this);
          addFullAnimation(ianim);
       }
@@ -2882,7 +2893,7 @@ public class Drawable extends ObjectGC implements IDrawable, IBOStyle, IStringab
       }
 
       //may define an animation on the content only.
-      ByteObject contentFig = getStyleOp().getStyleDrw(style, IBOStyle.STYLE_OFFSET_1_FLAGA, IBOStyle.STYLE_FLAGA_1_CONTENT);
+      ByteObject contentFig = getStyleOp().getStyleDrw(style, IBOStyle.STYLE_OFFSET_1_FLAG_A, IBOStyle.STYLE_FLAG_A_1_CONTENT);
       //go over each style elements and inspect animated figures.
       for (int i = 0; i < styleElements.length; i++) {
          ByteObject styleSub = styleElements[i];
@@ -2930,8 +2941,8 @@ public class Drawable extends ObjectGC implements IDrawable, IBOStyle, IStringab
       this.initPosition();
    }
 
-   public void removeDrawable(InputConfig ic, IDrawable newFocus) {
-      vc.getDrawCtrlAppli().removeDrawable(ic, this, newFocus);
+   public void removeDrawable(ExecutionContextCanvasGui ec, IDrawable newFocus) {
+      vc.getDrawCtrlAppli().removeDrawable(ec, this, newFocus);
    }
 
    public void repaintDrawable() {
@@ -3004,19 +3015,19 @@ public class Drawable extends ObjectGC implements IDrawable, IBOStyle, IStringab
    }
 
    /**
+    * Custom Type -> see {@link Drawable#ctype} for discussion on the nature of this field.
+    * 
+    * <p>
     * Sets the CType. This state is not supposed to change.
-    * <br>
-    * <br>
-    * It is of the style Type differentiation such as MSG_INFO, MSG_ERROR and MSG_WARNING
-    * <br>
-    * <br>
-    * It often has a business meaning in direct relation to {@link ObjectTableModel#getCellCType(int)}
-    * <br>
-    * <br>
+    * </p>
+    * 
+    * <p>
+    * Invalidates the style
+    * </p>
     * @return
     */
-   public void setCType(int num) {
-      this.ctype = num;
+   public void setCType(int ctype) {
+      this.ctype = ctype;
       styleInvalidate();
    }
 
@@ -3030,6 +3041,22 @@ public class Drawable extends ObjectGC implements IDrawable, IBOStyle, IStringab
     */
    protected void setDh(int dh) {
       this.layEngine.setH(dh);
+   }
+
+   protected void decrementDw(int incr) {
+      this.layEngine.incrDh(-incr);
+   }
+
+   protected void decrementDh(int incr) {
+      this.layEngine.incrDh(-incr);
+   }
+
+   protected void incrementDw(int incr) {
+      this.layEngine.incrDh(incr);
+   }
+
+   protected void incrementDh(int incr) {
+      this.layEngine.incrDh(incr);
    }
 
    /**
@@ -3217,10 +3244,24 @@ public class Drawable extends ObjectGC implements IDrawable, IBOStyle, IStringab
       layEngine.setRelativePozerY(typePozerY);
    }
 
+   /**
+    * <li> {@link ITechStyleCache#RELATIVE_TYPE_0_MARGIN}
+    * <li> {@link ITechStyleCache#RELATIVE_TYPE_1_BORDER}
+    * <li> {@link ITechStyleCache#RELATIVE_TYPE_2_PADDING}
+    * <li> {@link ITechStyleCache#RELATIVE_TYPE_3_CONTENT}
+    * @param typeSizerH
+    */
    public void setRelativeSizerH(int typeSizerH) {
       layEngine.setRelativeSizerH(typeSizerH);
    }
 
+   /**
+    * <li> {@link ITechStyleCache#RELATIVE_TYPE_0_MARGIN}
+    * <li> {@link ITechStyleCache#RELATIVE_TYPE_1_BORDER}
+    * <li> {@link ITechStyleCache#RELATIVE_TYPE_2_PADDING}
+    * <li> {@link ITechStyleCache#RELATIVE_TYPE_3_CONTENT}
+    * @param typeSizerH
+    */
    public void setRelativeSizerW(int typeSizerW) {
       layEngine.setRelativeSizerW(typeSizerW);
    }
@@ -3310,23 +3351,28 @@ public class Drawable extends ObjectGC implements IDrawable, IBOStyle, IStringab
          styleStates = BitUtils.setFlag(styleStates, styleFlag, value);
          //updates the style given by this style flag
          ByteObject stateStyle = styleClass.getStateStyle(styleFlag);
-         if (stateStyle != null) {
+         if (stateStyle == null) {
+            //no style updates
+            toDLog().pState("NONE \t" + msgBase, this, Drawable.class, "setStateStyle", LVL_05_FINE, true);
+
+         } else {
+
             //#debug
             toDLog().pState("OK \t" + msgBase, this, Drawable.class, "setStateStyle", LVL_05_FINE, true);
 
             //extract the IAnimable, ask the Da to animate
             //individual style may have anim
-            if (stateStyle.hasFlag(STYLE_OFFSET_4_FLAG_PERF, STYLE_FLAG_PERF_4_ANIMS)) {
-               processAnim(ITechAnim.ANIM_TIME_1_ENTRY, STYLE_FLAGC_6_ANIM_ENTRY, stateStyle);
+            if (stateStyle.hasFlag(STYLE_OFFSET_6_FLAG_PERF, STYLE_FLAG_PERF_4_ANIMS)) {
+               processAnim(ITechAnim.ANIM_TIME_1_ENTRY, STYLE_FLAG_C_6_ANIM_ENTRY, stateStyle);
                processAnimFigure(stateStyle);
             }
-         } else {
-            toDLog().pState("NONE \t" + msgBase, this, Drawable.class, "setStateStyle", LVL_05_FINE, true);
+            styleValidate();
+            //TODO do we invalidate Layout?
+            //in most cases, layout will not change.. how can we know if a style update changes the tblr values ?
+            //we do have to invalidate opaqueness
+            setStateFlag(STATE_18_OPAQUE_COMPUTED, false);
          }
-         styleValidate();
-         //TODO do we invalidate Layout?
-         //we do have to invalidate opaqueness
-         setStateFlag(STATE_18_OPAQUE_COMPUTED, false);
+
       } else {
          //#debug
          toDLog().pState("IG \t" + msgBase, this, Drawable.class, "setStateStyle", LVL_05_FINE, true);
@@ -3340,13 +3386,23 @@ public class Drawable extends ObjectGC implements IDrawable, IBOStyle, IStringab
    }
 
    /**
-    * This state is not supposed to change. <br>
-    * It is of the Type differentiation such as COL1, COL2 and COL3 in a Table
-    * <br>
-    * @param style
+    * 
+    * See {@link Drawable#styleStruct} for a discussion of the nature of this field
+    * 
+    * <p>
+    * This state is not supposed to change once set 
+    * </p>
+    * 
+    * POST: Style is invalidated
+    * 
+    * @param style Must be incomplete
     */
-   public void setStructStyle(ByteObject style) {
-      this.structStyle = style;
+   public void setStyleStruct(ByteObject style) {
+      //#debug
+      gc.getDC().getStyleOperator().checkStyleIncomplete(style);
+
+      this.styleStruct = style;
+
       styleInvalidate();
    }
 
@@ -3488,8 +3544,8 @@ public class Drawable extends ObjectGC implements IDrawable, IBOStyle, IStringab
       this.zindex = zindex;
    }
 
-   public void shHideDrawable(InputConfig ic) {
-      vc.getDrawCtrlAppli().shHideDrawable(ic, this);
+   public void shHideDrawable(ExecutionContextCanvasGui ec) {
+      vc.getDrawCtrlAppli().shHideDrawable(ec, this);
    }
 
    /**
@@ -3530,13 +3586,13 @@ public class Drawable extends ObjectGC implements IDrawable, IBOStyle, IStringab
       draw(g);
    }
 
-   public void shShowDrawable(InputConfig ic, int showType1Over) {
-      vc.getDrawCtrlAppli().shShowDrawable(ic, this, showType1Over);
+   public void shShowDrawable(ExecutionContextCanvasGui ec, int showType1Over) {
+      vc.getDrawCtrlAppli().shShowDrawable(ec, this, showType1Over);
    }
 
-   public void shShowDrawableOver(InputConfig ic) {
+   public void shShowDrawableOver(ExecutionContextCanvasGui ec) {
       CanvasDrawControl drawCtrlAppli = vc.getDrawCtrlAppli();
-      drawCtrlAppli.shShowDrawableOver(ic, this);
+      drawCtrlAppli.shShowDrawableOver(ec, this);
    }
 
    public void stateReadFrom(StatorReader state) {
@@ -3548,7 +3604,7 @@ public class Drawable extends ObjectGC implements IDrawable, IBOStyle, IStringab
    public void stringUpdate() {
       //nothing to update here
    }
-   //   protected void managePointerStateStyle(InputConfig ic) {
+   //   protected void managePointerStateStyle(ExecutionContextCanvasGui ec) {
    //      if (ic.getSlaveDrawable() == this) {
    //         return;
    //      }
@@ -3602,6 +3658,9 @@ public class Drawable extends ObjectGC implements IDrawable, IBOStyle, IStringab
    //      }
    //   }
 
+   /**
+    * 
+    */
    protected void styleInvalidate() {
       setStateFlag(STATE_06_STYLED, false);
       setStateFlag(STATE_18_OPAQUE_COMPUTED, false);
@@ -3624,20 +3683,25 @@ public class Drawable extends ObjectGC implements IDrawable, IBOStyle, IStringab
     */
    public void styleValidate() {
 
-      style = styleClass.getStyle(styleStates, ctype, structStyle);
-
+      style = styleClass.getStyle(styleStates, ctype, styleStruct);
+      styleCache.setNewStyle(style);
+      
       //check for global animations
       ByteObject currentStyle = getStyle();
       //remove animation in the array
-      if (currentStyle.hasFlag(STYLE_OFFSET_4_FLAG_PERF, STYLE_FLAG_PERF_4_ANIMS)) {
-         processAnim(ITechAnim.ANIM_TIME_1_ENTRY, STYLE_FLAGC_6_ANIM_ENTRY, currentStyle);
-         processAnim(ITechAnim.ANIM_TIME_0_MAIN, STYLE_FLAGC_7_ANIM_MAIN, currentStyle);
-         processAnim(ITechAnim.ANIM_TIME_2_EXIT, STYLE_FLAGC_8_ANIM_EXIT, currentStyle);
+      if (currentStyle.hasFlag(STYLE_OFFSET_6_FLAG_PERF, STYLE_FLAG_PERF_4_ANIMS)) {
+         processAnim(ITechAnim.ANIM_TIME_1_ENTRY, STYLE_FLAG_C_6_ANIM_ENTRY, currentStyle);
+         processAnim(ITechAnim.ANIM_TIME_0_MAIN, STYLE_FLAG_C_7_ANIM_MAIN, currentStyle);
+         processAnim(ITechAnim.ANIM_TIME_2_EXIT, STYLE_FLAG_C_8_ANIM_EXIT, currentStyle);
       }
       processAnimFigure(currentStyle);
 
       //state style previously made are set.
       setStateFlag(STATE_06_STYLED, true);
+      
+      if(style.hasFlag(IBOStyle.STYLE_OFFSET_5_FLAG_X, IBOStyle.STYLE_FLAG_X_3_MERGED_STRUCT)) {
+         this.invalidateLayout();
+      }
    }
 
    public void toString(Dctx dc) {
@@ -3666,7 +3730,7 @@ public class Drawable extends ObjectGC implements IDrawable, IBOStyle, IStringab
       dc.nlLvl("", layEngine);
 
       dc.nlVarOneLineListNull("Parent", parent);
-      dc.nlLvlList("StructStyle", structStyle);
+      dc.nlLvlList("StructStyle", styleStruct);
 
       if (ctype != 0) {
          dc.nlAppend("CType=" + ctype);

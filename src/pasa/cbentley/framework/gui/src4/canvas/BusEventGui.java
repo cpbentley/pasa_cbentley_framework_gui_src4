@@ -3,20 +3,21 @@ package pasa.cbentley.framework.gui.src4.canvas;
 import pasa.cbentley.core.src4.event.BusEvent;
 import pasa.cbentley.core.src4.logging.Dctx;
 import pasa.cbentley.framework.gui.src4.ctx.GuiCtx;
+import pasa.cbentley.framework.gui.src4.exec.ExecutionContextCanvasGui;
 
 public class BusEventGui extends BusEvent {
 
    protected final GuiCtx gc;
-   private InputConfig ic;
+   private ExecutionContextCanvasGui ec;
 
-   public BusEventGui(GuiCtx gc, InputConfig ic, int pid, int eid) {
+   public BusEventGui(GuiCtx gc, ExecutionContextCanvasGui ec, int pid, int eid) {
       super(gc.getUC(), gc.getEventsBusGui(), pid, eid);
       this.gc = gc;
-      this.ic = ic;
+      this.ec = ec;
    }
 
-   public InputConfig getIC() {
-      return ic;
+   public ExecutionContextCanvasGui getExecutionContext() {
+      return ec;
    }
    public GuiCtx getGC() {
       return gc;

@@ -1,7 +1,7 @@
 package pasa.cbentley.framework.gui.src4.string;
 
-import pasa.cbentley.framework.coreui.src4.interfaces.BCodes;
-import pasa.cbentley.framework.coreui.src4.tech.ITechCodes;
+import pasa.cbentley.framework.core.ui.src4.interfaces.BCodes;
+import pasa.cbentley.framework.core.ui.src4.tech.ITechCodes;
 
 public class Symbs {
 

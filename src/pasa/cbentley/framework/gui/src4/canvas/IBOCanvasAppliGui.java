@@ -2,9 +2,7 @@ package pasa.cbentley.framework.gui.src4.canvas;
 
 import pasa.cbentley.core.src4.interfaces.C;
 import pasa.cbentley.framework.drawx.src4.engine.GraphicsX;
-import pasa.cbentley.framework.gui.src4.ctx.IBOTypesGui;
 import pasa.cbentley.framework.gui.src4.interfaces.ITechCanvasDrawable;
-import pasa.cbentley.framework.input.src4.ctx.IBOTypesInput;
 import pasa.cbentley.framework.input.src4.interfaces.IBOCanvasAppli;
 
 /**
@@ -103,9 +101,9 @@ public interface IBOCanvasAppliGui extends IBOCanvasAppli {
    public static final int CANVAS_APP_DRW_OFFSET_10_FONT_SCREEN_RATIO1   = CANVAS_APP_BASIC_SIZE + 11;
 
    /**
-    * <li> {@link ITechCanvasDrawable#CMD_PRO_0}
-    * <li> {@link ITechCanvasDrawable#CMD_PRO_1}
-    * <li> {@link ITechCanvasDrawable#CMD_PRO_2}
+    * <li> {@link ITechCanvasDrawable#CMD_PRO_0_REPO_NODE_UI}
+    * <li> {@link ITechCanvasDrawable#CMD_PRO_2_UI_NODE_REPO}
+    * <li> {@link ITechCanvasDrawable#CMD_PRO_1_REPO_UI_NODE}
     * 
     */
    public static final int CANVAS_APP_DRW_OFFSET_11_CMD_PROCESSING_MODE1 = CANVAS_APP_BASIC_SIZE + 12;

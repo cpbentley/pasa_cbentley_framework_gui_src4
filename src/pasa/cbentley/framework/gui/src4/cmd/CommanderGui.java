@@ -3,28 +3,35 @@ package pasa.cbentley.framework.gui.src4.cmd;
 import pasa.cbentley.byteobjects.src4.core.ByteObject;
 import pasa.cbentley.core.src4.event.BusEvent;
 import pasa.cbentley.core.src4.event.IEventConsumer;
+import pasa.cbentley.core.src4.interfaces.IHostFeature;
 import pasa.cbentley.framework.cmd.src4.engine.CmdInstance;
 import pasa.cbentley.framework.cmd.src4.engine.CmdNode;
-import pasa.cbentley.framework.cmd.src4.engine.CommanderAbstract;
 import pasa.cbentley.framework.cmd.src4.engine.MCmd;
+import pasa.cbentley.framework.cmd.src4.input.CommanderAbstract;
 import pasa.cbentley.framework.cmd.src4.interfaces.ITechCmd;
 import pasa.cbentley.framework.cmd.src4.interfaces.ITechCmdViewLog;
-import pasa.cbentley.framework.core.src4.interfaces.IHostCoreTools;
-import pasa.cbentley.framework.core.src4.interfaces.ITechHostCore;
+import pasa.cbentley.framework.core.framework.src4.interfaces.IHostCoreTools;
+import pasa.cbentley.framework.core.ui.src4.tech.IBOCanvasHost;
+import pasa.cbentley.framework.core.ui.src4.tech.ITechHostFeatureDrawUI;
+import pasa.cbentley.framework.core.ui.src4.tech.ITechInputFeedback;
+import pasa.cbentley.framework.core.ui.src4.utils.ViewState;
 import pasa.cbentley.framework.coredraw.src4.engine.VisualState;
-import pasa.cbentley.framework.coreui.src4.tech.IBOCanvasHost;
-import pasa.cbentley.framework.coreui.src4.tech.ITechInputFeedback;
-import pasa.cbentley.framework.coreui.src4.utils.ViewState;
 import pasa.cbentley.framework.drawx.src4.engine.RgbImage;
 import pasa.cbentley.framework.gui.src4.canvas.CanvasAppliInputGui;
+import pasa.cbentley.framework.gui.src4.canvas.CanvasDebugger;
 import pasa.cbentley.framework.gui.src4.canvas.InputConfig;
 import pasa.cbentley.framework.gui.src4.canvas.RgbImageSaveTask;
 import pasa.cbentley.framework.gui.src4.canvas.ViewContext;
+import pasa.cbentley.framework.gui.src4.cmd.mcmd.MCmdGuiChangeCanvasDebugger;
+import pasa.cbentley.framework.gui.src4.cmd.mcmd.MCmdGuiChangeLanguage;
+import pasa.cbentley.framework.gui.src4.cmd.mcmd.MCmdGuiChangeMenuLocation;
+import pasa.cbentley.framework.gui.src4.cmd.mcmd.MCmdGuiNewStart;
 import pasa.cbentley.framework.gui.src4.core.StyleClass;
 import pasa.cbentley.framework.gui.src4.ctx.CanvasGuiCtx;
 import pasa.cbentley.framework.gui.src4.ctx.GuiCtx;
 import pasa.cbentley.framework.gui.src4.ctx.ITechCtxSettingsAppGui;
-import pasa.cbentley.framework.gui.src4.interfaces.ICmdsView;
+import pasa.cbentley.framework.gui.src4.exec.ExecutionContextCanvasGui;
+import pasa.cbentley.framework.gui.src4.interfaces.ICmdsGui;
 import pasa.cbentley.framework.gui.src4.interfaces.ITechCanvasDrawable;
 import pasa.cbentley.framework.gui.src4.interfaces.IUIView;
 import pasa.cbentley.framework.gui.src4.menu.CmdMenuBar;
@@ -33,9 +40,14 @@ import pasa.cbentley.framework.gui.src4.mui.AppliGui;
 import pasa.cbentley.framework.gui.src4.mui.MLogViewer;
 import pasa.cbentley.layouter.src4.engine.SizerFactory;
 
-public class CommanderGui extends CommanderAbstract implements ICmdsView, ITechInputFeedback, ITechCanvasDrawable, IEventConsumer {
+/**
+ * 
+ * @author Charles Bentley
+ *
+ */
+public class CommanderGui extends CommanderAbstract implements ICmdsGui, ITechInputFeedback, ITechCanvasDrawable, IEventConsumer {
 
-   private CmdInstance                 activeCmdLang;
+   private CmdInstance               activeCmdLang;
 
    /**
     * Set to the command currently being active.
@@ -46,26 +58,22 @@ public class CommanderGui extends CommanderAbstract implements ICmdsView, ITechI
     * <br>
     * 
     */
-   private CmdInstance                 activeCommand;
+   private CmdInstance               activeCommand;
 
-   private MCmdGuiChangeLanguage       cmdGuiChangeLanguage;
+   private MCmdGuiChangeLanguage     cmdGuiChangeLanguage;
 
-   private MCmdGuiChangeMenuLocation   cmdGuiChangeMenuLocation;
+   private MCmdGuiChangeMenuLocation cmdGuiChangeMenuLocation;
 
-   private CmdNode                     currentLocation;
+   private CmdNode                   currentLocation;
 
-   protected final GuiCtx              gc;
-
-   private MCmdGuiChangeCanvasDebugger MCmdGuiChangeCanvasDebugger;
-
-   private MCmdGuiChangeMenuLocation   MCmdGuiChangeMenuLocation;
+   protected final GuiCtx            gc;
 
    /**
     * Shows helps data.
     * <br>
     * 
     */
-   private HelperStringDrawable        strDrawableHelpData;
+   private HelperStringDrawable      strDrawableHelpData;
 
    public CommanderGui(GuiCtx gc) {
       super(gc.getCC());
@@ -74,14 +82,14 @@ public class CommanderGui extends CommanderAbstract implements ICmdsView, ITechI
    }
 
    public CmdInstance createNewCommand(int vcmdID) {
-      return new CmdInstanceDrawable(gc, vcmdID);
+      return new CmdInstanceGui(gc, vcmdID);
    }
 
    /**
     * 
     * @param cmd
     */
-   protected void cmdAccept(CmdInstanceDrawable cmd) {
+   protected void cmdAccept(CmdInstanceGui cmd) {
       if (activeCommand != null) {
          //TODO check the context in which accept was called.
          //Help dialog shows OK. MORE.
@@ -103,23 +111,25 @@ public class CommanderGui extends CommanderAbstract implements ICmdsView, ITechI
       System.out.println(gc.getCanvasGCRoot().toString());
    }
 
-
-   protected void cmdDebugCanvasChange(CmdInstanceDrawable cd) {
-      MCmdGuiChangeCanvasDebugger cmdModelDebug = getMCmdGuiChangeCanvasDebugger();
+   protected void cmdDebugCanvasChange(CmdInstanceGui cd) {
+      CmdFactoryGui cfg = gc.getCmdFactoryGui();
+      MCmdGuiChangeCanvasDebugger cmdModelDebug = cfg.getMCmdGuiChangeCanvasDebugger();
       cd.setBluePrint(cmdModelDebug);
       CanvasAppliInputGui canvas = gc.getCanvasGCRoot().getCanvas();
       cmdModelDebug.setParamsDirective(cd, canvas, ITechCmd.DIRECTIVE_4_ASK_GUI);
    }
 
-   protected void cmdDebugCanvasIterateUp(CmdInstanceDrawable cd) {
-      MCmdGuiChangeCanvasDebugger cmdModelDebug = getMCmdGuiChangeCanvasDebugger();
+   protected void cmdDebugCanvasIterateUp(CmdInstanceGui cd) {
+      CmdFactoryGui cfg = gc.getCmdFactoryGui();
+      MCmdGuiChangeCanvasDebugger cmdModelDebug = cfg.getMCmdGuiChangeCanvasDebugger();
       cd.setBluePrint(cmdModelDebug);
       CanvasAppliInputGui canvas = gc.getCanvasGCRoot().getCanvas();
       cmdModelDebug.setParamsDirective(cd, canvas, ITechCmd.DIRECTIVE_2_ITERATE_UP);
    }
 
-   protected void cmdDebugCanvasIterateDown(CmdInstanceDrawable cd) {
-      MCmdGuiChangeCanvasDebugger cmdModelDebug = getMCmdGuiChangeCanvasDebugger();
+   protected void cmdDebugCanvasIterateDown(CmdInstanceGui cd) {
+      CmdFactoryGui cfg = gc.getCmdFactoryGui();
+      MCmdGuiChangeCanvasDebugger cmdModelDebug = cfg.getMCmdGuiChangeCanvasDebugger();
       cd.setBluePrint(cmdModelDebug);
       CanvasAppliInputGui canvas = gc.getCanvasGCRoot().getCanvas();
       cmdModelDebug.setParamsDirective(cd, canvas, ITechCmd.DIRECTIVE_3_ITERATE_DOWN);
@@ -129,8 +139,10 @@ public class CommanderGui extends CommanderAbstract implements ICmdsView, ITechI
     * Toggle the debug mode to the canvases in the command ctx
     * The currently active canvas
     */
-   protected void cmdDebugCanvasToggle(CmdInstanceDrawable cd) {
-      MCmdGuiChangeCanvasDebugger cmdModelDebug = getMCmdGuiChangeCanvasDebugger();
+   protected void cmdDebugCanvasToggle(CmdInstanceGui cd) {
+      CmdFactoryGui cfg = gc.getCmdFactoryGui();
+      MCmd cmd = cd.getCmd(); //if null for some reason. we must def
+      MCmdGuiChangeCanvasDebugger cmdModelDebug = cfg.getMCmdGuiChangeCanvasDebugger();
       cd.setBluePrint(cmdModelDebug);
       CanvasAppliInputGui canvas = gc.getCanvasGCRoot().getCanvas();
       cmdModelDebug.setParamsToggle(cd, canvas);
@@ -143,7 +155,7 @@ public class CommanderGui extends CommanderAbstract implements ICmdsView, ITechI
 
    }
 
-   protected void cmdFontSizedecrease(CmdInstanceDrawable cd) {
+   protected void cmdFontSizedecrease(CmdInstanceGui cd) {
       InputConfig ic = cd.getIC();
       VisualState vs = gc.getCDC().getFontFactory().fontSizeDecrease();
 
@@ -160,7 +172,7 @@ public class CommanderGui extends CommanderAbstract implements ICmdsView, ITechI
     * <br>
     * TODO Save Font settings in user profile
     */
-   protected void cmdFontSizeIncrease(CmdInstanceDrawable cd) {
+   protected void cmdFontSizeIncrease(CmdInstanceGui cd) {
       InputConfig ic = cd.getIC();
       VisualState vs = gc.getCDC().getFontFactory().fontSizeIncrease();
 
@@ -193,7 +205,8 @@ public class CommanderGui extends CommanderAbstract implements ICmdsView, ITechI
       strDrawableHelpData.setSizers(boW, boH);
       strDrawableHelpData.initSize();
 
-      strDrawableHelpData.shShowDrawable((InputConfig) cmd.getFeedback(), ITechCanvasDrawable.SHOW_TYPE_1_OVER_TOP);
+      ExecutionContextCanvasGui ec = (ExecutionContextCanvasGui) cmd.getExecutionContext();
+      strDrawableHelpData.shShowDrawable(ec, ITechCanvasDrawable.SHOW_TYPE_1_OVER_TOP);
 
       cmd.actionDone(strDrawableHelpData, 0);
    }
@@ -204,7 +217,7 @@ public class CommanderGui extends CommanderAbstract implements ICmdsView, ITechI
     * <br>
     * Naviation to Home page in top level
     */
-   private void cmdHomePage(CmdInstanceDrawable cd) {
+   private void cmdHomePage(CmdInstanceGui cd) {
 
    }
 
@@ -236,17 +249,6 @@ public class CommanderGui extends CommanderAbstract implements ICmdsView, ITechI
       cmd.actionDone(null, responseType);
    }
 
-   /**
-    * Called by {@link ICmdsView#VCMD_00_LAST_LOGIN}
-    */
-   private void cmdNewLogin(CmdInstanceDrawable cd) {
-
-   }
-
-   private void cmdOpenPage(InputConfig ic) {
-
-   }
-
    private void cmdPause() {
 
       CanvasAppliInputGui cv = gc.getCanvasGCRoot().getCanvas();
@@ -266,14 +268,20 @@ public class CommanderGui extends CommanderAbstract implements ICmdsView, ITechI
       }
    }
 
-   private void cmdResetDebug(InputConfig ic) {
+   private void cmdResetDebug(ExecutionContextCanvasGui ec) {
       CanvasAppliInputGui cv = gc.getCanvasGCRoot().getCanvas();
-      cv.getDebugCanvas().reset();
+      CanvasDebugger debugCanvas = cv.getDebugCanvas();
 
-      ic.cmdActionOnDrawable(cv.getDebugCanvas());
+      debugCanvas.reset();
+
+      ec.cmdActionOnDrawable(debugCanvas);
 
    }
 
+   /**
+    * Copy the screen to a designated place
+    * @param cmd
+    */
    private void cmdScreenshot(CmdInstance cmd) {
       int bgColor = cmd.param;
       CanvasAppliInputGui canvas = gc.getCanvasGCRoot().getCanvas();
@@ -283,10 +291,11 @@ public class CommanderGui extends CommanderAbstract implements ICmdsView, ITechI
       cmd.actionDone();
    }
 
-   private void cmdSelectPointer(CmdInstanceDrawable cmd) {
+   private void cmdSelectPointer(CmdInstanceGui cmd) {
       //depending on the state of the commands
 
-      gc.getCanvasGCRoot().getCanvas().cmdSelectPointer(cmd.getIC());
+      ExecutionContextCanvasGui ec = cmd.getExecutionCtxGui();
+      gc.getCanvasGCRoot().getCanvas().cmdSelectPointer(ec);
    }
 
    /**
@@ -302,7 +311,7 @@ public class CommanderGui extends CommanderAbstract implements ICmdsView, ITechI
     * Provided the host device allows it. J2SE only.
     * @param cmd
     */
-   private void cmdViewLog(CmdInstanceDrawable cd) {
+   private void cmdViewLog(CmdInstanceGui cd) {
       //TODO where are stored options of the command? parameters telling how to proceed.
 
       //So the ctrl keeps state about cmds. the menu displays a string about the current
@@ -317,7 +326,8 @@ public class CommanderGui extends CommanderAbstract implements ICmdsView, ITechI
          log.setViewContext(gc.getCanvasGCRoot().getCanvas().getVCAppli());
          gc.setCtxLogViewer(log);
 
-         boolean hasMultiWindows = gc.getCFC().getHostCore().hasFeatureSupport(ITechHostCore.SUP_ID_24_MULTIPLE_WINDOWS);
+         IHostFeature feats = gc.getHostFeature();
+         boolean hasMultiWindows = feats.isHostFeatureSupported(ITechHostFeatureDrawUI.SUP_ID_24_MULTIPLE_WINDOWS);
          //
          if (hasMultiWindows && cd.param == ITechCmdViewLog.PARAM_1_OUTSIDE) {
             //check if params already have data for this canvas
@@ -346,8 +356,8 @@ public class CommanderGui extends CommanderAbstract implements ICmdsView, ITechI
       MLogViewer log = gc.getCtxLogViewer();
       //physically attach
       InputConfig ic = cd.getIC();
-
-      gc.getFocusCtrl().newFocusKey(ic, log);
+      ExecutionContextCanvasGui ec = cd.getExecutionCtxGui();
+      gc.getFocusCtrl().newFocusKey(ec, log);
       //topolgy will sort out the type
       ViewContext vc = log.getVC();
       vc.getTopo().addDLayer(log, ITechCanvasDrawable.SHOW_TYPE_1_OVER_TOP);
@@ -358,20 +368,26 @@ public class CommanderGui extends CommanderAbstract implements ICmdsView, ITechI
     * 
     */
    public void commandAction(CmdInstance cmd) {
-      if (cmd instanceof CmdInstanceDrawable) {
-         commandActionDrawable((CmdInstanceDrawable) cmd);
+      if (cmd instanceof CmdInstanceGui) {
+         commandActionDrawable((CmdInstanceGui) cmd);
          return;
       }
 
    }
 
-   public boolean commandActionDrawable(CmdInstanceDrawable cd) {
-      int cmdid = cd.cmdID;
+   /**
+    * 
+    * @param cd
+    * @return
+    */
+   public boolean commandActionDrawable(CmdInstanceGui cd) {
+      ExecutionContextCanvasGui ec = cd.getExecutionCtxGui();
+      int cmdid = cd.getCmdID();
       if (cmdid == CMD_51_SHOW_HOME) {
          cmdHomePage(cd);
       } else if (cmdid == VCMD_00_LAST_LOGIN) {
          MCmdGuiNewStart cmdGuiNewStart = new MCmdGuiNewStart(gc);
-         cmdGuiNewStart.cmdExecuteFinal(cd);
+         cd.setMCmd(cmdGuiNewStart);
       } else if (cmdid == CMD_60_FONT_SIZE_INCREASE) {
          cmdFontSizedecrease(cd);
       } else if (cmdid == CMD_61_FONT_SIZE_DECREASE) {
@@ -391,7 +407,7 @@ public class CommanderGui extends CommanderAbstract implements ICmdsView, ITechI
             nextPageID = gc.getTopLvl().nextPage();
             cd.setParamUndoInt(0, nextPageID);
          }
-         cd.getDExCtx().addPage(nextPageID);
+         cd.getExecutionCtxGui().addPage(nextPageID);
          cd.actionDone();
       } else if (cmdid == VCMD_09_PAGE_PREVIOUS) {
          int prevPageID = cd.getParamUndoInt(0);
@@ -399,7 +415,7 @@ public class CommanderGui extends CommanderAbstract implements ICmdsView, ITechI
             prevPageID = gc.getTopLvl().prevPage();
             cd.setParamUndoInt(0, prevPageID);
          }
-         cd.getDExCtx().addPage(prevPageID);
+         cd.getExecutionCtxGui().addPage(prevPageID);
          cd.actionDone();
       } else if (cmdid == CMD_24_SELECT) {
          //select drawable at pointer position
@@ -430,18 +446,18 @@ public class CommanderGui extends CommanderAbstract implements ICmdsView, ITechI
       } else if (cmdid == CMD_47_VIEW_LOG) {
          cmdViewLog(cd);
       } else if (cmdid == CMD_28_HISTORY_BACK) {
-         if (cd.ctx == currentLocation) {
+         if (cd.getCmdNode() == currentLocation) {
             //            fp.setFinished(true);
             //            gc.getTopLvl().reloadLast(gc);
             //            cmd.actionDone(fp, 0);
          } else {
             //gives focus and show the previous top level
-            int num = gc.getTopLvl().backCommand(cd.getIC());
+            int num = gc.getTopLvl().backCommand(ec);
             cd.actionDone(null, 0);
          }
       } else if (cmdid == CMD_29_HISTORY_FORWARD) {
          //gives focus and show the previous top level
-         int num = gc.getTopLvl().forwardCommand(cd.getIC());
+         int num = gc.getTopLvl().forwardCommand(ec);
          cd.actionDone(null, 0);
       } else if (cmdid == CMD_35_SHOW_EASTER_EGG1) {
          //         fp = new FallingPixels(gc);
@@ -468,25 +484,11 @@ public class CommanderGui extends CommanderAbstract implements ICmdsView, ITechI
       }
       //cmd has been processed
       cc.processCmd(cd);
-      return true; 
+      return true;
    }
 
    public void consumeEvent(BusEvent e) {
       Object producer = e.getProducer();
-   }
-
-   public MCmdGuiChangeCanvasDebugger getMCmdGuiChangeCanvasDebugger() {
-      if (MCmdGuiChangeCanvasDebugger == null) {
-         MCmdGuiChangeCanvasDebugger = new MCmdGuiChangeCanvasDebugger(gc);
-      }
-      return MCmdGuiChangeCanvasDebugger;
-   }
-
-   public MCmdGuiChangeMenuLocation getMCmdGuiChangeMenuLocation() {
-      if (MCmdGuiChangeMenuLocation == null) {
-         MCmdGuiChangeMenuLocation = new MCmdGuiChangeMenuLocation(gc);
-      }
-      return MCmdGuiChangeMenuLocation;
    }
 
 }

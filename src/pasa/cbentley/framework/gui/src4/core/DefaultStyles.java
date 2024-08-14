@@ -15,6 +15,7 @@ import pasa.cbentley.framework.drawx.src4.style.IBOStyle;
 import pasa.cbentley.framework.drawx.src4.style.StyleFactory;
 import pasa.cbentley.framework.drawx.src4.style.StyleOperator;
 import pasa.cbentley.framework.drawx.src4.tech.ITechFigure;
+import pasa.cbentley.framework.drawx.src4.tech.ITechStyle;
 import pasa.cbentley.framework.gui.src4.ctx.GuiCtx;
 import pasa.cbentley.layouter.src4.ctx.IBOTypesLayout;
 import pasa.cbentley.layouter.src4.engine.TblrFactory;
@@ -60,7 +61,7 @@ public class DefaultStyles extends BOAbstractFactory implements IBOStyle, ITechF
 
       ByteObject figBg = figureFactory.getFigRectOpaque(IColors.FULLY_OPAQUE_WHITE);
       ByteObject text = figureFactory.getFigString(IMFont.FACE_SYSTEM, IMFont.STYLE_PLAIN, IMFont.SIZE_3_MEDIUM, IColors.FULLY_OPAQUE_BLACK);
-      ByteObject anchor = boxFac.getBoxCenter();
+      ByteObject anchor = boxFac.getBoxCenterCenterT_WH();
       ByteObject style = styleFactory.getStyle(figBg, text, anchor);
       StyleClass defStyle = new StyleClass(gc, style);
       defStyle.setName("Default");
@@ -181,11 +182,11 @@ public class DefaultStyles extends BOAbstractFactory implements IBOStyle, ITechF
       ByteObject bg = figureFactory.getFigRect(ColorUtils.getRGBInt(255, 255, 255, 255), true);
       ByteObject fg2 = figureFactory.getFigBorder(2, ColorUtils.getRGBInt(255, 255, 0, 0), true);
       fg2.setFlag(IBOFigure.FIG__OFFSET_03_FLAGP, IBOFigure.FIG_FLAGP_8_POSTPONE, true);
-      ByteObject style = styleFactory.getStyle(bg, STYLE_OFFSET_2_FLAGB, STYLE_FLAGB_4_BG);
-      styleOp.setGAnchors(style, STYLE_FLAGB_4_BG, STYLE_ANC_3_PADDING);
+      ByteObject style = styleFactory.getStyle(bg, STYLE_OFFSET_2_FLAG_B, STYLE_FLAG_B_4_BG);
+      styleOp.setGAnchors(style, STYLE_FLAG_B_4_BG, ITechStyle.STYLE_ANC_3_PADDING);
 
-      styleOp.styleSet(style, fg2, STYLE_OFFSET_2_FLAGB, STYLE_FLAGB_5_FG);
-      styleOp.setGAnchors(style, STYLE_FLAGB_5_FG, STYLE_ANC_0_BORDER);
+      styleOp.styleSet(style, fg2, STYLE_OFFSET_2_FLAG_B, STYLE_FLAG_B_5_FG);
+      styleOp.setGAnchors(style, STYLE_FLAG_B_5_FG, ITechStyle.STYLE_ANC_0_BORDER);
 
       return style;
    }
@@ -195,9 +196,9 @@ public class DefaultStyles extends BOAbstractFactory implements IBOStyle, ITechF
       //DrwParam borderValue = DrwParam.getTBLR(2);
       //DrwParam borderFigure = DrwParam.getFigBorder(borderValue, ColorUtils.getRGBInt(210, 10, 10));
       //DrwParam style = DrwParam.getStyle(new ByteObject[] { null, borderFigure }, null, null, null, borderValue, null, fg);
-      ByteObject style = styleFactory.getStyle(fg, STYLE_OFFSET_2_FLAGB, STYLE_FLAGB_4_BG);
-      styleOp.setGAnchors(style, STYLE_FLAGB_4_BG, STYLE_ANC_3_PADDING);
-      ByteObject content = figureFactory.getFigStringTColor(ColorUtils.getRGBInt(255, 255, 255, 255));
+      ByteObject style = styleFactory.getStyle(fg, STYLE_OFFSET_2_FLAG_B, STYLE_FLAG_B_4_BG);
+      styleOp.setGAnchors(style, STYLE_FLAG_B_4_BG, ITechStyle.STYLE_ANC_3_PADDING);
+      ByteObject content = figureFactory.getFigStringT_Color(ColorUtils.getRGBInt(255, 255, 255, 255));
       //STYLESet(style, content, STYLE_OFFSET_1FLAGV, STYLE_FLAGV_1CONTENT);
       return style;
    }
@@ -224,10 +225,10 @@ public class DefaultStyles extends BOAbstractFactory implements IBOStyle, ITechF
       //DrwParam borderValue = DrwParam.getTBLR(2);
       //DrwParam borderFigure = DrwParam.getFigBorder(borderValue, ColorUtils.getRGBInt(210, 10, 10));
       //DrwParam style = DrwParam.getStyle(new ByteObject[] { null, borderFigure }, null, null, null, borderValue, null, fg);
-      ByteObject style = styleFactory.getStyle(fg, STYLE_OFFSET_2_FLAGB, STYLE_FLAGB_5_FG);
-      styleOp.setGAnchors(style, STYLE_FLAGB_5_FG, STYLE_ANC_3_PADDING);
-      ByteObject content = figureFactory.getFigStringTColor(ColorUtils.getRGBInt(255, 255, 255, 255));
-      styleOp.styleSet(style, content, STYLE_OFFSET_1_FLAGA, STYLE_FLAGA_1_CONTENT);
+      ByteObject style = styleFactory.getStyle(fg, STYLE_OFFSET_2_FLAG_B, STYLE_FLAG_B_5_FG);
+      styleOp.setGAnchors(style, STYLE_FLAG_B_5_FG, ITechStyle.STYLE_ANC_3_PADDING);
+      ByteObject content = figureFactory.getFigStringT_Color(ColorUtils.getRGBInt(255, 255, 255, 255));
+      styleOp.styleSet(style, content, STYLE_OFFSET_1_FLAG_A, STYLE_FLAG_A_1_CONTENT);
       return style;
    }
 

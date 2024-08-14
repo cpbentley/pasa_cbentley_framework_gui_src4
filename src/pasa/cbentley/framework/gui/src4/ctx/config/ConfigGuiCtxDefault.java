@@ -4,8 +4,8 @@ import pasa.cbentley.core.src4.ctx.UCtx;
 import pasa.cbentley.core.src4.interfaces.C;
 import pasa.cbentley.core.src4.logging.Dctx;
 import pasa.cbentley.core.src4.utils.BitUtils;
-import pasa.cbentley.framework.core.src4.app.ConfigAppAbstract;
-import pasa.cbentley.framework.core.src4.app.IConfigApp;
+import pasa.cbentley.framework.core.framework.src4.app.ConfigAppAbstract;
+import pasa.cbentley.framework.core.framework.src4.app.IConfigApp;
 import pasa.cbentley.framework.drawx.src4.tech.ITechGraphicsX;
 import pasa.cbentley.framework.gui.src4.ctx.IToStringFlagsGui;
 import pasa.cbentley.framework.gui.src4.interfaces.ITechCanvasDrawable;
@@ -31,7 +31,7 @@ public class ConfigGuiCtxDefault extends ConfigAppAbstract implements IConfigApp
    }
 
    public int getCmdProcessingMode() {
-      return ITechCanvasDrawable.CMD_PRO_0;
+      return ITechCanvasDrawable.CMD_PRO_0_REPO_NODE_UI;
    }
 
    public int getDebugBarPosition() {

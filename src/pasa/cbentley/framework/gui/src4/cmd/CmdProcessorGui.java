@@ -5,37 +5,37 @@ import pasa.cbentley.framework.cmd.src4.ctx.CmdCtx;
 import pasa.cbentley.framework.cmd.src4.engine.CmdFactoryCore;
 import pasa.cbentley.framework.cmd.src4.engine.CmdInstance;
 import pasa.cbentley.framework.cmd.src4.engine.CmdNode;
+import pasa.cbentley.framework.cmd.src4.engine.CmdProcessor;
 import pasa.cbentley.framework.cmd.src4.engine.CmdSearch;
-import pasa.cbentley.framework.cmd.src4.engine.CommanderAbstract;
 import pasa.cbentley.framework.cmd.src4.engine.MCmd;
+import pasa.cbentley.framework.cmd.src4.input.CommanderAbstract;
 import pasa.cbentley.framework.cmd.src4.interfaces.ICmdListener;
 import pasa.cbentley.framework.cmd.src4.interfaces.ICmdsCmd;
 import pasa.cbentley.framework.cmd.src4.interfaces.ICommandable;
 import pasa.cbentley.framework.cmd.src4.trigger.CmdTrigger;
-import pasa.cbentley.framework.coreui.src4.event.DeviceEvent;
-import pasa.cbentley.framework.coreui.src4.event.GestureArea;
-import pasa.cbentley.framework.coreui.src4.exec.ExecutionContext;
-import pasa.cbentley.framework.coreui.src4.tech.ITechCodes;
-import pasa.cbentley.framework.coreui.src4.tech.IInput;
-import pasa.cbentley.framework.coreui.src4.tech.ITechInputFeedback;
-import pasa.cbentley.framework.coreui.src4.utils.ViewState;
-import pasa.cbentley.framework.gui.src4.canvas.CanvasAppliInputGui;
-import pasa.cbentley.framework.gui.src4.canvas.CanvasResultDrawable;
-import pasa.cbentley.framework.gui.src4.canvas.ExecutionContextGui;
+import pasa.cbentley.framework.core.ui.src4.event.DeviceEvent;
+import pasa.cbentley.framework.core.ui.src4.event.GestureArea;
+import pasa.cbentley.framework.core.ui.src4.exec.ExecutionContext;
+import pasa.cbentley.framework.core.ui.src4.exec.OutputState;
+import pasa.cbentley.framework.core.ui.src4.input.InputState;
+import pasa.cbentley.framework.core.ui.src4.tech.IInput;
+import pasa.cbentley.framework.core.ui.src4.tech.ITechCodes;
+import pasa.cbentley.framework.core.ui.src4.tech.ITechInputFeedback;
+import pasa.cbentley.framework.core.ui.src4.utils.ViewState;
 import pasa.cbentley.framework.gui.src4.canvas.ICanvasDrawable;
 import pasa.cbentley.framework.gui.src4.canvas.InputConfig;
-import pasa.cbentley.framework.gui.src4.canvas.InputStateDrawable;
 import pasa.cbentley.framework.gui.src4.core.Drawable;
 import pasa.cbentley.framework.gui.src4.core.UserInteraction;
 import pasa.cbentley.framework.gui.src4.ctx.GuiCtx;
-import pasa.cbentley.framework.gui.src4.ctx.ObjectGC;
+import pasa.cbentley.framework.gui.src4.exec.ExecutionContextCanvasGui;
+import pasa.cbentley.framework.gui.src4.exec.InputStateCanvasGui;
+import pasa.cbentley.framework.gui.src4.exec.OutputStateCanvasGui;
 import pasa.cbentley.framework.gui.src4.interfaces.IBOUserInterAction;
-import pasa.cbentley.framework.gui.src4.interfaces.ICmdsView;
+import pasa.cbentley.framework.gui.src4.interfaces.ICmdsGui;
 import pasa.cbentley.framework.gui.src4.menu.CmdMenuBar;
 import pasa.cbentley.framework.gui.src4.string.RequestStringInput;
 import pasa.cbentley.framework.gui.src4.table.TableView;
-import pasa.cbentley.framework.input.src4.CanvasAppliInput;
-import pasa.cbentley.framework.input.src4.InputState;
+import pasa.cbentley.framework.input.src4.engine.CanvasAppliInput;
 
 /**
  * Implements the Root {@link CmdCtx} commands that require the use of {@link Drawable}s.
@@ -56,25 +56,36 @@ import pasa.cbentley.framework.input.src4.InputState;
  * @author Charles-Philip Bentley
  *
  */
-public class ViewCommandListener extends ObjectGC implements ICmdsView, ICommandable, ITechInputFeedback {
+public class CmdProcessorGui extends CmdProcessor implements ICmdsGui, ICommandable, ITechInputFeedback {
 
-   private CmdNode       ctx;
+   private CmdNode        ctx;
 
-   private CmdNode       modalCtx;
+   private CmdNode        modalCtx;
 
-   private int           numUsers;
+   private int            numUsers;
 
-   private CmdTrigger    patternTrigger;
+   private CmdTrigger     patternTrigger;
 
-   private CmdTrigger    patternTriggerPlus;
+   private CmdTrigger     patternTriggerPlus;
 
-   private CmdSearch     previousSearch;
+   private CmdSearch      previousSearch;
 
-   private UserProcessor up;
+   private UserProcessorGui  up;
 
-   public ViewCommandListener(GuiCtx gc) {
-      super(gc);
+   protected final GuiCtx gc;
+
+   public CmdProcessorGui(GuiCtx gc) {
+      super(gc.getCC());
+      this.gc = gc;
       previousSearch = new CmdSearch(cc);
+   }
+
+   public void addUser(CommanderAbstract user) {
+
+   }
+
+   public void addUser(CommanderAbstract user, int deviceID) {
+
    }
 
    /**
@@ -97,9 +108,8 @@ public class ViewCommandListener extends ObjectGC implements ICmdsView, ICommand
     * @param ic
     * @return
     */
-   public CmdInstanceDrawable createCC(InputConfig ic, int cmdid) {
-      CmdInstanceDrawable cd = new CmdInstanceDrawable(gc, cmdid);
-      cd.setFeedback(ic);
+   public CmdInstanceGui createCC(ExecutionContextCanvasGui ec, int cmdid) {
+      CmdInstanceGui cd = new CmdInstanceGui(gc, cmdid, ec);
       return cd;
    }
 
@@ -108,16 +118,13 @@ public class ViewCommandListener extends ObjectGC implements ICmdsView, ICommand
    }
 
    public CmdInstance createInstance(MCmd cmd) {
-      return new CmdInstanceDrawable(gc, cmd.getCmdId());
+      return new CmdInstanceGui(gc, cmd.getCmdId());
    }
 
    public CmdInstance createInstance(MCmd cmd, CmdNode ctx, CmdTrigger ct) {
-      return new CmdInstanceDrawable(gc, cmd, ctx, ct);
+      return new CmdInstanceGui(gc, cmd, ctx, ct);
    }
 
-   public void executeCommand() {
-
-   }
 
    /**
     * Executes a {@link MCmd} generated by a menu action. The {@link CmdCtx} used is provided by the Menu.
@@ -150,19 +157,19 @@ public class ViewCommandListener extends ObjectGC implements ICmdsView, ICommand
       //get the active context in which the command is executing
       //TODO bug here because active ctx it the menu ctx. what is the target context of a menu
       //the menu target context some navigation events modify the 
-      CmdNode activeCtx = cc.getActiveCtx();
+      CmdNode activeCtx = cc.getMenuCmdNode();
       CmdTrigger triggerMenu = cc.getMenuTrigger();
       CmdInstance ci = new CmdInstance(cc, cmd, activeCtx, triggerMenu);
 
       //#debug
-      toDLog().pCmd("", ci, ViewCommandListener.class, "executeMenuCmd@158", LVL_05_FINE, true);
+      toDLog().pCmd("", ci, CmdProcessorGui.class, "executeMenuCmd@158", LVL_05_FINE, true);
 
       cc.processCmd(ci);
    }
 
    public CmdInstance getCI(InputState is) {
       CmdTrigger triggerHotSeat = cc.getTriggerHot();
-      CmdNode workCtx = cc.getActiveCtx();
+      CmdNode workCtx = cc.getActiveNode();
       triggerHotSeat.add(is.getKeyCode(), is.getMode(), is.getLastDeviceType());
 
       //this code use per context mappings. no global mapping
@@ -197,12 +204,12 @@ public class ViewCommandListener extends ObjectGC implements ICmdsView, ICommand
       return null;
    }
 
-   public CmdNode getCmdNode() {
-      return ctx;
-   }
-
    public CmdMenuBar getCmdMenuBar() {
       return getCmdMenuBar();
+   }
+
+   public CmdNode getCmdNode() {
+      return ctx;
    }
 
    /**
@@ -243,15 +250,10 @@ public class ViewCommandListener extends ObjectGC implements ICmdsView, ICommand
       return patternTrigger;
    }
 
-   /**
-    * Map device event to user
-    * @param is
-    * @return
-    */
-   private UserProcessor getUserProcessor(InputState is) {
 
-      return up;
-   }
+
+   //#mdebug
+
 
    /**
     * Stores
@@ -281,17 +283,15 @@ public class ViewCommandListener extends ObjectGC implements ICmdsView, ICommand
       //at this stage, we have at least once visible canvas
       //a cmd has a rootCanvas associated
       ICanvasDrawable canvasView = gc.getCanvasRoot();
-      InputStateDrawable isd = (InputStateDrawable) canvasView.getEvCtrl().getState();
-      CanvasResultDrawable srd = canvasView.getRepaintCtrlDraw().getSD();
+      InputStateCanvasGui isd = (InputStateCanvasGui) canvasView.getEventController().getInputState();
+      OutputStateCanvasGui srd = canvasView.getRepaintCtrlDraw().getSD();
       InputConfig ic = new InputConfig(gc, canvasView, isd, srd);
 
       processCmd(vcmdID, ic);
 
    }
 
-   //#mdebug
-
-   public void processCmd(int vcmdID, InputConfig ic) {
+   public void processCmd(int vcmdID, ExecutionContextCanvasGui ec) {
       //user interaction is used to help user modify things he doesn't like about
       //what just happened.. flag user interaction as slow for example.
       //it is a feedback tool
@@ -308,9 +308,12 @@ public class ViewCommandListener extends ObjectGC implements ICmdsView, ICommand
 
       //or create just an empty input state? System Input State flag?
 
-      CmdInstanceDrawable cd = new CmdInstanceDrawable(gc, vcmdID);
-      cd.setFeedback(ic);
-      gc.getCommanderGui().commandActionDrawable(cd);
+      CmdInstanceGui cd = new CmdInstanceGui(gc, vcmdID);
+      OutputState outputState = ec.getOutputState();
+      cd.setFeedback(outputState);
+      CommanderGui commanderGui = gc.getCommanderGui();
+
+      commanderGui.commandActionDrawable(cd);
    }
 
    /**
@@ -385,66 +388,30 @@ public class ViewCommandListener extends ObjectGC implements ICmdsView, ICommand
     * @param sr
     * @return processing state
     */
-   public int processGUIEvent(ExecutionContextGui dex, int ctxcat) {
+   public int processGUIEvent(ExecutionContextCanvasGui ec, InputStateCanvasGui is,  int ctxcat) {
       //if any error, reset all triggers and output log
       try {
 
-         InputConfig ic = dex.getInputConfig();
-         InputState is = ic.is;
-
+         //when we have a device event
+         
          //idenfity to which user the event belongs
-         UserProcessor up = this.up;
+         UserProcessorGui up = this.up;
          if (numUsers != 1) {
             //we have more than one user.. each user has its own command processor
-            up = getUserProcessor(is);
+            up = (UserProcessorGui) getUserProcessor(is);
          }
          if (up != null) {
             //
-            return up.processEvent(dex, is);
+            return up.processEvent(ec, is);
          } else {
             return ICmdListener.PRO_STATE_0;
          }
       } catch (Exception e) {
          e.printStackTrace();
          //resets dex
-         dex.clear();
+         ec.clear();
          return ICmdListener.PRO_STATE_0;
       }
-   }
-
-   public int processEvent(ExecutionContext dex, DeviceEvent deviceEvent) {
-
-      //idenfity to which user the event belongs
-      UserProcessor up = this.up;
-      if (numUsers != 1) {
-         //we have more than one user.. each user has its own command processor
-         up = getUserProcessor();
-      }
-      int deviceID = deviceEvent.getDeviceID();
-
-      return 0;
-   }
-
-   public void addUser(CommanderAbstract user) {
-
-   }
-
-   public void addUser(CommanderAbstract user, int deviceID) {
-
-   }
-
-   /**
-    * Called when there are different users on the same application and each uses
-    * one or more different Devices.
-    * 
-    * The default users controls all Devices unless a call is made
-    * Map device event to user based on application level Device ID
-    * @param is
-    * @return
-    */
-   private UserProcessor getUserProcessor() {
-
-      return up;
    }
 
    public int sendEvent(int evType, Object param) {
@@ -469,13 +436,13 @@ public class ViewCommandListener extends ObjectGC implements ICmdsView, ICommand
 
    //#mdebug
    public void toString(Dctx dc) {
-      dc.root(this, ViewCommandListener.class, 473);
+      dc.root(this, CmdProcessorGui.class, 473);
       toStringPrivate(dc);
       super.toString(dc.sup());
    }
 
    public void toString1Line(Dctx dc) {
-      dc.root1Line(this, ViewCommandListener.class, 479);
+      dc.root1Line(this, CmdProcessorGui.class, 479);
       toStringPrivate(dc);
       super.toString1Line(dc.sup1Line());
    }

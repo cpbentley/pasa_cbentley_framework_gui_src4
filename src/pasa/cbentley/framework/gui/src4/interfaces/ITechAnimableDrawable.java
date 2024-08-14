@@ -5,7 +5,7 @@ import pasa.cbentley.framework.gui.src4.anim.IBOAnim;
 import pasa.cbentley.framework.gui.src4.anim.Realisator;
 import pasa.cbentley.framework.gui.src4.anim.base.ImgAnimable;
 
-public interface ITechAnimable {
+public interface ITechAnimableDrawable {
    /**
     * By default all animations are decorative and thus switching them off does
     * not prevent correct use of application,

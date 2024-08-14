@@ -18,7 +18,7 @@ import pasa.cbentley.framework.gui.src4.ctx.ToStringStaticGui;
 import pasa.cbentley.framework.gui.src4.interfaces.IAnimable;
 import pasa.cbentley.framework.gui.src4.interfaces.ITechCanvasDrawable;
 import pasa.cbentley.framework.gui.src4.interfaces.IDrawable;
-import pasa.cbentley.framework.gui.src4.interfaces.ITechAnimable;
+import pasa.cbentley.framework.gui.src4.interfaces.ITechAnimableDrawable;
 import pasa.cbentley.framework.gui.src4.interfaces.ITechDrawable;
 
 /**
@@ -78,7 +78,7 @@ import pasa.cbentley.framework.gui.src4.interfaces.ITechDrawable;
  * @author Charles-Philip Bentley
  *
  */
-public class DrawableAnimator implements IStringable, ITechAnimable {
+public class DrawableAnimator implements IStringable, ITechAnimableDrawable {
 
    /**
     * Set when at least 1 main anim
@@ -310,13 +310,14 @@ public class DrawableAnimator implements IStringable, ITechAnimable {
       if (anim.hasAnimFlag(ANIM_25_OVERRIDE_DRAW_CONTENT)) {
          d.setStateFlag(ITechDrawable.STATE_22_ANIMATED_CONTENT_HIDDEN, true);
       }
-      if (anim.getType() == ITechAnim.ANIM_TIME_1_ENTRY) {
+      int timing = anim.getTiming();
+      if (timing == ITechAnim.ANIM_TIME_1_ENTRY) {
          //ENTRY
          d.setStateFlag(ITechDrawable.STATE_12_APPEARING, true);
-      } else if (anim.getType() == ITechAnim.ANIM_TIME_0_MAIN) {
+      } else if (timing == ITechAnim.ANIM_TIME_0_MAIN) {
          //MAIN
 
-      } else if (anim.getType() == ITechAnim.ANIM_TIME_2_EXIT) {
+      } else if (timing == ITechAnim.ANIM_TIME_2_EXIT) {
          //EXIT
          d.setStateFlag(ITechDrawable.STATE_13_DISAPPEARING, true);
       }

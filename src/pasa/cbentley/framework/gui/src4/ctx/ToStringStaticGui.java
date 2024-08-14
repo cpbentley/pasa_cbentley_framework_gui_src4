@@ -3,7 +3,6 @@ package pasa.cbentley.framework.gui.src4.ctx;
 import pasa.cbentley.core.src4.logging.Dctx;
 import pasa.cbentley.core.src4.logging.ToStringStaticBase;
 import pasa.cbentley.framework.gui.src4.anim.ITechAnim;
-import pasa.cbentley.framework.gui.src4.anim.move.ITechMoveFunction;
 import pasa.cbentley.framework.gui.src4.core.ViewDrawable;
 import pasa.cbentley.framework.gui.src4.interfaces.IDrawable;
 import pasa.cbentley.framework.gui.src4.interfaces.ITechCanvasDrawable;
@@ -83,7 +82,7 @@ public class ToStringStaticGui extends ToStringStaticBase {
             return "Expand";
          case ITechViewPane.PLANET_MODE_2_OVERLAY:
             return "Overlay";
-         case ITechViewPane.PLANET_MODE_3_IMMATERIAL:
+         case ITechViewPane.PLANET_MODE_3_GHOST:
             return "Immaterial";
          default:
             return "Unknown";
@@ -393,28 +392,6 @@ public class ToStringStaticGui extends ToStringStaticBase {
       }
    }
 
-   public static String toStringMoveIncrementType(int v) {
-      switch (v) {
-         case ITechMoveFunction.INCREMENT_0_PARAM:
-            return "Linear";
-         case ITechMoveFunction.INCREMENT_1_FIB:
-            return "Fib";
-         default:
-            return "Unknown" + v;
-      }
-   }
-
-   public static String toStringMoveType(int v) {
-      switch (v) {
-         case ITechMoveFunction.TYPE_MOVE_0_ASAP:
-            return "ASAP";
-         case ITechMoveFunction.TYPE_MOVE_1_BRESENHAM:
-            return "Bresenham";
-         default:
-            return "Unknown" + v;
-      }
-   }
-
    public static String toStringPolicyType(final int type) {
       switch (type) {
          case ITechCell.CELL_3_FILL_STRONG:
@@ -685,14 +662,6 @@ public class ToStringStaticGui extends ToStringStaticBase {
             return "Spanning";
          case IBOTypesGui.TYPE_GUI_06_CELL_POLICY:
             return "CellPolicy";
-         case IBOTypesGui.TYPE_124_STRING_DATA:
-            return "StringTech";
-         case IBOTypesGui.TYPE_125_STRING_EDIT_TECH:
-            return "StringEditTech";
-         case IBOTypesGui.TYPE_GUI_09_STRING_GLOBAL:
-            return "StringGlobal";
-         case IBOTypesGui.TYPE_127_STRING_PREDITION:
-            return "StringPred";
          default:
             return null;
       }

@@ -403,7 +403,7 @@ public class TableCellPolicyFactory extends BOAbstractFactory implements IBOCell
       int etalon = ITechLayout.ETALON_4_PARENT;
       //TODO viewport, scrollbar, other properties
       int etalonSub = ITechLayoutDrawable.ETALON_09_VIEWPORT;
-      int etalonFunction = ITechLayout.ET_FUN_0_CTX;
+      int etalonFunction = ITechLayout.ET_FUN_00_CTX;
       int etalonProp = ITechLayout.SIZER_PROP_05_CONTENT;
       ByteObject maxSizer = gc.getLAC().getSizerFactory().getSizerRatio100(100, etalon, etalonFunction, etalonProp);
 

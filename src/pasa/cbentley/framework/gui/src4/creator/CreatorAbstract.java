@@ -133,7 +133,7 @@ public abstract class CreatorAbstract
    }
 
    public ByteObject getCenter() {
-      return boxEng.getBoxCenter();
+      return boxEng.getBoxCenterCenterT_WH();
    }
 
    public ColorSet getColorSetActive() {

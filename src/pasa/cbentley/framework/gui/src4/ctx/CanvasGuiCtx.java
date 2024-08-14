@@ -2,9 +2,9 @@ package pasa.cbentley.framework.gui.src4.ctx;
 
 import pasa.cbentley.byteobjects.src4.ctx.ABOCtx;
 import pasa.cbentley.core.src4.logging.Dctx;
+import pasa.cbentley.framework.core.ui.src4.ctx.CoreUiCtx;
+import pasa.cbentley.framework.core.ui.src4.tech.IBOCanvasHost;
 import pasa.cbentley.framework.coredraw.src4.ctx.CoreDrawCtx;
-import pasa.cbentley.framework.coreui.src4.ctx.CoreUiCtx;
-import pasa.cbentley.framework.coreui.src4.tech.IBOCanvasHost;
 import pasa.cbentley.framework.gui.src4.canvas.CanvasAppliInputGui;
 import pasa.cbentley.framework.gui.src4.ctx.config.IConfigCanvasGui;
 import pasa.cbentley.framework.gui.src4.interfaces.IDrawable;

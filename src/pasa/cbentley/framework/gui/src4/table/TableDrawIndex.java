@@ -14,8 +14,6 @@ import pasa.cbentley.framework.gui.src4.core.Drawable;
 import pasa.cbentley.framework.gui.src4.core.StyleClass;
 import pasa.cbentley.framework.gui.src4.ctx.GuiCtx;
 import pasa.cbentley.framework.gui.src4.interfaces.IDrawable;
-import pasa.cbentley.framework.gui.src4.table.Config;
-import pasa.cbentley.framework.gui.src4.table.TableView;
 import pasa.cbentley.framework.gui.src4.table.interfaces.IBOTableView;
 import pasa.cbentley.framework.gui.src4.table.interfaces.ITechTable;
 import pasa.cbentley.framework.gui.src4.utils.DrawableMapper;

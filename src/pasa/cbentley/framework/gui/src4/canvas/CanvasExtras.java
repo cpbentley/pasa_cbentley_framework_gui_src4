@@ -1,17 +1,14 @@
 package pasa.cbentley.framework.gui.src4.canvas;
 
-import pasa.cbentley.core.src4.interfaces.C;
 import pasa.cbentley.core.src4.logging.Dctx;
-import pasa.cbentley.framework.gui.src4.cmd.CmdInstanceDrawable;
-import pasa.cbentley.framework.gui.src4.core.StyleClass;
-import pasa.cbentley.framework.gui.src4.core.TopoViewDrawable;
+import pasa.cbentley.framework.core.ui.src4.input.InputState;
+import pasa.cbentley.framework.gui.src4.cmd.CmdInstanceGui;
 import pasa.cbentley.framework.gui.src4.ctx.GuiCtx;
 import pasa.cbentley.framework.gui.src4.ctx.ObjectGC;
-import pasa.cbentley.framework.gui.src4.interfaces.ITechCanvasDrawable;
+import pasa.cbentley.framework.gui.src4.exec.OutputStateCanvasGui;
 import pasa.cbentley.framework.gui.src4.interfaces.IUIView;
 import pasa.cbentley.framework.gui.src4.menu.CmdMenuBar;
 import pasa.cbentley.framework.gui.src4.tech.ITechViewPane;
-import pasa.cbentley.framework.input.src4.InputState;
 
 /**
  * Special objects around the canvas such as a menubar
@@ -38,7 +35,7 @@ public class CanvasExtras extends ObjectGC {
       return canvas.getCanvasBOHelper();
    }
 
-   public void setMenuBarMode(boolean useMenuBar, int pos, CmdInstanceDrawable cd) {
+   public void setMenuBarMode(boolean useMenuBar, int pos, CmdInstanceGui cd) {
       //if only root canvas
       if (useMenuBar) {
          if (cmdMenuBar == null) {
@@ -57,7 +54,7 @@ public class CanvasExtras extends ObjectGC {
       this.setMenuBar(cmdMenuBar);
    }
 
-   void ctrlUIEvent(InputState ic, CanvasResultDrawable sd) {
+   void ctrlUIEvent(InputState ic, OutputStateCanvasGui sd) {
       if (canvasDebug != null) {
          sd.setActionDoneRepaint(canvasDebug);
       }
@@ -98,7 +95,7 @@ public class CanvasExtras extends ObjectGC {
     *  command is part of a command chain. doing other things before and after 
     * @param mode
     */
-   public void setDebugMode(int mode, CmdInstanceDrawable cd) {
+   public void setDebugMode(int mode, CmdInstanceGui cd) {
 
    }
 

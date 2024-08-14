@@ -2,15 +2,16 @@ package pasa.cbentley.framework.gui.src4.cmd;
 
 import pasa.cbentley.core.src4.interfaces.C;
 import pasa.cbentley.framework.cmd.src4.engine.CmdNode;
-import pasa.cbentley.framework.coreui.src4.tech.ITechGestures;
+import pasa.cbentley.framework.core.ui.src4.tech.ITechGestures;
 import pasa.cbentley.framework.gui.src4.canvas.InputConfig;
-import pasa.cbentley.framework.gui.src4.canvas.InputStateDrawable;
 import pasa.cbentley.framework.gui.src4.canvas.PointerGestureDrawable;
 import pasa.cbentley.framework.gui.src4.canvas.ViewContext;
 import pasa.cbentley.framework.gui.src4.core.Drawable;
 import pasa.cbentley.framework.gui.src4.core.StyleClass;
 import pasa.cbentley.framework.gui.src4.ctx.GuiCtx;
-import pasa.cbentley.framework.gui.src4.interfaces.ICmdsView;
+import pasa.cbentley.framework.gui.src4.exec.ExecutionContextCanvasGui;
+import pasa.cbentley.framework.gui.src4.exec.InputStateCanvasGui;
+import pasa.cbentley.framework.gui.src4.interfaces.ICmdsGui;
 import pasa.cbentley.framework.gui.src4.interfaces.IDrawable;
 import pasa.cbentley.framework.gui.src4.interfaces.IDrawableListener;
 import pasa.cbentley.framework.gui.src4.interfaces.ITechDrawable;
@@ -46,30 +47,31 @@ public class HelperStringDrawable extends StringDrawable implements IDrawableLis
       //commander stuff
       CmdNode helpCtx = gc.getCC().createCmdNode("help");
       //help menu may stay there
-      helpCtx.addMenuCmd(ICmdsView.CMD_04_OK);
-      helpCtx.addMenuCmd(ICmdsView.CMD_51_SHOW_HOME);
-      helpCtx.addMenuCmd(ICmdsView.CMD_50_SHOW_SYSTEM_MENU);
+      helpCtx.addMenuCmd(ICmdsGui.CMD_04_OK);
+      helpCtx.addMenuCmd(ICmdsGui.CMD_51_SHOW_HOME);
+      helpCtx.addMenuCmd(ICmdsGui.CMD_50_SHOW_SYSTEM_MENU);
 
    }
 
-   public void managePointerInputViewPort(InputConfig ic) {
+   public void managePointerInputViewPort(ExecutionContextCanvasGui ec) {
       // TODO Auto-generated method stub
-      super.managePointerInputViewPort(ic);
+      super.managePointerInputViewPort(ec);
    }
 
-   public void managePointerInput(InputConfig ic) {
-      super.managePointerInput(ic);
+   public void managePointerInput(ExecutionContextCanvasGui ec) {
+      super.managePointerInput(ec);
+      InputConfig ic = ec.getInputConfig();
       Drawable d = this;
-      if (DrawableUtilz.isInside(ic, d)) {
-         if (!DrawableUtilz.isInsideBorder(ic, d)) {
+      if (DrawableUtilz.isInside(ec, d)) {
+         if (!DrawableUtilz.isInsideBorder(ec, d)) {
             //see which border is selected
-            GestureDetector pg = ic.is.getOrCreateGesture(d);
+            GestureDetector pg = ic.getInputStateDrawable().getOrCreateGesture(d);
 
             if (ic.isPressed()) {
                //Gesture is auto started
                int pressedX = d.getDrawnWidth();
                int pressedY = d.getDrawnHeight();
-               pg.simplePress(pressedX, pressedY, ic.is);
+               pg.simplePress(pressedX, pressedY, ic.getInputStateDrawable());
             }
             if (ic.isDraggedPointer0Button0()) {
                int pressedX = pg.getPressed(PointerGestureDrawable.ID_0_X);
@@ -84,7 +86,7 @@ public class HelperStringDrawable extends StringDrawable implements IDrawableLis
                //d.setXY(x, y);
                ic.srActionDoneRepaint(d);
             } else if (ic.isReleased()) {
-               pg.simpleRelease(ic.is);
+               pg.simpleRelease(ic.getInputStateDrawable());
             }
          }
       }
@@ -92,7 +94,7 @@ public class HelperStringDrawable extends StringDrawable implements IDrawableLis
 
    public void notifyEvent(IDrawable d, int event, Object o) {
       InputConfig ic = (InputConfig) o;
-      InputStateDrawable is = ic.is;
+      InputStateCanvasGui is = ic.getInputStateDrawable();
       if (d == titleHelp) {
          Drawable g = this;
          //manage the gesture
@@ -104,7 +106,7 @@ public class HelperStringDrawable extends StringDrawable implements IDrawableLis
 
          if (is.isGestured()) {
             //#debug
-            toDLog().pFlow("", pg, ViewCommandListener.class, "managePointerEvent", LVL_05_FINE, true);
+            toDLog().pFlow("", pg, CmdProcessorGui.class, "managePointerEvent", LVL_05_FINE, true);
 
             //do an update on the vector.
             int x = g.getX();
@@ -117,7 +119,7 @@ public class HelperStringDrawable extends StringDrawable implements IDrawableLis
             }
             g.setXY(x, y);
             //#debug
-            toDLog().pFlow("[" + pg.getPosition(PointerGestureDrawable.ID_0_X) + "," + pg.getPosition(PointerGestureDrawable.ID_1_Y) + "]", this, ViewCommandListener.class, "managePointerEvent", LVL_05_FINE, true);
+            toDLog().pFlow("[" + pg.getPosition(PointerGestureDrawable.ID_0_X) + "," + pg.getPosition(PointerGestureDrawable.ID_1_Y) + "]", this, CmdProcessorGui.class, "managePointerEvent", LVL_05_FINE, true);
             ic.srActionDoneRepaint(g);
          }
          if (is.isModPressed()) {

@@ -1,9 +1,9 @@
 package pasa.cbentley.framework.gui.src4.core;
 
 import pasa.cbentley.framework.drawx.src4.engine.GraphicsX;
-import pasa.cbentley.framework.gui.src4.canvas.InputConfig;
 import pasa.cbentley.framework.gui.src4.canvas.ViewContext;
 import pasa.cbentley.framework.gui.src4.ctx.GuiCtx;
+import pasa.cbentley.framework.gui.src4.exec.ExecutionContextCanvasGui;
 import pasa.cbentley.framework.gui.src4.interfaces.IDrawable;
 import pasa.cbentley.framework.gui.src4.utils.DrawableArrays;
 
@@ -44,18 +44,18 @@ public class DummyDrawable extends Drawable {
    /**
     * Overrides this method
     */
-   public void manageKeyInput(InputConfig ic) {
+   public void manageKeyInput(ExecutionContextCanvasGui ec) {
       for (int i = 0; i < nextEmpty; i++) {
          if (my[i] != null) {
-            my[i].manageKeyInput(ic);
+            my[i].manageKeyInput(ec);
          }
       }
    }
 
-   public void managePointerInput(InputConfig ic) {
+   public void managePointerInput(ExecutionContextCanvasGui ec) {
       for (int i = 0; i < nextEmpty; i++) {
          if (my[i] != null) {
-            my[i].managePointerInput(ic);
+            my[i].managePointerInput(ec);
          }
       }
    }

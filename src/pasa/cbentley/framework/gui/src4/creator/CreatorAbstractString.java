@@ -47,7 +47,24 @@ public abstract class CreatorAbstractString extends CreatorAbstract {
       ByteObject mask = null;
       ByteObject scale = null;
       ByteObject anchor = null;
-      ByteObject bo = facFigure.getString(null, face, style, size, color, effects, mask, scale, anchor);
+      ByteObject bo = facFigure.getFigString(null, face, style, size, color, effects, mask, scale, anchor, format, specials);
+
+      return bo;
+   }
+
+   public ByteObject getBOStringFigurePreset() {
+      int face = ITechFont.FACE_PROPORTIONAL;
+      int style = ITechFont.STYLE_PLAIN;
+      int size = ITechFont.SIZE_3_MEDIUM;
+      int color = getRepo().getContent1();
+
+      ByteObject format = null;
+      ByteObject specials = null;
+      ByteObject effects = null;
+      ByteObject mask = null;
+      ByteObject scale = null;
+      ByteObject anchor = null;
+      ByteObject bo = facFigure.getFigString(null, face, style, size, color, effects, mask, scale, anchor, format, specials);
 
       return bo;
    }
@@ -65,7 +82,7 @@ public abstract class CreatorAbstractString extends CreatorAbstract {
       ByteObject mask = null;
       ByteObject scale = null;
       ByteObject anchor = null;
-      ByteObject bo = facFigure.getString(null, face, style, size, color, effects, mask, scale, anchor);
+      ByteObject bo = facFigure.getFigString(null, face, style, size, color, effects, mask, scale, anchor, format, specials);
 
       return bo;
    }
@@ -77,8 +94,29 @@ public abstract class CreatorAbstractString extends CreatorAbstract {
       return tech;
    }
 
+   protected ByteObject getBOStringDataNoPreset() {
+      int stringType = ITechStringDrawable.PRESET_CONFIG_0_NONE;
+      int stringMode = ITechStringDrawable.S_ACTION_MODE_1_SELECT;
+      ByteObject bo = fac.getBOStringData(stringType, stringMode);
+      return bo;
+   }
+
    protected ByteObject getBOStringDataReader() {
       int stringType = ITechStringDrawable.PRESET_CONFIG_3_SCROLL_V;
+      int stringMode = ITechStringDrawable.S_ACTION_MODE_1_SELECT;
+      ByteObject bo = fac.getBOStringData(stringType, stringMode);
+      return bo;
+   }
+
+   protected ByteObject getBOStringDataReaderNaturalNoWrap() {
+      int stringType = ITechStringDrawable.PRESET_CONFIG_4_NATURAL_NO_WRAP;
+      int stringMode = ITechStringDrawable.S_ACTION_MODE_1_SELECT;
+      ByteObject bo = fac.getBOStringData(stringType, stringMode);
+      return bo;
+   }
+
+   protected ByteObject getBOStringDataReaderH() {
+      int stringType = ITechStringDrawable.PRESET_CONFIG_2_SCROLL_H;
       int stringMode = ITechStringDrawable.S_ACTION_MODE_1_SELECT;
       ByteObject bo = fac.getBOStringData(stringType, stringMode);
       return bo;

@@ -12,6 +12,7 @@ import pasa.cbentley.framework.gui.src4.core.ScrollConfig;
 import pasa.cbentley.framework.gui.src4.core.ViewDrawable;
 import pasa.cbentley.framework.gui.src4.ctx.GuiCtx;
 import pasa.cbentley.framework.gui.src4.ctx.ObjectGC;
+import pasa.cbentley.framework.gui.src4.exec.ExecutionContextCanvasGui;
 import pasa.cbentley.framework.gui.src4.string.StringDrawable;
 import pasa.cbentley.framework.gui.src4.table.interfaces.IBOCellPolicy;
 import pasa.cbentley.framework.gui.src4.table.interfaces.ITableUtils;
@@ -979,10 +980,10 @@ public class CellModel extends ObjectGC implements IStringable, ITechCell, IBOCe
     * @param ic
     * @return
     */
-   public boolean managePointerInputForward(InputConfig ic) {
+   public boolean managePointerInputForward(ExecutionContextCanvasGui ec) {
       for (int j = firstCellAbs; j <= lastCellAbs; j++) {
-         if (DrawableUtilz.isInside(ic, titleStringDrawables[j])) {
-            titleStringDrawables[j].managePointerInput(ic);
+         if (DrawableUtilz.isInside(ec, titleStringDrawables[j])) {
+            titleStringDrawables[j].managePointerInput(ec);
             return true;
          }
       }

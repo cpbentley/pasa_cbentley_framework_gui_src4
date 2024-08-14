@@ -189,7 +189,7 @@ public interface IBOViewPane extends IByteObject {
    /**
     * Vertical scrollbar is fully invisible.
     * <br>
-    * Subtle difference with {@link ITechViewPane#PLANET_MODE_3_IMMATERIAL}.
+    * Subtle difference with {@link ITechViewPane#PLANET_MODE_3_GHOST}.
     * <br>
     */
    public static final int VP_FLAGY_6_SB_INVISIBLE_VERT          = 1 << 5;
@@ -231,7 +231,7 @@ public interface IBOViewPane extends IByteObject {
     * <li>{@link ITechViewPane#PLANET_MODE_0_EAT}
     * <li>{@link ITechViewPane#PLANET_MODE_1_EXPAND}
     * <li>{@link ITechViewPane#PLANET_MODE_2_OVERLAY}
-    * <li>{@link ITechViewPane#PLANET_MODE_3_IMMATERIAL}
+    * <li>{@link ITechViewPane#PLANET_MODE_3_GHOST}
     * <br>
     * <b>2 bits 1</b> for Top mode <br>
     * <b>2 bits 2</b> for Bot mode <br>
@@ -258,7 +258,7 @@ public interface IBOViewPane extends IByteObject {
     * <li>{@link ITechViewPane#PLANET_MODE_0_EAT}
     * <li>{@link ITechViewPane#PLANET_MODE_1_EXPAND}
     * <li>{@link ITechViewPane#PLANET_MODE_2_OVERLAY}
-    * <li>{@link ITechViewPane#PLANET_MODE_3_IMMATERIAL}
+    * <li>{@link ITechViewPane#PLANET_MODE_3_GHOST}
     * 
 
     * 

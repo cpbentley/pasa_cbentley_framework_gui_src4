@@ -1,5 +1,6 @@
 package pasa.cbentley.framework.gui.src4.anim.move;
 
+import pasa.cbentley.byteobjects.src4.objects.move.FunctionMove;
 import pasa.cbentley.core.src4.logging.Dctx;
 import pasa.cbentley.core.src4.utils.BitUtils;
 import pasa.cbentley.framework.gui.src4.anim.base.DrawableAnim;

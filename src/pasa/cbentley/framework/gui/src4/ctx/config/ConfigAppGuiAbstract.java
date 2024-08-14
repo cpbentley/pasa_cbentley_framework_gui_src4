@@ -2,8 +2,8 @@ package pasa.cbentley.framework.gui.src4.ctx.config;
 
 import pasa.cbentley.core.src4.ctx.UCtx;
 import pasa.cbentley.core.src4.logging.Dctx;
-import pasa.cbentley.framework.core.src4.app.ConfigAppAbstract;
-import pasa.cbentley.framework.coreui.src4.tech.ITechInputConstants;
+import pasa.cbentley.framework.core.framework.src4.app.ConfigAppAbstract;
+import pasa.cbentley.framework.core.ui.src4.tech.ITechInputConstants;
 import pasa.cbentley.framework.gui.src4.interfaces.ITechCanvasDrawable;
 
 public abstract class ConfigAppGuiAbstract extends ConfigAppAbstract {

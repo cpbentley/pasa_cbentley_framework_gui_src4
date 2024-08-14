@@ -253,20 +253,29 @@ public interface ITechViewDrawable extends ITech {
    public static final int FLAG_GENE_30_SHRINKABLE_H                 = 1 << 29;
 
    /**
-    * When preferred size is smaller than drawable size, drawable expands its preferred size to drawable size.
-    * <br>
-    * State Expanded is then set.
-    * <br>
-    * Case of a single column table whose preferred width is smaller than the ViewPort.
-    * Case when Preferred Width is smaller than Drawable width and ViewDrawable has the Expandable genetic. An Image is not.
-    * <br>
+    * When preferred width is smaller than drawable width, drawable expands its preferred size to drawable size.
+    * 
+    * 
+    * State {@link ITechViewDrawable#FLAG_VSTATE_18_EXPANDED_W} is then set.
+    * 
+    * <p>
+    * 
+    * <li>Case of a single column table whose preferred width is smaller than the ViewPort.
+    * <li>Case when Preferred Width is smaller than Drawable width and ViewDrawable has the Expandable genetic. An Image is not.
+    * 
+    * </p>
     * Fill the gap left by COLL_FILL policy or ratio. Why not asking Column policy?
     * 
+    * <p>
+    * Similar to {@link ITechViewDrawable#FLAG_GENE_32_EXPANDABLE_H} but for the width.
+    * </p>
     */
    public static final int FLAG_GENE_31_EXPANDABLE_W                 = 1 << 30;
 
    /**
+    * State {@link ITechViewDrawable#FLAG_VSTATE_18_EXPANDED_W} is then set.
     * 
+    * Same as {@link ITechViewDrawable#FLAG_GENE_31_EXPANDABLE_W} but for the height.
     */
    public static final int FLAG_GENE_32_EXPANDABLE_H                 = 1 << 31;
 

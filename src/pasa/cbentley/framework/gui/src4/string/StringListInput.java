@@ -4,8 +4,8 @@ import pasa.cbentley.byteobjects.src4.core.ByteObject;
 import pasa.cbentley.core.src4.event.BusEvent;
 import pasa.cbentley.core.src4.event.IEventConsumer;
 import pasa.cbentley.framework.cmd.src4.interfaces.ICmdListener;
-import pasa.cbentley.framework.coreui.src4.tech.ITechCodes;
-import pasa.cbentley.framework.coreui.src4.utils.ViewState;
+import pasa.cbentley.framework.core.ui.src4.tech.ITechCodes;
+import pasa.cbentley.framework.core.ui.src4.utils.ViewState;
 import pasa.cbentley.framework.datamodel.src4.table.ITableModel;
 import pasa.cbentley.framework.datamodel.src4.table.ObjectTableModel;
 import pasa.cbentley.framework.drawx.src4.engine.GraphicsX;
@@ -15,6 +15,7 @@ import pasa.cbentley.framework.gui.src4.core.LayouterEngineDrawable;
 import pasa.cbentley.framework.gui.src4.core.ScrollConfig;
 import pasa.cbentley.framework.gui.src4.core.StyleClass;
 import pasa.cbentley.framework.gui.src4.ctx.GuiCtx;
+import pasa.cbentley.framework.gui.src4.exec.ExecutionContextCanvasGui;
 import pasa.cbentley.framework.gui.src4.interfaces.ITechCanvasDrawable;
 import pasa.cbentley.framework.gui.src4.interfaces.ITechDrawable;
 import pasa.cbentley.framework.gui.src4.table.TableView;
@@ -111,10 +112,10 @@ public class StringListInput extends StringDrawable implements IEventConsumer {
          if (e.getEventID() == ITechTable.EVENT_ID_00_SELECT) {
             //no parameter. just read the selected index from the TableView
             selectedModelIndex = listView.getSelectedIndex();
-            updateString((InputConfig) e.getParamO2());
+            updateString((ExecutionContextCanvasGui) e.getParamO2());
             //remove TV from view and send a full repaint
             //call this when inside User Event Thread. otherwise no repaint will be made.
-            listView.removeDrawable((InputConfig) e.getParamO2(), this);
+            listView.removeDrawable((ExecutionContextCanvasGui) e.getParamO2(), this);
             e.setFlag(BusEvent.FLAG_1_ACTED, true);
          }
       }
@@ -122,13 +123,13 @@ public class StringListInput extends StringDrawable implements IEventConsumer {
    public void initViewDrawable(LayouterEngineDrawable ds) {
       super.initViewDrawable(ds);
    }
-   public void updateString(InputConfig ic) {
+   public void updateString(ExecutionContextCanvasGui ec) {
       if (model != null) {
          int selectedIndex = selectedModelIndex;
          String str = model.getObject(selectedIndex).toString();
          super.setStringNoUpdate(str);
-         if (listView != null && ic != null) {
-            listView.setSelectedIndex(selectedIndex, ic, false);
+         if (listView != null) {
+            listView.setSelectedIndex(selectedIndex, ec, false);
          }
       } else {
          setStringNoUpdate(EMTPY);
@@ -140,48 +141,48 @@ public class StringListInput extends StringDrawable implements IEventConsumer {
       super.drawViewDrawableContent(g, x, y, scX, scY);
    }
 
-   private void keyFunctions(int keyCode, InputConfig ic) {
+   private void keyFunctions(int keyCode, ExecutionContextCanvasGui ec) {
       switch (keyCode) {
          case ITechCodes.KEY_STAR: {
-            t9Decrement(ic);
+            t9Decrement(ec);
             break;
          }
          case ITechCodes.KEY_POUND:
-            t9Increment(ic);
+            t9Increment(ec);
             break;
          case -8:
             //remove one letter of the T9
-            minusT9(ic);
+            minusT9(ec);
             break;
          case ITechCodes.KEY_NUM0:
-            selectX(ic, 0);
+            selectX(ec, 0);
             break;
          case ITechCodes.KEY_NUM1:
-            selectX(ic, 1);
+            selectX(ec, 1);
             break;
          case ITechCodes.KEY_NUM2:
-            selectX(ic, 2);
+            selectX(ec, 2);
             break;
          case ITechCodes.KEY_NUM3:
-            selectX(ic, 3);
+            selectX(ec, 3);
             break;
          case ITechCodes.KEY_NUM4:
-            selectX(ic, 4);
+            selectX(ec, 4);
             break;
          case ITechCodes.KEY_NUM5:
-            selectX(ic, 5);
+            selectX(ec, 5);
             break;
          case ITechCodes.KEY_NUM6:
-            selectX(ic, 6);
+            selectX(ec, 6);
             break;
          case ITechCodes.KEY_NUM7:
-            selectX(ic, 7);
+            selectX(ec, 7);
             break;
          case ITechCodes.KEY_NUM8:
-            selectX(ic, 8);
+            selectX(ec, 8);
             break;
          case ITechCodes.KEY_NUM9:
-            selectX(ic, 9);
+            selectX(ec, 9);
             break;
 
          default:
@@ -199,28 +200,29 @@ public class StringListInput extends StringDrawable implements IEventConsumer {
     * <br>
     * 
     */
-   public void manageKeyInput(InputConfig ic) {
+   public void manageKeyInput(ExecutionContextCanvasGui ec) {
+      InputConfig ic = ec.getInputConfig();
       if (ic.isFireP()) {
          //
-         showTable(ic);
+         showTable(ec);
       }
       if (ic.isPressed()) {
-         keyFunctions(ic.getIdKeyBut(), ic);
+         keyFunctions(ic.getIdKeyBut(), ec);
       }
       if (!ic.isActionDone()) {
-         super.manageKeyInput(ic);
+         super.manageKeyInput(ec);
       }
    }
 
    /**
     * Display a button for the pointer to show the table of choices
     */
-   public void managePointerInput(InputConfig ic) {
-
+   public void managePointerInput(ExecutionContextCanvasGui ec) {
+      InputConfig ic = ec.getInputConfig();
       if (ic.isPressed() && hasStateStyle(ITechDrawable.STYLE_08_PRESSED)) {
-         showTable(ic);
+         showTable(ec);
       } else {
-         super.managePointerInput(ic);
+         super.managePointerInput(ec);
       }
    }
 
@@ -228,12 +230,12 @@ public class StringListInput extends StringDrawable implements IEventConsumer {
     * Removes a letter
     * @param ic TODO
     */
-   private void minusT9(InputConfig ic) {
+   private void minusT9(ExecutionContextCanvasGui ec) {
       String s = t9.decrement();
       if (s != null) {
          int newselected = t9.getLastI();
          selectedModelIndex = newselected;
-         updateString(ic);
+         updateString(ec);
       } else {
       }
    }
@@ -268,14 +270,14 @@ public class StringListInput extends StringDrawable implements IEventConsumer {
     * The key index
     * @param visualIndex
     */
-   public void selectX(InputConfig ic, int visualIndex) {
+   public void selectX(ExecutionContextCanvasGui ec, int visualIndex) {
       if (isT9mode) {
          String s = t9.increment(visualIndex);
          if (s != null) {
             int index = t9.getLastI();
             //set selected to table selection model, which generate an event for the TableView
             selectedModelIndex = index;
-            updateString(ic);
+            updateString(ec);
          } else {
             if (t9.getLetterCount() > 0) {
             }
@@ -303,7 +305,7 @@ public class StringListInput extends StringDrawable implements IEventConsumer {
       t9 = new T9(gc.getUC(), list);
    }
 
-   public void showTable(InputConfig ic) {
+   public void showTable(ExecutionContextCanvasGui ec) {
       if (model != null) {
          if (listView == null) {
             StyleClass symbolStyleClass = this.styleClass.getStyleClass(ITechLinks.LINK_45_STRING_LIST_VIEW);
@@ -325,12 +327,13 @@ public class StringListInput extends StringDrawable implements IEventConsumer {
             listView.addEventListener(this, ITechTable.EVENT_ID_00_SELECT);
          }
          //show it over
-         listView.shShowDrawable(ic, ITechCanvasDrawable.SHOW_TYPE_1_OVER_TOP);
+         listView.shShowDrawable(ec, ITechCanvasDrawable.SHOW_TYPE_1_OVER_TOP);
+         InputConfig ic = ec.getInputConfig();
          ic.srActionDoneRepaint();
       }
    }
 
-   private void t9Decrement(InputConfig ic) {
+   private void t9Decrement(ExecutionContextCanvasGui ec) {
       if (model != null) {
          int modelSize = model.getSizeModel();
          if (modelSize == 0) {
@@ -342,17 +345,17 @@ public class StringListInput extends StringDrawable implements IEventConsumer {
             }
          }
          if (listView != null) {
-            listView.setSelectedIndex(selectedModelIndex, ic, false);
+            listView.setSelectedIndex(selectedModelIndex, ec, false);
          }
-         updateString(ic);
-         ic.srActionDoneRepaint(this);
+         updateString(ec);
+         ec.srActionDoneRepaint(this);
       }
    }
 
    /**
     * Displays next element from model.
     */
-   private void t9Increment(InputConfig ic) {
+   private void t9Increment(ExecutionContextCanvasGui ec) {
       if (model != null) {
          int modelSize = model.getSizeModel();
          if (modelSize == 0) {
@@ -364,10 +367,10 @@ public class StringListInput extends StringDrawable implements IEventConsumer {
             }
          }
          if (listView != null) {
-            listView.setSelectedIndex(selectedModelIndex, ic, false);
+            listView.setSelectedIndex(selectedModelIndex, ec, false);
          }
-         updateString(ic);
-         ic.srActionDoneRepaint(this);
+         updateString(ec);
+         ec.srActionDoneRepaint(this);
       }
    }
 }

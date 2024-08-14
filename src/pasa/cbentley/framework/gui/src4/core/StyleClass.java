@@ -17,8 +17,10 @@ import pasa.cbentley.core.src4.structs.IntToObjects;
 import pasa.cbentley.core.src4.utils.ArrayUtils;
 import pasa.cbentley.core.src4.utils.BitUtils;
 import pasa.cbentley.core.src4.utils.IntUtils;
+import pasa.cbentley.framework.drawx.src4.ctx.BOModuleDrawx;
 import pasa.cbentley.framework.drawx.src4.ctx.IBOTypesDrawX;
 import pasa.cbentley.framework.drawx.src4.style.IBOStyle;
+import pasa.cbentley.framework.drawx.src4.style.StyleOperator;
 import pasa.cbentley.framework.gui.src4.ctx.GuiCtx;
 import pasa.cbentley.framework.gui.src4.ctx.ObjectGC;
 import pasa.cbentley.framework.gui.src4.ctx.ToStringStaticGui;
@@ -43,7 +45,7 @@ import pasa.cbentley.framework.gui.src4.tech.ITechLinks;
  * 
  * From these, {@link StyleClass} create variations of the root style. 
  * <br>
- * Root style is usually opaque and sub styles are semi transparent i.e. flagged with {@link IBOStyle#STYLE_FLAG_PERF_7_INCOMPLETE}
+ * Root style is usually opaque and sub styles are semi transparent i.e. flagged with {@link IBOStyle#STYLE_FLAG_X_1_INCOMPLETE}
  * <br>
  * <br>
  * <b>Style Variations </b>:
@@ -236,8 +238,26 @@ public class StyleClass extends ObjectGC implements IStringable, IStatorable {
          throw new NullPointerException("RootStyle is null");
       }
       rootMODs = new ByteObject[] { rootStyle };
+      setRootStyle(rootStyle);
       cacheStyleInit();
       FLAG_CACHE_STYLE = gc.getSettingsWrapper().hasStyleClassCache();
+   }
+   
+   /**
+    * Does not reset previous 
+    * 
+    * TODO fix it
+    * @param rootStyle
+    */
+   public void setRootStyle(ByteObject rootStyle) {
+      if (rootStyle == null) {
+         throw new NullPointerException("RootStyle is null");
+      }
+      if(rootMODs == null) {
+         rootMODs = new ByteObject[] { rootStyle };
+      } else {
+         rootMODs[0] = rootStyle;
+      }
    }
 
    /**
@@ -562,7 +582,7 @@ public class StyleClass extends ObjectGC implements IStringable, IStatorable {
     * If caching is done, it must be done on ctype/structStyle and states
     * <br>
     * <br>
-    * @param states states style are merged from {@link IDrawable#STYL}
+    * @param states states style are merged from 
     * @param ctype a ctype must be different than zero to have an impact on the styling.
     * @param structStyle
     * @return
@@ -598,7 +618,10 @@ public class StyleClass extends ObjectGC implements IStringable, IStatorable {
             }
             if ((possibles & stateFlag) == stateFlag) {
                try {
-                  newStyle = newStyle.mergeByteObject(stateStyle);
+                  //we know its both styles so right to method
+                  //newStyle = newStyle.mergeByteObject(stateStyle);
+                  StyleOperator styleOperator = gc.getDC().getStyleOperator();
+                  newStyle = styleOperator.mergeStyle(newStyle,stateStyle);
                } catch (ArrayIndexOutOfBoundsException e) {
                   //#debug
                   toDLog().pNull("msg", stateStyle, StyleClass.class, "getStyle", LVL_05_FINE, true);
@@ -1129,9 +1152,6 @@ public class StyleClass extends ObjectGC implements IStringable, IStatorable {
       parent = sc;
    }
 
-   public void setRoot(ByteObject style) {
-      rootMODs[0] = style;
-   }
 
    public void stateReadFrom(StatorReader state) {
       IntToObjects ito = new IntToObjects(uc);

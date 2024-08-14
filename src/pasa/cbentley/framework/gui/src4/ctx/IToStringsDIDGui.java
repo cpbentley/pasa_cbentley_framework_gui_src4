@@ -54,9 +54,15 @@ public interface IToStringsDIDGui extends IToStringsDIDsBoc {
    public static final int DID_14_VIEWPANE_HEADER_COMPET_TYPE   = A_DID_OFFSET_A_GUI + 14;
 
    public static final int DID_15_TABLEVIEW_PSELECT_MODE        = A_DID_OFFSET_A_GUI + 15;
-
+   /**
+    * TODO moved to boc ?
+    */
    public static final int DID_45_ANIM_MOVE_TYPE                = A_DID_OFFSET_A_GUI + 45;
 
+   
+   /**
+    * TODO moved to boc ?
+    */
    public static final int DID_46_ANIM_INCREMENT_TYPE           = A_DID_OFFSET_A_GUI + 46;
 
    public static final int DID_MUI_NUMBER                       = A_DID_OFFSET_A_GUI + 46;

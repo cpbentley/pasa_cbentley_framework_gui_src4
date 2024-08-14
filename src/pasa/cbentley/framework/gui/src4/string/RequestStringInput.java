@@ -12,6 +12,7 @@ import pasa.cbentley.framework.gui.src4.core.StyleClass;
 import pasa.cbentley.framework.gui.src4.core.ViewDrawable;
 import pasa.cbentley.framework.gui.src4.ctx.GuiCtx;
 import pasa.cbentley.framework.gui.src4.ctx.ObjectGC;
+import pasa.cbentley.framework.gui.src4.exec.ExecutionContextCanvasGui;
 import pasa.cbentley.framework.gui.src4.forms.ListRoot;
 import pasa.cbentley.framework.gui.src4.interfaces.ITechCanvasDrawable;
 import pasa.cbentley.framework.gui.src4.interfaces.IValidable;
@@ -79,7 +80,7 @@ public class RequestStringInput extends ObjectGC implements ICommandable {
     * TODO string validation?
     */
    public void commandAction(CmdInstance cmd) {
-      if (cmd.cmdID == cc.CMD_04_OK || cmd.cmdID == cc.CMD_04_OK) {
+      if (cmd.getCmdID() == cc.CMD_04_OK || cmd.getCmdID() == cc.CMD_04_OK) {
          ci.paramO = sd.getString();
          icon.commandAction(ci);
          sd.removeEditControl();
@@ -111,8 +112,8 @@ public class RequestStringInput extends ObjectGC implements ICommandable {
    public void show(ICommandable icon, CmdInstance ci) {
       this.icon = icon;
       this.ci = ci;
-
-      sd.shShowDrawable((InputConfig) ci.getFeedback(), ITechCanvasDrawable.SHOW_TYPE_1_OVER_TOP);
+      ExecutionContextCanvasGui ec = (ExecutionContextCanvasGui) ci.getExecutionContext();
+      sd.shShowDrawable(ec, ITechCanvasDrawable.SHOW_TYPE_1_OVER_TOP);
    }
 
    //#mdebug

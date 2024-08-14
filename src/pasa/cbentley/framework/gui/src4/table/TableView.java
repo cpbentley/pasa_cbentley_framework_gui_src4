@@ -15,19 +15,19 @@ import pasa.cbentley.framework.cmd.src4.interfaces.ICmdListener;
 import pasa.cbentley.framework.cmd.src4.interfaces.ICmdsCmd;
 import pasa.cbentley.framework.cmd.src4.interfaces.ICommandable;
 import pasa.cbentley.framework.cmd.src4.interfaces.INavTech;
-import pasa.cbentley.framework.coreui.src4.ctx.ToStringStaticCoreUi;
-import pasa.cbentley.framework.coreui.src4.exec.ExecutionContext;
-import pasa.cbentley.framework.coreui.src4.tech.ITechCodes;
-import pasa.cbentley.framework.coreui.src4.utils.ViewState;
+import pasa.cbentley.framework.core.ui.src4.ctx.ToStringStaticCoreUi;
+import pasa.cbentley.framework.core.ui.src4.exec.ExecutionContext;
+import pasa.cbentley.framework.core.ui.src4.input.InputState;
+import pasa.cbentley.framework.core.ui.src4.tech.ITechCodes;
+import pasa.cbentley.framework.core.ui.src4.utils.ViewState;
 import pasa.cbentley.framework.datamodel.src4.table.ITableModel;
 import pasa.cbentley.framework.datamodel.src4.table.ModelAux;
 import pasa.cbentley.framework.datamodel.src4.table.ObjectTableModel;
 import pasa.cbentley.framework.drawx.src4.ctx.IBOTypesDrawX;
 import pasa.cbentley.framework.drawx.src4.engine.GraphicsX;
 import pasa.cbentley.framework.drawx.src4.factories.FigureOperator;
-import pasa.cbentley.framework.gui.src4.canvas.ExecutionContextGui;
 import pasa.cbentley.framework.gui.src4.canvas.InputConfig;
-import pasa.cbentley.framework.gui.src4.cmd.CmdInstanceDrawable;
+import pasa.cbentley.framework.gui.src4.cmd.CmdInstanceGui;
 import pasa.cbentley.framework.gui.src4.core.Drawable;
 import pasa.cbentley.framework.gui.src4.core.DrawableInjected;
 import pasa.cbentley.framework.gui.src4.core.LayouterEngineDrawable;
@@ -40,6 +40,7 @@ import pasa.cbentley.framework.gui.src4.ctx.GuiCtx;
 import pasa.cbentley.framework.gui.src4.ctx.IBOTypesGui;
 import pasa.cbentley.framework.gui.src4.ctx.IToStringFlagsGui;
 import pasa.cbentley.framework.gui.src4.ctx.ToStringStaticGui;
+import pasa.cbentley.framework.gui.src4.exec.ExecutionContextCanvasGui;
 import pasa.cbentley.framework.gui.src4.factories.TablePolicyFactory;
 import pasa.cbentley.framework.gui.src4.factories.interfaces.IBOViewPane;
 import pasa.cbentley.framework.gui.src4.interfaces.IDrawListener;
@@ -64,7 +65,6 @@ import pasa.cbentley.framework.gui.src4.tech.ITechStringDrawable;
 import pasa.cbentley.framework.gui.src4.tech.ITechViewPane;
 import pasa.cbentley.framework.gui.src4.utils.DrawableMapper;
 import pasa.cbentley.framework.gui.src4.utils.DrawableUtilz;
-import pasa.cbentley.framework.input.src4.InputState;
 import pasa.cbentley.framework.input.src4.gesture.GestureDetector;
 import pasa.cbentley.layouter.src4.ctx.IBOTypesLayout;
 
@@ -273,7 +273,7 @@ import pasa.cbentley.layouter.src4.ctx.IBOTypesLayout;
  * <li> {@link MLogViewer} class <b>isA</b> TableView. It implements the
  * {@link MLogViewer#log(String, int)} method to update the model? Why use or
  * usesA TableView. IsA TableView when class needs to override a Method (Usually
- * {@link TableView#manageKeyInput(InputConfig)} ) or use a protected field <br>
+ * {@link TableView#manageKeyInput(ExecutionContextCanvasGui)} ) or use a protected field <br>
  * <li>Table is only used to select in a model. A wizard displaying a linked
  * list of Choices. At each step, each model is fed to the TableView. When users
  * select one item, TableView mark model index as selected and next Model Choice
@@ -1639,7 +1639,7 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
    }
 
    /**
-    * Forwards the method call {@link Drawable#managePointerInput(InputConfig)} to the Drawable.
+    * Forwards the method call {@link Drawable#managePointerInput(ExecutionContextCanvasGui)} to the Drawable.
     * <br>
     * Contrary to {@link TableView#forwardPointerSelectEvent(InputConfig)} which generates a {@link BusEvent} selection event.
     * without calling the 
@@ -1650,14 +1650,14 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
     * Finds the cell {@link Drawable} at the coordinate.
     * <br>
     * <br>
-    * The {@link Drawable#managePointerInput(InputConfig)} method is called.
+    * The {@link Drawable#managePointerInput(ExecutionContextCanvasGui)} method is called.
     * <br>
     * <br>
     * It will set the in {@link PointerGesture} the pressed Drawable.
     * @param ic
     */
-   protected void forwardPointerEvent(InputConfig ic) {
-      int[] pointed = getPointerDrawableCoordinates(ic);
+   protected void forwardPointerEvent(ExecutionContextCanvasGui ec) {
+      int[] pointed = getPointerDrawableCoordinates(ec);
       if (pointed != null) {
          //cell coordinates for which the pointer is over
          int i = pointed[0];
@@ -1667,13 +1667,13 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
             //when cell is not selected
             if (!isSelectedCell(i, j)) {
                boolean isSelectable = isCellDrawableSelectable(d, i, j);
-               d.managePointerInput(ic);
+               d.managePointerInput(ec);
                if (isSelectable) {
-                  selectionMove(ic, i, j);
+                  selectionMove(ec, i, j);
                }
-               gc.getFocusCtrl().newFocusKey(ic, d);
+               gc.getFocusCtrl().newFocusKey(ec, d);
             } else {
-               d.managePointerInput(ic);
+               d.managePointerInput(ec);
             }
          }
       }
@@ -1686,7 +1686,7 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
     * <br>
     * @param ic
     */
-   private void forwardPointerSelectEvent(InputConfig ic) {
+   private void forwardPointerSelectEvent(ExecutionContextCanvasGui ic) {
       int[] pointed = getPointerDrawableCoordinates(ic);
       if (pointed != null) {
          //cell coordinates for which the pointer is over
@@ -1705,26 +1705,26 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
     * <br>
     * May also generate a {@link ITechTable#EVENT_ID_01_SELECTION_CHANGE} before it if it was not already so
     * <br>
-    * @param ic
+    * @param ec
     * @param d
     * @param i
     * @param j
     */
-   private void forwardPointerSelectEventSub(InputConfig ic, IDrawable d, int i, int j) {
+   private void forwardPointerSelectEventSub(ExecutionContextCanvasGui ec, IDrawable d, int i, int j) {
       if (hasTechX(T_FLAGX_3_ROW_SELECTION)) {
          modelCol.setNewSelection(i);
          modelRow.setNewSelection(j);
-         selectionSelectEvent(ic);
+         selectionSelectEvent(ec);
       } else if (isSelectedCell(i, i)) {
-         selectionSelectEvent(ic);
+         selectionSelectEvent(ec);
       } else {
-         selectionMove(ic, i, j);
-         selectionSelectEvent(ic);
+         selectionMove(ec, i, j);
+         selectionSelectEvent(ec);
       }
    }
 
-   protected void forwardPointerSelectPress(InputConfig ic) {
-      int[] pointed = getPointerDrawableCoordinates(ic);
+   protected void forwardPointerSelectPress(ExecutionContextCanvasGui ec) {
+      int[] pointed = getPointerDrawableCoordinates(ec);
       if (pointed != null) {
          //cell coordinates for which the pointer is over
          int i = pointed[0];
@@ -1732,18 +1732,18 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
          //check if the element at this index is 'selected'. In case of drawable less
          if (hasHelperFlag(HELPER_FLAG_20_SPECIAL_REPAINT)) {
             if (hasPointState(getGridIndexFromAbs(i, j), ITechDrawable.STYLE_05_SELECTED)) {
-               selectionSelectEvent(ic);
+               selectionSelectEvent(ec);
             } else {
-               selectionMove(ic, i, j);
+               selectionMove(ec, i, j);
             }
          } else {
             IDrawable d = getModelDrawable(i, j);
             if (d != null && d.hasStateStyle(ITechDrawable.STYLE_05_SELECTED)) {
-               selectionSelectEvent(ic);
+               selectionSelectEvent(ec);
             } else {
                boolean isSelectable = isCellDrawableSelectable(d, i, j);
                if (isSelectable) {
-                  selectionMove(ic, i, j);
+                  selectionMove(ec, i, j);
                }
             }
          }
@@ -1823,7 +1823,7 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
     * Throws an exception if call is made while TableView is not initialized
     * 
     */
-   public IDrawable getDrawableViewPort(int x, int y, ExecutionContextGui ex) {
+   public IDrawable getDrawableViewPort(int x, int y, ExecutionContextCanvasGui ex) {
       checkInit();
       int firstRowAbs = modelRow.firstCellAbs;
       int lastRowAbs = modelRow.lastCellAbs;
@@ -2332,7 +2332,7 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
     * @param ic
     * @return
     */
-   private int[] getPointerDrawableCoordinates(InputConfig ic) {
+   private int[] getPointerDrawableCoordinates(ExecutionContextCanvasGui ec) {
       int firstRowAbs = modelRow.firstCellAbs;
       int lastRowAbs = modelRow.lastCellAbs;
       int firstColAbs = modelCol.firstCellAbs;
@@ -2347,7 +2347,7 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
             int cellY = dy + modelRow.positions[j];
             //System.out.println("[" + i + "," + j + "] = (" + cellX + ", " + cellY + ")");
             getCellsDim(r, i, j);
-            if (DrawableUtilz.isInside(ic, cellX, cellY, r[0], r[1])) {
+            if (DrawableUtilz.isInside(ec, cellX, cellY, r[0], r[1])) {
                //toLog().printEvent("#TableView#getPointerDrawableCoordinates ----[" + i + "," + j + "] = Point(" + ic.x + ", " + ic.y + ") isInside [" + cellX + "," + cellY + " " + (cellX + r[0])
                //      + ", " + (cellY + r[1]));
                pointed[0] = i;
@@ -3173,13 +3173,13 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
       ph += getSizeGridH() * (modelRow.numCells - 1);
       return ph;
    }
-   
+
    public int computeContentPw() {
       int pw = IntUtils.sum(modelCol.workCellSizes);
       pw += getSizeGridV() * (modelCol.numCells - 1);
       return pw;
    }
-   
+
    /**
     * <br>
     * <br>
@@ -3358,36 +3358,38 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
     * <br>
     * <br>
     */
-   public void manageKeyInput(InputConfig ic) {
-      super.manageKeyInput(ic);
+   public void manageKeyInput(ExecutionContextCanvasGui ec) {
+      super.manageKeyInput(ec);
    }
 
-   public void manageNavigate(CmdInstanceDrawable cd, int navEvent) {
+   public void manageNavigate(CmdInstanceGui cd, int navEvent) {
       if (navEvent == INavTech.NAV_1_UP) {
-         navigateUp(cd.getIC());
+         ExecutionContextCanvasGui ec = cd.getExecutionCtxGui();
+         navigateUp(ec);
       } else if (navEvent == INavTech.NAV_5_SELECT) {
 
       }
    }
 
-   public void managePointerEvent(IDrawable slave, InputConfig ic) {
+   public void managePointerEvent(IDrawable slave, ExecutionContextCanvasGui ec) {
+      InputConfig ic = ec.getInputConfig();
       if (slave == modelCol.titlesView) {
          //we have an event on the column titles.
          //all events going to a title, first go through container. (top-down)
          //ask the CellModel to forward to pointer input to the right title
-         if (modelCol.managePointerInputForward(ic)) {
+         if (modelCol.managePointerInputForward(ec)) {
             return;
          }
          //TODO if u want to sort.. get the column index
       } else if (slave == modelRow.titlesView) {
-         if (modelRow.managePointerInputForward(ic)) {
+         if (modelRow.managePointerInputForward(ec)) {
             return;
          }
-      } else if (modelRow.titlesView != null && DrawableUtilz.isInside(ic, modelRow.titlesView)) {
+      } else if (modelRow.titlesView != null && DrawableUtilz.isInside(ec, modelRow.titlesView)) {
          //press event first goes viewpane/title container/tableview slave/title/tableview now here
          //#debug
          toDLog().pEvent("Row Title Slaved Event '" + ic.toStringMod() + "' " + slave.toString1Line(), this, TableView.class, "managePointerEvent", LVL_05_FINE, true);
-      } else if (modelCol.titlesView != null && DrawableUtilz.isInside(ic, modelCol.titlesView)) {
+      } else if (modelCol.titlesView != null && DrawableUtilz.isInside(ec, modelCol.titlesView)) {
          //row title event
          //#debug
          toDLog().pEvent("Column Title Slaved Event", this, TableView.class, "managePointerEvent", LVL_05_FINE, true);
@@ -3395,7 +3397,7 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
          //forward it
       } else {
          //
-         managePointerInputSlaveCell(ic, slave);
+         managePointerInputSlaveCell(ec, slave);
          //return from others
          //            if (ic.isPressed()) {
          //               movePointerPressed(ic);
@@ -3419,10 +3421,10 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
     * 
     * @see Drawable
     */
-   protected void managePointerInputSlaveCell(InputConfig ic, IDrawable slave) {
+   protected void managePointerInputSlaveCell(ExecutionContextCanvasGui ec, IDrawable slave) {
       //toLog().println("#TableView#managePointerInputSlave Event sent to Slave = " + slave.toStringOneLine());
       //we don't do anything? but maybe sub class will do something on it
-      slave.managePointerStateStyle(ic);
+      slave.managePointerStateStyle(ec);
       // 2 march 2014. we add this so
       //      if (ic.isMoved()) {
       //         //move inside viewport. first pass.
@@ -3441,10 +3443,11 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
     * <li>1st time slave drawable is null.
     * <li>2nd time, if the slave is not null, calls {@link TableView#managePointerInputSlave(InputConfig)}
     */
-   public void managePointerInputViewPort(InputConfig ic) {
+   public void managePointerInputViewPort(ExecutionContextCanvasGui ec) {
       if (boTable.hasFlag(T_OFFSET_02_FLAGX, T_FLAGX_7_VIEW_PORT_BLIND)) {
          return;
       }
+      InputConfig ic = ec.getInputConfig();
       //#debug
       //toLog().printFlow("#TableView#managePointerInputViewPort " + ((ic.getSlaveDrawable() != null) ? ic.getSlaveDrawable().toStringOneLine() : " Slave=Null"));
       //call back by titles
@@ -3454,15 +3457,15 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
          toDLog().pFlow("Wheeled " + ToStringStaticCoreUi.toStringMouseButton(ic.getIdKeyBut()), this, TableView.class, "managePointerInputViewPort", LVL_05_FINE, true);
          if (ic.getIdKeyBut() == ITechCodes.PBUTTON_3_WHEEL_UP) {
             if (modelRow.numCells == 1) {
-               navigateLeft(ic);
+               navigateLeft(ec);
             } else {
-               navigateUp(ic);
+               navigateUp(ec);
             }
          } else {
             if (modelRow.numCells == 1) {
-               navigateRight(ic);
+               navigateRight(ec);
             } else {
-               navigateDown(ic);
+               navigateDown(ec);
             }
          }
          return;
@@ -3471,23 +3474,23 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
       //deletage to ViewDrawable to redirect
       if (ic.isMoved()) {
          //move inside viewport. first pass.
-         managePointerViewMoved(ic);
+         managePointerViewMoved(ec);
       } else {
          if (ic.isPressed()) {
-            managePointerViewPressed(ic);
+            managePointerViewPressed(ec);
          } else if (ic.isReleased()) {
-            managePointerViewReleased(ic);
+            managePointerViewReleased(ec);
          } else if (ic.isDraggedPointer0Button0()) {
-            managePointerViewDragged(ic);
+            managePointerViewDragged(ec);
          }
       }
       //separates pointer gesture from child event
       //first manage the scrolling gesture
-      super.managePointerGesture(ic);
+      super.managePointerGesture(ec);
 
    }
 
-   private void managePointerViewDragged(InputConfig ic) {
+   private void managePointerViewDragged(ExecutionContextCanvasGui ic) {
       // TODO Auto-generated method stub
 
    }
@@ -3496,13 +3499,14 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
     * Manage the state style {@link ITechDrawable#STYLE_07_FOCUSED_POINTER}
     * <br>
     * <br>
-    * Redirect from {@link IDrawable#managePointerInput(InputConfig)}.
+    * Redirect from {@link IDrawable#managePointerInput(ExecutionContextCanvasGui)}.
     * <br>
     * <br>
     * @param ic
     */
-   private void managePointerViewMoved(InputConfig ic) {
-      int[] pointed = getPointerDrawableCoordinates(ic);
+   private void managePointerViewMoved(ExecutionContextCanvasGui ec) {
+      InputConfig ic = ec.getInputConfig();
+      int[] pointed = getPointerDrawableCoordinates(ec);
       if (pointed != null) {
          int i = pointed[0];
          int j = pointed[1];
@@ -3528,12 +3532,12 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
                toDLog().pFlow("Pointer to " + od.toString1Line(), this, TableView.class, "managePointerViewMoved", LVL_05_FINE, true);
 
                //the drawable will set the states by itself
-               od.managePointerInput(ic);
+               od.managePointerInput(ec);
             }
          }
       } else {
          //when pointer is not over a drawable, give focus back to TableView
-         gc.getFocusCtrl().newFocusPointerPress(ic, this);
+         gc.getFocusCtrl().newFocusPointerPress(ec, this);
       }
    }
 
@@ -3548,44 +3552,44 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
     * <br>
     * @param ic
     */
-   protected void managePointerViewPressed(InputConfig ic) {
+   protected void managePointerViewPressed(ExecutionContextCanvasGui ec) {
       //#debug
       toDLog().pFlow("", boTable, TableView.class, "managePointerViewPressed", LVL_05_FINE, true);
-
+      InputConfig ic = ec.getInputConfig();
       int type = boTable.get1(T_OFFSET_12_PSELECTION_MODE1);
       if (type == PSELECT_0_NONE) {
-         forwardPointerEvent(ic);
+         forwardPointerEvent(ec);
       } else if (type == PSELECT_1_PRESS) {
-         forwardPointerSelectEvent(ic);
+         forwardPointerSelectEvent(ec);
       } else if (type == PSELECT_2_PRESS_RELEASE) {
-         forwardPointerEvent(ic);
+         forwardPointerEvent(ec);
       } else if (type == PSELECT_3_SELECTED_PRESS) {
-         forwardPointerSelectPress(ic);
+         forwardPointerSelectPress(ec);
       } else if (type == PSELECT_4_PRESS_DOUBLE) {
          if (ic.isPressedDouble()) {
-            forwardPointerSelectEvent(ic);
+            forwardPointerSelectEvent(ec);
          } else {
-            forwardPointerEvent(ic);
+            forwardPointerEvent(ec);
          }
       } else if (type == PSELECT_5_PRESS_RELEASE_DOUBLE) {
          if (ic.isPressedReleasedDouble()) {
-            forwardPointerSelectEvent(ic);
+            forwardPointerSelectEvent(ec);
          } else {
-            forwardPointerEvent(ic);
+            forwardPointerEvent(ec);
          }
       }
    }
 
-   public void managePointerViewReleased(InputConfig ic) {
-
+   public void managePointerViewReleased(ExecutionContextCanvasGui ec) {
+      InputConfig ic = ec.getInputConfig();
       int type = boTable.get1(T_OFFSET_12_PSELECTION_MODE1);
       if (type == PSELECT_0_NONE) {
-         forwardPointerEvent(ic);
+         forwardPointerEvent(ec);
       } else if (type == PSELECT_1_PRESS) {
          //dealt with in the other method
       } else if (type == PSELECT_2_PRESS_RELEASE) {
          //finds which drawable is located under the release event
-         int[] pointed = getPointerDrawableCoordinates(ic);
+         int[] pointed = getPointerDrawableCoordinates(ec);
          if (pointed != null) {
             int i = pointed[0];
             int j = pointed[1];
@@ -3593,21 +3597,21 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
             //TODO... check this. for press releases.. maybe use more 
             //check if release is done on the same drawable as the press event
             //however if the release is done after a drag, no selection
-            GestureDetector gd = ic.is.getOrCreateGesture(d);
+            GestureDetector gd = ic.getInputStateDrawable().getOrCreateGesture(d);
             if (!ic.isDraggedDragged()) {
                boolean isSelectable = isCellDrawableSelectable(d, i, j);
                if (isSelectable) {
-                  forwardPointerSelectEventSub(ic, d, i, j);
+                  forwardPointerSelectEventSub(ec, d, i, j);
                }
             }
             // pointer event as slave. manage the internal drawable states.
-            d.managePointerInput(ic);
+            d.managePointerInput(ec);
          }
       } else if (type == PSELECT_3_SELECTED_PRESS) {
       } else if (type == PSELECT_4_PRESS_DOUBLE) {
       } else if (type == PSELECT_5_PRESS_RELEASE_DOUBLE) {
          if (ic.isPressedReleasedDouble()) {
-            forwardPointerSelectEvent(ic);
+            forwardPointerSelectEvent(ec);
          }
       }
    }
@@ -3635,12 +3639,13 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
     * 
     * @param cd
     */
-   public void navigateDown(CmdInstanceDrawable cd) {
+   public void navigateDown(CmdInstanceGui cd) {
       // table has its own navigation
       if (modelRow.hasHelperFlag(CELL_H_FLAG_10_OWN_NAVIGATION)) {
          int nextRow = getNextSelectableDown();
          if (nextRow != modelRow.selectedCellAbs) {
-            selectionMove(cd.getIC(), modelCol.selectedCellAbs, nextRow);
+            ExecutionContextCanvasGui ec = cd.getExecutionCtxGui();
+            selectionMove(ec, modelCol.selectedCellAbs, nextRow);
          }
       }
    }
@@ -3658,23 +3663,24 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
     * <br>
     * When 
     */
-   public void navigateDown(InputConfig ic) {
+   public void navigateDown(ExecutionContextCanvasGui ec) {
+      InputConfig ic = ec.getInputConfig();
       if (ic.isPressed() || ic.isWheeled()) {
          // table has its own navigation
          if (modelRow.hasHelperFlag(CELL_H_FLAG_10_OWN_NAVIGATION)) {
             int nextRow = getNextSelectableDown();
             if (nextRow != modelRow.selectedCellAbs) {
-               selectionMove(ic, modelCol.selectedCellAbs, nextRow);
+               selectionMove(ec, modelCol.selectedCellAbs, nextRow);
             }
          }
       }
    }
 
-   public void navigateLeft(CmdInstanceDrawable cd) {
+   public void navigateLeft(CmdInstanceGui cd) {
       if (modelCol.hasHelperFlag(CELL_H_FLAG_10_OWN_NAVIGATION)) {
          int nextCol = getNextSelectableLeft();
          if (nextCol != modelCol.selectedCellAbs) {
-            selectionMove(cd.getIC(), nextCol, modelRow.selectedCellAbs);
+            selectionMove(cd.getExecutionCtxGui(), nextCol, modelRow.selectedCellAbs);
          }
       }
    }
@@ -3683,22 +3689,23 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
     * 
     * When for example, there is only one column selectable, delegates to parent of TableView
     */
-   public void navigateLeft(InputConfig ic) {
+   public void navigateLeft(ExecutionContextCanvasGui ec) {
+      InputConfig ic = ec.getInputConfig();
       if (ic.isPressed()) {
          if (modelCol.hasHelperFlag(CELL_H_FLAG_10_OWN_NAVIGATION)) {
             int nextCol = getNextSelectableLeft();
             if (nextCol != modelCol.selectedCellAbs) {
-               selectionMove(ic, nextCol, modelRow.selectedCellAbs);
+               selectionMove(ec, nextCol, modelRow.selectedCellAbs);
             }
          }
       }
    }
 
-   public void navigateRight(CmdInstanceDrawable cd) {
+   public void navigateRight(CmdInstanceGui cd) {
       if (modelCol.hasHelperFlag(CELL_H_FLAG_10_OWN_NAVIGATION)) {
          int nextCol = getNextSelectableRight();
          if (nextCol != modelCol.selectedCellAbs) {
-            selectionMove(cd.getIC(), nextCol, modelRow.selectedCellAbs);
+            selectionMove(cd.getExecutionCtxGui(), nextCol, modelRow.selectedCellAbs);
          }
       }
    }
@@ -3706,12 +3713,13 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
    /**
     * 
     */
-   public void navigateRight(InputConfig ic) {
+   public void navigateRight(ExecutionContextCanvasGui ec) {
+      InputConfig ic = ec.getInputConfig();
       if (ic.isPressed()) {
          if (modelCol.hasHelperFlag(CELL_H_FLAG_10_OWN_NAVIGATION)) {
             int nextCol = getNextSelectableRight();
             if (nextCol != modelCol.selectedCellAbs) {
-               selectionMove(ic, nextCol, modelRow.selectedCellAbs);
+               selectionMove(ec, nextCol, modelRow.selectedCellAbs);
             }
          }
       }
@@ -3729,19 +3737,20 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
     *  
     * @param ic {@link InputConfig} might be in pressed mode or release or continuous
     */
-   public void navigateSelect(InputConfig ic) {
+   public void navigateSelect(ExecutionContextCanvasGui ec) {
+      InputConfig ic = ec.getInputConfig();
       if (ic.isPressed()) {
          // notify on input config?
-         selectionSelectEvent(ic);
+         selectionSelectEvent(ec);
       }
    }
 
-   public void navigateUp(CmdInstanceDrawable cd) {
+   public void navigateUp(CmdInstanceGui cd) {
       if (modelRow.hasHelperFlag(CELL_H_FLAG_10_OWN_NAVIGATION)) {
          int nextRow = getNextSelectableUp();
          if (nextRow != modelRow.selectedCellAbs) {
-            InputConfig ic = cd.getIC();
-            selectionMove(ic, modelCol.selectedCellAbs, nextRow);
+            ExecutionContextCanvasGui ec = (ExecutionContextCanvasGui) cd.getExecutionContext();
+            selectionMove(ec, modelCol.selectedCellAbs, nextRow);
          }
       }
    }
@@ -3751,12 +3760,13 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
     * <br>
     * ViewPane navigation will be automatic
     */
-   public void navigateUp(InputConfig ic) {
+   public void navigateUp(ExecutionContextCanvasGui ec) {
+      InputConfig ic = ec.getInputConfig();
       if (ic.isPressed() || ic.isWheeled()) {
          if (modelRow.hasHelperFlag(CELL_H_FLAG_10_OWN_NAVIGATION)) {
             int nextRow = getNextSelectableUp();
             if (nextRow != modelRow.selectedCellAbs) {
-               selectionMove(ic, modelCol.selectedCellAbs, nextRow);
+               selectionMove(ec, modelCol.selectedCellAbs, nextRow);
             }
          }
       }
@@ -3764,7 +3774,7 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
 
    public void notifyEvent(IDrawable d, int event, Object o) {
       if (event == ITechDrawable.EVENT_14_POINTER_EVENT) {
-         managePointerEvent(d, (InputConfig) o);
+         managePointerEvent(d, (ExecutionContextCanvasGui) o);
       }
    }
 
@@ -3816,7 +3826,7 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
     * @param colAbs
     * @param rowAbs
     */
-   public void selectionAdd(InputConfig ic, int colAbs, int rowAbs) {
+   public void selectionAdd(ExecutionContextCanvasGui ec, int colAbs, int rowAbs) {
 
    }
 
@@ -3829,7 +3839,7 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
     * @param od
     * @param nd can be null.
     */
-   protected void selectionChangeSelectedState(InputConfig ic, IDrawable od, IDrawable nd, boolean giveFocus) {
+   protected void selectionChangeSelectedState(ExecutionContextCanvasGui ec, IDrawable od, IDrawable nd, boolean giveFocus) {
       if (hasTechX(T_FLAGX_3_ROW_SELECTION)) {
          if (hasTechX(T_FLAGX_4_ROW_SELECTION_STYLE_STATES)) {
             setRowStyle(modelRow.oldSelectedCellAbs, ITechDrawable.STYLE_05_SELECTED, false);
@@ -3853,7 +3863,7 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
          if (nd != null) {
             nd.setStateStyle(ITechDrawable.STYLE_05_SELECTED, true);
             if (giveFocus) {
-               gc.getFocusCtrl().newFocusKey(ic, nd);
+               gc.getFocusCtrl().newFocusKey(ec, nd);
             }
          }
       }
@@ -3896,9 +3906,9 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
     * @param rowAbs are cells pre-checked?
     * 
     */
-   public void selectionMove(InputConfig ic, int colAbs, int rowAbs) {
+   public void selectionMove(ExecutionContextCanvasGui ec, int colAbs, int rowAbs) {
       boolean giveFocus = !hasTechF(T_FLAGF_2_SELECT_MOVE_NOT_GIVES_FOCUS);
-      selectionMove(ic, colAbs, rowAbs, giveFocus);
+      selectionMove(ec, colAbs, rowAbs, giveFocus);
    }
 
    /**
@@ -3912,11 +3922,11 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
     * @param rowAbs
     * @param giveFocus
     */
-   public void selectionMove(InputConfig ic, int colAbs, int rowAbs, boolean giveFocus) {
-      //System.out.println("#TableView moveSelection to col=" + colAbs + " row=" + rowAbs);
-      if (ic == null) {
-         throw new NullPointerException("Null InputConfig");
-      }
+   public void selectionMove(ExecutionContextCanvasGui ec, int colAbs, int rowAbs, boolean giveFocus) {
+      //#debug
+      toDLog().pFlow("col=" + colAbs + " row=" + rowAbs, this, TableView.class, "selectionMove@3927", LVL_05_FINE, true);
+
+      InputConfig ic = ec.getInputConfig();
       // only do the move if the destination cell is valid
       if (rowAbs < 0 || rowAbs > modelRow.numCells) {
          return;
@@ -3965,7 +3975,7 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
          //            getMe().focusLost(od);
          //         }
 
-         selectionChangeSelectedState(ic, od, nd, giveFocus);
+         selectionChangeSelectedState(ec, od, nd, giveFocus);
 
          if (isFullInsideTransition()) {
             //ask InputConfig to repaint 
@@ -3997,14 +4007,14 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
             changeX = modelCol.doUpdate(viewPane.getScrollConfigHorizontal(), getContentW());
             if (changeX != 0) {
                //move the scroll config vx increments
-               viewPane.moveX(ic, changeX);
+               viewPane.moveX(ec, changeX);
             }
          }
          if (modelRow.transitionType != TRANSITION_0_INSIDE_VIEWPORT) {
             changeY = modelRow.doUpdate(viewPane.getScrollConfigVertical(), getContentH());
             if (changeY != 0) {
                //move the scroll config vx increments
-               viewPane.moveY(ic, changeY);
+               viewPane.moveY(ec, changeY);
             }
          }
          ic.srActionDoneRepaint(this);
@@ -4016,10 +4026,10 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
       if (boTable.hasFlag(T_OFFSET_01_FLAG, T_FLAG_8_STYLE_ANIMATION)) {
 
       }
-      selectionMoveEvent(ic);
+      selectionMoveEvent(ec);
    }
 
-   protected void selectionMoveEvent(InputConfig ic) {
+   protected void selectionMoveEvent(ExecutionContextCanvasGui ic) {
       gc.getEventsBusGui().sendNewEvent(producerID, EVENT_ID_01_SELECTION_CHANGE, this);
    }
 
@@ -4030,9 +4040,9 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
     * Depending on key assignments and tech pointer behavior. Keyboard usually uses the ENTER key.
     * <br>
     * <br>
-    * @param ic
+    * @param ec
     */
-   protected void selectionSelectEvent(InputConfig ic) {
+   protected void selectionSelectEvent(ExecutionContextCanvasGui ec) {
       //#debug
       toDLog().pEvent("SelectedCell=[" + getSelectedCol() + "," + getSelectedRow() + "] =" + toStringSelectedDrawable(), this, TableView.class, "selectionSelectEvent");
       BusEvent be = gc.getEventsBusGui().createEvent(producerID, EVENT_ID_00_SELECT, this);
@@ -4183,11 +4193,11 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
     * @param ic
     * @param giveFocus
     */
-   public void setSelectedIndex(int index, InputConfig ic, boolean giveFocus) {
+   public void setSelectedIndex(int index, ExecutionContextCanvasGui ec, boolean giveFocus) {
       //acquire write lock
       int colAbs = getAbsColFromIndex(index);
       int rowAbs = getAbsRowFromIndex(index);
-      selectionMove(ic, colAbs, rowAbs, giveFocus);
+      selectionMove(ec, colAbs, rowAbs, giveFocus);
       //release lock
    }
 
@@ -4304,7 +4314,7 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
             structStyle = modelCol.styles[colAbs].mergeByteObject(modelRow.styles[rowAbs]);
          }
       }
-      d.setStructStyle(structStyle);
+      d.setStyleStruct(structStyle);
    }
 
    public void setStyleClass(StyleClass sc) {
@@ -4674,9 +4684,9 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
          size = getGeneticSize(isRow);
       } else {
          //
-         if(policy.hasFlag(CELLP_OFFSET_04_FLAGZ, CELLP_FLAGZ_8_SIZER)) {
+         if (policy.hasFlag(CELLP_OFFSET_04_FLAGZ, CELLP_FLAGZ_8_SIZER)) {
             ByteObject sizer = policy.getSubFirst(IBOTypesLayout.FTYPE_3_SIZER);
-            if(isRow) {
+            if (isRow) {
                size = gc.getLAC().getLayoutOperator().getPixelSizeH(sizer, this);
             } else {
                size = gc.getLAC().getLayoutOperator().getPixelSizeW(sizer, this);
@@ -4685,6 +4695,7 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
       }
       return size;
    }
+
    private void setupTypeGeneric(boolean isRow, CellModel cm, int totalSize, int sepSize) {
       ByteObject policy = cm.policy;
       int[] setupSizes = new int[cm.numCells];

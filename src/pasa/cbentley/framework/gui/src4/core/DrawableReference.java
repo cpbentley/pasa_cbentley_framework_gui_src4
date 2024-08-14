@@ -4,8 +4,8 @@ import pasa.cbentley.core.src4.ctx.UCtx;
 import pasa.cbentley.core.src4.logging.Dctx;
 import pasa.cbentley.core.src4.logging.IDLog;
 import pasa.cbentley.core.src4.logging.IStringable;
-import pasa.cbentley.framework.gui.src4.canvas.InputConfig;
 import pasa.cbentley.framework.gui.src4.ctx.GuiCtx;
+import pasa.cbentley.framework.gui.src4.exec.ExecutionContextCanvasGui;
 
 /**
  * Encapsulates a possibly null reference to a {@link Drawable}
@@ -39,15 +39,15 @@ public class DrawableReference implements IStringable {
       return drawable != null;
    }
 
-   public void showDrawable(InputConfig ic) {
+   public void showDrawable(ExecutionContextCanvasGui ec) {
       if (drawable != null) {
-         drawable.shShowDrawableOver(ic);
+         drawable.shShowDrawableOver(ec);
       }
    }
 
-   public void closeDrawable(InputConfig ic) {
+   public void closeDrawable(ExecutionContextCanvasGui ec) {
       if (drawable != null) {
-         drawable.shHideDrawable(ic);
+         drawable.shHideDrawable(ec);
       }
    }
 

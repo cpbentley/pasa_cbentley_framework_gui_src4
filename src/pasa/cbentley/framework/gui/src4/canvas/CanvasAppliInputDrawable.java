@@ -5,20 +5,24 @@ import pasa.cbentley.framework.cmd.src4.engine.CmdInstance;
 import pasa.cbentley.framework.cmd.src4.engine.CmdNode;
 import pasa.cbentley.framework.cmd.src4.engine.MCmd;
 import pasa.cbentley.framework.cmd.src4.interfaces.ICmdListener;
+import pasa.cbentley.framework.core.ui.src4.utils.ViewState;
 import pasa.cbentley.framework.coredraw.src4.interfaces.IGraphics;
-import pasa.cbentley.framework.coreui.src4.utils.ViewState;
 import pasa.cbentley.framework.drawx.src4.engine.GraphicsX;
 import pasa.cbentley.framework.drawx.src4.engine.RgbImage;
-import pasa.cbentley.framework.gui.src4.cmd.CmdInstanceDrawable;
+import pasa.cbentley.framework.gui.src4.cmd.CmdInstanceGui;
 import pasa.cbentley.framework.gui.src4.core.Drawable;
 import pasa.cbentley.framework.gui.src4.core.StyleClass;
 import pasa.cbentley.framework.gui.src4.ctx.CanvasGuiCtx;
 import pasa.cbentley.framework.gui.src4.ctx.GuiCtx;
+import pasa.cbentley.framework.gui.src4.exec.ExecutionContextCanvasGui;
+import pasa.cbentley.framework.gui.src4.exec.InputStateCanvasGui;
+import pasa.cbentley.framework.gui.src4.exec.OutputStateCanvasGui;
 import pasa.cbentley.framework.gui.src4.interfaces.IAnimable;
 import pasa.cbentley.framework.gui.src4.interfaces.IDrawable;
-import pasa.cbentley.framework.input.src4.CanvasAppliInput;
-import pasa.cbentley.framework.input.src4.InputState;
-import pasa.cbentley.framework.input.src4.CanvasResult;
+import pasa.cbentley.framework.input.src4.engine.CanvasAppliInput;
+import pasa.cbentley.framework.input.src4.engine.ExecutionContextCanvas;
+import pasa.cbentley.framework.input.src4.engine.OutputStateCanvas;
+import pasa.cbentley.framework.input.src4.engine.InputStateCanvas;
 
 /**
  * Drawable to be used inside another {@link CanvasAppliInputGui}.
@@ -61,7 +65,7 @@ public abstract class CanvasAppliInputDrawable extends CanvasAppliInput implemen
 
    }
 
-   public void commandAction(CmdInstanceDrawable cd) {
+   public void commandAction(CmdInstanceGui cd) {
       // TODO Auto-generated method stub
 
    }
@@ -235,17 +239,17 @@ public abstract class CanvasAppliInputDrawable extends CanvasAppliInput implemen
 
    }
 
-   public void manageInput(InputConfig ic) {
+   public void manageInput(ExecutionContextCanvasGui ec) {
    }
 
-   public void manageKeyInput(InputConfig ic) {
+   public void manageKeyInput(ExecutionContextCanvasGui ec) {
 
    }
 
-   public void managePointerInput(InputConfig ic) {
+   public void managePointerInput(ExecutionContextCanvasGui ec) {
    }
 
-   public void managePointerStateStyle(InputConfig ic) {
+   public void managePointerStateStyle(ExecutionContextCanvasGui ec) {
       // TODO Auto-generated method stub
 
    }
@@ -263,11 +267,11 @@ public abstract class CanvasAppliInputDrawable extends CanvasAppliInput implemen
    /**
     * 
     */
-   protected void render(IGraphics g, InputState is, CanvasResult sr) {
+   public void render(IGraphics g, ExecutionContextCanvas ec, InputStateCanvas is, OutputStateCanvas sr) {
       //#debug
       toDLog().pDraw("Clip " + "[" + g.getClipX() + "," + g.getClipY() + " " + g.getClipWidth() + "," + g.getClipHeight() + "]", null, CanvasAppliInput.class, "render");
 
-      CanvasResultDrawable renderCause = (CanvasResultDrawable) sr;
+      OutputStateCanvasGui renderCause = (OutputStateCanvasGui) sr;
       //clean clip sequence since this is a new paint job
       super.paintStart();
       //create new GraphicsXDrawable context
@@ -284,7 +288,7 @@ public abstract class CanvasAppliInputDrawable extends CanvasAppliInput implemen
          destGraphicsX.reset(g);
       }
       destGraphicsX.screenResultCause = renderCause;
-      destGraphicsX.isd = (InputStateDrawable) is;
+      destGraphicsX.isd = (InputStateCanvasGui) is;
 
       draw(destGraphicsX);
    }
@@ -332,7 +336,7 @@ public abstract class CanvasAppliInputDrawable extends CanvasAppliInput implemen
 
    }
 
-   public void setStructStyle(ByteObject style) {
+   public void setStyleStruct(ByteObject style) {
       // TODO Auto-generated method stub
 
    }

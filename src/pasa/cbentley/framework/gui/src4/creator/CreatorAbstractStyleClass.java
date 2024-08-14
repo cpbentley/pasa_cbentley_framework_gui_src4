@@ -25,6 +25,14 @@ public abstract class CreatorAbstractStyleClass extends CreatorAbstract {
       creatorView = createCreatorView();
    }
 
+   public void setCreatorScrollbar(CreatorAbstractScrollbar creator) {
+      this.creatorScrollbar = creator;
+   }
+
+   public void setCreatorView(CreatorAbstractView creator) {
+      this.creatorView = creator;
+   }
+
    protected abstract CreatorAbstractScrollbar createCreatorScrollbar();
 
    protected abstract CreatorAbstractString createCreatorString();

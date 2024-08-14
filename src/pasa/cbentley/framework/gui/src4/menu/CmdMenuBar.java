@@ -10,9 +10,10 @@ import pasa.cbentley.framework.cmd.src4.engine.CmdInstance;
 import pasa.cbentley.framework.cmd.src4.engine.MCmd;
 import pasa.cbentley.framework.cmd.src4.interfaces.ICommandable;
 import pasa.cbentley.framework.cmd.src4.interfaces.IEventCmds;
-import pasa.cbentley.framework.coreui.src4.interfaces.IActionFeedback;
-import pasa.cbentley.framework.coreui.src4.tech.ITechCodes;
-import pasa.cbentley.framework.coreui.src4.tech.IInput;
+import pasa.cbentley.framework.cmd.src4.interfaces.ITechCmd;
+import pasa.cbentley.framework.core.ui.src4.interfaces.IActionFeedback;
+import pasa.cbentley.framework.core.ui.src4.tech.IInput;
+import pasa.cbentley.framework.core.ui.src4.tech.ITechCodes;
 import pasa.cbentley.framework.datamodel.src4.table.ObjectTableModel;
 import pasa.cbentley.framework.gui.src4.canvas.FocusCtrl;
 import pasa.cbentley.framework.gui.src4.canvas.InputConfig;
@@ -20,9 +21,12 @@ import pasa.cbentley.framework.gui.src4.core.Drawable;
 import pasa.cbentley.framework.gui.src4.core.LayouterEngineDrawable;
 import pasa.cbentley.framework.gui.src4.core.StyleClass;
 import pasa.cbentley.framework.gui.src4.ctx.GuiCtx;
+import pasa.cbentley.framework.gui.src4.exec.ExecutionContextCanvasGui;
+import pasa.cbentley.framework.gui.src4.exec.InputStateCanvasGui;
+import pasa.cbentley.framework.gui.src4.exec.OutputStateCanvasGui;
 import pasa.cbentley.framework.gui.src4.factories.TablePolicyFactory;
 import pasa.cbentley.framework.gui.src4.interfaces.ITechCanvasDrawable;
-import pasa.cbentley.framework.gui.src4.interfaces.ICmdsView;
+import pasa.cbentley.framework.gui.src4.interfaces.ICmdsGui;
 import pasa.cbentley.framework.gui.src4.interfaces.IDrawable;
 import pasa.cbentley.framework.gui.src4.interfaces.ITechDrawable;
 import pasa.cbentley.framework.gui.src4.string.StringDrawable;
@@ -86,7 +90,7 @@ import pasa.cbentley.framework.gui.src4.utils.DrawableUtilz;
  * @author Charles-Philip Bentley
  * @see TableView
  */
-public class CmdMenuBar extends TableView implements IEventConsumer, ICmdsView {
+public class CmdMenuBar extends TableView implements IEventConsumer, ICmdsGui {
 
    //inner link values
    public static final int    LINK_CHILD_1LEFT_STYLE   = 1;
@@ -278,10 +282,10 @@ public class CmdMenuBar extends TableView implements IEventConsumer, ICmdsView {
     * @param ic
     * @param otm
     */
-   private void changeMenuModel(InputConfig ic, ObjectTableModel otm) {
+   private void changeMenuModel(ExecutionContextCanvasGui ec, ObjectTableModel otm) {
       if (otm != null && cmdModelActive != otm) {
          setActiveMenuModel(otm);
-         ic.srMenuRepaint();
+         ec.getOutputStateCanvasGui().srMenuRepaint();
       }
    }
 
@@ -313,8 +317,8 @@ public class CmdMenuBar extends TableView implements IEventConsumer, ICmdsView {
             if (focusCount != fc.getKeyFocusCount()) {
                itemKeyFocusBackUp = fc.getItemInKeyFocus();
             }
-            InputConfig ic = (InputConfig) e.getParamO2();
-            hideAndGoState0(ic);
+            ExecutionContextCanvasGui ec = (ExecutionContextCanvasGui) e.getParamO2();
+            hideAndGoState0(ec);
             e.setFlag(BusEvent.FLAG_1_ACTED, true);
          }
       } else if (e.getEventID() == IEventCmds.PID_01_CMD_01_LABEL_CHANGE) {
@@ -381,7 +385,7 @@ public class CmdMenuBar extends TableView implements IEventConsumer, ICmdsView {
          toDLog().pCmd("executing", cmd, CmdMenuBar.class, "executeSelectedCmd", LVL_05_FINE, true);
          //execute menu command within the right Feedback
 
-         gc.getViewCommandListener().executeMenuCmd(cmd);
+         gc.getCmdProcessorGui().executeMenuCmd(cmd);
       } else {
          //#debug
          toDLog().pCmd("No Command Model Active", this, CmdMenuBar.class, "executeSelectedCmd", LVL_05_FINE, true);
@@ -441,29 +445,30 @@ public class CmdMenuBar extends TableView implements IEventConsumer, ICmdsView {
     * <br>
     * @param ic
     */
-   private void hideAndGoState0(InputConfig ic) {
+   private void hideAndGoState0(ExecutionContextCanvasGui ec) {
       //TODO give focus to saved focus
 
-      cmdTableView.removeDrawable(ic, itemKeyFocusBackUp);
-      ic.srActionDoneRepaint(this);
+      cmdTableView.removeDrawable(ec, itemKeyFocusBackUp);
+      ec.srActionDoneRepaint(this);
       setState0Strings();
       setState(MENU_STATE_0_NONE);
    }
 
-   private void icRelease(InputConfig ic) {
-      if (ic.is.getKeyCode() == ITechCodes.KEY_MENU_LEFT) {
+   private void icRelease(ExecutionContextCanvasGui ec) {
+      InputStateCanvasGui is = ec.getInputStateDrawable();
+      if (is.getKeyCode() == ITechCodes.KEY_MENU_LEFT) {
          mLeft.setStateStyle(ITechDrawable.STYLE_08_PRESSED, false);
          //send a menu repaint
-         ic.srActionDoneRepaint(mLeft);
-      } else if (ic.is.getKeyCode() == ITechCodes.KEY_MENU_RIGHT) {
+         ec.srActionDoneRepaint(mLeft);
+      } else if (is.getKeyCode() == ITechCodes.KEY_MENU_RIGHT) {
          mRight.setStateStyle(ITechDrawable.STYLE_08_PRESSED, false);
          //send a menu repaint
-         ic.srActionDoneRepaint(mRight);
-      } else if (ic.is.getKeyCode() == ITechCodes.KEY_FIRE) {
+         ec.srActionDoneRepaint(mRight);
+      } else if (is.getKeyCode() == ITechCodes.KEY_FIRE) {
          if (mMiddle.hasStateStyle(ITechDrawable.STYLE_08_PRESSED)) {
             mMiddle.setStateStyle(ITechDrawable.STYLE_08_PRESSED, false);
             //send a menu repaint
-            ic.srActionDoneRepaint(mMiddle);
+            ec.srActionDoneRepaint(mMiddle);
          }
       }
    }
@@ -572,12 +577,12 @@ public class CmdMenuBar extends TableView implements IEventConsumer, ICmdsView {
       }
    }
 
-   private boolean isInterCept(InputConfig ic) {
+   private boolean isInterCept(ExecutionContextCanvasGui ec) {
       boolean doIt = false;
       //only check interceptions when in state
       if (state != MENU_STATE_0_NONE) {
-         if (!DrawableUtilz.isInside(ic, this) && (cmdTableView != null && !cmdTableView.hasState(ITechDrawable.STATE_03_HIDDEN))) {
-            if (!DrawableUtilz.isInside(ic, cmdTableView)) {
+         if (!DrawableUtilz.isInside(ec, this) && (cmdTableView != null && !cmdTableView.hasState(ITechDrawable.STATE_03_HIDDEN))) {
+            if (!DrawableUtilz.isInside(ec, cmdTableView)) {
                doIt = true;
             }
          }
@@ -626,9 +631,10 @@ public class CmdMenuBar extends TableView implements IEventConsumer, ICmdsView {
     * <br>
     * Menu Actions on Key Release with visual feedback on Key Press.
     */
-   public void manageKeyInput(InputConfig ic) {
-      if (ic.is.getMode() == IInput.MOD_1_RELEASED) {
-         icRelease(ic);
+   public void manageKeyInput(ExecutionContextCanvasGui ec) {
+      InputConfig ic = ec.getInputConfig();
+      if (ic.getInputStateDrawable().getMode() == IInput.MOD_1_RELEASED) {
+         icRelease(ec);
       } else {
          if (ic.isCancel() && state != MENU_STATE_0_NONE) {
             setState(MENU_STATE_0_NONE);
@@ -639,35 +645,35 @@ public class CmdMenuBar extends TableView implements IEventConsumer, ICmdsView {
             if (isOnDemand() && this.hasState(ITechDrawable.STATE_03_HIDDEN)) {
                //make the menu bar visible 
             }
-            menuActionOnModel(ic, mLeft);
+            menuActionOnModel(ec, mLeft);
             //mLeft.setStateStyle(IDrawable.STYLE_08_PRESSED, true);
             //ic.setActionDoneRepaint(mLeft);
          }
          if (ic.isSoftRightP()) {
             //show Right menu
-            menuActionOnModel(ic, mRight);
+            menuActionOnModel(ec, mRight);
             //mRight.setStateStyle(IDrawable.STYLE_08_PRESSED, true);
             //ic.setActionDoneRepaint(mRight);
          }
          if (ic.isFireP()) {
-            menuActionOnModel(ic, mMiddle);
+            menuActionOnModel(ec, mMiddle);
          }
 
          //when modifiers key are kept pressed, modifies the base Model content. with ctx specifics
          if (ic.isKeyTypedAlone(ITechCodes.KEY_STAR)) {
             //modifies 3 to show 3 starred menu cmds. modifies active model
             if (modeMenu == MODE_MENU_1_STAR) {
-               changeMenuModel(ic, cmdModelDefault);
+               changeMenuModel(ec, cmdModelDefault);
             } else {
-               changeMenuModel(ic, cmdModelStar);
+               changeMenuModel(ec, cmdModelStar);
             }
          }
          if (ic.isKeyTypedAlone(ITechCodes.KEY_POUND)) {
             //modifies 3 to show 3 starred menu cmds. modifies active model
             if (modeMenu == MODE_MENU_2_POUND) {
-               changeMenuModel(ic, cmdModelDefault);
+               changeMenuModel(ec, cmdModelDefault);
             } else {
-               changeMenuModel(ic, cmdModelPound);
+               changeMenuModel(ec, cmdModelPound);
             }
          }
       }
@@ -677,19 +683,20 @@ public class CmdMenuBar extends TableView implements IEventConsumer, ICmdsView {
    /**
     * Interceptor was removed.
     * <li> register for a pointer press context change and link it to this command
-    * {@link ICmdsView#CTX_CAT_1_POINTER_PRESSED}
+    * {@link ITechCmd#CTX_CAT_1_POINTER_PRESSED}
     * <li> register for a pointer press in any context.. less safe because
     * we can change context without using a pointer press
     * @param ic
     */
-   private void cmdCloseMenuTable(InputConfig ic) {
+   private void cmdCloseMenuTable(ExecutionContextCanvasGui ec) {
       //call routine to close menu and 
-      cmdTableView.removeDrawable(ic, null);
+      cmdTableView.removeDrawable(ec, null);
       setState0Strings();
       setState(MENU_STATE_0_NONE);
-      ic.srActionDoneRepaint(this);
-      ic.srActionDoneRepaint(cmdTableView);
-      ic.sr.setFlag(IActionFeedback.FLAG_01_ACTION_DONE, false);
+      OutputStateCanvasGui os = ec.getCanvasResultDrawable();
+      os.setActionDoneRepaint(this);
+      os.setActionDoneRepaint(cmdTableView);
+      os.setFlag(IActionFeedback.FLAG_01_ACTION_DONE, false);
       //remove interceptor
       this.getCanvas().getVCRoot().getTopo().removeInterceptor(this);
    }
@@ -702,17 +709,20 @@ public class CmdMenuBar extends TableView implements IEventConsumer, ICmdsView {
     * <br>
     * 
     */
-   protected void managePointerInputSlaveCell(InputConfig ic, IDrawable slave) {
+   protected void managePointerInputSlaveCell(ExecutionContextCanvasGui ec, IDrawable slave) {
       //#debug
       toDLog().pFlow("", slave, CmdMenuBar.class, "managePointerInputSlaveCell", LVL_05_FINE, true);
+      InputConfig ic = ec.getInputConfig();
+      InputStateCanvasGui is = ec.getInputStateDrawable();
       if (ic.isReleased()) {
-         if (slave == mLeft && ic.isInside(mLeft)) {
-            menuActionOnModel(ic, mLeft);
-         } else if (slave == mRight && ic.isInside(mRight)) {
-            menuActionOnModel(ic, mRight);
+         if (slave == mLeft && is.isInside(mLeft)) {
+            
+            menuActionOnModel(ec, mLeft);
+         } else if (slave == mRight && is.isInside(mRight)) {
+            menuActionOnModel(ec, mRight);
          }
       }
-      super.managePointerInputSlaveCell(ic, slave);
+      super.managePointerInputSlaveCell(ec, slave);
    }
 
    /**
@@ -725,18 +735,18 @@ public class CmdMenuBar extends TableView implements IEventConsumer, ICmdsView {
     * @param w
     * @param index
     */
-   private void menuActionOnModel(InputConfig ic, Drawable w) {
+   private void menuActionOnModel(ExecutionContextCanvasGui ec, Drawable w) {
       if (w == mLeft) {
          if (state == MENU_STATE_0_NONE) {
-            state0LeftActionShowMenu(ic);
+            state0LeftActionShowMenu(ec);
          } else if (state == MENU_STATE_1_LEFT) {
-            state1LeftActionSelect(ic);
+            state1LeftActionSelect(ec);
          }
       } else if (w == mRight) {
          if (state == MENU_STATE_0_NONE) {
-            state0RightActionExecCmd(ic);
+            state0RightActionExecCmd(ec);
          } else if (state == MENU_STATE_1_LEFT) {
-            state1RightActionCancelMenu(ic);
+            state1RightActionCancelMenu(ec);
          }
       }
    }
@@ -922,15 +932,16 @@ public class CmdMenuBar extends TableView implements IEventConsumer, ICmdsView {
       setState0Strings();
    }
 
-   public void showCtxMenu(InputConfig ic) {
+   public void showCtxMenu(ExecutionContextCanvasGui ec) {
       if (cmdTableView != null) {
          initSizeSubMenuTable();
       }
-      int x = ic.is.getX();
-      int y = ic.is.getY();
+      InputStateCanvasGui is = ec.getInputStateDrawable();
+      int x = is.getX();
+      int y = is.getY();
 
       cmdTableView.setXY(x, y);
-      showSubMenuTable(ic);
+      showSubMenuTable(ec);
    }
 
    /**
@@ -946,17 +957,20 @@ public class CmdMenuBar extends TableView implements IEventConsumer, ICmdsView {
     * <br> 
     * @param ic
     */
-   protected void showSubMenuTable(InputConfig ic) {
-      cmdTableView.shShowDrawable(ic, ITechCanvasDrawable.SHOW_TYPE_1_OVER_TOP);
+   protected void showSubMenuTable(ExecutionContextCanvasGui ec) {
+
+      cmdTableView.shShowDrawable(ec, ITechCanvasDrawable.SHOW_TYPE_1_OVER_TOP);
       //registers as an event interceptor
       this.getCanvas().getVCRoot().getTopo().addInterceptor(this);
 
       //previous focus
       itemKeyFocusBackUp = gc.getFocusCtrl().getItemInKeyFocus();
       //give focus control
-      gc.getFocusCtrl().newFocusKey(ic, cmdTableView);
-      ic.srActionDoneRepaint(cmdTableView);
-      ic.srActionDoneRepaint(this);
+      gc.getFocusCtrl().newFocusKey(ec, cmdTableView);
+
+      OutputStateCanvasGui os = ec.getCanvasResultDrawable();
+      os.setActionDoneRepaint(cmdTableView);
+      os.setActionDoneRepaint(this);
       setState(MENU_STATE_1_LEFT);
       setStrings(getLabelSelect(), null, getLabelCancel());
    }
@@ -969,7 +983,7 @@ public class CmdMenuBar extends TableView implements IEventConsumer, ICmdsView {
     * <br>
     * @param ic
     */
-   private void state0LeftActionShowMenu(InputConfig ic) {
+   private void state0LeftActionShowMenu(ExecutionContextCanvasGui ec) {
       if (cmdTableView == null) {
          initSubMenuTable();
          initSizeSubMenuTable();
@@ -980,7 +994,7 @@ public class CmdMenuBar extends TableView implements IEventConsumer, ICmdsView {
       }
       initSubMenuTablePosition();
 
-      showSubMenuTable(ic);
+      showSubMenuTable(ec);
    }
 
    /**
@@ -989,33 +1003,29 @@ public class CmdMenuBar extends TableView implements IEventConsumer, ICmdsView {
     * <br>
     * @param ic
     */
-   private void state0RightActionExecCmd(InputConfig ic) {
+   private void state0RightActionExecCmd(ExecutionContextCanvasGui ec) {
       MCmd cmd = (MCmd) cmdModelActive.getObject(0);
       if (topPriorityCmd != null) {
          cmd = topPriorityCmd;
       }
-      gc.getViewCommandListener().executeMenuCmd(cmd);
+      gc.getCmdProcessorGui().executeMenuCmd(cmd);
    }
 
-   //#enddebug
 
    /**
     * 
     * @param ic
     */
-   private void state1LeftActionSelect(InputConfig ic) {
+   private void state1LeftActionSelect(ExecutionContextCanvasGui ec) {
       executeSelectedCmd();
-      hideAndGoState0(ic);
+      hideAndGoState0(ec);
    }
 
-   private void state1RightActionCancelMenu(InputConfig ic) {
-      hideAndGoState0(ic);
+   private void state1RightActionCancelMenu(ExecutionContextCanvasGui ec) {
+      hideAndGoState0(ec);
    }
 
    //#mdebug
-   public String toString() {
-      return Dctx.toString(this);
-   }
 
    public void toString(Dctx dc) {
       dc.root(this, CmdMenuBar.class,1023);
@@ -1026,9 +1036,6 @@ public class CmdMenuBar extends TableView implements IEventConsumer, ICmdsView {
       dc.nlLvl("Menus TableView with Model", cmdTableView);
    }
 
-   public String toString1Line() {
-      return Dctx.toString1Line(this);
-   }
 
    public void toString1Line(Dctx dc) {
       dc.root(this, CmdMenuBar.class);

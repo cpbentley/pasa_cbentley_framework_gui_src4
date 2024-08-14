@@ -5,23 +5,20 @@ import pasa.cbentley.framework.cmd.src4.engine.CmdInstance;
 import pasa.cbentley.framework.cmd.src4.engine.CmdNode;
 import pasa.cbentley.framework.cmd.src4.engine.MCmd;
 import pasa.cbentley.framework.cmd.src4.interfaces.ICmdListener;
-import pasa.cbentley.framework.coredraw.src4.interfaces.IGraphics;
-import pasa.cbentley.framework.coreui.src4.event.BEvent;
-import pasa.cbentley.framework.coreui.src4.utils.ViewState;
+import pasa.cbentley.framework.core.ui.src4.event.BEvent;
+import pasa.cbentley.framework.core.ui.src4.utils.ViewState;
 import pasa.cbentley.framework.drawx.src4.engine.GraphicsX;
 import pasa.cbentley.framework.drawx.src4.engine.RgbImage;
-import pasa.cbentley.framework.gui.src4.cmd.CmdInstanceDrawable;
+import pasa.cbentley.framework.gui.src4.cmd.CmdInstanceGui;
 import pasa.cbentley.framework.gui.src4.core.Drawable;
 import pasa.cbentley.framework.gui.src4.core.StyleClass;
 import pasa.cbentley.framework.gui.src4.ctx.CanvasGuiCtx;
-import pasa.cbentley.framework.gui.src4.ctx.GuiCtx;
 import pasa.cbentley.framework.gui.src4.ctx.ObjectGC;
+import pasa.cbentley.framework.gui.src4.exec.ExecutionContextCanvasGui;
 import pasa.cbentley.framework.gui.src4.interfaces.IAnimable;
 import pasa.cbentley.framework.gui.src4.interfaces.IDrawable;
 import pasa.cbentley.framework.gui.src4.interfaces.ITechDrawable;
-import pasa.cbentley.framework.input.src4.CanvasAppliInput;
-import pasa.cbentley.framework.input.src4.InputState;
-import pasa.cbentley.framework.input.src4.CanvasResult;
+import pasa.cbentley.framework.input.src4.engine.CanvasAppliInput;
 
 /**
  * Drawable to be used inside another {@link CanvasAppliInputGui}.
@@ -70,7 +67,7 @@ public abstract class CanvasDrawable2 extends ObjectGC implements IDrawable {
 
    }
 
-   public void commandAction(CmdInstanceDrawable cd) {
+   public void commandAction(CmdInstanceGui cd) {
       // TODO Auto-generated method stub
 
    }
@@ -243,25 +240,25 @@ public abstract class CanvasDrawable2 extends ObjectGC implements IDrawable {
 
    }
 
-   public void manageInput(InputConfig ic) {
-      generateEvent(ic);
+   public void manageInput(ExecutionContextCanvasGui ec) {
+      generateEvent(ec);
    }
    
-   protected void generateEvent(InputConfig ic) {
-      BEvent eventCurrent = ic.getInputState().getEventCurrent();
+   protected void generateEvent(ExecutionContextCanvasGui ec) {
+      BEvent eventCurrent = ec.getInputState().getEventCurrent();
       canvas.event(eventCurrent);
    }
 
-   public void manageKeyInput(InputConfig ic) {
-      generateEvent(ic);
+   public void manageKeyInput(ExecutionContextCanvasGui ec) {
+      generateEvent(ec);
 
    }
 
-   public void managePointerInput(InputConfig ic) {
-      generateEvent(ic);
+   public void managePointerInput(ExecutionContextCanvasGui ec) {
+      generateEvent(ec);
    }
 
-   public void managePointerStateStyle(InputConfig ic) {
+   public void managePointerStateStyle(ExecutionContextCanvasGui ec) {
       // TODO Auto-generated method stub
 
    }
@@ -328,7 +325,7 @@ public abstract class CanvasDrawable2 extends ObjectGC implements IDrawable {
 
    }
 
-   public void setStructStyle(ByteObject style) {
+   public void setStyleStruct(ByteObject style) {
       // TODO Auto-generated method stub
 
    }

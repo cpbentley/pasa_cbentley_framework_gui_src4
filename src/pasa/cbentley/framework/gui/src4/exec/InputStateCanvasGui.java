@@ -1,14 +1,15 @@
-package pasa.cbentley.framework.gui.src4.canvas;
+package pasa.cbentley.framework.gui.src4.exec;
 
-import pasa.cbentley.core.src4.ctx.UCtx;
 import pasa.cbentley.core.src4.logging.Dctx;
-import pasa.cbentley.core.src4.logging.IDLog;
 import pasa.cbentley.framework.cmd.src4.trigger.CmdTrigger;
+import pasa.cbentley.framework.core.ui.src4.input.InputState;
+import pasa.cbentley.framework.gui.src4.canvas.CanvasAppliInputGui;
 import pasa.cbentley.framework.gui.src4.ctx.GuiCtx;
 import pasa.cbentley.framework.gui.src4.interfaces.IDrawable;
 import pasa.cbentley.framework.gui.src4.utils.DrawableArrays;
-import pasa.cbentley.framework.input.src4.CanvasAppliInput;
-import pasa.cbentley.framework.input.src4.InputState;
+import pasa.cbentley.framework.gui.src4.utils.DrawableUtilz;
+import pasa.cbentley.framework.input.src4.engine.CanvasAppliInput;
+import pasa.cbentley.framework.input.src4.engine.InputStateCanvas;
 import pasa.cbentley.framework.input.src4.gesture.GestureDetector;
 
 /**
@@ -22,11 +23,13 @@ import pasa.cbentley.framework.input.src4.gesture.GestureDetector;
  * @author Charles Bentley
  *
  */
-public class InputStateDrawable extends InputState {
+public class InputStateCanvasGui extends InputStateCanvas {
 
    protected final GuiCtx gc;
+   
+   protected CanvasAppliInputGui canvasGui;
 
-   public InputStateDrawable(GuiCtx gc, CanvasAppliInputGui mc) {
+   public InputStateCanvasGui(GuiCtx gc, CanvasAppliInputGui mc) {
       super(gc.getIC(), mc);
       this.gc = gc;
    }
@@ -52,6 +55,10 @@ public class InputStateDrawable extends InputState {
          gesturesD[i] = null;
          gestures[i] = null;
       }
+   }
+
+   public boolean isInside(IDrawable d) {
+      return DrawableUtilz.isInside(this, d);
    }
 
    /**
@@ -95,7 +102,7 @@ public class InputStateDrawable extends InputState {
          gestures = ds;
          index = gestures.length - 1;
       }
-      gestures[index] = new GestureDetector(gc.getIC(), canvasLast);
+      gestures[index] = new GestureDetector(gc.getIC(), (CanvasAppliInputGui)eventCanvas);
       gesturesD[index] = d;
       return gestures[index];
    }
@@ -117,7 +124,7 @@ public class InputStateDrawable extends InputState {
 
    //#mdebug
    public void toString(Dctx dc) {
-      dc.root(this, InputStateDrawable.class);
+      dc.root(this, InputStateCanvasGui.class);
       toStringPrivate(dc);
       super.toString(dc.sup());
    }
@@ -127,7 +134,7 @@ public class InputStateDrawable extends InputState {
    }
 
    public void toString1Line(Dctx dc) {
-      dc.root1Line(this, InputStateDrawable.class);
+      dc.root1Line(this, InputStateCanvasGui.class);
       toStringPrivate(dc);
       super.toString1Line(dc.sup1Line());
    }

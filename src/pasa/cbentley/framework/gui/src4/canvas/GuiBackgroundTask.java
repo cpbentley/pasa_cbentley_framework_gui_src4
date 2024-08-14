@@ -9,9 +9,9 @@ public abstract class GuiBackgroundTask extends AbstractBRunnable implements Run
 
    protected final GuiCtx         gc;
 
-   protected final RepaintCtrlGui ctrl;
+   protected final RepaintHelperGui ctrl;
 
-   public GuiBackgroundTask(GuiCtx gc, RepaintCtrlGui ctrl) {
+   public GuiBackgroundTask(GuiCtx gc, RepaintHelperGui ctrl) {
       super(gc.getUC());
       this.gc = gc;
       this.ctrl = ctrl;

@@ -9,10 +9,10 @@ import pasa.cbentley.core.src4.thread.ITechRunnable;
 import pasa.cbentley.core.src4.utils.BitUtils;
 import pasa.cbentley.framework.cmd.src4.ctx.CmdCtx;
 import pasa.cbentley.framework.cmd.src4.engine.CmdNode;
-import pasa.cbentley.framework.gui.src4.canvas.InputConfig;
 import pasa.cbentley.framework.gui.src4.core.StyleClass;
 import pasa.cbentley.framework.gui.src4.ctx.GuiCtx;
-import pasa.cbentley.framework.gui.src4.interfaces.ICmdsView;
+import pasa.cbentley.framework.gui.src4.exec.ExecutionContextCanvasGui;
+import pasa.cbentley.framework.gui.src4.interfaces.ICmdsGui;
 import pasa.cbentley.framework.gui.src4.string.StringDrawable;
 import pasa.cbentley.framework.gui.src4.table.TableLayoutView;
 import pasa.cbentley.framework.gui.src4.tech.ITechStringDrawable;
@@ -53,8 +53,8 @@ public class GaugeScreenS extends TableLayoutView implements IBProgessable {
 
       CmdCtx cc = gc.getCC();
       CmdNode ctx = cc.createCmdNode("gauge");
-      ctx.addMenuCmd(ICmdsView.CMD_05_CANCEL);
-      ctx.addMenuCmd(ICmdsView.VCMD_13_HIDE);
+      ctx.addMenuCmd(ICmdsGui.CMD_05_CANCEL);
+      ctx.addMenuCmd(ICmdsGui.VCMD_13_HIDE);
 
       setCmdNote(ctx);
    }
@@ -63,7 +63,7 @@ public class GaugeScreenS extends TableLayoutView implements IBProgessable {
     * 
     * @see mordan.kernel.interfaces.IMProgessable#close()
     */
-   public void close(InputConfig ic) {
+   public void close(ExecutionContextCanvasGui ec) {
       // the method might have been called accidently while no gaugescreen is visible.
       //makes sure the current displayable is the gaugescreen
       if (opened > 0) {
@@ -72,7 +72,7 @@ public class GaugeScreenS extends TableLayoutView implements IBProgessable {
          gauge.setLabel("");
          info.setStringNoUpdate("");
          //hide it
-         this.shHideDrawable(ic);
+         this.shHideDrawable(ec);
       }
    }
 
@@ -261,28 +261,28 @@ public class GaugeScreenS extends TableLayoutView implements IBProgessable {
     * Open it
     * @see mordan.kernel.interfaces.IMProgessable#open()
     */
-   public void open(InputConfig ic) {
+   public void open(ExecutionContextCanvasGui ec) {
       opened++;
       if (opened == 1) {
          //only do it, if not already opened
-         this.shShowDrawableOver(ic);
+         this.shShowDrawableOver(ec);
       }
    }
 
-   public void open(InputConfig ic, int options) {
+   public void open(ExecutionContextCanvasGui ec, int options) {
       CmdCtx cc = gc.getCC();
       CmdNode ctx = getCmdNode();
       if (BitUtils.isSet(options, ITechRunnable.FLAG_04_CANCELABLE)) {
-         ctx.addMenuCmd(ICmdsView.CMD_05_CANCEL);
+         ctx.addMenuCmd(ICmdsGui.CMD_05_CANCEL);
       } else {
-         ctx.removeMenuCmd(ICmdsView.CMD_05_CANCEL);
+         ctx.removeMenuCmd(ICmdsGui.CMD_05_CANCEL);
       }
       if (BitUtils.isSet(options, ITechRunnable.FLAG_05_UI_HIDABLE)) {
-         ctx.addMenuCmd(ICmdsView.VCMD_13_HIDE);
+         ctx.addMenuCmd(ICmdsGui.VCMD_13_HIDE);
       } else {
-         ctx.removeMenuCmd(ICmdsView.VCMD_13_HIDE);
+         ctx.removeMenuCmd(ICmdsGui.VCMD_13_HIDE);
       }
-      this.open(ic);
+      this.open(ec);
    }
 
    public void setCancelRunnable(Runnable run) {

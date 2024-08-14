@@ -99,11 +99,11 @@ public class CreatorStyleClassSimple extends CreatorAbstractStyleClass {
 
       ByteObject styleSelected = creatorStyle.getStyleSelected();
       sc.linkStateStyle(styleSelected, ITechDrawable.STYLE_05_SELECTED);
-      
+
       StyleClass scVp = getStyleClassViewPane();
       sc.linkStyleClass(scVp, ITechLinks.LINK_65_STYLE_VIEWPANE);
       populateStyleClassViewPane(scVp);
-      
+
       return sc;
    }
 
@@ -123,11 +123,57 @@ public class CreatorStyleClassSimple extends CreatorAbstractStyleClass {
       return sc;
    }
 
+   public StyleClass getStyleClassTextNoPreset() {
+      ByteObject style = creatorStyle.getStyleTextReaderH();
+      StyleClass sc = new StyleClass(gc, style);
+
+      ByteObject styleSelected = creatorStyle.getStyleSelected();
+      sc.linkStateStyle(styleSelected, ITechDrawable.STYLE_05_SELECTED);
+
+      ByteObject styleMarked = creatorStyle.getStyleMarked();
+      sc.linkStateStyle(styleMarked, ITechDrawable.STYLE_03_MARKED);
+      
+      ByteObject styleGreyed = creatorStyle.getStyleGreyed();
+      sc.linkStateStyle(styleGreyed, ITechDrawable.STYLE_04_GREYED);
+      
+      
+      populateStyleClassStringNoPreset(sc);
+
+      StyleClass scVp = getStyleClassViewPane();
+      sc.linkStyleClass(scVp, ITechLinks.LINK_65_STYLE_VIEWPANE);
+      populateStyleClassViewPane(scVp);
+      return sc;
+   }
+
    public StyleClass getStyleClassTextReader() {
-      ByteObject style = creatorStyle.getStyleTextReader();
+      ByteObject style = creatorStyle.getStyleTextReaderH();
       StyleClass sc = new StyleClass(gc, style);
 
       populateStyleClassStringReader(sc);
+
+      StyleClass scVp = getStyleClassViewPane();
+      sc.linkStyleClass(scVp, ITechLinks.LINK_65_STYLE_VIEWPANE);
+      populateStyleClassViewPane(scVp);
+      return sc;
+   }
+
+   public StyleClass getStyleClassTextNaturalNoWrap() {
+      ByteObject style = creatorStyle.getStyleTextReaderH();
+      StyleClass sc = new StyleClass(gc, style);
+
+      populateStyleClassStringReaderNaturalNoWrap(sc);
+
+      StyleClass scVp = getStyleClassViewPane();
+      sc.linkStyleClass(scVp, ITechLinks.LINK_65_STYLE_VIEWPANE);
+      populateStyleClassViewPane(scVp);
+      return sc;
+   }
+
+   public StyleClass getStyleClassTextHorizontal() {
+      ByteObject style = creatorStyle.getStyleTextReaderH();
+      StyleClass sc = new StyleClass(gc, style);
+
+      populateStyleClassStringReaderH(sc);
 
       StyleClass scVp = getStyleClassViewPane();
       sc.linkStyleClass(scVp, ITechLinks.LINK_65_STYLE_VIEWPANE);
@@ -160,7 +206,7 @@ public class CreatorStyleClassSimple extends CreatorAbstractStyleClass {
 
       return sc;
    }
-   
+
    public StyleClass getStyleClassViewPane() {
       ByteObject boStyle = creatorView.getBOStyleViewPane();
       StyleClass sc = new StyleClass(gc, boStyle);
@@ -200,6 +246,28 @@ public class CreatorStyleClassSimple extends CreatorAbstractStyleClass {
 
    }
 
+   protected void populateStyleClassStringReaderH(StyleClass sc) {
+      ByteObject stringTech = creatorString.getBOStringDataReaderH();
+      sc.linkByteObject(stringTech, ITechLinks.LINK_41_BO_STRING_DATA);
+
+      ByteObject stringEditTech = creatorString.getBOStringEdit();
+      sc.linkByteObject(stringEditTech, ITechLinks.LINK_42_BO_STRING_EDIT);
+
+      ByteObject stringFigure = creatorString.getBOStringFigurePreset();
+      sc.linkByteObject(stringFigure, ITechLinks.LINK_40_BO_STRING_FIGURE);
+   }
+
+   protected void populateStyleClassStringReaderNaturalNoWrap(StyleClass sc) {
+      ByteObject stringTech = creatorString.getBOStringDataReaderNaturalNoWrap();
+      sc.linkByteObject(stringTech, ITechLinks.LINK_41_BO_STRING_DATA);
+
+      ByteObject stringEditTech = creatorString.getBOStringEdit();
+      sc.linkByteObject(stringEditTech, ITechLinks.LINK_42_BO_STRING_EDIT);
+
+      ByteObject stringFigure = creatorString.getBOStringFigurePreset();
+      sc.linkByteObject(stringFigure, ITechLinks.LINK_40_BO_STRING_FIGURE);
+   }
+
    protected void populateStyleClassStringReader(StyleClass sc) {
       ByteObject stringTech = creatorString.getBOStringDataReader();
       sc.linkByteObject(stringTech, ITechLinks.LINK_41_BO_STRING_DATA);
@@ -207,6 +275,16 @@ public class CreatorStyleClassSimple extends CreatorAbstractStyleClass {
       sc.linkByteObject(stringEditTech, ITechLinks.LINK_42_BO_STRING_EDIT);
 
       ByteObject stringFigure = creatorString.getBOStringFigureScrollReader();
+      sc.linkByteObject(stringFigure, ITechLinks.LINK_40_BO_STRING_FIGURE);
+   }
+
+   protected void populateStyleClassStringNoPreset(StyleClass sc) {
+      ByteObject stringTech = creatorString.getBOStringDataNoPreset();
+      sc.linkByteObject(stringTech, ITechLinks.LINK_41_BO_STRING_DATA);
+      ByteObject stringEditTech = creatorString.getBOStringEdit();
+      sc.linkByteObject(stringEditTech, ITechLinks.LINK_42_BO_STRING_EDIT);
+
+      ByteObject stringFigure = creatorString.getBOStringFigure();
       sc.linkByteObject(stringFigure, ITechLinks.LINK_40_BO_STRING_FIGURE);
    }
 

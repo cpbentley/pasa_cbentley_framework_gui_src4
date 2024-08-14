@@ -4,6 +4,7 @@ import pasa.cbentley.framework.cmd.src4.engine.CmdInstance;
 import pasa.cbentley.framework.cmd.src4.interfaces.INavTech;
 import pasa.cbentley.framework.gui.src4.canvas.InputConfig;
 import pasa.cbentley.framework.gui.src4.core.Drawable;
+import pasa.cbentley.framework.gui.src4.exec.ExecutionContextCanvasGui;
 import pasa.cbentley.framework.gui.src4.table.TableView;
 
 /**
@@ -62,7 +63,7 @@ import pasa.cbentley.framework.gui.src4.table.TableView;
  */
 public interface INavigational extends INavTech {
 
-   public void manageNavigate(InputConfig ic, int navEvent);
+   public void manageNavigate(ExecutionContextCanvasGui ec, int navEvent);
 
    /**
     * Try to navigate. If it could not navigate, because
@@ -93,15 +94,17 @@ public interface INavigational extends INavTech {
    public boolean canNavigate(int navEvent);
    /**
      * Call Back for Up Command
+    * @param ec TODO
      *
      */
-   public void navigateUp(InputConfig ic);
+   public void navigateUp(ExecutionContextCanvasGui ec);
 
    /**
     * Call Back for DownCmd
+    * @param ec TODO
     *
     */
-   public void navigateDown(InputConfig ic);
+   public void navigateDown(ExecutionContextCanvasGui ec);
 
    /**
     * Called only if {@link ITechDrawable#BEHAVIOR_27_NAV_HORIZONTAL} is true.
@@ -109,21 +112,21 @@ public interface INavigational extends INavTech {
     * First call in cycle with {@link InputConfig#isFirstNavCycle()}
     * <br>
     * Second call, implements any second cycle stuff like cycles or other stuff.
-    * @param ic
+    * @param ec TODO
     */
-   public void navigateLeft(InputConfig ic);
+   public void navigateLeft(ExecutionContextCanvasGui ec);
 
    /**
     * Implement to the right horizontal traversal
-    * @param ic
+    * @param ec TODO
     */
-   public void navigateRight(InputConfig ic);
+   public void navigateRight(ExecutionContextCanvasGui ec);
 
    /**
     * 
-    * @param ic
+    * @param ec TODO
     */
-   public void navigateSelect(InputConfig ic);
+   public void navigateSelect(ExecutionContextCanvasGui ec);
 
    /**
     * Returns an integer Flags.<br>

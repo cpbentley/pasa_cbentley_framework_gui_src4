@@ -12,7 +12,7 @@ import pasa.cbentley.framework.cmd.src4.engine.CmdNode;
 import pasa.cbentley.framework.cmd.src4.engine.MCmd;
 import pasa.cbentley.framework.cmd.src4.interfaces.ICmdsCmd;
 import pasa.cbentley.framework.cmd.src4.interfaces.ICommandable;
-import pasa.cbentley.framework.coredata.src4.db.IByteStore;
+import pasa.cbentley.framework.core.data.src4.db.IByteStore;
 import pasa.cbentley.framework.datamodel.src4.filter.FilterCondition;
 import pasa.cbentley.framework.datamodel.src4.filter.IFilterable;
 import pasa.cbentley.framework.datamodel.src4.filter.MFilterSet;
@@ -113,7 +113,7 @@ public class FilterForm extends TableLayoutView implements ICommandable, IBOStrA
    }
 
    public void commandAction(CmdInstance cmd) {
-      MCmd c = cmd.cmd;
+      MCmd c = cmd.getMCmd();
       CmdCtx cc = cmd.getCC();
       if (c.getCmdId() == ICmdsCmd.CMD_23_DELETE) {
          int m_setting_id = filters.ints[filterRoot.getList().getSelectedIndex()];

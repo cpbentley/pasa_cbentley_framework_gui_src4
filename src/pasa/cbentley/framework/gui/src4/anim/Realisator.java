@@ -1,11 +1,10 @@
 package pasa.cbentley.framework.gui.src4.anim;
 
-import pasa.cbentley.core.src4.ctx.UCtx;
 import pasa.cbentley.core.src4.logging.Dctx;
-import pasa.cbentley.core.src4.logging.IDLog;
 import pasa.cbentley.core.src4.logging.IStringable;
 import pasa.cbentley.core.src4.utils.BitUtils;
 import pasa.cbentley.framework.gui.src4.ctx.GuiCtx;
+import pasa.cbentley.framework.gui.src4.ctx.ObjectGC;
 import pasa.cbentley.framework.gui.src4.interfaces.IAnimable;
 
 /**
@@ -25,7 +24,7 @@ import pasa.cbentley.framework.gui.src4.interfaces.IAnimable;
  *computed next sleep time.
  *starts and wait
  */
-public abstract class Realisator implements Runnable, IStringable {
+public abstract class Realisator extends ObjectGC implements Runnable, IStringable {
 
    public static final int CTRL_FLAG_1_DEBUG = 1;
 
@@ -33,14 +32,9 @@ public abstract class Realisator implements Runnable, IStringable {
 
    private int             ctrlFlags;
 
-   protected final GuiCtx  gc;
 
    public Realisator(GuiCtx gc) {
-      this.gc = gc;
-   }
-
-   public IDLog toLog() {
-      return gc.toDLog();
+      super(gc);
    }
 
    /**
@@ -116,33 +110,25 @@ public abstract class Realisator implements Runnable, IStringable {
 
    }
 
+
    //#mdebug
-   public IDLog toDLog() {
-      return toStringGetUCtx().toDLog();
-   }
-
    public void toString(Dctx dc) {
-      dc.root(this, "Realisator");
+      dc.root(this, Realisator.class, 118);
       toStringPrivate(dc);
-   }
-
-   private void toStringPrivate(Dctx dc) {
-
-   }
-
-   public String toString1Line() {
-      return Dctx.toString1Line(this);
+      super.toString(dc.sup());
    }
 
    public void toString1Line(Dctx dc) {
-      dc.root1Line(this, "Realisator");
+      dc.root1Line(this, Realisator.class);
       toStringPrivate(dc);
+      super.toString1Line(dc.sup1Line());
    }
 
-   public UCtx toStringGetUCtx() {
-      return gc.getUC();
+   private void toStringPrivate(Dctx dc) {
+      
    }
-
    //#enddebug
+   
+
 
 }

@@ -5,16 +5,15 @@ import pasa.cbentley.framework.cmd.src4.engine.CmdNode;
 import pasa.cbentley.framework.cmd.src4.engine.MCmd;
 import pasa.cbentley.framework.cmd.src4.trigger.CmdTrigger;
 import pasa.cbentley.framework.cmd.src4.trigger.FacTrig;
-import pasa.cbentley.framework.coreui.src4.tech.ITechCodes;
-import pasa.cbentley.framework.gui.src4.canvas.InputConfig;
-import pasa.cbentley.framework.gui.src4.cmd.ViewCommandListener;
+import pasa.cbentley.framework.core.ui.src4.tech.ITechCodes;
 import pasa.cbentley.framework.gui.src4.core.Drawable;
 import pasa.cbentley.framework.gui.src4.ctx.GuiCtx;
 import pasa.cbentley.framework.gui.src4.ctx.ObjectGC;
-import pasa.cbentley.framework.gui.src4.interfaces.ICmdsView;
+import pasa.cbentley.framework.gui.src4.exec.ExecutionContextCanvasGui;
+import pasa.cbentley.framework.gui.src4.interfaces.ICmdsGui;
 import pasa.cbentley.framework.gui.src4.interfaces.IDrawable;
 
-public class Navigator extends ObjectGC implements ICmdsView {
+public class Navigator extends ObjectGC implements ICmdsGui {
 
    protected CmdNode navCtx;
 
@@ -27,7 +26,7 @@ public class Navigator extends ObjectGC implements ICmdsView {
       return new NavigationCmd(gc, 0, cmdid);
    }
 
-   public void cmdPopActive(InputConfig ic) {
+   public void cmdPopActive(ExecutionContextCanvasGui ic) {
 
    }
 
@@ -39,7 +38,7 @@ public class Navigator extends ObjectGC implements ICmdsView {
     * @param dir
     * @param insert
     */
-   public void navInsert(InputConfig ic, IDrawable src, int dir, IDrawable insert) {
+   public void navInsert(ExecutionContextCanvasGui ic, IDrawable src, int dir, IDrawable insert) {
       
    }
 
@@ -48,7 +47,7 @@ public class Navigator extends ObjectGC implements ICmdsView {
     * @param src
     * @param remove
     */
-   public void navRemove(InputConfig ic, IDrawable src, IDrawable remove) {
+   public void navRemove(ExecutionContextCanvasGui ic, IDrawable src, IDrawable remove) {
       
    }
 

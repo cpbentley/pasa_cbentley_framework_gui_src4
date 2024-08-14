@@ -3,7 +3,6 @@ package pasa.cbentley.framework.gui.src4.utils;
 import java.util.TimerTask;
 
 import pasa.cbentley.core.src4.ctx.UCtx;
-import pasa.cbentley.core.src4.interfaces.ITech;
 import pasa.cbentley.core.src4.logging.Dctx;
 import pasa.cbentley.core.src4.logging.IDLog;
 import pasa.cbentley.core.src4.logging.IStringable;

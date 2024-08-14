@@ -168,6 +168,7 @@ public interface ITechStringDrawable extends ITech {
 
    /**
     * Draws text like an Image. Scrolling Increments are pixels
+    * 
     * Free Dimension constraint when width and height are set to 0. H and V Scrolling
     * Implementation:
     * When drawing, clipping is done at padding.

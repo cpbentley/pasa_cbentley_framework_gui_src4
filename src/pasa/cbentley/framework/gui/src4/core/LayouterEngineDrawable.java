@@ -8,6 +8,7 @@ import pasa.cbentley.core.src4.logging.IStringable;
 import pasa.cbentley.framework.coredraw.src4.interfaces.IMFont;
 import pasa.cbentley.framework.drawx.src4.ctx.ToStringStaticDrawx;
 import pasa.cbentley.framework.drawx.src4.style.IBOStyle;
+import pasa.cbentley.framework.drawx.src4.style.ITechStyleCache;
 import pasa.cbentley.framework.drawx.src4.style.StyleCache;
 import pasa.cbentley.framework.gui.src4.canvas.ViewContext;
 import pasa.cbentley.framework.gui.src4.ctx.GuiCtx;
@@ -45,24 +46,24 @@ public class LayouterEngineDrawable extends LayouterEngineRead implements ITechL
 
    protected final GuiCtx gc;
 
-   protected int      minusH;
+   protected int          minusH;
 
    /**
     * Number of pixels that are substracted from dw.
     */
-   protected int      minusW;
+   protected int          minusW;
 
    /**
     * Never null. However, caching can be disabled
     */
-   private StyleCache styleCache;
+   private StyleCache     styleCache;
 
    /**
     * Value computed from
     */
-   protected int      styleH;
+   protected int          styleH;
 
-   protected int      styleW;
+   protected int          styleW;
 
    private int            typePozerX;
 
@@ -217,10 +218,30 @@ public class LayouterEngineDrawable extends LayouterEngineRead implements ITechL
       return typePozerY;
    }
 
+   /**
+    * What is the sizer sizing. 
+    * When zero, it sizes everything including margin.
+    *  
+    * <li> {@link ITechStyleCache#RELATIVE_TYPE_0_MARGIN}
+    * <li> {@link ITechStyleCache#RELATIVE_TYPE_1_BORDER}
+    * <li> {@link ITechStyleCache#RELATIVE_TYPE_2_PADDING}
+    * <li> {@link ITechStyleCache#RELATIVE_TYPE_3_CONTENT}
+    * @return
+    */
    public int getTypeSizerH() {
       return typeSizerH;
    }
 
+   /**
+    * What is the sizer sizing. 
+    * When zero, it sizes everything including margin.
+    *  
+    * <li> {@link ITechStyleCache#RELATIVE_TYPE_0_MARGIN}
+    * <li> {@link ITechStyleCache#RELATIVE_TYPE_1_BORDER}
+    * <li> {@link ITechStyleCache#RELATIVE_TYPE_2_PADDING}
+    * <li> {@link ITechStyleCache#RELATIVE_TYPE_3_CONTENT}
+    * @return
+    */
    public int getTypeSizerW() {
       return typeSizerW;
    }
@@ -264,13 +285,14 @@ public class LayouterEngineDrawable extends LayouterEngineRead implements ITechL
    }
 
    public void rebuild() {
-      if(isManualOverrideW()) {
+      if (isManualOverrideW()) {
          this.rect.setW(originalOverrideW);
       }
-      if(isManualOverrideH()) {
+      if (isManualOverrideH()) {
          this.rect.setH(originalOverrideH);
       }
    }
+
    public void incrDw(int incr) {
       rect.incrW(incr);
    }
@@ -284,11 +306,15 @@ public class LayouterEngineDrawable extends LayouterEngineRead implements ITechL
    }
 
    public boolean isPhBiggerThanDh() {
-      return getPh() > getH();
+      int ph = getPh();
+      int h = getH();
+      return ph > h;
    }
 
    public boolean isPwBiggerThanDw() {
-      return getPw() > getW();
+      int pw = getPw();
+      int w = getW();
+      return pw > w;
    }
 
    public boolean isPwOrPhEqualsZero() {

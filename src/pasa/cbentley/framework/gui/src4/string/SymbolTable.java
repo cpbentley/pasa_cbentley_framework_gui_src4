@@ -15,6 +15,8 @@ import pasa.cbentley.framework.gui.src4.core.Drawable;
 import pasa.cbentley.framework.gui.src4.core.ScrollBar;
 import pasa.cbentley.framework.gui.src4.core.StyleClass;
 import pasa.cbentley.framework.gui.src4.ctx.GuiCtx;
+import pasa.cbentley.framework.gui.src4.exec.ExecutionContextCanvasGui;
+import pasa.cbentley.framework.gui.src4.exec.InputStateCanvasGui;
 import pasa.cbentley.framework.gui.src4.factories.TablePolicyFactory;
 import pasa.cbentley.framework.gui.src4.interfaces.ITechDrawable;
 import pasa.cbentley.framework.gui.src4.table.TableView;
@@ -126,7 +128,7 @@ public class SymbolTable extends TableView {
       doUpdateCharArray();
    }
 
-   protected void cmdNextPlane(InputConfig ic) {
+   protected void cmdNextPlane(ExecutionContextCanvasGui ec) {
       //find next valid plane
       currentPlaneIndex--;
       if (currentPlaneIndex < 0) {
@@ -134,10 +136,10 @@ public class SymbolTable extends TableView {
       }
       currentPlane = SymbolUtils.planes[currentPlaneIndex];
       doUpdateCharArray();
-      ic.srActionDoneRepaint(this);
+      ec.srActionDoneRepaint(this);
    }
 
-   protected void cmdPreviousPlane(InputConfig ic) {
+   protected void cmdPreviousPlane(ExecutionContextCanvasGui ec) {
       //find next valid plane
       currentPlaneIndex++;
       if (currentPlaneIndex >= SymbolUtils.planes.length) {
@@ -145,13 +147,13 @@ public class SymbolTable extends TableView {
       }
       currentPlane = SymbolUtils.planes[currentPlaneIndex];
       doUpdateCharArray();
-      ic.srActionDoneRepaint(this);
+      ec.srActionDoneRepaint(this);
    }
 
-   protected void cmdToggleFiltering(InputConfig ic) {
+   protected void cmdToggleFiltering(ExecutionContextCanvasGui ec) {
       isFiltering = !isFiltering;
       doUpdateCharArray();
-      ic.srActionDoneRepaint(this);
+      ec.srActionDoneRepaint(this);
    }
 
    /**
@@ -288,24 +290,26 @@ public class SymbolTable extends TableView {
     * Uses the selection mechanism provided by {@link TableView}.
     * <br>
     */
-   public void manageKeyInput(InputConfig ic) {
-      if (ic.isStarP() && ic.is.getNumKeysPressed() == 1) {
-         cmdPreviousPlane(ic);
+   public void manageKeyInput(ExecutionContextCanvasGui ec) {
+      InputConfig ic = ec.getInputConfig();
+      InputStateCanvasGui is = ec.getInputStateDrawable();
+      if (ic.isStarP() && is.getNumKeysPressed() == 1) {
+         cmdPreviousPlane(ec);
       }
-      if (ic.isPoundP() && ic.is.getNumKeysPressed() == 1) {
-         cmdNextPlane(ic);
+      if (ic.isPoundP() && is.getNumKeysPressed() == 1) {
+         cmdNextPlane(ec);
       }
       if (ic.isCancelP()) {
-         cmdToggleFiltering(ic);
+         cmdToggleFiltering(ec);
       }
-      super.manageKeyInput(ic);
+      super.manageKeyInput(ec);
    }
 
    /**
     * Since we don't have cell {@link Drawable}, the {@link TableView} automatic press management will not work.
     */
-   public void managePointerInput(InputConfig ic) {
-      super.managePointerInput(ic);
+   public void managePointerInput(ExecutionContextCanvasGui ec) {
+      super.managePointerInput(ec);
    }
 
    /**
@@ -327,7 +331,7 @@ public class SymbolTable extends TableView {
     * <br>
     * 
     */
-   protected void selectionMoveEvent(InputConfig ic) {
+   protected void selectionMoveEvent(ExecutionContextCanvasGui ec) {
       int selectedIndex = super.getSelectedIndex();
       if (selectedIndex < myChars.length) {
          this.selectedIndexPrevious = getSelectedIndexPrevious();
@@ -339,7 +343,7 @@ public class SymbolTable extends TableView {
       //#debug
       toDLog().pEvent("selectedIndex=" + selectedIndex, this, SymbolTable.class, "selectionMoveEvent", LVL_05_FINE, true);
 
-      super.selectionMoveEvent(ic);
+      super.selectionMoveEvent(ec);
    }
 
    //#mdebug

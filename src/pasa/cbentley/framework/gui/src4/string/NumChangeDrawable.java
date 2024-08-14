@@ -1,10 +1,10 @@
 package pasa.cbentley.framework.gui.src4.string;
 
 import pasa.cbentley.framework.coredraw.src4.interfaces.IGraphics;
-import pasa.cbentley.framework.gui.src4.canvas.InputConfig;
 import pasa.cbentley.framework.gui.src4.core.Drawable;
 import pasa.cbentley.framework.gui.src4.core.StyleClass;
 import pasa.cbentley.framework.gui.src4.ctx.GuiCtx;
+import pasa.cbentley.framework.gui.src4.exec.ExecutionContextCanvasGui;
 import pasa.cbentley.framework.gui.src4.table.TableView;
 
 /**
@@ -65,7 +65,7 @@ public class NumChangeDrawable extends Drawable {
       }
    }
 
-   public void navigateDown(InputConfig ic) {
+   public void navigateDown(ExecutionContextCanvasGui ec) {
       int c = (data[currentIndex] & 0xFF);
       if (c > 0)
          data[currentIndex] = (byte) (c - 1);
@@ -75,24 +75,24 @@ public class NumChangeDrawable extends Drawable {
 
    }
 
-   public void navigateLeft(InputConfig ic) {
+   public void navigateLeft(ExecutionContextCanvasGui ec) {
       currentIndex--;
       if (currentIndex < 0)
          currentIndex = 0;
    }
 
-   public void navigateRight(InputConfig ic) {
+   public void navigateRight(ExecutionContextCanvasGui ec) {
       currentIndex++;
       if (currentIndex >= nums)
          currentIndex = nums - 1;
    }
 
-   public void navigateSelect(InputConfig ic) {
+   public void navigateSelect(ExecutionContextCanvasGui ec) {
       //notifies parent of this drawable that the number selection is finished
       //gets out of keyfocus
    }
 
-   public void navigateUp(InputConfig ic) {
+   public void navigateUp(ExecutionContextCanvasGui ec) {
       data[currentIndex] = (byte) (((data[currentIndex] & 0xFF) + 1) % 10);
    }
 }

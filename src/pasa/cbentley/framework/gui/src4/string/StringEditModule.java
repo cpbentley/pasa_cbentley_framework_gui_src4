@@ -7,17 +7,18 @@ import pasa.cbentley.core.src4.logging.IDLog;
 import pasa.cbentley.core.src4.logging.IStringable;
 import pasa.cbentley.core.src4.utils.StringUtils;
 import pasa.cbentley.framework.cmd.src4.engine.MCmd;
-import pasa.cbentley.framework.coreui.src4.tech.ITechCodes;
+import pasa.cbentley.framework.core.ui.src4.tech.ITechCodes;
 import pasa.cbentley.framework.drawx.src4.engine.GraphicsX;
 import pasa.cbentley.framework.drawx.src4.string.StringMetrics;
 import pasa.cbentley.framework.drawx.src4.string.Stringer;
 import pasa.cbentley.framework.gui.src4.canvas.InputConfig;
-import pasa.cbentley.framework.gui.src4.cmd.CmdInstanceDrawable;
+import pasa.cbentley.framework.gui.src4.cmd.CmdInstanceGui;
 import pasa.cbentley.framework.gui.src4.core.Drawable;
 import pasa.cbentley.framework.gui.src4.core.DrawableInjected;
 import pasa.cbentley.framework.gui.src4.core.StyleClass;
 import pasa.cbentley.framework.gui.src4.ctx.GuiCtx;
 import pasa.cbentley.framework.gui.src4.ctx.IEventsGui;
+import pasa.cbentley.framework.gui.src4.exec.ExecutionContextCanvasGui;
 import pasa.cbentley.framework.gui.src4.factories.interfaces.IBOStrAuxData;
 import pasa.cbentley.framework.gui.src4.factories.interfaces.IBOStrAuxEdit;
 import pasa.cbentley.framework.gui.src4.interfaces.IDrawListener;
@@ -256,16 +257,16 @@ public class StringEditModule implements IDrawListener, IBOStrAuxData, IStringab
          //#debug
          toDLog().pFlow("char " + c + " inserted in ", stringDrawable, StringEditModule.class, "caretAtInsertChar", LVL_05_FINE, true);
 
-         gc.getEventsBusGui().sendNewEvent(CHAR_EVENT_PROD_ID, CHAR_EVENT_0_ADDED, this);
+         gc.getEventsBusGui().sendNewEvent(IEventsGui.PID_02_CHAR, IEventsGui.PID_02_CHAR_01_ADDED, this);
       }
       sec.predictionStart();
    }
 
-   public void caretAtReplaceChar(InputConfig ic, int index, char c) {
+   public void caretAtReplaceChar(ExecutionContextCanvasGui ec, int index, char c) {
       //TODO possible with caretIndex at 0?
       stringDrawable.setCharAt(index, c);
       positionCaret();
-      ic.srActionDoneRepaint(caret);
+      ec.srActionDoneRepaint(caret);
    }
 
    /**
@@ -483,7 +484,7 @@ public class StringEditModule implements IDrawListener, IBOStrAuxData, IStringab
     * @param ic 
     * @param key
     */
-   private void manageKey09PressedWrite(InputConfig ic, int key) {
+   private void manageKey09PressedWrite(ExecutionContextCanvasGui ec, int key) {
       currentKey = key;
       //when a same key is pressed is fast, the next char in the key charset is shown 
       long diff = System.currentTimeMillis() - lastKeyTimestamp;
@@ -511,11 +512,11 @@ public class StringEditModule implements IDrawListener, IBOStrAuxData, IStringab
             positionCaret();
          }
          //after insertion, repaint the whole
-         ic.srActionDoneRepaint(stringDrawable);
+         ec.srActionDoneRepaint(stringDrawable);
          lastKeyTimestamp = System.currentTimeMillis();
          isGoToNextChar = false;
       }
-      ic.srActionDoneRepaint(sec.getLetterChoices());
+      ec.srActionDoneRepaint(sec.getLetterChoices());
    }
 
    /**
@@ -532,10 +533,10 @@ public class StringEditModule implements IDrawListener, IBOStrAuxData, IStringab
     * <br>
     * @param ic
     */
-   public void manageKeyInput(InputConfig ic) {
+   public void manageKeyInput(ExecutionContextCanvasGui ec) {
       //ask if StringEditControl has something relevant to do
-      sec.manageKeyInput(ic);
-
+      sec.manageKeyInput(ec);
+      InputConfig ic = ec.getInputConfig();
       if (!ic.isActionDone()) {
          //generate an edit command
          //edit control did not action a command
@@ -548,7 +549,7 @@ public class StringEditModule implements IDrawListener, IBOStrAuxData, IStringab
                isGoToNextChar = true;
                ic.srActionDoneRepaint();
             } else if (key >= ITechCodes.KEY_NUM0 && key <= ITechCodes.KEY_NUM9) {
-               manageKey09PressedWrite(ic, key);
+               manageKey09PressedWrite(ec, key);
                ic.srActionDoneRepaint();
             } else if (ic.isFireP()) {
                //become edit
@@ -592,7 +593,7 @@ public class StringEditModule implements IDrawListener, IBOStrAuxData, IStringab
     * @param ic
     * @param navEvent
     */
-   public void manageNavigate(CmdInstanceDrawable ic, int navEvent) {
+   public void manageNavigate(CmdInstanceGui ic, int navEvent) {
 
    }
 
@@ -605,24 +606,24 @@ public class StringEditModule implements IDrawListener, IBOStrAuxData, IStringab
     * <br>
     * @param ic
     */
-   public void managePointerInput(InputConfig ic) {
+   public void managePointerInput(ExecutionContextCanvasGui ec) {
       //compute caret position from pointer x and y coordinates.
       //check which line
-
+      InputConfig ic = ec.getInputConfig();
       if (ic.isPressed()) {
          StringMetrics sm = stringDrawable.getStringer().getMetrics();
 
          //#debug
-         toDLog().pFlow("Pointer @ " + ic.is.getX() + "," + ic.is.getY(), this, StringEditModule.class, "managePointerInput", LVL_05_FINE, true);
+         toDLog().pFlow("Pointer @ " + ic.getInputStateDrawable().getX() + "," + ic.getInputStateDrawable().getY(), this, StringEditModule.class, "managePointerInput", LVL_05_FINE, true);
 
          int lh = sm.getLineHeight();
-         int lineid = ic.is.getY();
-         if (ic.is.getY() > stringDrawable.getContentY() && ic.is.getY() < stringDrawable.getContentY() + lh) {
+         int lineid = ic.getInputStateDrawable().getY();
+         if (ic.getInputStateDrawable().getY() > stringDrawable.getContentY() && ic.getInputStateDrawable().getY() < stringDrawable.getContentY() + lh) {
             //first line
             int charid = stringDrawable.getContentX();
             for (int i = 0; i < stringDrawable.getLen(); i++) {
                int cw = sm.getCharWidth(i);
-               if (ic.is.getX() < charid + cw) {
+               if (ic.getInputStateDrawable().getX() < charid + cw) {
                   caretIndexPrevious = caretIndex;
                   caretIndex = i;
                   positionCaret();
@@ -653,13 +654,13 @@ public class StringEditModule implements IDrawListener, IBOStrAuxData, IStringab
     * <br>
     * 
     */
-   public void navigateDown(InputConfig ic) {
+   public void navigateDown(ExecutionContextCanvasGui ec) {
       //inside navitation. updates StringDrawable viewpane
       if (numEditLines > 1) {
          //TODO even in multiline, if a prediction table is shown. down will select first element in table
          //
       }
-      gc.getFocusCtrl().newFocusKey(ic, stringDrawable);
+      gc.getFocusCtrl().newFocusKey(ec, stringDrawable);
 
    }
 
@@ -671,7 +672,8 @@ public class StringEditModule implements IDrawListener, IBOStrAuxData, IStringab
     * Caret Drawable coordinates are updated.
     * @param InputConfig
     */
-   public void navigateLeft(InputConfig ic) {
+   public void navigateLeft(ExecutionContextCanvasGui ec) {
+      InputConfig ic = ec.getInputConfig();
       if (!ic.isPressed()) {
          return;
       }
@@ -692,11 +694,12 @@ public class StringEditModule implements IDrawListener, IBOStrAuxData, IStringab
    }
 
    /**
-    * {@link IDrawable#navigateRight(InputConfig)}
+    * {@link IDrawable#navigateRight(ExecutionContextCanvasGui)}
     * <br>
     * @param ic
     */
-   public void navigateRight(InputConfig ic) {
+   public void navigateRight(ExecutionContextCanvasGui ec) {
+      InputConfig ic = ec.getInputConfig();
       if (!ic.isPressed()) {
          return;
       }
@@ -710,7 +713,7 @@ public class StringEditModule implements IDrawListener, IBOStrAuxData, IStringab
       }
    }
 
-   public void navigateSelect(InputConfig ic) {
+   public void navigateSelect(ExecutionContextCanvasGui ec) {
    }
 
    /**
@@ -730,10 +733,10 @@ public class StringEditModule implements IDrawListener, IBOStrAuxData, IStringab
     * <br>
     * @param ic
     */
-   public void navigateUp(InputConfig ic) {
+   public void navigateUp(ExecutionContextCanvasGui ec) {
       //moves caret position
       if (numEditLines == 1) {
-         gc.getFocusCtrl().newFocusKey(ic, sec);
+         gc.getFocusCtrl().newFocusKey(ec, sec);
       }
    }
 

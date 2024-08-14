@@ -3,7 +3,7 @@ package pasa.cbentley.framework.gui.src4.interfaces;
 import pasa.cbentley.byteobjects.src4.core.ByteObject;
 import pasa.cbentley.core.src4.logging.IStringable;
 import pasa.cbentley.framework.cmd.src4.engine.MCmd;
-import pasa.cbentley.framework.coreui.src4.interfaces.IUserInteraction;
+import pasa.cbentley.framework.core.ui.src4.interfaces.IUserInteraction;
 import pasa.cbentley.framework.drawx.src4.engine.GraphicsX;
 import pasa.cbentley.framework.drawx.src4.engine.RgbImage;
 import pasa.cbentley.framework.gui.src4.anim.ITechAnim;
@@ -136,7 +136,7 @@ import pasa.cbentley.framework.gui.src4.core.UserInteraction;
  * @see ImgAnimable
  *
  */
-public interface IAnimable extends IStringable, ITechAnimable {
+public interface IAnimable extends IStringable, ITechAnimableDrawable {
 
 
    /**

@@ -12,10 +12,12 @@ import pasa.cbentley.core.src4.logging.IDLog;
 import pasa.cbentley.core.src4.logging.IStringable;
 import pasa.cbentley.core.src4.structs.IntBuffer;
 import pasa.cbentley.framework.cmd.src4.ctx.CmdCtx;
-import pasa.cbentley.framework.coredata.src4.db.IByteCache;
-import pasa.cbentley.framework.coredata.src4.db.IByteStore;
-import pasa.cbentley.framework.coreui.src4.utils.ViewState;
+import pasa.cbentley.framework.core.data.src4.db.IByteCache;
+import pasa.cbentley.framework.core.data.src4.db.IByteStore;
+import pasa.cbentley.framework.core.ui.src4.utils.ViewState;
 import pasa.cbentley.framework.gui.src4.ctx.GuiCtx;
+import pasa.cbentley.framework.gui.src4.ctx.ObjectGC;
+import pasa.cbentley.framework.gui.src4.exec.ExecutionContextCanvasGui;
 import pasa.cbentley.framework.gui.src4.factories.interfaces.IBOTopLevel;
 import pasa.cbentley.framework.gui.src4.interfaces.IDrawable;
 import pasa.cbentley.framework.gui.src4.interfaces.IPageCreator;
@@ -50,15 +52,13 @@ import pasa.cbentley.framework.gui.src4.interfaces.IPageCreator;
  * @author Charles-Philip Bentley
  *
  */
-public class TopLevelCtrl implements IStringable {
+public class TopLevelCtrl extends ObjectGC implements IStringable {
 
    private Hashtable      cache           = new Hashtable();
 
    private IPageCreator[] creators        = new IPageCreator[10];
 
    private int            currentPageID;
-
-   protected final GuiCtx gc;
 
    private int            maxPage;
 
@@ -84,7 +84,7 @@ public class TopLevelCtrl implements IStringable {
    private int[]          topLevelsHashes = new int[10];
 
    public TopLevelCtrl(GuiCtx gc) {
-      this.gc = gc;
+      super(gc);
       pageForward = new IntBuffer(gc.getUC());
       pageHistory = new IntBuffer(gc.getUC());
    }
@@ -111,7 +111,7 @@ public class TopLevelCtrl implements IStringable {
     * The back is always single choice
     * @return
     */
-   public int backCommand(InputConfig ic) {
+   public int backCommand(ExecutionContextCanvasGui ic) {
       if (pageHistory.getSize() != 0) {
          //#debug
          toDLog().pFlow("", this, TopLevelCtrl.class, "backCommand", LVL_05_FINE, true);
@@ -128,7 +128,7 @@ public class TopLevelCtrl implements IStringable {
    public void destroyAllButCurrent() {
       for (int i = 0; i < roots.length; i++) {
          if (i != currentPageID) {
-            destroyTopLevel( i);
+            destroyTopLevel(i);
          }
       }
    }
@@ -173,7 +173,7 @@ public class TopLevelCtrl implements IStringable {
     * The forward is going into a tree of possibilities.
     * This is a special trie structure.
     */
-   public int forwardCommand(InputConfig gc) {
+   public int forwardCommand(ExecutionContextCanvasGui gc) {
       if (pageForward.getSize() != 0) {
          int backid = pageForward.removeLast();
          if (backid == 0) {
@@ -206,7 +206,7 @@ public class TopLevelCtrl implements IStringable {
     * @param id
     * @return
     */
-   public IDrawable getPage(InputConfig ic, int id) {
+   public IDrawable getPage(ExecutionContextCanvasGui ec, int id) {
       Object o = cache.get(new Integer(id));
       if (o == null) {
 
@@ -290,7 +290,7 @@ public class TopLevelCtrl implements IStringable {
             data = new byte[IBOTopLevel.TOP_BASIC_SIZE];
             tl = new ByteObject(boc, data, 0);
          } else {
-            ByteObjectFactory bofac= boc.getByteObjectFactory();
+            ByteObjectFactory bofac = boc.getByteObjectFactory();
             tl = bofac.createByteObjectFromWrap(data, 0);
          }
          topLevels[toplevel] = tl;
@@ -298,7 +298,7 @@ public class TopLevelCtrl implements IStringable {
       return topLevels[toplevel];
    }
 
-   public void homeCommand(InputConfig ic) {
+   public void homeCommand(ExecutionContextCanvasGui ic) {
       showPage(ic, 1);
    }
 
@@ -320,21 +320,21 @@ public class TopLevelCtrl implements IStringable {
     * Iteration
     * @param ic
     */
-   public void nextPage(InputConfig ic) {
+   public void nextPage(ExecutionContextCanvasGui ic) {
       int pid = gc.getTopLvl().getPageID();
       pid++;
       //
       showPage(ic, pid, true);
    }
 
-   public void previousPage(InputConfig ic) {
+   public void previousPage(ExecutionContextCanvasGui ic) {
       int pid = gc.getTopLvl().getPageID();
       pid--;
       //
       showPage(ic, pid, true);
    }
 
-   public void reloadLast(InputConfig ic) {
+   public void reloadLast(ExecutionContextCanvasGui ic) {
       IDrawable newFocus = getPage(ic, currentPageID);
       newFocus.getVC().getDrawCtrlAppli().shShowDrawableOver(ic, newFocus);
    }
@@ -369,7 +369,7 @@ public class TopLevelCtrl implements IStringable {
       currentPageID = pageid;
    }
 
-   public void showPage(InputConfig ic, int newPageid) {
+   public void showPage(ExecutionContextCanvasGui ic, int newPageid) {
       this.showPage(ic, newPageid, true);
    }
 
@@ -378,7 +378,7 @@ public class TopLevelCtrl implements IStringable {
     * <br>
     * @param newPageid
     */
-   public void showPage(InputConfig ic, int newPageid, boolean addToHistory) {
+   public void showPage(ExecutionContextCanvasGui ec, int newPageid, boolean addToHistory) {
       if (newPageid != currentPageID) {
          int oldPageID = currentPageID;
          IDrawable old = roots[oldPageID];
@@ -387,59 +387,35 @@ public class TopLevelCtrl implements IStringable {
          if (addToHistory) {
             pageHistory.addInt(oldPageID);
          }
-         old.shHideDrawable(ic);
-         IDrawable newFocus = getPage(ic, newPageid);
-         newFocus.shShowDrawableOver(ic);
+         old.shHideDrawable(ec);
+         IDrawable newFocus = getPage(ec, newPageid);
+         newFocus.shShowDrawableOver(ec);
          currentPageID = newPageid;
       }
    }
-
-   public void showPage(ExecutionContextGui ex, int newPageid, boolean addToHistory) {
-      if (newPageid != currentPageID) {
-         int oldPageID = currentPageID;
-         IDrawable old = roots[oldPageID];
-         //not yet implemtend
-         //saveTopLevel(currentPageID);
-         if (addToHistory) {
-            pageHistory.addInt(oldPageID);
-         }
-         IDrawable newFocus = getPage(newPageid);
-         gc.getFocusCtrl().drawableHide(ex.cd, old, null);
-         gc.getFocusCtrl().drawableShow(ex, newFocus);
-         currentPageID = newPageid;
-      }
-   }
-
+   
    //#mdebug
-   public IDLog toDLog() {
-      return toStringGetUCtx().toDLog();
+   public void toString(Dctx dc) {
+      dc.root(this, TopLevelCtrl.class, 400);
+      toStringPrivate(dc);
+      super.toString(dc.sup());
+      dc.appendVarWithSpace("CurrentPageID", currentPageID);
+      dc.nlLvl(pageHistory, "History");
+      dc.nlLvl(pageForward, "Forward");
    }
 
-   public String toString() {
-      return Dctx.toString(this);
+   public void toString1Line(Dctx dc) {
+      dc.root1Line(this, TopLevelCtrl.class, 400);
+      toStringPrivate(dc);
+      super.toString1Line(dc.sup1Line());
+      dc.appendVarWithSpace("CurrentPageID", currentPageID);
+      dc.nlLvl1Line(pageHistory, "History");
+      dc.nlLvl1Line(pageForward, "Forward");
    }
 
-   public void toString(Dctx sb) {
-      sb.root(this, "TopLevelCtrl");
-      sb.appendVarWithSpace("CurrentPageID", currentPageID);
-      sb.nlLvl(pageHistory, "History");
-      sb.nlLvl(pageForward, "Forward");
+   private void toStringPrivate(Dctx dc) {
+      
    }
-
-   public String toString1Line() {
-      return Dctx.toString1Line(this);
-   }
-
-   public void toString1Line(Dctx sb) {
-      sb.root1Line(this, "TopLevelCtrl");
-      sb.appendVarWithSpace("CurrentPageID", currentPageID);
-      sb.nlLvl1Line(pageHistory, "History");
-      sb.nlLvl1Line(pageForward, "Forward");
-   }
-
-   public UCtx toStringGetUCtx() {
-      return gc.getUC();
-   }
-
    //#enddebug
+
 }

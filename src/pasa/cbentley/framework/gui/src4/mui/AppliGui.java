@@ -1,36 +1,31 @@
 package pasa.cbentley.framework.gui.src4.mui;
 
 import pasa.cbentley.byteobjects.src4.core.ByteObject;
-import pasa.cbentley.byteobjects.src4.ctx.IBOTypesBOC;
 import pasa.cbentley.byteobjects.src4.objects.color.ITechGradient;
 import pasa.cbentley.core.src4.logging.Dctx;
-import pasa.cbentley.core.src4.stator.StatorReader;
-import pasa.cbentley.core.src4.stator.StatorWriter;
 import pasa.cbentley.core.src4.structs.IntToObjects;
 import pasa.cbentley.core.src4.utils.interfaces.IColorsBase;
 import pasa.cbentley.framework.cmd.src4.ctx.CmdCtx;
-import pasa.cbentley.framework.core.src4.app.AppCtx;
-import pasa.cbentley.framework.core.src4.app.AppliAbstract;
-import pasa.cbentley.framework.core.src4.app.IBOCtxSettingsAppli;
-import pasa.cbentley.framework.coreui.src4.interfaces.ICanvasAppli;
-import pasa.cbentley.framework.coreui.src4.tech.IBOCanvasHost;
-import pasa.cbentley.framework.coreui.src4.utils.ViewState;
+import pasa.cbentley.framework.core.framework.src4.app.AppCtx;
+import pasa.cbentley.framework.core.framework.src4.app.AppliAbstract;
+import pasa.cbentley.framework.core.ui.src4.interfaces.ICanvasAppli;
+import pasa.cbentley.framework.core.ui.src4.tech.IBOCanvasHost;
+import pasa.cbentley.framework.core.ui.src4.utils.ViewState;
 import pasa.cbentley.framework.gui.src4.canvas.CanvasAppliInputGui;
-import pasa.cbentley.framework.gui.src4.canvas.CanvasResultDrawable;
 import pasa.cbentley.framework.gui.src4.canvas.ICanvasDrawable;
 import pasa.cbentley.framework.gui.src4.canvas.InputConfig;
-import pasa.cbentley.framework.gui.src4.canvas.InputStateDrawable;
 import pasa.cbentley.framework.gui.src4.canvas.TopLevelCtrl;
-import pasa.cbentley.framework.gui.src4.cmd.CmdInstanceDrawable;
-import pasa.cbentley.framework.gui.src4.cmd.MCmdGuiNewStart;
-import pasa.cbentley.framework.gui.src4.cmd.ViewCommandListener;
+import pasa.cbentley.framework.gui.src4.cmd.CmdInstanceGui;
+import pasa.cbentley.framework.gui.src4.cmd.CmdProcessorGui;
+import pasa.cbentley.framework.gui.src4.cmd.mcmd.MCmdGuiNewStart;
 import pasa.cbentley.framework.gui.src4.core.FigDrawable;
 import pasa.cbentley.framework.gui.src4.core.IDToDrawable;
 import pasa.cbentley.framework.gui.src4.core.StyleClass;
-import pasa.cbentley.framework.gui.src4.ctx.CanvasGuiCtx;
 import pasa.cbentley.framework.gui.src4.ctx.GuiCtx;
-import pasa.cbentley.framework.gui.src4.ctx.config.IConfigAppGui;
-import pasa.cbentley.framework.gui.src4.interfaces.ICmdsView;
+import pasa.cbentley.framework.gui.src4.exec.ExecutionContextCanvasGui;
+import pasa.cbentley.framework.gui.src4.exec.InputStateCanvasGui;
+import pasa.cbentley.framework.gui.src4.exec.OutputStateCanvasGui;
+import pasa.cbentley.framework.gui.src4.interfaces.ICmdsGui;
 import pasa.cbentley.framework.gui.src4.interfaces.IDrawable;
 import pasa.cbentley.framework.gui.src4.interfaces.IUIView;
 
@@ -46,6 +41,8 @@ import pasa.cbentley.framework.gui.src4.interfaces.IUIView;
 public abstract class AppliGui extends AppliAbstract {
 
    private IntToObjects        canvasExtras;
+
+   private IDrawable           firstDrawableCreated;
 
    protected final GuiCtx      gc;
 
@@ -80,12 +77,8 @@ public abstract class AppliGui extends AppliAbstract {
 
    }
 
-   public void cmdStart(CmdInstanceDrawable cd) {
+   public void cmdStart(CmdInstanceGui cd) {
 
-   }
-
-   public IDToDrawable createIDMapper() {
-      return new IDToDrawable(gc);
    }
 
    public ICanvasAppli createCanvas(int id, ByteObject techCanvasHost, Object params) {
@@ -120,6 +113,10 @@ public abstract class AppliGui extends AppliAbstract {
          }
          return null;
       }
+   }
+
+   public IDToDrawable createIDMapper() {
+      return new IDToDrawable(gc);
    }
 
    /**
@@ -157,6 +154,10 @@ public abstract class AppliGui extends AppliAbstract {
     */
    public abstract StyleClass[] getClasses();
 
+   public IDrawable getCreated() {
+      return firstDrawableCreated;
+   }
+
    /**
     * Return the Home Drawable of this Appli. Method will be called by the HOME command
     * Creates if necessary. The first drawable is unaware of top level logic.
@@ -179,7 +180,7 @@ public abstract class AppliGui extends AppliAbstract {
    }
 
    /**
-    * <li> {@link ViewCommandListener} state
+    * <li> {@link CmdProcessorGui} state
     * <li> {@link TopLevelCtrl} list of History.
     * <li> Current Drawables state? how
     * 
@@ -193,7 +194,7 @@ public abstract class AppliGui extends AppliAbstract {
    public ViewState getViewState() {
       ViewState vs = new ViewState();
 
-      vs.add(gc.getViewCommandListener().getViewState());
+      vs.add(gc.getCmdProcessorGui().getViewState());
       return vs;
    }
 
@@ -212,11 +213,17 @@ public abstract class AppliGui extends AppliAbstract {
     */
    protected void setFirstDrawable() {
       //which input config to use here?
-      InputConfig ic = null;
+      ExecutionContextCanvasGui ec = null;
       IDrawable firstD = getFirstDrawable();
       if (firstD != null) {
-         firstD.shShowDrawableOver(ic);
+         firstD.shShowDrawableOver(ec);
       }
+   }
+
+   /**
+    */
+   protected void showCanvasDefault() {
+      super.showCanvasDefault();
    }
 
    /**
@@ -230,8 +237,15 @@ public abstract class AppliGui extends AppliAbstract {
       //called when the app is launched first 
    }
 
-   protected void subAppVersionChange() {
-      //called when the app is launched first 
+   /**
+    * Loads {@link StyleClass}.
+    * 
+    * subclass may also decide  to?
+    * We don't know if its the first load at this stage
+    * <li>
+    */
+   protected void subAppLoad() {
+
    }
 
    protected void subAppLoadPostCtxSettings() {
@@ -242,17 +256,6 @@ public abstract class AppliGui extends AppliAbstract {
          throw new NullPointerException("Implementation must define a set of Styles");
       }
       gc.setClasses(roots);
-   }
-
-   /**
-    * Loads {@link StyleClass}.
-    * 
-    * subclass may also decide  to?
-    * We don't know if its the first load at this stage
-    * <li>
-    */
-   protected void subAppLoad() {
-
    }
 
    /**
@@ -267,17 +270,6 @@ public abstract class AppliGui extends AppliAbstract {
 
    }
 
-   private IDrawable firstDrawableCreated;
-
-   public IDrawable getCreated() {
-      return firstDrawableCreated;
-   }
-
-   /**
-    */
-   protected void showCanvasDefault() {
-      super.showCanvasDefault();
-   }
    /**
     * Not started in headless mode, console only.
     * <br>
@@ -291,10 +283,10 @@ public abstract class AppliGui extends AppliAbstract {
    protected void subAppStarted() {
 
       //TODO check if started from scratch or with saved state.
-      
+
       ICanvasDrawable canvasRoot = gc.getCanvasRoot();
-      InputStateDrawable isd = (InputStateDrawable) canvasRoot.getEvCtrl().getState();
-      CanvasResultDrawable srd = canvasRoot.getRepaintCtrlDraw().getSD();
+      InputStateCanvasGui isd = (InputStateCanvasGui) canvasRoot.getEventController().getInputState();
+      OutputStateCanvasGui srd = canvasRoot.getRepaintCtrlDraw().getSD();
       InputConfig ic = new InputConfig(gc, canvasRoot, isd, srd);
       IDrawable draw = null;
       try {
@@ -326,8 +318,18 @@ public abstract class AppliGui extends AppliAbstract {
       toDLog().pInit("CanvasView after FirstDrawable is created", canvasRoot, AppliGui.class, "subAppStarted@289", LVL_05_FINE, false);
 
       //set GUI State from saved view state. send CMD App Start
-      gc.getViewCommandListener().processCmd(ICmdsView.VCMD_00_LAST_LOGIN);
+      
+      //we are still in the gui thread here
+      //generate a cmd event and put it on the queue for this canvas.
+      
+      
+      CmdProcessorGui viewCommandListener = gc.getCmdProcessorGui();
+      viewCommandListener.processCmd(ICmdsGui.VCMD_00_LAST_LOGIN);
 
+   }
+
+   protected void subAppVersionChange() {
+      //called when the app is launched first 
    }
 
    //#mdebug

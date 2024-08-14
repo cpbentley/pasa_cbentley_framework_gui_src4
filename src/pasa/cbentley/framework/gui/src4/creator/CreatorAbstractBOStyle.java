@@ -1,7 +1,7 @@
 package pasa.cbentley.framework.gui.src4.creator;
 
 import pasa.cbentley.byteobjects.src4.core.ByteObject;
-import pasa.cbentley.byteobjects.src4.objects.pointer.IBOMergeMask;
+import pasa.cbentley.byteobjects.src4.objects.pointer.IBOMerge;
 import pasa.cbentley.framework.drawx.src4.string.interfaces.IBOFigString;
 
 /**
@@ -9,7 +9,7 @@ import pasa.cbentley.framework.drawx.src4.string.interfaces.IBOFigString;
  * @author Charles Bentley
  *
  */
-public abstract class CreatorAbstractBOStyle extends CreatorAbstract implements IBOMergeMask, IBOFigString {
+public abstract class CreatorAbstractBOStyle extends CreatorAbstract implements IBOMerge, IBOFigString {
 
    public CreatorAbstractBOStyle(CreateContext gc) {
       super(gc);
@@ -49,9 +49,17 @@ public abstract class CreatorAbstractBOStyle extends CreatorAbstract implements 
 
    public abstract ByteObject getStyleSelected();
 
+   public abstract ByteObject getStyleGreyed();
+
+   public abstract ByteObject getStyleMarked();
+
    public abstract ByteObject getStyleTextReader();
 
+   public abstract ByteObject getStyleTextReaderH();
+
    public abstract ByteObject getStyleTitle();
-   
+
    public abstract ByteObject getStyleFigureLosange();
+
+   public abstract ByteObject getStyleBackgroundIncomplete();
 }

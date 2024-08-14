@@ -1,19 +1,18 @@
 package pasa.cbentley.framework.gui.src4.utils;
 
 import pasa.cbentley.byteobjects.src4.core.ByteObject;
-import pasa.cbentley.framework.drawx.src4.style.IBOStyle;
-import pasa.cbentley.framework.drawx.src4.style.StyleOperator;
+import pasa.cbentley.framework.core.ui.src4.input.InputState;
 import pasa.cbentley.framework.gui.src4.canvas.InputConfig;
 import pasa.cbentley.framework.gui.src4.core.Drawable;
 import pasa.cbentley.framework.gui.src4.core.ScrollConfig;
 import pasa.cbentley.framework.gui.src4.core.ViewDrawable;
+import pasa.cbentley.framework.gui.src4.exec.ExecutionContextCanvasGui;
+import pasa.cbentley.framework.gui.src4.exec.InputStateCanvasGui;
 import pasa.cbentley.framework.gui.src4.interfaces.IDrawable;
 import pasa.cbentley.framework.gui.src4.interfaces.ITechDrawable;
 import pasa.cbentley.framework.gui.src4.tech.ITechViewPane;
-import pasa.cbentley.framework.input.src4.InputState;
 
 public class DrawableUtilz {
-
 
    /**
     * Sets state flag to visible.
@@ -67,11 +66,11 @@ public class DrawableUtilz {
    }
 
    public static void initConfigPixelPageX(ViewDrawable vd, ScrollConfig scX) {
-      initConfigPixelPage(scX, vd.getPreferredContentWidth(), vd.getContentW());
+      initConfigPixelPage(scX, vd.getSizePreferredContentWidth(), vd.getContentW());
    }
 
    public static void initConfigPixelPageY(ViewDrawable vd, ScrollConfig scY) {
-      initConfigPixelPage(scY, vd.getPreferredContentHeight(), vd.getContentH());
+      initConfigPixelPage(scY, vd.getSizePreferredContentHeight(), vd.getContentH());
    }
 
    /**
@@ -86,18 +85,18 @@ public class DrawableUtilz {
       switch (scX.getTypeUnit()) {
          case ITechViewPane.SCROLL_TYPE_0_PIXEL_UNIT:
             incrementPixelSize = 1;
-            totalScrollingIncrement = vd.getPreferredContentWidth();
+            totalScrollingIncrement = vd.getSizePreferredContentWidth();
             visibleScrollingIncrement = vd.getContentW();
             break;
          case ITechViewPane.SCROLL_TYPE_1_LOGIC_UNIT:
             incrementPixelSize = 1;
-            totalScrollingIncrement = vd.getPreferredContentWidth();
+            totalScrollingIncrement = vd.getSizePreferredContentWidth();
             visibleScrollingIncrement = vd.getContentW();
             break;
          case ITechViewPane.SCROLL_TYPE_2_PAGE_UNIT:
             incrementPixelSize = vd.getContentW();
             visibleScrollingIncrement = 1;
-            totalScrollingIncrement = vd.getPreferredContentWidth() / vd.getContentW();
+            totalScrollingIncrement = vd.getSizePreferredContentWidth() / vd.getContentW();
             break;
          default:
             throw new IllegalArgumentException();
@@ -113,18 +112,18 @@ public class DrawableUtilz {
          case ITechViewPane.SCROLL_TYPE_0_PIXEL_UNIT:
             incrementPixelSize = 1;
             //
-            totalScrollingIncrement = vd.getPreferredContentHeight();
+            totalScrollingIncrement = vd.getSizePreferredContentHeight();
             visibleScrollingIncrement = vd.getContentH();
             break;
          case ITechViewPane.SCROLL_TYPE_1_LOGIC_UNIT:
             incrementPixelSize = 1;
-            totalScrollingIncrement = vd.getPreferredContentHeight();
+            totalScrollingIncrement = vd.getSizePreferredContentHeight();
             visibleScrollingIncrement = vd.getContentH();
             break;
          case ITechViewPane.SCROLL_TYPE_2_PAGE_UNIT:
             incrementPixelSize = vd.getContentH();
             visibleScrollingIncrement = 1;
-            totalScrollingIncrement = vd.getPreferredContentHeight() / vd.getContentH();
+            totalScrollingIncrement = vd.getSizePreferredContentHeight() / vd.getContentH();
             break;
          default:
             throw new IllegalArgumentException();
@@ -134,24 +133,27 @@ public class DrawableUtilz {
 
    /**
     * Is the InputConfig current x,y coordinate inside the drawable drawing area
-    * @param ic 
+    * @param ec 
     * @param d
     * @return
     */
-   public static boolean isInside(InputConfig ic, IDrawable d) {
+   public static boolean isInside(ExecutionContextCanvasGui ec, IDrawable d) {
+      InputStateCanvasGui is = ec.getInputStateDrawable();
+      return isInside(is, d);
+   }
+
+   public static boolean isInside(InputStateCanvasGui is, IDrawable d) {
       if (d == null)
          return false;
-      //System.out.print("Pointer = (" + ic.x + "," + ic.y + ")");
-      //System.out.println("Drawable = (" + d.getX() + "," + d.getY() + ") [" + (d.getX() + d.getDrawnWidth()) + "," + (d.getY() + d.getDrawnHeight()) + "]");
-      if (ic.is.getX() >= d.getX() && ic.is.getY() >= d.getY()) {
-         if (ic.is.getX() < d.getX() + d.getDrawnWidth() && ic.is.getY() < d.getY() + d.getDrawnHeight()) {
+      if (is.getX() >= d.getX() && is.getY() >= d.getY()) {
+         if (is.getX() < d.getX() + d.getDrawnWidth() && is.getY() < d.getY() + d.getDrawnHeight()) {
             if (d.hasState(ITechDrawable.STATE_29_CLIPPED)) {
 
             }
             if (d.hasState(ITechDrawable.STATE_24_HOLED)) {
                int[] holes = d.getHoles();
                for (int i = 0; i < holes.length; i += 4) {
-                  if (isInside(ic, holes[0], holes[1], holes[2], holes[3])) {
+                  if (isInside(is, holes[0], holes[1], holes[2], holes[3])) {
                      return false;
                   }
                }
@@ -195,9 +197,19 @@ public class DrawableUtilz {
       return false;
    }
 
-   public static boolean isInside(InputConfig ic, int x, int y, int w, int h) {
-      if (ic.is.getX() >= x && ic.is.getY() >= y) {
-         if (ic.is.getX() < x + w && ic.is.getY() < y + h) {
+   public static boolean isInside(ExecutionContextCanvasGui ec, int x, int y, int w, int h) {
+      InputStateCanvasGui is = ec.getInputStateDrawable();
+      if (is.getX() >= x && is.getY() >= y) {
+         if (is.getX() < x + w && is.getY() < y + h) {
+            return true;
+         }
+      }
+      return false;
+   }
+
+   public static boolean isInside(InputStateCanvasGui is, int x, int y, int w, int h) {
+      if (is.getX() >= x && is.getY() >= y) {
+         if (is.getX() < x + w && is.getY() < y + h) {
             return true;
          }
       }
@@ -213,24 +225,24 @@ public class DrawableUtilz {
       return false;
    }
 
-
    /**
     * Returns true when.
     * <br>
     * Does not made the assumption that x,y is inside drawable.
     * <br>
     * Slack works if pointer is outside Drawable.
-    * @param ic
+    * @param ec
     * @param d
     * @param slack
     * @return
     */
-   public static boolean isInsideBorder(InputConfig ic, Drawable d, int slack) {
+   public static boolean isInsideBorder(ExecutionContextCanvasGui ec, Drawable d, int slack) {
       if (d == null)
          return false;
       ByteObject style = d.getStyle();
-      int x = ic.is.getX();
-      int y = ic.is.getY();
+      InputStateCanvasGui is = ec.getInputStateDrawable();
+      int x = is.getX();
+      int y = is.getY();
       int dx = d.getX();
       int dy = d.getY();
       int dh = d.getDrawnHeight();
@@ -267,30 +279,29 @@ public class DrawableUtilz {
 
    /**
     * PRE: assume is already inside 
-    * @param ic
+    * @param ec
     * @param d
     * @return
     */
-   public static boolean isInsideBorder(InputConfig ic, Drawable d) {
+   public static boolean isInsideBorder(ExecutionContextCanvasGui ec, Drawable d) {
       if (d == null)
          return false;
       ByteObject style = d.getStyle();
-      if (ic.is.getX() < d.getX() + d.getStyleWLeftConsumed()) {
+      InputStateCanvasGui is = ec.getInputStateDrawable();
+      if (is.getX() < d.getX() + d.getStyleWLeftConsumed()) {
          return true;
       }
-      if (ic.is.getX() > d.getX() + d.getDrawnWidth() - d.getStyleWRightConsumed()) {
+      if (is.getX() > d.getX() + d.getDrawnWidth() - d.getStyleWRightConsumed()) {
          return true;
       }
-      if (ic.is.getY() > d.getY() + d.getDrawnHeight() - d.getStyleHBotConsumed()) {
+      if (is.getY() > d.getY() + d.getDrawnHeight() - d.getStyleHBotConsumed()) {
          return true;
       }
-      if (ic.is.getY() < d.getY() + d.getStyleHTopConsumed()) {
+      if (is.getY() < d.getY() + d.getStyleHTopConsumed()) {
          return true;
       }
       return false;
    }
-
-
 
    /**
     * True when D is a child of look

@@ -1,8 +1,8 @@
 package pasa.cbentley.framework.gui.src4.interfaces;
 
 import pasa.cbentley.framework.gui.src4.canvas.CanvasDrawControl;
-import pasa.cbentley.framework.gui.src4.canvas.InputConfig;
 import pasa.cbentley.framework.gui.src4.canvas.ViewContext;
+import pasa.cbentley.framework.gui.src4.exec.ExecutionContextCanvasGui;
 
 /**
  * Interface to the put and remove Drawables .
@@ -44,20 +44,20 @@ public interface IDrawableCtrl {
     * @param d
     * @param newFocus the drawable which will get the focus
     */
-   public void removeDrawable(InputConfig ic, IDrawable d, IDrawable newFocus);
+   public void removeDrawable(ExecutionContextCanvasGui ec, IDrawable d, IDrawable newFocus);
 
    /**
     * 
     * @param d
     */
-   public void shHideDrawable(InputConfig ic, IDrawable d);
+   public void shHideDrawable(ExecutionContextCanvasGui ec, IDrawable d);
 
    /**
     * Shows the Drawable 
     * @param view
     * @param type
     */
-   public void shShowDrawable(InputConfig ic, IDrawable view, int type);
+   public void shShowDrawable(ExecutionContextCanvasGui ec, IDrawable view, int type);
 
    /**
     * Draws {@link IDrawable} using {@link ITechCanvasDrawable#SHOW_TYPE_1_OVER_TOP}.
@@ -72,11 +72,11 @@ public interface IDrawableCtrl {
     * <br>
     * @param d cannot be null
     */
-   public void shShowDrawableOver(InputConfig ic, IDrawable d);
+   public void shShowDrawableOver(ExecutionContextCanvasGui ec, IDrawable d);
 
-   public void shShowDrawableOverCmds(InputConfig ic, IDrawable d);
+   public void shShowDrawableOverCmds(ExecutionContextCanvasGui ec, IDrawable d);
 
-   public void shShowDrawableOverNoCmds(InputConfig ic, IDrawable d);
+   public void shShowDrawableOverNoCmds(ExecutionContextCanvasGui ec, IDrawable d);
 
-   public void shShowDrawableOverNoFocus(InputConfig ic, IDrawable d);
+   public void shShowDrawableOverNoFocus(ExecutionContextCanvasGui ec, IDrawable d);
 }

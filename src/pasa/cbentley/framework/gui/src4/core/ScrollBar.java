@@ -9,7 +9,7 @@ import pasa.cbentley.core.src4.utils.ColorUtils;
 import pasa.cbentley.core.src4.utils.interfaces.IColors;
 import pasa.cbentley.framework.cmd.src4.ctx.CmdCtx;
 import pasa.cbentley.framework.cmd.src4.interfaces.ICmdsCmd;
-import pasa.cbentley.framework.coreui.src4.tech.ITechCodes;
+import pasa.cbentley.framework.core.ui.src4.tech.ITechCodes;
 import pasa.cbentley.framework.drawx.src4.ctx.DrwCtx;
 import pasa.cbentley.framework.drawx.src4.engine.GraphicsX;
 import pasa.cbentley.framework.drawx.src4.factories.FigureFactory;
@@ -18,10 +18,11 @@ import pasa.cbentley.framework.drawx.src4.tech.ITechAnchor;
 import pasa.cbentley.framework.drawx.src4.utils.AnchorUtils;
 import pasa.cbentley.framework.gui.src4.canvas.InputConfig;
 import pasa.cbentley.framework.gui.src4.canvas.PointerGestureDrawable;
-import pasa.cbentley.framework.gui.src4.cmd.CmdInstanceDrawable;
+import pasa.cbentley.framework.gui.src4.cmd.CmdInstanceGui;
 import pasa.cbentley.framework.gui.src4.ctx.GuiCtx;
 import pasa.cbentley.framework.gui.src4.ctx.IBOTypesGui;
 import pasa.cbentley.framework.gui.src4.ctx.IToStringFlagsDraw;
+import pasa.cbentley.framework.gui.src4.exec.ExecutionContextCanvasGui;
 import pasa.cbentley.framework.gui.src4.factories.interfaces.IBOScrollBar;
 import pasa.cbentley.framework.gui.src4.factories.interfaces.IBOViewPane;
 import pasa.cbentley.framework.gui.src4.interfaces.IDrawable;
@@ -269,14 +270,14 @@ public class ScrollBar extends Drawable implements IBOScrollBar, IDrawableListen
       toDLog().pInit(toStringGetName() + " ", this, ScrollBar.class, "Created@268", LVL_05_FINE, true);
    }
 
-   protected void actionUnselectTopBot(InputConfig ic) {
+   protected void actionUnselectTopBot(ExecutionContextCanvasGui ec) {
       if (topLeftFigure != null && topLeftFigure.hasStateStyle(ITechDrawable.STYLE_05_SELECTED)) {
          topLeftFigure.setStateStyle(ITechDrawable.STYLE_05_SELECTED, false);
-         ic.srActionDoneRepaint(topLeftFigure);
+         ec.srActionDoneRepaint(topLeftFigure);
       }
       if (botRightFigure != null && botRightFigure.hasStateStyle(ITechDrawable.STYLE_05_SELECTED)) {
          botRightFigure.setStateStyle(ITechDrawable.STYLE_05_SELECTED, false);
-         ic.srActionDoneRepaint(botRightFigure);
+         ec.srActionDoneRepaint(botRightFigure);
       }
    }
 
@@ -289,16 +290,16 @@ public class ScrollBar extends Drawable implements IBOScrollBar, IDrawableListen
     * <br>
     * @param upleft
     */
-   private void animCall(InputConfig ic, boolean upleft) {
+   private void animCall(ExecutionContextCanvasGui ec, boolean upleft) {
       if (scrollConfig.getTypeUnit() == ITechViewPane.SCROLL_TYPE_0_PIXEL_UNIT) {
          return;
       }
       if (pane != null && pane.hasTechX(IBOViewPane.VP_FLAGX_7_ANIMATED)) {
          boolean isVert = hasTechFlag(SB_FLAG_1_VERT);
          if (isVert) {
-            pane.manageAnimVert(ic, scrollConfig, upleft);
+            pane.manageAnimVert(ec, scrollConfig, upleft);
          } else {
-            pane.manageAnimHoriz(ic, scrollConfig, upleft);
+            pane.manageAnimHoriz(ec, scrollConfig, upleft);
          }
       }
    }
@@ -320,9 +321,10 @@ public class ScrollBar extends Drawable implements IBOScrollBar, IDrawableListen
       }
    }
 
-   public void commandAction(CmdInstanceDrawable cd) {
+   public void commandAction(CmdInstanceGui cd) {
       if (cd.getCmdID() == ICmdsCmd.CMD_11_NAV_UP) {
-         navigateUp(cd.getIC());
+         ExecutionContextCanvasGui ec = cd.getExecutionCtxGui();
+         navigateUp(ec);
       } else {
          super.commandAction(cd);
       }
@@ -418,9 +420,9 @@ public class ScrollBar extends Drawable implements IBOScrollBar, IDrawableListen
       botRightFigure.setBehaviorFlag(ITechDrawable.BEHAVIOR_23_PARENT_EVENT_CONTROL, true);
 
       //#debug
-      topLeftFigure.toStringSetName("Fig" + (hasTechFlag(SB_FLAG_1_VERT) ? "Top" : "Left"));
+      topLeftFigure.toStringSetName("Scrollbar_Figure_" + (hasTechFlag(SB_FLAG_1_VERT) ? "Top" : "Left"));
       //#debug
-      botRightFigure.toStringSetName("Fig" + (hasTechFlag(SB_FLAG_1_VERT) ? "Bottom" : "Right"));
+      botRightFigure.toStringSetName("Scrollbar_Figure_" + (hasTechFlag(SB_FLAG_1_VERT) ? "Bottom" : "Right"));
    }
 
    /**
@@ -575,8 +577,8 @@ public class ScrollBar extends Drawable implements IBOScrollBar, IDrawableListen
 
    /**
     * Apply Style Filters.
-    * Most used is the {@link #STYLE_FLAGC_5_FILTER_ALL} that applies
-    * to overlay scrollbars
+    * 
+    * Most used is the {@link #STYLE_FLAG_F_5_FILTER_ALL} that applies to overlay scrollbars
     * @param g
     */
    private void drawBlockBar(GraphicsX g) {
@@ -1303,96 +1305,99 @@ public class ScrollBar extends Drawable implements IBOScrollBar, IDrawableListen
       return !hasTechFlag(SB_FLAG_1_VERT);
    }
 
-   protected void manageBlockBgPointerEvent(InputConfig ic) {
+   protected void manageBlockBgPointerEvent(ExecutionContextCanvasGui ec) {
+      InputConfig ic = ec.getInputConfig();
       if (ic.isPressed()) {
          boolean upleft = false;
          if (hasTechFlag(SB_FLAG_1_VERT)) {
-            if (ic.is.getY() < blockFigure.getY()) {
+            if (ic.getInputStateDrawable().getY() < blockFigure.getY()) {
                upleft = true;
             }
-            navigateGeneric(ic, scrollConfig.getSIVisible(), upleft, true);
+            navigateGeneric(ec, scrollConfig.getSIVisible(), upleft, true);
          } else {
-            if (ic.is.getX() < blockFigure.getX()) {
+            if (ic.getInputStateDrawable().getX() < blockFigure.getX()) {
                upleft = true;
             }
-            navigateGeneric(ic, scrollConfig.getSIVisible(), upleft, true);
+            navigateGeneric(ec, scrollConfig.getSIVisible(), upleft, true);
          }
       } else if (ic.isReleased()) {
-         pointerReleasedDragged(ic);
+         pointerReleasedDragged(ec);
       }
    }
 
    /**
     * Called by {@link Controller} in stand alone mode.
     * <br>
-    * Within a {@link ViewPane} context, called by {@link ViewPane#manageKeyInput(InputConfig)} 
+    * Within a {@link ViewPane} context, called by {@link ViewPane#manageKeyInput(ExecutionContextCanvasGui)} 
     */
-   public void manageKeyInput(InputConfig ic) {
+   public void manageKeyInput(ExecutionContextCanvasGui ec) {
+      InputConfig ic = ec.getInputConfig();
       //System.out.println("ScrollBar Key");
       if (hasTechFlag(SB_FLAG_1_VERT) && ic.isUpActive()) {
-         navigateUp(ic);
+         navigateUp(ec);
       }
       if ((!hasTechFlag(SB_FLAG_1_VERT) && ic.isLeftActive())) {
-         navigateLeft(ic);
+         navigateLeft(ec);
       }
       if (hasTechFlag(SB_FLAG_1_VERT) && ic.isDownActive()) {
-         navigateDown(ic);
+         navigateDown(ec);
       }
       if (!hasTechFlag(SB_FLAG_1_VERT) && ic.isRightActive()) {
-         navigateRight(ic);
+         navigateRight(ec);
       }
       //
       if (ic.isUp() && ic.isReleased()) {
-         navigateUp(ic);
+         navigateUp(ec);
       }
       if (ic.isDown() && ic.isReleased()) {
-         navigateDown(ic);
+         navigateDown(ec);
       }
    }
 
-   public void managePointerEvent(IDrawable slave, InputConfig ic) {
+   public void managePointerEvent(IDrawable slave, ExecutionContextCanvasGui ec) {
+      InputConfig ic = ec.getInputConfig();
       //either call back from slave
       //System.out.println("#Scrollbar#managePointerInput Slave " + slave.toStringOneLine());
       if (ic.isMoved()) {
          //when moving from and to bgfigure and block figure, we must do the swap here
-         if (slave == blockBgFigure && DrawableUtilz.isInside(ic, blockFigure)) {
-            blockFigure.managePointerStateStyle(ic);
+         if (slave == blockBgFigure && DrawableUtilz.isInside(ec, blockFigure)) {
+            blockFigure.managePointerStateStyle(ec);
          } else {
-            blockBgFigure.managePointerStateStyle(ic);
+            blockBgFigure.managePointerStateStyle(ec);
          }
          //we have to set action done, otherwise ViewPane thinks nothing was done
          return;
       }
       //registered for presses (scrolling + state) and releases (state change)
       if (slave == topLeftFigure) {
-         navigateGeneric(ic, 0, true, true);
+         navigateGeneric(ec, 0, true, true);
       } else if (slave == botRightFigure) {
-         navigateGeneric(ic, 0, false, true);
-         botRightFigure.managePointerStateStyle(ic);
+         navigateGeneric(ec, 0, false, true);
+         botRightFigure.managePointerStateStyle(ec);
       } else if (slave == blockBgFigure) {
-         manageBlockBgPointerEvent(ic);
-         blockBgFigure.managePointerStateStyle(ic);
+         manageBlockBgPointerEvent(ec);
+         blockBgFigure.managePointerStateStyle(ec);
       } else if (slave == blockFigure) {
          //update the drag starter values
          if (ic.isPressed()) {
             //update the x
-            GestureDetector pg = ic.is.getOrCreateGesture(blockFigure);
+            GestureDetector pg = ic.getInputStateDrawable().getOrCreateGesture(blockFigure);
             pg.setReleasePointer(true, false);
             //starts a simple gesture with no values
-            pg.simplePress(scrollConfig.getSIStart(), ic.is);
+            pg.simplePress(scrollConfig.getSIStart(), ic.getInputStateDrawable());
          } else if (ic.isReleased()) {
-            GestureDetector pg = ic.is.getOrCreateGesture(blockFigure);
+            GestureDetector pg = ic.getInputStateDrawable().getOrCreateGesture(blockFigure);
             //starts a simple gesture with no values
             //gesture depends on the ViewDrawable
-            pg.simpleRelease(ic.is);
-            pointerReleasedDragged(ic);
+            pg.simpleRelease(ic.getInputStateDrawable());
+            pointerReleasedDragged(ec);
          } else if (ic.isDraggedPointer0Button0()) {
-            GestureDetector pg = ic.is.getOrCreateGesture(blockFigure);
+            GestureDetector pg = ic.getInputStateDrawable().getOrCreateGesture(blockFigure);
             //starts a simple gesture with no values
-            pg.simpleDrag(ic.is);
-            pointerDraggingBlock(ic);
+            pg.simpleDrag(ic.getInputStateDrawable());
+            pointerDraggingBlock(ec);
          }
-         blockFigure.managePointerStateStyle(ic);
+         blockFigure.managePointerStateStyle(ec);
       }
    }
 
@@ -1415,29 +1420,30 @@ public class ScrollBar extends Drawable implements IBOScrollBar, IDrawableListen
     * 	<li>North/West of Block
     * 	<li>South/East of Block
     */
-   public void managePointerInput(InputConfig ic) {
+   public void managePointerInput(ExecutionContextCanvasGui ec) {
+      InputConfig ic = ec.getInputConfig();
       if (ic.isWheeled()) {
          if (ic.getIdKeyBut() == ITechCodes.PBUTTON_3_WHEEL_UP) {
-            navigateGeneric(ic, 0, true, true);
+            navigateGeneric(ec, 0, true, true);
          } else {
-            navigateGeneric(ic, 0, false, true);
+            navigateGeneric(ec, 0, false, true);
          }
          return;
       }
 
       //top down dispatch: arrives here when no slave and when there is no pointer moves
       //straight event because dispatch to Drawable
-      if (DrawableUtilz.isInside(ic, topLeftFigure)) {
-         topLeftFigure.managePointerInput(ic);
-      } else if (DrawableUtilz.isInside(ic, botRightFigure)) {
-         botRightFigure.managePointerInput(ic);
-      } else if (DrawableUtilz.isInside(ic, blockFigure)) {
-         blockFigure.managePointerInput(ic);
-      } else if (DrawableUtilz.isInside(ic, blockBgFigure)) {
-         blockBgFigure.managePointerInput(ic);
+      if (DrawableUtilz.isInside(ec, topLeftFigure)) {
+         topLeftFigure.managePointerInput(ec);
+      } else if (DrawableUtilz.isInside(ec, botRightFigure)) {
+         botRightFigure.managePointerInput(ec);
+      } else if (DrawableUtilz.isInside(ec, blockFigure)) {
+         blockFigure.managePointerInput(ec);
+      } else if (DrawableUtilz.isInside(ec, blockBgFigure)) {
+         blockBgFigure.managePointerInput(ec);
       } else {
          //inside scrollbar per se... nothing to do
-         gc.getFocusCtrl().newFocusPointerPress(ic, this);
+         gc.getFocusCtrl().newFocusPointerPress(ec, this);
          //we need to inform ViewPane that this is it.
          ic.srActionDoneRepaint(this);
       }
@@ -1449,7 +1455,7 @@ public class ScrollBar extends Drawable implements IBOScrollBar, IDrawableListen
     * Smooth moves with the scrollbars. Handles dragging and move animation
     * Move animation
     */
-   public void navigateDown(InputConfig ic) {
+   public void navigateDown(ExecutionContextCanvasGui ic) {
       if (!hasTechFlag(SB_FLAG_1_VERT)) {
          return;
       }
@@ -1466,21 +1472,23 @@ public class ScrollBar extends Drawable implements IBOScrollBar, IDrawableListen
     * @param vchange change for start increment. when 0
     * @param upleft
     */
-   public void navigateGeneric(InputConfig ic, int vchange, boolean upleft, boolean isPointer) {
+   public void navigateGeneric(ExecutionContextCanvasGui ec, int vchange, boolean upleft, boolean isPointer) {
+      InputConfig ic = ec.getInputConfig();
       if (ic.isPressed()) {
-         navigateGenericPressed(ic, vchange, upleft, isPointer);
+         navigateGenericPressed(ec, vchange, upleft, isPointer);
       } else if (ic.isDraggedPointer0Button0()) {
          //
-         navigateGenericDragged(ic, vchange, upleft);
+         navigateGenericDragged(ec, vchange, upleft);
       } else if (ic.isReleased()) {
          setSelectedStateGeneric(upleft, false);
          ic.srActionDoneRepaint(this);
       } else if (ic.isWheeled()) {
-         navigateGenericWheeled(ic, vchange, upleft);
+         navigateGenericWheeled(ec, vchange, upleft);
       }
    }
 
-   public void navigateGenericDragged(InputConfig ic, int vchange, boolean upleft) {
+   public void navigateGenericDragged(ExecutionContextCanvasGui ec, int vchange, boolean upleft) {
+      InputConfig ic = ec.getInputConfig();
       if (scrollConfig.getSIStart() != vchange) {
          setSelectedStateGeneric(upleft, true);
          scrollConfig.setSIStartNoEx(vchange);
@@ -1496,8 +1504,9 @@ public class ScrollBar extends Drawable implements IBOScrollBar, IDrawableListen
     * @param upleft
     * @param isPointer
     */
-   public void navigateGenericPressed(InputConfig ic, int vchange, boolean upleft, boolean isPointer) {
+   public void navigateGenericPressed(ExecutionContextCanvasGui ec, int vchange, boolean upleft, boolean isPointer) {
       //we want pointer/ and if key to repeat sending event until there is a release
+      InputConfig ic = ec.getInputConfig();
       ic.requestRepetition();
 
       if (vchange == 0) {
@@ -1518,12 +1527,13 @@ public class ScrollBar extends Drawable implements IBOScrollBar, IDrawableListen
 
          doUpdateStructure();
 
-         repaintScrollbarAndContent(ic);
-         animCall(ic, upleft);
+         repaintScrollbarAndContent(ec);
+         animCall(ec, upleft);
       }
    }
 
-   public void navigateGenericWheeled(InputConfig ic, int vchange, boolean upleft) {
+   public void navigateGenericWheeled(ExecutionContextCanvasGui ec, int vchange, boolean upleft) {
+      InputConfig ic = ec.getInputConfig();
       if (vchange == 0) {
          vchange = 1 + 0;
       }
@@ -1534,36 +1544,36 @@ public class ScrollBar extends Drawable implements IBOScrollBar, IDrawableListen
       }
       if (scrollConfig.getSILastChange() != 0) {
          doUpdateStructure();
-         repaintScrollbarAndContent(ic);
-         animCall(ic, upleft);
+         repaintScrollbarAndContent(ec);
+         animCall(ec, upleft);
       }
    }
 
    /**
     * The amount of Left Navigation
     */
-   public void navigateLeft(InputConfig ic) {
+   public void navigateLeft(ExecutionContextCanvasGui ic) {
       if (hasTechFlag(SB_FLAG_1_VERT)) {
          return;
       }
       navigateGeneric(ic, 0, true, false);
    }
 
-   public void navigateRight(InputConfig ic) {
+   public void navigateRight(ExecutionContextCanvasGui ic) {
       if (hasTechFlag(SB_FLAG_1_VERT)) {
          return;
       }
       navigateGeneric(ic, 0, false, false);
    }
 
-   public void navigateSelect(InputConfig ic) {
+   public void navigateSelect(ExecutionContextCanvasGui ic) {
       //nothing to select here
    }
 
    /**
     * 
     */
-   public void navigateUp(InputConfig ic) {
+   public void navigateUp(ExecutionContextCanvasGui ic) {
       if (!hasTechFlag(SB_FLAG_1_VERT)) {
          return;
       }
@@ -1572,7 +1582,7 @@ public class ScrollBar extends Drawable implements IBOScrollBar, IDrawableListen
 
    public void notifyEvent(IDrawable d, int event, Object o) {
       if (event == ITechDrawable.EVENT_14_POINTER_EVENT) {
-         managePointerEvent(d, (InputConfig) o);
+         managePointerEvent(d, (ExecutionContextCanvasGui) o);
       }
    }
 
@@ -1597,8 +1607,9 @@ public class ScrollBar extends Drawable implements IBOScrollBar, IDrawableListen
     * 
     * @param ic
     */
-   private void pointerDraggingBlock(InputConfig ic) {
+   private void pointerDraggingBlock(ExecutionContextCanvasGui ec) {
       //pixel different since the last pressed event
+      InputConfig ic = ec.getInputConfig();
       int pixelMove = 0;
       if (hasTechFlag(SB_FLAG_1_VERT)) {
          pixelMove = ic.getDraggedVectorY();
@@ -1606,7 +1617,7 @@ public class ScrollBar extends Drawable implements IBOScrollBar, IDrawableListen
          pixelMove = ic.getDraggedVectorX();
       }
 
-      int startIncr = ic.is.getOrCreateGesture(blockFigure).getPressed(PointerGestureDrawable.ID_0_X);
+      int startIncr = ic.getInputStateDrawable().getOrCreateGesture(blockFigure).getPressed(PointerGestureDrawable.ID_0_X);
       //translate the pixel into increment units.
       //int startIncr = Controller.getMe().getDraggedPressedX();
 
@@ -1657,14 +1668,14 @@ public class ScrollBar extends Drawable implements IBOScrollBar, IDrawableListen
          doUpdateStructure();
       }
       //repaint ViewDrawable content and this scrollbar
-      repaintScrollbarAndContent(ic);
+      repaintScrollbarAndContent(ec);
 
       //generates call drag method on View
       pane.getViewDrawable().manageDragCallBack(this);
       if (trailer != null) {
          if (trailer.hasState(ITechDrawable.STATE_03_HIDDEN)) {
             trailer.init(0, 0);
-            vc.getDrawCtrlAppli().shShowDrawable(ic, trailer, ITechCanvasDrawable.SHOW_TYPE_1_OVER_TOP);
+            vc.getDrawCtrlAppli().shShowDrawable(ec, trailer, ITechCanvasDrawable.SHOW_TYPE_1_OVER_TOP);
          }
          trailer.setXY(blockFigure.getX() - trailer.getDrawnWidth(), blockFigure.getY());
       }
@@ -1674,27 +1685,27 @@ public class ScrollBar extends Drawable implements IBOScrollBar, IDrawableListen
     * Called when a release pointer event is generated after a dragged of block scrollbar.
     * @param ic
     */
-   private void pointerReleasedDragged(InputConfig ic) {
+   private void pointerReleasedDragged(ExecutionContextCanvasGui ec) {
       //System.out.println("#Scrollbar pointerReleasedDragged after Dragging");
       //deselects all drawables that may have been selected
-      actionUnselectTopBot(ic);
+      actionUnselectTopBot(ec);
       if (blockFigure != null) {
          blockFigure.setStateStyle(ITechDrawable.STYLE_05_SELECTED, false);
       }
       if (trailer != null) {
          vc.getDrawCtrlAppli().removeDrawable(null, trailer, null);
       }
-      ic.srActionDoneRepaint(this);
+      ec.srActionDoneRepaint(this);
    }
 
-   public void repaintScrollbarAndContent(InputConfig ic) {
+   public void repaintScrollbarAndContent(ExecutionContextCanvasGui ec) {
       //scroll action done on ScrollBar. we want to repaint the scrollbar and ViewDrawable's content.
-      ic.srActionDoneRepaint(this);
+      ec.srActionDoneRepaint(this);
       if (pane != null) {
          ViewDrawable vd = pane.getViewDrawable();
          //ask to repaint only the content of the viewpane
          vd.setFlagView(ITechViewDrawable.FLAG_VSTATE_02_REPAINTING_CONTENT, true);
-         ic.srActionDoneRepaint(vd);
+         ec.srActionDoneRepaint(vd);
       }
    }
 

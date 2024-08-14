@@ -1,15 +1,14 @@
 package pasa.cbentley.framework.gui.src4.cmd;
 
 import pasa.cbentley.core.src4.logging.Dctx;
-import pasa.cbentley.framework.cmd.src4.ctx.CmdCtx;
 import pasa.cbentley.framework.cmd.src4.engine.CmdInstance;
 import pasa.cbentley.framework.cmd.src4.engine.CmdNode;
 import pasa.cbentley.framework.cmd.src4.engine.MCmd;
 import pasa.cbentley.framework.cmd.src4.trigger.CmdTrigger;
-import pasa.cbentley.framework.coreui.src4.tech.ITechInputFeedback;
-import pasa.cbentley.framework.gui.src4.canvas.ExecutionContextGui;
+import pasa.cbentley.framework.core.ui.src4.tech.ITechInputFeedback;
 import pasa.cbentley.framework.gui.src4.canvas.InputConfig;
 import pasa.cbentley.framework.gui.src4.ctx.GuiCtx;
+import pasa.cbentley.framework.gui.src4.exec.ExecutionContextCanvasGui;
 import pasa.cbentley.framework.gui.src4.interfaces.IDrawable;
 
 /**
@@ -17,29 +16,40 @@ import pasa.cbentley.framework.gui.src4.interfaces.IDrawable;
  * @author Charles Bentley
  *
  */
-public class CmdInstanceDrawable extends CmdInstance {
+public class CmdInstanceGui extends CmdInstance {
 
-   private String                actionString;
+   private String           actionString;
 
-   private CmdInstanceDrawable   childCmd;
+   private CmdInstanceGui   childCmd;
 
-   private IDrawable             d;
+   private IDrawable        d;
 
-   protected CmdInstanceDrawable parentCmd;
+   protected CmdInstanceGui parentGui;
 
-   protected final GuiCtx        gc;
+   protected final GuiCtx   gc;
 
-   public CmdInstanceDrawable(GuiCtx gc, int vcmdID) {
+   public CmdInstanceGui(GuiCtx gc, int vcmdID) {
       super(gc.getCC(), vcmdID);
       this.gc = gc;
    }
 
-   public CmdInstanceDrawable(GuiCtx gc, MCmd c) {
+   public CmdInstanceGui(GuiCtx gc, int vcmdID, ExecutionContextCanvasGui ec) {
+      super(gc.getCC(), vcmdID);
+      this.gc = gc;
+      this.exeCtx = ec;
+   }
+
+   public CmdInstanceGui(GuiCtx gc, MCmd c) {
       super(gc.getCC(), c);
       this.gc = gc;
    }
 
-   public CmdInstanceDrawable(GuiCtx gc, MCmd c, CmdNode ctx, CmdTrigger ct) {
+   public void setParentGui(CmdInstanceGui cmdGui) {
+      this.setParent(cmdGui);
+      this.parentGui = cmdGui;
+   }
+
+   public CmdInstanceGui(GuiCtx gc, MCmd c, CmdNode ctx, CmdTrigger ct) {
       super(gc.getCC(), c, ctx, ct);
       this.gc = gc;
    }
@@ -64,12 +74,12 @@ public class CmdInstanceDrawable extends CmdInstance {
       this.actionDone(null, ITechInputFeedback.FLAG_02_FULL_REPAINT);
    }
 
-   public CmdInstanceDrawable getChildCmdDrawable() {
+   public CmdInstanceGui getChildCmdDrawable() {
       return childCmd;
    }
 
-   public ExecutionContextGui getDExCtx() {
-      return (ExecutionContextGui) getExCtx();
+   public ExecutionContextCanvasGui getExecutionCtxGui() {
+      return (ExecutionContextCanvasGui) getExecutionContext();
    }
 
    public InputConfig getIC() {
@@ -89,7 +99,7 @@ public class CmdInstanceDrawable extends CmdInstance {
    }
 
    public MCmd getRoot() {
-      return cmd;
+      return getMCmd();
    }
 
    //#enddebug
@@ -144,14 +154,14 @@ public class CmdInstanceDrawable extends CmdInstance {
 
    //#mdebug
    public void toString(Dctx dc) {
-      dc.root(this, CmdInstanceDrawable.class, 141);
+      dc.root(this, CmdInstanceGui.class, 141);
       toStringPrivate(dc);
       super.toString(dc.sup());
 
    }
 
    public void toString1Line(Dctx dc) {
-      dc.root1Line(this, CmdInstanceDrawable.class);
+      dc.root1Line(this, CmdInstanceGui.class);
       toStringPrivate(dc);
       super.toString1Line(dc.sup1Line());
    }

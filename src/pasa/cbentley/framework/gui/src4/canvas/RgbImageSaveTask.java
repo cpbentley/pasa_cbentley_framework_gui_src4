@@ -3,12 +3,10 @@ package pasa.cbentley.framework.gui.src4.canvas;
 import java.io.IOException;
 import java.io.OutputStream;
 
-import pasa.cbentley.core.src4.ctx.UCtx;
 import pasa.cbentley.core.src4.logging.Dctx;
 import pasa.cbentley.core.src4.logging.IStringable;
-import pasa.cbentley.framework.coreio.src4.IConnector;
-import pasa.cbentley.framework.coreio.src4.ctx.CoreIOCtx;
-import pasa.cbentley.framework.coreio.src4.file.IFileConnection;
+import pasa.cbentley.framework.core.io.src4.ctx.CoreIOCtx;
+import pasa.cbentley.framework.core.io.src4.file.IFileConnection;
 import pasa.cbentley.framework.drawx.src4.engine.RgbImage;
 import pasa.cbentley.framework.drawx.src4.image.PngEncoder;
 import pasa.cbentley.framework.gui.src4.ctx.GuiCtx;
@@ -19,13 +17,13 @@ public class RgbImageSaveTask extends GuiBackgroundTask implements IStringable {
 
    private String   fileName;
 
-   public RgbImageSaveTask(GuiCtx gc, RepaintCtrlGui ctrl, RgbImage img) {
+   public RgbImageSaveTask(GuiCtx gc, RepaintHelperGui ctrl, RgbImage img) {
       super(gc, ctrl);
 
       this.img = img;
    }
 
-   public RgbImageSaveTask(GuiCtx gc, RepaintCtrlGui ctrl) {
+   public RgbImageSaveTask(GuiCtx gc, RepaintHelperGui ctrl) {
       super(gc, ctrl);
    }
 
@@ -35,13 +33,13 @@ public class RgbImageSaveTask extends GuiBackgroundTask implements IStringable {
       return name;
    }
 
-   public void saveImage(RgbImage img, RepaintCtrlGui ctrl) {
+   public void saveImage(RgbImage img, RepaintHelperGui ctrl) {
       PngEncoder pngEncoder = gc.getDC().getPngEncoder();
       byte[] pngdata = pngEncoder.encodePNG(img);
       saveByteData(pngdata, ctrl);
    }
 
-   public void saveByteData(byte[] pngdata, int offset, int len, RepaintCtrlGui ctrl) {
+   public void saveByteData(byte[] pngdata, int offset, int len, RepaintHelperGui ctrl) {
       try {
          String name = getFileName();
          if (name == null) {
@@ -68,7 +66,7 @@ public class RgbImageSaveTask extends GuiBackgroundTask implements IStringable {
       ctrl.repaintDrawableCycleBusiness();
    }
 
-   public void saveByteData(byte[] pngdata, RepaintCtrlGui ctrl) {
+   public void saveByteData(byte[] pngdata, RepaintHelperGui ctrl) {
       saveByteData(pngdata, 0, pngdata.length, ctrl);
    }
 

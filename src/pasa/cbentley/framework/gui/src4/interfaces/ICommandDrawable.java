@@ -1,7 +1,7 @@
 package pasa.cbentley.framework.gui.src4.interfaces;
 
 import pasa.cbentley.framework.cmd.src4.interfaces.ICommandable;
-import pasa.cbentley.framework.gui.src4.cmd.CmdInstanceDrawable;
+import pasa.cbentley.framework.gui.src4.cmd.CmdInstanceGui;
 
 /**
  * A {@link IDrawable} that is commandable.
@@ -20,6 +20,6 @@ public interface ICommandDrawable extends ICommandable {
     * This method provides for all commands
     * @param cd
     */
-   public void commandAction(CmdInstanceDrawable cd);
+   public void commandAction(CmdInstanceGui cd);
 
 }

@@ -2,7 +2,6 @@ package pasa.cbentley.framework.gui.src4.canvas;
 
 import pasa.cbentley.core.src4.logging.Dctx;
 import pasa.cbentley.core.src4.logging.IStringable;
-import pasa.cbentley.framework.drawx.src4.engine.GraphicsX;
 import pasa.cbentley.framework.gui.src4.ctx.CanvasGuiCtx;
 import pasa.cbentley.framework.gui.src4.ctx.GuiCtx;
 import pasa.cbentley.framework.gui.src4.interfaces.IDrawable;
@@ -89,7 +88,7 @@ public class ViewContext extends LayoutableAbstract implements IStringable, ILay
       return parentVC;
    }
 
-   public RepaintCtrlGui getRepaintCtrlDraw() {
+   public RepaintHelperGui getRepaintCtrlDraw() {
       return getCanvasDrawable().getRepaintCtrlDraw();
    }
 

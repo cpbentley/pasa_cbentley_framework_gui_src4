@@ -14,22 +14,27 @@ import pasa.cbentley.framework.cmd.src4.ctx.CmdCtx;
 import pasa.cbentley.framework.cmd.src4.engine.MCmd;
 import pasa.cbentley.framework.cmd.src4.interfaces.ICmdListener;
 import pasa.cbentley.framework.cmd.src4.interfaces.ICmdMenu;
+import pasa.cbentley.framework.cmd.src4.interfaces.ITechCmd;
+import pasa.cbentley.framework.core.ui.src4.event.CanvasHostEvent;
+import pasa.cbentley.framework.core.ui.src4.exec.ExecEntry;
+import pasa.cbentley.framework.core.ui.src4.exec.ExecutionContext;
+import pasa.cbentley.framework.core.ui.src4.exec.OutputState;
+import pasa.cbentley.framework.core.ui.src4.input.InputState;
+import pasa.cbentley.framework.core.ui.src4.input.ScreenOrientationCtrl;
+import pasa.cbentley.framework.core.ui.src4.interfaces.ICanvasHost;
+import pasa.cbentley.framework.core.ui.src4.interfaces.ITechEventHost;
+import pasa.cbentley.framework.core.ui.src4.tech.IBOCanvasHost;
+import pasa.cbentley.framework.core.ui.src4.tech.IInput;
+import pasa.cbentley.framework.core.ui.src4.tech.ITechCodes;
+import pasa.cbentley.framework.core.ui.src4.tech.ITechHostUI;
 import pasa.cbentley.framework.coredraw.src4.interfaces.IGraphics;
 import pasa.cbentley.framework.coredraw.src4.interfaces.IImage;
-import pasa.cbentley.framework.coreui.src4.event.CanvasHostEvent;
-import pasa.cbentley.framework.coreui.src4.exec.ExecEntry;
-import pasa.cbentley.framework.coreui.src4.exec.ExecutionContext;
-import pasa.cbentley.framework.coreui.src4.interfaces.ICanvasHost;
-import pasa.cbentley.framework.coreui.src4.interfaces.ITechEventHost;
-import pasa.cbentley.framework.coreui.src4.tech.IBOCanvasHost;
-import pasa.cbentley.framework.coreui.src4.tech.IInput;
-import pasa.cbentley.framework.coreui.src4.tech.ITechCodes;
-import pasa.cbentley.framework.coreui.src4.tech.ITechHostUI;
 import pasa.cbentley.framework.drawx.src4.engine.GraphicsX;
 import pasa.cbentley.framework.drawx.src4.engine.RgbImage;
 import pasa.cbentley.framework.drawx.src4.tech.ITechGraphicsX;
 import pasa.cbentley.framework.gui.src4.anim.AnimManager;
-import pasa.cbentley.framework.gui.src4.cmd.CmdInstanceDrawable;
+import pasa.cbentley.framework.gui.src4.cmd.CmdInstanceGui;
+import pasa.cbentley.framework.gui.src4.cmd.CmdProcessorGui;
 import pasa.cbentley.framework.gui.src4.core.FigDrawable;
 import pasa.cbentley.framework.gui.src4.core.StyleClass;
 import pasa.cbentley.framework.gui.src4.core.TopoViewDrawable;
@@ -37,7 +42,9 @@ import pasa.cbentley.framework.gui.src4.ctx.CanvasGuiCtx;
 import pasa.cbentley.framework.gui.src4.ctx.GuiCtx;
 import pasa.cbentley.framework.gui.src4.ctx.ITechStatorableGui;
 import pasa.cbentley.framework.gui.src4.ctx.ToStringStaticGui;
-import pasa.cbentley.framework.gui.src4.interfaces.ICmdsView;
+import pasa.cbentley.framework.gui.src4.exec.ExecutionContextCanvasGui;
+import pasa.cbentley.framework.gui.src4.exec.InputStateCanvasGui;
+import pasa.cbentley.framework.gui.src4.exec.OutputStateCanvasGui;
 import pasa.cbentley.framework.gui.src4.interfaces.IDrawable;
 import pasa.cbentley.framework.gui.src4.interfaces.IDrawableListener;
 import pasa.cbentley.framework.gui.src4.interfaces.ITechCanvasDrawable;
@@ -48,13 +55,13 @@ import pasa.cbentley.framework.gui.src4.menu.CmdMenuBar;
 import pasa.cbentley.framework.gui.src4.mui.StyleAdapter;
 import pasa.cbentley.framework.gui.src4.utils.ForegroundsQueues;
 import pasa.cbentley.framework.gui.src4.utils.RenderMetrics;
-import pasa.cbentley.framework.input.src4.CanvasAppliInput;
-import pasa.cbentley.framework.input.src4.CanvasResult;
-import pasa.cbentley.framework.input.src4.InputState;
-import pasa.cbentley.framework.input.src4.RepaintCtrl;
-import pasa.cbentley.framework.input.src4.ScreenOrientationCtrl;
+import pasa.cbentley.framework.input.src4.engine.CanvasAppliInput;
+import pasa.cbentley.framework.input.src4.engine.ExecutionContextCanvas;
+import pasa.cbentley.framework.input.src4.engine.InputStateCanvas;
+import pasa.cbentley.framework.input.src4.engine.OutputStateCanvas;
+import pasa.cbentley.framework.input.src4.engine.RepaintHelper;
 import pasa.cbentley.framework.input.src4.interfaces.ITechInputCycle;
-import pasa.cbentley.framework.input.src4.interfaces.ITechPaintThread;
+import pasa.cbentley.framework.input.src4.interfaces.ITechThreadPaint;
 import pasa.cbentley.layouter.src4.engine.LayouterDebugBreaker;
 import pasa.cbentley.layouter.src4.engine.PozerFactory;
 import pasa.cbentley.layouter.src4.engine.SizerFactory;
@@ -96,7 +103,7 @@ public class CanvasAppliInputGui extends CanvasAppliInput implements IDrawableLi
 
    private boolean            isPainting;
 
-   ExecutionContextGui        previous;
+   ExecutionContextCanvasGui  previous;
 
    private RenderMetrics      renderMetrics;
 
@@ -208,11 +215,6 @@ public class CanvasAppliInputGui extends CanvasAppliInput implements IDrawableLi
       getTopologyRoot().setStateFlags(ITechDrawable.STATE_02_DRAWN, false);
    }
 
-   private void cmdPro2() {
-      // TODO Auto-generated method stub
-
-   }
-
    /**
     * Sends {@link ITechCanvasDrawable#CMD_EVENT_4_UIEVENT} to the current {@link CmdCtx} hierarchy
     * for processing
@@ -221,39 +223,51 @@ public class CanvasAppliInputGui extends CanvasAppliInput implements IDrawableLi
     */
    private int cmdProCmdCtx(int state, InputConfig icc) {
       if (state == ICmdListener.PRO_STATE_0) {
-         return cc.getActiveCtx().sendEvent(ITechCanvasDrawable.CMD_EVENT_4_UIEVENT, icc); //send event down ctx hierarch
+         return cc.getActiveNode().sendEvent(ITechCanvasDrawable.CMD_EVENT_4_UIEVENT, icc); //send event down ctx hierarch
       }
       return state;
    }
 
    /**
     * 
+    * @param ec
+    * @param is TODO
     * @param cc
-    * @param icc
     */
-   private int cmdProCmdRepo(int state, ExecutionContextGui icc, int ctxcat) {
+   private int cmdProCmdRepo(ExecutionContextCanvasGui ec, InputStateCanvasGui is, int state, int ctxcat) {
       if (state == ICmdListener.PRO_STATE_0) {
-         state = gc.getViewCommandListener().processGUIEvent(icc, ctxcat);
+         CmdProcessorGui cmdProcessorGui = gc.getCmdProcessorGui();
+         state = cmdProcessorGui.processGUIEvent(ec, is, ctxcat);
          return state;
       }
       return state;
    }
 
    /**
-    * Delegates the input management to the {@link TopologyDLayer} root.
+    * Top-Down input management from the root {@link TopologyDLayer} using {@link TopologyDLayer#manageInput(ExecutionContextCanvasGui)}.
+    * 
+    * <li>It does not use the {@link ExecutionContextCanvasGui}
+    * <li>Code that updates can make the assumption of a single thread for updating and drawing -> not thread safe
+    * 
+    * <p>
+    * Every {@link IDrawable} in the event chain can do stuff in its {@link IDrawable#manageInput(ExecutionContextCanvasGui)}
+    * method. It is used for backward compatibility or a dev that wants to program the oldschool way.
+    * </p>
     * @param state
     * @param icc
     * @return
     */
-   private int cmdProDrawables(int state, InputConfig icc) {
+   private int cmdProDrawables(ExecutionContextCanvasGui ec, int state) {
+      InputConfig icc = ec.getInputConfig();
       //send event down drawable hierarchy why third? why not first? TODO config
       if (state == ICmdListener.PRO_STATE_0) {
          //a cmd was not processed
          //TODO aqcuire lock on topology. business threads might update it
-         boolean isDone = getTopologyRoot().intercepts(icc);
+         TopologyDLayer topologyRoot = getTopologyRoot();
+         boolean isDone = topologyRoot.intercepts(ec);
          if (!isDone) {
             //send the event down to the Drawables
-            getTopologyRoot().manageInput(icc);
+            topologyRoot.manageInput(ec);
          }
          //         isDone = appliTopo.intercepts(icc);
          //         if (!isDone) {
@@ -267,11 +281,11 @@ public class CanvasAppliInputGui extends CanvasAppliInput implements IDrawableLi
     * Navigational Pointer Event Select
     * @param ic
     */
-   public void cmdSelectPointer(InputConfig ic) {
-      boolean isDone = getTopologyRoot().intercepts(ic);
+   public void cmdSelectPointer(ExecutionContextCanvasGui ec) {
+      boolean isDone = getTopologyRoot().intercepts(ec);
       if (!isDone) {
          //send the event down to the Drawablesd
-         getTopologyRoot().manageInput(ic);
+         getTopologyRoot().manageInput(ec);
       }
    }
 
@@ -309,20 +323,41 @@ public class CanvasAppliInputGui extends CanvasAppliInput implements IDrawableLi
 
    }
 
+   public ExecutionContext createExecutionContext() {
+      return new ExecutionContextCanvasGui(gc);
+   }
+
+   public ExecutionContextCanvasGui createExecutionContextCanvasGui() {
+      return (ExecutionContextCanvasGui) createExecutionContext();
+   }
+
+   public ExecutionContextCanvasGui createExecutionContextCmdGui() {
+      ExecutionContextCanvasGui ec = createExecutionContextCanvasGui();
+      InputStateCanvas is = eventController.getInputState();
+      ec.setInputState(is);
+      OutputStateCanvas os = repaintHelper.getNextRender();
+      ec.setOutputState(os);
+      return ec;
+   }
+
    /**
     * Called when a new
     */
    public InputState createInputState() {
-      return new InputStateDrawable(gc, this);
+      return new InputStateCanvasGui(gc, this);
    }
 
-   protected RepaintCtrl createRepaintCtrl() {
-      return new RepaintCtrlGui(gc, this);
-
+   public OutputState createOutputState() {
+      return new OutputStateCanvasGui(gc, this);
    }
 
-   public CanvasResultDrawable createScreenResultAnimation() {
-      return (CanvasResultDrawable) repaintControl.create(ITechInputCycle.CYCLE_2_ANIMATION_EVENT);
+   protected RepaintHelper createRepaintHelper() {
+      return new RepaintHelperGui(gc, this);
+   }
+
+
+   public OutputStateCanvasGui createScreenResultAnimation() {
+      return (OutputStateCanvasGui) repaintHelper.create(ITechInputCycle.CYCLE_2_ANIMATION_EVENT);
    }
 
    /**
@@ -331,7 +366,7 @@ public class CanvasAppliInputGui extends CanvasAppliInput implements IDrawableLi
     * @param sr
     * @param che
     */
-   protected void ctrlAppEvent(InputState is, CanvasResult sr, CanvasHostEvent che) {
+   protected void ctrlAppEvent(InputState is, OutputStateCanvas sr, CanvasHostEvent che) {
       //#debug
       toDLog().pEvent1("", che, CanvasAppliInputGui.class, "ctrlAppEvent@381");
 
@@ -347,7 +382,7 @@ public class CanvasAppliInputGui extends CanvasAppliInput implements IDrawableLi
 
    }
 
-   protected void ctrlAppEventResized(InputState is, CanvasResult sr, CanvasHostEvent e) {
+   protected void ctrlAppEventResized(InputState is, OutputStateCanvas sr, CanvasHostEvent e) {
       sizeChanged(e.getW(), e.getH());
    }
 
@@ -355,10 +390,10 @@ public class CanvasAppliInputGui extends CanvasAppliInput implements IDrawableLi
     * 
     * An event 
     * <li>wait for previous execution context to finish
-    * <li>queries the state of the GUI with focus state changes , Lock on {@link ITechPaintThread#THREAD_2_RENDER} 
+    * <li>queries the state of the GUI with focus state changes , Lock on {@link ITechThreadPaint#THREAD_2_RENDER} 
     * <li>identify a command,
     * <li>execute the command and sub commands, 
-    * <li>push the changes to the GUI. Lock on {@link ITechPaintThread#THREAD_2_RENDER}
+    * <li>push the changes to the GUI. Lock on {@link ITechThreadPaint#THREAD_2_RENDER}
     * <br>
     * <br>
     * An execution context can be parceled in several paint jobs. 
@@ -382,7 +417,7 @@ public class CanvasAppliInputGui extends CanvasAppliInput implements IDrawableLi
     * the event to the 
     * {@link CanvasAppliInput#ctrlKeyPressed}
     * <br>
-    * Called in the update thread {@link ITechPaintThread#THREAD_1_UPDATE}
+    * Called in the update thread {@link ITechThreadPaint#THREAD_1_UPDATE}
     * <br>
     * <br>
     * At the begining of the Appli life cycle, the CMD start is processed.
@@ -397,33 +432,36 @@ public class CanvasAppliInputGui extends CanvasAppliInput implements IDrawableLi
     * <li> the drawable hierarchy checks for a new PointerPressFocus Drawable 
     * <li> Associated context is set.
     */
-   protected void ctrlUIEvent(InputState ic, CanvasResult sr) {
+   protected void ctrlUIEvent(ExecutionContextCanvas exc, InputStateCanvas ixs, OutputStateCanvas oxs) {
+      InputStateCanvasGui is = (InputStateCanvasGui) ixs;
+      OutputStateCanvasGui os = (OutputStateCanvasGui) oxs;
+      ExecutionContextCanvasGui ec = (ExecutionContextCanvasGui) exc;
+      InputConfig ic = new InputConfig(gc, this, is, os);
+      ec.setInputConfig(ic);
+
       //#debug
       toDLog().pFlow("", this, CanvasAppliInputGui.class, "ctrlUIEvent@line416", LVL_03_FINEST, true);
 
-      if (ic.getEventCurrent() instanceof CanvasHostEvent) {
-         ctrlAppEvent(ic, sr, (CanvasHostEvent) ic.getEventCurrent());
+      if (is.getEventCurrent() instanceof CanvasHostEvent) {
+         CanvasHostEvent hostEvent = (CanvasHostEvent) is.getEventCurrent();
+         ctrlAppEvent(is, os, hostEvent);
          return;
       }
 
-      if (ic.isKeyTyped(ITechCodes.KEY_F2)) {
+      if (is.isKeyTyped(ITechCodes.KEY_F2)) {
          toDLog().pAlways("F2 Debug CanvasView", this, CanvasAppliInputGui.class, "ctrlUIEvent");
          return;
       }
-      if (ic.isKeyPressed(ITechCodes.KEY_F3)) {
-         toDLog().pAlways("F3 Debug InputState", ic, CanvasAppliInputGui.class, "ctrlUIEvent");
+      if (is.isKeyPressed(ITechCodes.KEY_F3)) {
+         toDLog().pAlways("F3 Debug InputState", is, CanvasAppliInputGui.class, "ctrlUIEvent");
       }
-      if (ic.isKeyPressed(ITechCodes.KEY_F4)) {
+      if (is.isKeyPressed(ITechCodes.KEY_F4)) {
          toDLog().pAlways("F4 Debug Coordinator", gc.getCFC().getCoordinator(), CanvasAppliInputGui.class, "ctrlUIEvent");
       }
-      InputStateDrawable id = (InputStateDrawable) ic;
-      CanvasResultDrawable sd = (CanvasResultDrawable) sr;
-
-      InputConfig icc = new InputConfig(gc, this, id, sd);
 
       //wait until previous context has finished rendering. why?
       //because we will getDrawable at x,y and we need the latest state
-      if (getThreadingMode() == ITechPaintThread.THREADING_3_THREE_SEPARATE) {
+      if (getThreadingMode() == ITechThreadPaint.THREADING_3_THREE_SEPARATE) {
          //in single thread.. that's automatic
          if (previous != null) {
             if (!previous.finished) {
@@ -439,10 +477,9 @@ public class CanvasAppliInputGui extends CanvasAppliInput implements IDrawableLi
             }
          }
       }
-      ExecutionContextGui exd = new ExecutionContextGui(gc);
-      exd.setInputConfig(icc);
+
       //when only pointer pressed 
-      //TODO. we must get pointer events first so they pointer presses change the focus and thus
+      // TODO . we must get pointer events first so they pointer presses change the focus and thus
       //active pointer ctx
       //commands are activated on pointer context for pointer events. CTRL+pointer acts
       //on the pointer cmd context. same for drags
@@ -452,26 +489,33 @@ public class CanvasAppliInputGui extends CanvasAppliInput implements IDrawableLi
       // as null. it does not work anymore. disabled
       // left and right
       //TODO context category is device type and id dependant.
-      int ctxCategory = ICmdsView.CTX_CAT_0_KEY;
-      if (ic.isTypeDevicePointer()) {
+      //moving a pointer also changes the CmdNode for the pointer.
+      //Pressed keys are transfered to new pointer CmdSearch?
+      //What if we have a cmd, CTRL+pointer entering CmdNode generates a command ?
+      int ctxCategory = ITechCmd.CTX_CAT_0_KEY;
+      if (is.isTypeDevicePointer()) {
          //when pointer event, update the pointer context
-         if (ic.getMode() == IInput.MOD_0_PRESSED || ic.getMode() == IInput.MOD_1_RELEASED) {
-            ctxCategory = ICmdsView.CTX_CAT_1_POINTER_PRESSED;
-         } else if (ic.getMode() == IInput.MOD_3_MOVED) {
-            ctxCategory = ICmdsView.CTX_CAT_2_POINTER_OVER;
+         if (is.getMode() == IInput.MOD_0_PRESSED || is.getMode() == IInput.MOD_1_RELEASED) {
+            ctxCategory = ITechCmd.CTX_CAT_1_POINTER_PRESSED;
+         } else if (is.getMode() == IInput.MOD_3_MOVED) {
+            ctxCategory = ITechCmd.CTX_CAT_2_POINTER_OVER;
          }
          //TODO drag has a context?
-         ctxCategory = ctxCategory + (ic.getDeviceID() * 2);
+         ctxCategory = ctxCategory + (is.getDeviceID() * 2);
 
          //we need a read lock on graphical state.
          lockAcquireRender();
          //we must sync on the GUI thread to access. TODO wait for 
          //last execution context to be finished? i.e. shown on 
-         IDrawable d = getTopologyRoot().getDrawable(icc.is.getX(), icc.is.getY(), exd);
+         TopologyDLayer topologyRoot = getTopologyRoot();
+         int dx = is.getX();
+         int dy = is.getY();
+         IDrawable d = topologyRoot.getDrawable(dx, dy, ec);
          //it is the drawable to be focused in its category? always??
          if (d != null) {
             //set the states here? mouse animation hooks?
-            gc.getFocusCtrl().setPointerStates(icc, d);
+            FocusCtrl focusCtrl = gc.getFocusCtrl();
+            focusCtrl.setPointerStates(ec, d);
             //            FocusType ft = new FocusType();
             //            ft.deviceID = ic.getDeviceID();
             //            ft.deviceType = IInput.DEVICE_1_MOUSE;
@@ -482,50 +526,50 @@ public class CanvasAppliInputGui extends CanvasAppliInput implements IDrawableLi
       }
       //down open menu. if no left, left will go to next menu, the left is delegated up
       int state = 0;
-      if (cmdProcessingMode == ITechCanvasDrawable.CMD_PRO_0) {
-         state = cmdProCmdRepo(state, exd, ctxCategory);
-         state = cmdProCmdCtx(state, icc);
-         state = cmdProDrawables(state, icc);
-      } else if (cmdProcessingMode == ITechCanvasDrawable.CMD_PRO_1) {
-         state = cmdProDrawables(state, icc);
-         state = cmdProCmdCtx(state, icc);
-         state = cmdProCmdRepo(state, exd, ctxCategory);
-      } else if (cmdProcessingMode == ITechCanvasDrawable.CMD_PRO_2) {
-         state = cmdProCmdRepo(state, exd, ctxCategory);
-         state = cmdProDrawables(state, icc);
-         state = cmdProCmdCtx(state, icc);
+      if (cmdProcessingMode == ITechCanvasDrawable.CMD_PRO_0_REPO_NODE_UI) {
+         state = cmdProCmdRepo(ec, is, state, ctxCategory);
+         state = cmdProCmdCtx(state, ic);
+         state = cmdProDrawables(ec, state);
+      } else if (cmdProcessingMode == ITechCanvasDrawable.CMD_PRO_2_UI_NODE_REPO) {
+         state = cmdProDrawables(ec, state);
+         state = cmdProCmdCtx(state, ic);
+         state = cmdProCmdRepo(ec, is, state, ctxCategory);
+      } else if (cmdProcessingMode == ITechCanvasDrawable.CMD_PRO_1_REPO_UI_NODE) {
+         state = cmdProCmdRepo(ec, is, state, ctxCategory);
+         state = cmdProDrawables(ec, state);
+         state = cmdProCmdCtx(state, ic);
       } else {
          //no processing lol
       }
 
       //jobs from execution map execution. GUI thread stuff is packed into a run 
       ExecEntry ee = null;
-      while ((ee = exd.getNext()) != null) {
+      while ((ee = ec.getNext()) != null) {
          int type = ee.type;
          if (type == ITechExecutionContextGui.EXEC_TYPE_0_EVENT) {
             BusEvent be = (BusEvent) ee.o;
             be.putOnBus();
          } else if (type == ITechExecutionContextGui.EXEC_TYPE_1_RUN) {
             Runnable d = (Runnable) ee.o;
-            exd.addRender(ee);
+            ec.addRender(ee);
          } else if (type == ITechExecutionContextGui.EXEC_TYPE_2_DRAW) {
             IDrawable d = (IDrawable) ee.o;
             int action = ee.action;
             //issue is that it is not sized already.. so pointless?
             //no because drawables flags here will be painted
             //
-            sd.setActionDoneRepaint(d);
+            os.setActionDoneRepaint(d);
             //lets entry sit to be processed by render thread
-            exd.addRender(ee);
+            ec.addRender(ee);
 
          }
       }
       //we are in the update thread.. what to repaint?
       //wehen debug mode.. set full repaint
 
-      sr.setExCtx(exd);
+      os.setExCtx(ec);
 
-      extras.ctrlUIEvent(ic, sd);
+      extras.ctrlUIEvent(is, os);
 
    }
 
@@ -533,11 +577,11 @@ public class CanvasAppliInputGui extends CanvasAppliInput implements IDrawableLi
     * Draws a figure at the mouse position
     * @param cd
     */
-   public void doCuePress(CmdInstanceDrawable cd) {
-      int cx = cd.getIC().is.getX();
-      int cy = cd.getIC().is.getY();
+   public void doCuePress(CmdInstanceGui cd) {
+      int cx = cd.getIC().getInputStateDrawable().getX();
+      int cy = cd.getIC().getInputStateDrawable().getY();
       int cueColor = ColorUtils.getRGBInt(128, 128, 128, 128);
-      ByteObject fig = gc.getDC().getFigureFactory().getEllipse(cueColor);
+      ByteObject fig = gc.getDC().getFigureFactory().getFigEllipse(cueColor);
       IDrawable cue = new FigDrawable(gc, gc.getStyleClass(IUIView.SC_6_EMPTY), fig);
 
       SizerFactory siz = gc.getLAC().getSizerFactory();
@@ -558,7 +602,7 @@ public class CanvasAppliInputGui extends CanvasAppliInput implements IDrawableLi
 
       //cue.setBehaviorFlag(ITechDrawable.BEHAVIOR_16_IMMATERIAL, true);
       //cue must be shown in a foreground. pure visual
-      cd.getDExCtx().addDrawn(cue);
+      cd.getExecutionCtxGui().addDrawn(cue);
    }
 
    public void doThreadGUI() {
@@ -659,13 +703,13 @@ public class CanvasAppliInputGui extends CanvasAppliInput implements IDrawableLi
    /**
     * Returns singleton until a Canvas Structural Change event occurs.
     */
-   public RepaintCtrlGui getRepaintCtrlDraw() {
+   public RepaintHelperGui getRepaintCtrlDraw() {
       //#mdebug
-      if (repaintControl == null) {
+      if (repaintHelper == null) {
          throw new NullPointerException();
       }
       //#enddebug
-      return (RepaintCtrlGui) repaintControl;
+      return (RepaintHelperGui) repaintHelper;
    }
 
    /**
@@ -845,19 +889,19 @@ public class CanvasAppliInputGui extends CanvasAppliInput implements IDrawableLi
     * Main Render method to draw {@link CanvasAppliInputGui} content. 
     * 
     * <b>Threading Mode</b>
-    * <li>Called in the render thread {@link ITechPaintThread#THREAD_2_RENDER}
+    * <li>Called in the render thread {@link ITechThreadPaint#THREAD_2_RENDER}
     * in Active Rendering mode 
     * <li> the GUI Event Thread in Passive Mode.
     * <li> It can also be called in a Business Thread when painting ? Not a good idea.
     * <br>
     * 
-    * {@link RepaintCtrlGui} tracks the context;
+    * {@link RepaintHelperGui} tracks the context;
     * 
     * <br>
     * <br>
     * During the paint, {@link Controller} {@link InputConfig} and {@link ScreenResult} give the state that generates the painting
     * <br>
-    * Once paint concludes and {@link CanvasResult#paintEnd()} is called, this is no more the case. A new cycle has begun.
+    * Once paint concludes and {@link OutputStateCanvas#paintEnd()} is called, this is no more the case. A new cycle has begun.
     * Different cycles exist:
     * <li>UserEventAction-Repaint {@link Controller#CYCLE_0_USER_EVENT}
     * <li>BusinessCodeThread-Repaint {@link Controller#CYCLE_1_BUSINESS_EVENT}
@@ -888,9 +932,11 @@ public class CanvasAppliInputGui extends CanvasAppliInput implements IDrawableLi
     * <br>
     * This method may never be called anywhere in the framework or application code.
     * <br>
-    * <br>
+    *  All {@link Canvas} event methods, showNotify,Key,Pointer,Paint,hideNotify, are called serially, using the same single thread.
+    * That means there is a lag when a key is pressed during the {@link Canvas#paint} method. The {@link Canvas} allievate this issue
+    * by allowing the query of key states during the paint method.
     */
-   protected void render(IGraphics g, InputState is, CanvasResult sr) {
+   public void render(IGraphics g, ExecutionContextCanvas ec, InputStateCanvas is, OutputStateCanvas sr) {
 
       //in drawing, first validate layout, invalidate caches. 
       //second pass, draw.
@@ -901,7 +947,7 @@ public class CanvasAppliInputGui extends CanvasAppliInput implements IDrawableLi
       //1 execute runnables from the execution context in the screenres before
       ExecutionContext ex = sr.getExecCtx();
       if (ex != null) {
-         ExecutionContextGui dec = (ExecutionContextGui) ex;
+         ExecutionContextCanvasGui dec = (ExecutionContextCanvasGui) ex;
          dec.renderStart();
 
       }
@@ -914,7 +960,7 @@ public class CanvasAppliInputGui extends CanvasAppliInput implements IDrawableLi
       //#debug
       toDLog().pDraw(msg, g, CanvasAppliInputGui.class, "render@934", ITechLvl.LVL_04_FINER, true);
 
-      CanvasResultDrawable renderCause = (CanvasResultDrawable) sr;
+      OutputStateCanvasGui renderCause = (OutputStateCanvasGui) sr;
       //clean clip sequence since this is a new paint job
       super.paintStart();
 
@@ -927,7 +973,7 @@ public class CanvasAppliInputGui extends CanvasAppliInput implements IDrawableLi
          destGraphicsX.reset(g);
       }
       destGraphicsX.screenResultCause = renderCause;
-      destGraphicsX.isd = (InputStateDrawable) is;
+      destGraphicsX.isd = (InputStateCanvasGui) is;
 
       ///////////////////////
       //#debug
@@ -1008,7 +1054,6 @@ public class CanvasAppliInputGui extends CanvasAppliInput implements IDrawableLi
       render1(g);
    }
 
-
    /**
     * User can manually switch the paint mode. This commands will be 
     * executed just before the repaint of the command
@@ -1031,7 +1076,7 @@ public class CanvasAppliInputGui extends CanvasAppliInput implements IDrawableLi
       this.styleAdapter = styleAdapter;
    }
 
-   public void show(CmdInstanceDrawable cmd) {
+   public void show(CmdInstanceGui cmd) {
       //place it at the bottom
       vcRoot.getTopo().addDLayer(topoViewDrawableRoot, ITechCanvasDrawable.SHOW_TYPE_0_REPLACE_BOTTOM);
    }

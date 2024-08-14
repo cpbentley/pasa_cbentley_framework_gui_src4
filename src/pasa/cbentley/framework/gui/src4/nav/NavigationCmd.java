@@ -8,17 +8,17 @@ import pasa.cbentley.framework.cmd.src4.interfaces.ICmdsCmd;
 import pasa.cbentley.framework.cmd.src4.interfaces.INavTech;
 import pasa.cbentley.framework.cmd.src4.interfaces.IStringsCmd;
 import pasa.cbentley.framework.cmd.src4.trigger.CmdTrigger;
-import pasa.cbentley.framework.coreui.src4.tech.ITechCodes;
-import pasa.cbentley.framework.coreui.src4.tech.IInput;
+import pasa.cbentley.framework.core.ui.src4.input.InputState;
+import pasa.cbentley.framework.core.ui.src4.tech.IInput;
+import pasa.cbentley.framework.core.ui.src4.tech.ITechCodes;
 import pasa.cbentley.framework.gui.src4.canvas.FocusCtrl;
 import pasa.cbentley.framework.gui.src4.canvas.InputConfig;
-import pasa.cbentley.framework.gui.src4.cmd.CmdInstanceDrawable;
+import pasa.cbentley.framework.gui.src4.cmd.CmdInstanceGui;
 import pasa.cbentley.framework.gui.src4.core.ViewDrawable;
 import pasa.cbentley.framework.gui.src4.core.ViewPane;
 import pasa.cbentley.framework.gui.src4.ctx.GuiCtx;
 import pasa.cbentley.framework.gui.src4.interfaces.IDrawable;
 import pasa.cbentley.framework.gui.src4.interfaces.INavigational;
-import pasa.cbentley.framework.input.src4.InputState;
 
 /**
  * A command used to navigate between {@link INavigational}.
@@ -138,7 +138,7 @@ public class NavigationCmd extends MCmdAbstract implements INavTech {
     * </ol>
     * </ol>
     */
-   public void cmdExecuteFinal(CmdInstanceDrawable cd) {
+   public void cmdExecuteFinal(CmdInstanceGui cd) {
 
       //check 
       FocusCtrl fc = gc.getFocusCtrl();
@@ -183,7 +183,7 @@ public class NavigationCmd extends MCmdAbstract implements INavTech {
    }
 
    public void cmdExecuteFinal(CmdInstance cd) {
-      cmdExecuteFinal((CmdInstanceDrawable) cd);
+      cmdExecuteFinal((CmdInstanceGui) cd);
    }
 
    public void cmdExecuteParam() {
@@ -214,7 +214,7 @@ public class NavigationCmd extends MCmdAbstract implements INavTech {
     * Scrolling?
     * @param ci
     */
-   public int[] getLabelID(CmdInstanceDrawable cd) {
+   public int[] getLabelID(CmdInstanceGui cd) {
       int direction = getNavDir(cd);
       switch (direction) {
          case NAV_6_UNSELECT:
@@ -228,13 +228,13 @@ public class NavigationCmd extends MCmdAbstract implements INavTech {
       return null;
    }
 
-   private int getNavDir(CmdInstanceDrawable cd) {
+   private int getNavDir(CmdInstanceGui cd) {
       int direction = param;
       //do we have a direction associated?
       if (!hasFlag(FLAG_13_PARAMED)) {
          //read the CmdInstance trigger
          InputConfig ic = cd.getIC();
-         InputState is = ic.is;
+         InputState is = ic.getInputStateDrawable();
          if (is.isTypeDevicePointer()) {
             if (is.getKeyCode() == ITechCodes.PBUTTON_0_DEFAULT) {
                direction = NAV_5_SELECT;

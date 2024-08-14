@@ -6,24 +6,22 @@ import pasa.cbentley.core.src4.logging.IStringable;
 import pasa.cbentley.core.src4.stator.IStatorable;
 import pasa.cbentley.framework.cmd.src4.ctx.CmdCtx;
 import pasa.cbentley.framework.cmd.src4.interfaces.INavTech;
-import pasa.cbentley.framework.coreui.src4.interfaces.IBentleyFwSerial;
-import pasa.cbentley.framework.coreui.src4.tech.IInput;
-import pasa.cbentley.framework.coreui.src4.utils.ViewState;
+import pasa.cbentley.framework.core.ui.src4.interfaces.IBentleyFwSerial;
+import pasa.cbentley.framework.core.ui.src4.tech.IInput;
+import pasa.cbentley.framework.core.ui.src4.utils.ViewState;
 import pasa.cbentley.framework.drawx.src4.engine.GraphicsX;
 import pasa.cbentley.framework.drawx.src4.engine.RgbImage;
 import pasa.cbentley.framework.gui.src4.anim.move.Move;
 import pasa.cbentley.framework.gui.src4.canvas.CanvasAppliInputGui;
-import pasa.cbentley.framework.gui.src4.canvas.CanvasResultDrawable;
-import pasa.cbentley.framework.gui.src4.canvas.ExecutionContextGui;
 import pasa.cbentley.framework.gui.src4.canvas.FocusCtrl;
-import pasa.cbentley.framework.gui.src4.canvas.InputConfig;
 import pasa.cbentley.framework.gui.src4.canvas.TopologyDLayer;
 import pasa.cbentley.framework.gui.src4.canvas.ViewContext;
-import pasa.cbentley.framework.gui.src4.cmd.CmdInstanceDrawable;
+import pasa.cbentley.framework.gui.src4.cmd.CmdInstanceGui;
 import pasa.cbentley.framework.gui.src4.core.Drawable;
 import pasa.cbentley.framework.gui.src4.core.LayouterEngineDrawable;
 import pasa.cbentley.framework.gui.src4.core.StyleClass;
-import pasa.cbentley.layouter.src4.engine.LayouterEngine;
+import pasa.cbentley.framework.gui.src4.exec.ExecutionContextCanvasGui;
+import pasa.cbentley.framework.gui.src4.exec.OutputStateCanvasGui;
 import pasa.cbentley.layouter.src4.interfaces.ILayoutable;
 import pasa.cbentley.layouter.src4.tech.ITechLayout;
 
@@ -139,9 +137,9 @@ import pasa.cbentley.layouter.src4.tech.ITechLayout;
  * <b>Commands</b>
  * <br>
  * An {@link IDrawable} gets Input Events through
- * <li> {@link IDrawable#manageInput(InputConfig)}
- * <li> {@link IDrawable#manageKeyInput(InputConfig)}
- * <li> {@link IDrawable#managePointerInput(InputConfig)}
+ * <li> {@link IDrawable#manageInput(ExecutionContextCanvasGui)}
+ * <li> {@link IDrawable#manageKeyInput(ExecutionContextCanvasGui)}
+ * <li> {@link IDrawable#managePointerInput(ExecutionContextCanvasGui)}
  * <br>
  * <br>
  * {@link IDrawable} is a {@link ICommandDrawable} and provides a {@link CmdCtx}.
@@ -211,7 +209,7 @@ public interface IDrawable extends IStringable, ITechDrawable, IStatorable, IBen
     */
    public int getCType();
 
-   public IDrawable getDrawable(int x, int y, ExecutionContextGui ex);
+   public IDrawable getDrawable(int x, int y, ExecutionContextCanvasGui ex);
 
    /**
     * 
@@ -383,7 +381,7 @@ public interface IDrawable extends IStringable, ITechDrawable, IStatorable, IBen
    public int getSizeY(int sizeType);
 
    /**
-    * Structural style {@link ByteObject} that was set using {@link IDrawable#setStructStyle(ByteObject)}.
+    * Structural style {@link ByteObject} that was set using {@link IDrawable#setStyleStruct(ByteObject)}.
     * <br>
     * <br>
     * 
@@ -526,13 +524,13 @@ public interface IDrawable extends IStringable, ITechDrawable, IStatorable, IBen
     * 
     * @param ic
     */
-   public void manageGestureInput(InputConfig ic);
+   public void manageGestureInput(ExecutionContextCanvasGui ec);
 
    /**
     * Manage an input event.
-    * @param ic
+    * @param ec TODO
     */
-   public void manageInput(InputConfig ic);
+   public void manageInput(ExecutionContextCanvasGui ec);
 
    /**
     * {@link Controller} asking {@link IDrawable} to process its {@link InputConfig} for any key action.
@@ -547,18 +545,19 @@ public interface IDrawable extends IStringable, ITechDrawable, IStatorable, IBen
     * <br>
     * May Moves the Key Focus of {@link FocusCtrl}.
     * <br>
-    * This is flagged in the {@link CanvasResultDrawable} object.
+    * This is flagged in the {@link OutputStateCanvasGui} object.
     * <br>
-    * @param ic
+    * @param ec TODO
     */
-   public void manageKeyInput(InputConfig ic);
+   public void manageKeyInput(ExecutionContextCanvasGui ec);
 
-   public void manageNavigate(CmdInstanceDrawable cd, int navEvent);
+   public void manageNavigate(CmdInstanceGui cd, int navEvent);
 
    /**
     * All other events kinds are sent here.
+    * @param ec TODO
     */
-   public void manageOtherInput(InputConfig ic);
+   public void manageOtherInput(ExecutionContextCanvasGui ec);
 
    /**
     * Asks the Controlled View, its context given the pointer configuration generates a command.
@@ -570,23 +569,22 @@ public interface IDrawable extends IStringable, ITechDrawable, IStatorable, IBen
     * <br>
     * Returns which drawable must be in Pointer Over focus and Pointer Selection Focus,
     * In pointer pressed event.
-    * This is flagged in the {@link CanvasResultDrawable} object.
-    * 
-    * @param ic
+    * This is flagged in the {@link OutputStateCanvasGui} object.
+    * @param ec TODO
     */
-   public void managePointerInput(InputConfig ic);
+   public void managePointerInput(ExecutionContextCanvasGui ec);
 
    /**
     * 
-    * @param ic
+    * @param ec TODO
     */
-   public void managePointerStateStyle(InputConfig ic);
+   public void managePointerStateStyle(ExecutionContextCanvasGui ec);
 
    /**
     * When a mouse/key combination is repeated
-    * @param ic
+    * @param ec TODO
     */
-   public void manageRepeatInput(InputConfig ic);
+   public void manageRepeatInput(ExecutionContextCanvasGui ec);
 
    /**
     * See {@link IDrawable#notifyEvent(int, Object)}  with a null Object
@@ -684,7 +682,7 @@ public interface IDrawable extends IStringable, ITechDrawable, IStatorable, IBen
     * <br>
     * @param styleKey
     */
-   public void setStructStyle(ByteObject style);
+   public void setStyleStruct(ByteObject style);
 
    public void setStyleClass(StyleClass sc);
 
@@ -763,7 +761,7 @@ public interface IDrawable extends IStringable, ITechDrawable, IStatorable, IBen
     */
    public void setZIndex(int zindex);
 
-   public void shHideDrawable(InputConfig ic);
+   public void shHideDrawable(ExecutionContextCanvasGui ec);
 
    /**
     * Moves drawable from current position
@@ -799,7 +797,7 @@ public interface IDrawable extends IStringable, ITechDrawable, IStatorable, IBen
     * 
     * @param ic
     */
-   public void shShowDrawableOver(InputConfig ic);
+   public void shShowDrawableOver(ExecutionContextCanvasGui ec);
 
    public void stringUpdate();
 

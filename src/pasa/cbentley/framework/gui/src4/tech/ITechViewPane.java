@@ -203,7 +203,7 @@ public interface ITechViewPane extends IByteObject {
     * What if a {@link ScrollBar} is using both vertical and horizontal axis? Deal with it.
     * <br>
     */
-   public static final int PLANET_MODE_3_IMMATERIAL      = 3;
+   public static final int PLANET_MODE_3_GHOST      = 3;
 
    public static final int SAT_00_V_SB                   = 0;
 

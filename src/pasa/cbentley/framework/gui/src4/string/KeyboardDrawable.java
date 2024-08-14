@@ -8,6 +8,7 @@ import pasa.cbentley.framework.gui.src4.core.Drawable;
 import pasa.cbentley.framework.gui.src4.core.FigDrawable;
 import pasa.cbentley.framework.gui.src4.core.StyleClass;
 import pasa.cbentley.framework.gui.src4.ctx.GuiCtx;
+import pasa.cbentley.framework.gui.src4.exec.ExecutionContextCanvasGui;
 import pasa.cbentley.framework.gui.src4.interfaces.ITechDrawable;
 import pasa.cbentley.framework.gui.src4.table.TableView;
 
@@ -99,7 +100,7 @@ public class KeyboardDrawable extends Drawable {
     * Call Back for DownCmd
     *
     */
-   public void navigateDown(InputConfig ic) {
+   public void navigateDown(ExecutionContextCanvasGui ec) {
 
    }
 
@@ -111,7 +112,7 @@ public class KeyboardDrawable extends Drawable {
     * Second call, implements any second cycle stuff like cycles or other stuff.
     * @param ic
     */
-   public void navigateLeft(InputConfig ic) {
+   public void navigateLeft(ExecutionContextCanvasGui ec) {
 
    }
 
@@ -119,7 +120,7 @@ public class KeyboardDrawable extends Drawable {
     * Implement to the right horizontal traversal
     * @param ic
     */
-   public void navigateRight(InputConfig ic) {
+   public void navigateRight(ExecutionContextCanvasGui ec) {
 
    }
 
@@ -127,7 +128,7 @@ public class KeyboardDrawable extends Drawable {
     * 
     * @param ic
     */
-   public void navigateSelect(InputConfig ic) {
+   public void navigateSelect(ExecutionContextCanvasGui ec) {
 
    }
 

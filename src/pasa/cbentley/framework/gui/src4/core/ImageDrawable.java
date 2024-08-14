@@ -130,17 +130,17 @@ public class ImageDrawable extends ViewDrawable {
       //what happens if there is a super clip that wants to be inforced? Like for the PinBoard?
       //we must take the intersection or not?
       g.clipSet(x, y, w, h, GraphicsX.CLIP_DIRECTIVE_0_INTERSECTION);
-      x = drawVScrollMod(x, scx, xincr, getContentW(), img.getWidth() - getContentW());
-      y = drawVScrollMod(y, scy, yincr, getContentH(), img.getHeight() - getContentH());
+      x = drawVScrollMod(x, scx, xincr, w, img.getWidth() - w);
+      y = drawVScrollMod(y, scy, yincr, h, img.getHeight() - h);
 
       //apply Anchor if any
       ByteObject anchor = getStyleOp().getStyleAnchor(style);
       if (anchor != null) {
          if (scx == null) {
-            x += AnchorUtils.getXAlign(anchor, 0, getContentW(), img.getWidth());
+            x += AnchorUtils.getXAlign(anchor, 0, w, img.getWidth());
          }
          if (scy == null) {
-            y += AnchorUtils.getYAlign(anchor, 0, getContentH(), img.getHeight());
+            y += AnchorUtils.getYAlign(anchor, 0, h, img.getHeight());
          }
       }
       g.drawRgbImage(img, x, y);

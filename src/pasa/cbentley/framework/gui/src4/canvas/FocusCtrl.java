@@ -1,47 +1,47 @@
 package pasa.cbentley.framework.gui.src4.canvas;
 
-import pasa.cbentley.core.src4.ctx.UCtx;
 import pasa.cbentley.core.src4.event.BusEvent;
+import pasa.cbentley.core.src4.event.IEventBus;
 import pasa.cbentley.core.src4.interfaces.C;
 import pasa.cbentley.core.src4.logging.Dctx;
-import pasa.cbentley.core.src4.logging.IDLog;
 import pasa.cbentley.core.src4.logging.IStringable;
 import pasa.cbentley.framework.cmd.src4.ctx.CmdCtx;
-import pasa.cbentley.framework.cmd.src4.input.FocusTypeInput;
+import pasa.cbentley.framework.cmd.src4.input.FocusDeviceUser;
 import pasa.cbentley.framework.cmd.src4.interfaces.ICmdsCmd;
 import pasa.cbentley.framework.cmd.src4.interfaces.ICommandable;
-import pasa.cbentley.framework.coreui.src4.tech.IInput;
-import pasa.cbentley.framework.gui.src4.cmd.CmdInstanceDrawable;
+import pasa.cbentley.framework.cmd.src4.interfaces.ITechCmd;
+import pasa.cbentley.framework.core.ui.src4.input.InputState;
+import pasa.cbentley.framework.core.ui.src4.tech.IInput;
+import pasa.cbentley.framework.gui.src4.cmd.CmdInstanceGui;
 import pasa.cbentley.framework.gui.src4.core.Drawable;
 import pasa.cbentley.framework.gui.src4.ctx.GuiCtx;
 import pasa.cbentley.framework.gui.src4.ctx.IEventsGui;
-import pasa.cbentley.framework.gui.src4.interfaces.ITechCanvasDrawable;
-import pasa.cbentley.framework.gui.src4.interfaces.ICmdsView;
+import pasa.cbentley.framework.gui.src4.ctx.ObjectGC;
+import pasa.cbentley.framework.gui.src4.exec.ExecutionContextCanvasGui;
+import pasa.cbentley.framework.gui.src4.exec.OutputStateCanvasGui;
 import pasa.cbentley.framework.gui.src4.interfaces.IDrawable;
+import pasa.cbentley.framework.gui.src4.interfaces.ITechCanvasDrawable;
 import pasa.cbentley.framework.gui.src4.interfaces.ITechDrawable;
 import pasa.cbentley.framework.gui.src4.nav.TopologyTBLRNav;
 import pasa.cbentley.framework.gui.src4.table.TableView;
 import pasa.cbentley.framework.gui.src4.utils.DrawableArrays;
 import pasa.cbentley.framework.gui.src4.utils.DrawableUtilz;
-import pasa.cbentley.framework.input.src4.InputState;
 
 /**
- * Manages the focus for a {@link CanvasAppliInputGui}
+ * Manages the focus inside a {@link CanvasAppliInputGui}
  * 
- * {@link FocusCtrl} is thread safe because the Update Thread
- * query and the GUI thread writes when a new Drawable is shown.
- * <br>
- * But shared {@link CmdCtx} are also access by both threads.
- * <br>
- * What are the Update and UI command concerns?
- * <br>
+ * Focus owners:
+ * <li> User1 Mouse Focus
+ * <li> User2 Mouse Focus
+ * <li> User1 Keyboard1 Focus
+ * <li> User1 Keyboard2 Focus
  * 
+ * <p>
  *  There are 2 main input methods. 
  *  <li>Pointer/Touch 
  *  <li>Keyboard.
- *  <br>
  *  For each method, there is a focused {@link IDrawable} associated.
- *  <br>
+ * </p>
  *  
  *  Supporting of directional navigation in your application is also important in ensuring that your application is accessible to users who do not navigate using visual cues. 
  *  <br>
@@ -70,17 +70,15 @@ Each attribute designates the next view to receive focus when the user navigates
  * @author Charles Bentley
  *
  */
-public class FocusCtrl implements IStringable {
+public class FocusCtrl extends ObjectGC implements IStringable {
 
-   private BusEvent       focusChange;
-
-   protected final GuiCtx gc;
+   private BusEvent      focusChange;
 
    /**
     * {@link Drawable} who first respond to key events and whose {@link CmdCtx} is active.
     * <br>
     * <br>
-    * After {@link IDrawable}, it is the first to recieve the {@link IDrawable#manageKeyInput(InputConfig)} method call.
+    * After {@link IDrawable}, it is the first to recieve the {@link IDrawable#manageKeyInput(ExecutionContextCanvasGui)} method call.
     * <br> 
     * <br>
     * TODO when a Drawable gets the focus, it may send its Help ID to display.
@@ -98,7 +96,7 @@ public class FocusCtrl implements IStringable {
     * <br>
     * Specific IDs may be user learned
     */
-   private IDrawable      itemInKeyFocus;
+   private IDrawable     itemInKeyFocus;
 
    /**
     * Items to first recieve Menu command activation events.
@@ -106,7 +104,7 @@ public class FocusCtrl implements IStringable {
     * on which keyboard focus does it act? It acts on the keyboard
     * focus that the pointer would activate with a press
     */
-   private IDrawable      itemInMenuFocus;
+   private IDrawable     itemInMenuFocus;
 
    /**
     * {@link IDrawable} on which the pointer is currently on.
@@ -126,7 +124,7 @@ public class FocusCtrl implements IStringable {
     * <br>
     * 
     */
-   private IDrawable      itemInPointerPressedFocus = null;
+   private IDrawable     itemInPointerPressedFocus = null;
 
    /**
     * With devices with moving pointers like computer.
@@ -142,24 +140,24 @@ public class FocusCtrl implements IStringable {
     * pointer to the middle of the pointer Press Focus.
     * <br> 
     */
-   private IDrawable[]    itemInPointerOverFocus    = new IDrawable[1];
+   private IDrawable[]   itemInPointerOverFocus    = new IDrawable[1];
 
    /**
     * Stores Drawables in focus for the categories
-    * <li> {@link ICmdsView#CTX_CAT_0_KEY}
-    * <li> {@link ICmdsView#CTX_CAT_1_POINTER_PRESSED}
-    * <li> {@link ICmdsView#CTX_CAT_0_KEY}
+    * <li> {@link ITechCmd#CTX_CAT_0_KEY}
+    * <li> {@link ITechCmd#CTX_CAT_1_POINTER_PRESSED}
+    * <li> {@link ITechCmd#CTX_CAT_0_KEY}
     * 
     */
-   private IDrawable[]    itemInFocus               = new IDrawable[1];
+   private IDrawable[]   itemInFocus               = new IDrawable[1];
 
-   private IDrawable[]    devicesFocus              = new IDrawable[1];
+   private IDrawable[]   devicesFocus              = new IDrawable[1];
 
-   private IDrawable[][]  devicesExtraFocus         = new IDrawable[1][];
+   private IDrawable[][] devicesExtraFocus         = new IDrawable[1][];
 
-   private int            ITERATE_FOCUS_KEY;
+   private int           ITERATE_FOCUS_KEY;
 
-   private int            keyFocusChangeCount;
+   private int           keyFocusChangeCount;
 
    public IDrawable getFocus(int cat) {
       return itemInFocus[cat];
@@ -171,9 +169,11 @@ public class FocusCtrl implements IStringable {
    private TopologyTBLRNav topologyNav;
 
    public FocusCtrl(GuiCtx gc) {
-      this.gc = gc;
+      super(gc);
       topologyNav = new TopologyTBLRNav(gc);
-      focusChange = new BusEvent(gc.getUC(), gc.getEventsBusGui(), IEventsGui.PID_1_DRAW, IEventsGui.PID_1_DRW_EID_1_FOCUS_CHANGE);
+      
+      IEventBus eventsBusGui = gc.getEventsBusGui();
+      focusChange = new BusEvent(gc.getUC(), eventsBusGui, IEventsGui.PID_01_DRAW, IEventsGui.PID_01_DRAW_01_FOCUS_CHANGE);
    }
 
    private void focusGainPointer(IDrawable d) {
@@ -214,6 +214,16 @@ public class FocusCtrl implements IStringable {
    public void focusRelease() {
       // TODO Auto-generated method stub
 
+   }
+
+   /**
+    * The {@link IDrawable} under focus by the owner
+    * @param focus
+    * @return
+    */
+   public IDrawable getItemInFocus(FocusDeviceUser focus) {
+
+      return null;
    }
 
    public IDrawable getItemInKeyFocus() {
@@ -261,7 +271,7 @@ public class FocusCtrl implements IStringable {
     * @param nav
     * @param posLeft
     */
-   public void navigateOut(InputConfig ic, IDrawable nav, int posLeft) {
+   public void navigateOut(ExecutionContextCanvasGui ec, IDrawable nav, int posLeft) {
       if (posLeft == C.POS_2_LEFT) {
       }
    }
@@ -284,50 +294,49 @@ public class FocusCtrl implements IStringable {
     * Key focus becomes null when parameter is null.
     * <br>
     * <br>
-    * @param ic could be null
+    * @param ec TODO
     * @param newKeyFocusDrawable the {@link Drawable} to give focus {@link ITechDrawable#STYLE_06_FOCUSED_KEY} state to.
     */
-   public void newFocusKey(InputConfig ic, IDrawable newKeyFocusDrawable) {
-      CanvasResultDrawable srd = ic.sr;
+   public void newFocusKey(ExecutionContextCanvasGui ec, IDrawable newKeyFocusDrawable) {
+      OutputStateCanvasGui os = ec.getCanvasResultDrawable();
       focusChange.clearForReUse();
       focusChange.setParamO1(newKeyFocusDrawable);
       focusChange.setParamO2(itemInKeyFocus);
       keyFocusChangeCount++;
       if (newKeyFocusDrawable == null) {
          if (itemInKeyFocus != null) {
-            srd.setActionDoneRepaint(itemInKeyFocus);
+            os.setActionDoneRepaint(itemInKeyFocus);
             //#debug
-            srd.debugSetActionDoneRepaint("Removed Old Drawable KeyFocus");
+            os.debugSetActionDoneRepaint("Removed Old Drawable KeyFocus");
             itemInKeyFocus.notifyEvent(ITechDrawable.EVENT_04_KEY_FOCUS_LOSS, focusChange);
             itemInKeyFocus = null;
          }
       } else {
          if (itemInKeyFocus != null && newKeyFocusDrawable != itemInKeyFocus) {
-            srd.setActionDoneRepaint(itemInKeyFocus);
+            os.setActionDoneRepaint(itemInKeyFocus);
             itemInKeyFocus.notifyEvent(ITechDrawable.EVENT_04_KEY_FOCUS_LOSS, focusChange);
             itemInKeyFocus = null;
          }
          if (newKeyFocusDrawable != itemInKeyFocus) {
-            srd.setActionDoneRepaint(newKeyFocusDrawable);
+            os.setActionDoneRepaint(newKeyFocusDrawable);
             //#debug
-            srd.debugSetActionDoneRepaint("#Controller New Drawable KeyFocus");
+            os.debugSetActionDoneRepaint("#Controller New Drawable KeyFocus");
             newKeyFocusDrawable.notifyEvent(ITechDrawable.EVENT_03_KEY_FOCUS_GAIN, focusChange);
             itemInKeyFocus = newKeyFocusDrawable;
          }
       }
-      gc.getCC().setActiveCommandable(itemInKeyFocus, ICmdsView.CTX_CAT_0_KEY);
+      gc.getCC().setActiveCommandable(itemInKeyFocus, ITechCmd.CTX_CAT_0_KEY);
    }
 
    /**
     * Drawable is focus by the pointer in {@link InputState}.
     * <br>
-    * 
-    * @param ic
+    * @param ec TODO
     * @param drawable
     */
-   public void newFocusPointerOver(InputConfig ic, IDrawable drawable) {
+   public void newFocusPointerOver(ExecutionContextCanvasGui ec, IDrawable drawable) {
 
-      gc.getCC().setActiveCommandable(drawable, ICmdsView.CTX_CAT_2_POINTER_OVER);
+      gc.getCC().setActiveCommandable(drawable, ITechCmd.CTX_CAT_2_POINTER_OVER);
    }
 
    /**
@@ -347,10 +356,11 @@ public class FocusCtrl implements IStringable {
     * Sets the action done in all cases
     * <br>
     * <br>
-    * @param ic
+    * @param ec TODO
     * @param drawable when null removes the focus to all focused {@link IDrawable}.
     */
-   public void newFocusPointerPress(InputConfig ic, IDrawable drawable) {
+   public void newFocusPointerPress(ExecutionContextCanvasGui ec, IDrawable drawable) {
+      InputConfig ic = ec.getInputConfig();
       if (drawable == null) {
          if (itemInPointerPressedFocus != null) {
             ic.srActionDoneRepaint(itemInPointerPressedFocus);
@@ -364,7 +374,7 @@ public class FocusCtrl implements IStringable {
          //#debug
          toDLog().pFlow("", drawable, FocusCtrl.class, "newFocusPointerPress", LVL_05_FINE, true);
 
-         if (drawable != itemInPointerPressedFocus && DrawableUtilz.isInside(ic, drawable)) {
+         if (drawable != itemInPointerPressedFocus && DrawableUtilz.isInside(ec, drawable)) {
             if (itemInPointerPressedFocus != null && drawable != itemInPointerPressedFocus) {
                ic.srActionDoneRepaint(itemInPointerPressedFocus);
 
@@ -383,7 +393,7 @@ public class FocusCtrl implements IStringable {
             }
          }
       }
-      gc.getCC().setActiveCommandable(itemInPointerPressedFocus, ICmdsView.CTX_CAT_1_POINTER_PRESSED);
+      gc.getCC().setActiveCommandable(itemInPointerPressedFocus, ITechCmd.CTX_CAT_1_POINTER_PRESSED);
       //action flag is set. this must be done
       ic.srActionDone();
    }
@@ -394,11 +404,11 @@ public class FocusCtrl implements IStringable {
     * But if the state impacts other things??? Pressing
     * on a Drawable in a TableView will also set the state on another.
     * <br>
-    * 
-    * @param ic
+    * @param ec TODO
     * @param d
     */
-   public void setPointerStates(InputConfig ic, IDrawable d) {
+   public void setPointerStates(ExecutionContextCanvasGui ec, IDrawable d) {
+      InputConfig ic = ec.getInputConfig();
       if (ic.isMoved()) {
       } else if (ic.isPressed()) {
          d.setStateStyle(ITechDrawable.STYLE_08_PRESSED, true);
@@ -407,26 +417,27 @@ public class FocusCtrl implements IStringable {
          d.setStateStyle(ITechDrawable.STYLE_09_DRAGGED, false);
          //the release is done outside the drawable but it got called because 
          //it was the draggable. so it gets a chance to set state
-         if (!DrawableUtilz.isInside(ic, d)) {
-            ic.sr.setOutsideDrawable(true);
+         if (!DrawableUtilz.isInside(ec, d)) {
+            ic.getCanvasResultDrawable().setOutsideDrawable(true);
          }
       } else if (ic.isDraggedPointer0Button0()) {
          d.setStateStyle(ITechDrawable.STYLE_09_DRAGGED, true);
       } else if (ic.isWheeled()) {
 
       }
-      ic.sr.setDrawableStates();
+      ic.getCanvasResultDrawable().setDrawableStates();
 
    }
 
    /**
+    * Focus for what and who?
     * 
-    * <li> {@link ICmdsView#CTX_CAT_0_KEY}
-    * <li> {@link ICmdsView#CTX_CAT_1_POINTER_PRESSED}
-    * <li> {@link ICmdsView#CTX_CAT_2_POINTER_OVER}
-    * <li> {@link ICmdsView#CTX_CAT_3_POINTER2_PRESSED}
-    * <li> {@link ICmdsView#CTX_CAT_4_POINTER2_OVER}
-    * <li> {@link ICmdsView#CTX_CAT_5_POINTER3_PRESSED}
+    * <li> {@link ITechCmd#CTX_CAT_0_KEY}
+    * <li> {@link ITechCmd#CTX_CAT_1_POINTER_PRESSED}
+    * <li> {@link ITechCmd#CTX_CAT_2_POINTER_OVER}
+    * <li> {@link ITechCmd#CTX_CAT_3_POINTER2_PRESSED}
+    * <li> {@link ITechCmd#CTX_CAT_4_POINTER2_OVER}
+    * <li> {@link ITechCmd#CTX_CAT_5_POINTER3_PRESSED}
     * 
     * @param d
     * @param ctxCategory
@@ -440,9 +451,9 @@ public class FocusCtrl implements IStringable {
       gc.getCC().setActiveCommandable(d, ctxCategory);
    }
 
-   public void setNewFocus(InputState is, IDrawable d, FocusTypeInput ft) {
-      int deviceID = ft.getDeviceID();
-      int deviceType = ft.getDeviceType();
+   public void setNewFocus(InputState is, IDrawable d, FocusDeviceUser focusType) {
+      int deviceID = focusType.getDeviceID();
+      int deviceType = focusType.getDeviceType();
       //for the most used context we check them. most common case if deviceID 0 for pointer and keyboard
       IDrawable old = null;
       if (deviceID == 0) {
@@ -460,7 +471,7 @@ public class FocusCtrl implements IStringable {
          old = devicesExtraFocus[deviceType][deviceID];
          devicesExtraFocus[deviceType][deviceID] = d;
       }
-      CtxEventDrawable ced = new CtxEventDrawable(gc, d, old, ft);
+      EventCmdNodeDrawable ced = new EventCmdNodeDrawable(gc, d, old, focusType);
       //queue an event Ctx Change 
       is.queuePost(ced);
 
@@ -494,7 +505,7 @@ public class FocusCtrl implements IStringable {
     * @param nestedMenus
     * @param returns the new focus key. must be painted
     */
-   public IDrawable drawableHide(CmdInstanceDrawable cd, IDrawable d, IDrawable newKeyFocus) {
+   public IDrawable drawableHide(CmdInstanceGui cd, IDrawable d, IDrawable newKeyFocus) {
       //first remove drawable from the topology
       TopologyDLayer topo = d.getVC().getTopo();
       topo.removeDrawable(d);
@@ -520,7 +531,7 @@ public class FocusCtrl implements IStringable {
          }
       }
 
-      setNewFocus(newKeyFocus, ICmdsView.CTX_CAT_0_KEY);
+      setNewFocus(newKeyFocus, ITechCmd.CTX_CAT_0_KEY);
       return newKeyFocus;
    }
 
@@ -529,8 +540,8 @@ public class FocusCtrl implements IStringable {
     * @param drawExCtx
     * @param d
     */
-   public void drawableShow(ExecutionContextGui drawExCtx, IDrawable d) {
-      setNewFocus(d, ICmdsView.CTX_CAT_0_KEY);
+   public void drawableShow(ExecutionContextCanvasGui drawExCtx, IDrawable d) {
+      setNewFocus(d, ITechCmd.CTX_CAT_0_KEY);
       d.getVC().getTopo().addDLayer(d, ITechCanvasDrawable.SHOW_TYPE_1_OVER_TOP);
    }
 
@@ -548,7 +559,7 @@ public class FocusCtrl implements IStringable {
    //    * <br>
    //    * <li> {@link IDrawable#BE}
    //    */
-   //   private void processNav(InputConfig ic) {
+   //   private void processNav(ExecutionContextCanvasGui ec) {
    //      if (itemInKeyFocus == null) {
    //         return;
    //      }
@@ -585,7 +596,7 @@ public class FocusCtrl implements IStringable {
    //    * @param ic
    //    * @param d
    //    */
-   //   private void processNav(InputConfig ic, IDrawable d) {
+   //   private void processNav(ExecutionContextCanvasGui ec, IDrawable d) {
    //      processNavigationEvent(ic, d);
    //      if (!ic.isActionDone() && d.getParent() != null) {
    //         ic.is.setNavProcessParent(d);
@@ -615,7 +626,7 @@ public class FocusCtrl implements IStringable {
    //    * @param ic
    //    * @param nav {@link IDrawable} against which to check {@link InputConfig} for navigation commands.
    //    */
-   //   private void processNavigationEvent(InputConfig ic, IDrawable nav) {
+   //   private void processNavigationEvent(ExecutionContextCanvasGui ec, IDrawable nav) {
    //      if (nav == null) {
    //         return;
    //      }
@@ -687,36 +698,21 @@ public class FocusCtrl implements IStringable {
    //   }
 
    //#mdebug
-   public IDLog toDLog() {
-      return toStringGetUCtx().toDLog();
-   }
-
-   public String toString() {
-      return Dctx.toString(this);
-   }
-
    public void toString(Dctx dc) {
-      dc.root(this, "FocusCtrl");
+      dc.root(this, FocusCtrl.class, 700);
       toStringPrivate(dc);
+      super.toString(dc.sup());
    }
 
-   public String toString1Line() {
-      return Dctx.toString1Line(this);
+   public void toString1Line(Dctx dc) {
+      dc.root1Line(this, FocusCtrl.class, 700);
+      toStringPrivate(dc);
+      super.toString1Line(dc.sup1Line());
    }
 
    private void toStringPrivate(Dctx dc) {
 
    }
-
-   public void toString1Line(Dctx dc) {
-      dc.root1Line(this, "FocusCtrl");
-      toStringPrivate(dc);
-   }
-
-   public UCtx toStringGetUCtx() {
-      return gc.getUC();
-   }
-
    //#enddebug
 
 }

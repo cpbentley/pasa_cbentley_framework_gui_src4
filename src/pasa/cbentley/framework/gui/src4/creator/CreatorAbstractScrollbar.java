@@ -28,6 +28,14 @@ public abstract class CreatorAbstractScrollbar extends CreatorAbstract implement
    public void setWrapper() {
       isWrapper = true;
    }
+   
+   public void setWrapper(boolean b) {
+      this.isWrapper = b;
+   }
+   
+   public void setWrapperFill(boolean b) {
+      isWrapperFill = b;
+   }
 
    public void setWrapperFill() {
       isWrapperFill = true;

@@ -11,18 +11,21 @@ import pasa.cbentley.core.src4.ctx.IStaticIDs;
 import pasa.cbentley.core.src4.event.EventBusArray;
 import pasa.cbentley.core.src4.event.IEventBus;
 import pasa.cbentley.core.src4.i8n.IStringProducer;
+import pasa.cbentley.core.src4.interfaces.IHostFeature;
 import pasa.cbentley.core.src4.logging.Dctx;
 import pasa.cbentley.core.src4.stator.IStatorFactory;
 import pasa.cbentley.core.src4.utils.BitUtils;
 import pasa.cbentley.framework.cmd.src4.ctx.CmdCtx;
 import pasa.cbentley.framework.cmd.src4.ctx.IStaticIDsCmd;
-import pasa.cbentley.framework.core.src4.app.IAppli;
-import pasa.cbentley.framework.core.src4.ctx.CoreFrameworkCtx;
-import pasa.cbentley.framework.core.src4.interfaces.ITechHostCore;
-import pasa.cbentley.framework.coredata.src4.ctx.CoreDataCtx;
+import pasa.cbentley.framework.core.data.src4.ctx.CoreDataCtx;
+import pasa.cbentley.framework.core.framework.src4.app.IAppli;
+import pasa.cbentley.framework.core.framework.src4.ctx.CoreFrameworkCtx;
+import pasa.cbentley.framework.core.framework.src4.ctx.IEventsCoreFramework;
+import pasa.cbentley.framework.core.ui.src4.ctx.CoreUiCtx;
+import pasa.cbentley.framework.core.ui.src4.tech.ITechHostFeatureDrawUI;
 import pasa.cbentley.framework.coredraw.src4.ctx.CoreDrawCtx;
-import pasa.cbentley.framework.coreui.src4.ctx.CoreUiCtx;
 import pasa.cbentley.framework.datamodel.src4.ctx.DataModelCtx;
+import pasa.cbentley.framework.datamodel.src4.ctx.IEventsDataModel;
 import pasa.cbentley.framework.drawx.src4.ctx.DrwCtx;
 import pasa.cbentley.framework.gui.src4.anim.AnimFactory;
 import pasa.cbentley.framework.gui.src4.anim.AnimOperator;
@@ -31,12 +34,12 @@ import pasa.cbentley.framework.gui.src4.canvas.CanvasDrawControl;
 import pasa.cbentley.framework.gui.src4.canvas.FocusCtrl;
 import pasa.cbentley.framework.gui.src4.canvas.IBOCanvasAppliGui;
 import pasa.cbentley.framework.gui.src4.canvas.ICanvasDrawable;
-import pasa.cbentley.framework.gui.src4.canvas.InputConfig;
 import pasa.cbentley.framework.gui.src4.canvas.TopLevelCtrl;
 import pasa.cbentley.framework.gui.src4.canvas.ViewContext;
+import pasa.cbentley.framework.gui.src4.cmd.CmdFactoryGui;
 import pasa.cbentley.framework.gui.src4.cmd.CmdMapperGui;
+import pasa.cbentley.framework.gui.src4.cmd.CmdProcessorGui;
 import pasa.cbentley.framework.gui.src4.cmd.CommanderGui;
-import pasa.cbentley.framework.gui.src4.cmd.ViewCommandListener;
 import pasa.cbentley.framework.gui.src4.core.DefaultStyles;
 import pasa.cbentley.framework.gui.src4.core.Drawable;
 import pasa.cbentley.framework.gui.src4.core.DrawableRepo;
@@ -46,6 +49,7 @@ import pasa.cbentley.framework.gui.src4.core.UserInteraction;
 import pasa.cbentley.framework.gui.src4.core.UserInteractionCtrl;
 import pasa.cbentley.framework.gui.src4.ctx.config.IConfigAppGui;
 import pasa.cbentley.framework.gui.src4.ctx.config.IConfigGui;
+import pasa.cbentley.framework.gui.src4.exec.ExecutionContextCanvasGui;
 import pasa.cbentley.framework.gui.src4.factories.DrawableFactory;
 import pasa.cbentley.framework.gui.src4.factories.DrawableOperator;
 import pasa.cbentley.framework.gui.src4.factories.DrawableStringFactory;
@@ -54,7 +58,7 @@ import pasa.cbentley.framework.gui.src4.factories.TableCellPolicyFactory;
 import pasa.cbentley.framework.gui.src4.factories.TableGeneticsFactory;
 import pasa.cbentley.framework.gui.src4.factories.TablePolicyFactory;
 import pasa.cbentley.framework.gui.src4.forms.FormFactory;
-import pasa.cbentley.framework.gui.src4.interfaces.ICmdsView;
+import pasa.cbentley.framework.gui.src4.interfaces.ICmdsGui;
 import pasa.cbentley.framework.gui.src4.interfaces.IDrawable;
 import pasa.cbentley.framework.gui.src4.interfaces.IUIView;
 import pasa.cbentley.framework.gui.src4.mui.AppliGui;
@@ -195,11 +199,13 @@ public class GuiCtx extends ABOCtx implements ITechCtxSettingsAppGui {
 
    private ViewContext              vcGhost;
 
-   private ViewCommandListener      vcl;
+   private CmdProcessorGui          vcl;
 
-   private ViewCommandListener      viewCommandListener;
+   private CmdProcessorGui          viewCommandListener;
 
    private SettingsWrapperGui       wrapper;
+
+   private CmdFactoryGui            cmdFactoryGui;
 
    public GuiCtx(IConfigGui config, CoreFrameworkCtx cfc, InputCtx ic, CmdCtx cc, BOCtx boc, DrwCtx dc, DataModelCtx dmc, IStringProducer strings) {
       super(config, boc);
@@ -217,26 +223,26 @@ public class GuiCtx extends ABOCtx implements ITechCtxSettingsAppGui {
 
       statorFactory = new StatorFactoryDrawable(this);
       animFactory = new AnimFactory(this);
-
+      cmdFactoryGui = new CmdFactoryGui(this);
       CtxManager c = uc.getCtxManager();
 
       c.registerStaticRange(this, IStaticIDsBO.SID_BYTEOBJECT_TYPES, IBOTypesGui.SID_VIEWTYPE_A, IBOTypesGui.SID_VIEWTYPE_Z);
 
       c.registerStaticRange(this, IStaticIDs.SID_DIDS, IToStringsDIDGui.A_DID_OFFSET_A_GUI, IToStringsDIDGui.A_DID_OFFSET_Z_GUI);
-      c.registerStaticRange(this, IStaticIDsCmd.SID_COMMANDS, ICmdsView.A_SID_VCMD_A, ICmdsView.A_SID_VCMD_Z);
+      c.registerStaticRange(this, IStaticIDsCmd.SID_COMMANDS, ICmdsGui.A_SID_VCMD_A, ICmdsGui.A_SID_VCMD_Z);
       c.registerStaticRange(this, IStaticIDs.SID_STRINGS, IStringsGui.AZ_STR_VIEW_A, IStringsGui.AZ_STR_VIEW_Z);
+      cm.registerStaticRange(this, IStaticIDsBO.SID_EVENTS, IEventsGui.A_SID_GUI_EVENT_A, IEventsGui.A_SID_GUI_EVENT_Z);
 
       strings.loads(this, IStringsGui.STR_VIEW_FILE);
 
-      int[] eventsTolopogy = new int[IEventsGui.PID_NUM];
-      eventsTolopogy[IEventsGui.CHAR_EVENT_PROD_ID] = IEventsGui.CHAR_EVENT_NUM_MAX;
-      eventBus = new EventBusArray(uc, this, eventsTolopogy);
+      int[] topo = getEventBaseTopology();
+      eventBus = uc.getOrCreateEventBus(this, IEventsGui.A_SID_GUI_EVENT_A, IEventsGui.A_SID_GUI_EVENT_Z, topo);
 
       canvasCtxs = new CanvasGuiCtx[2];
       focusCtrl = new FocusCtrl(this);
       uiaCtrl = new UserInteractionCtrl(this);
       commander = new CommanderGui(this);
-      
+
       if (this.getClass() == GuiCtx.class) {
          a_Init();
       }
@@ -244,6 +250,14 @@ public class GuiCtx extends ABOCtx implements ITechCtxSettingsAppGui {
       //#debug
       toDLog().pInit("", this, GuiCtx.class, "Created@240", LVL_04_FINER, true);
 
+   }
+
+   public int[] getEventBaseTopology() {
+      int[] events = new int[IEventsGui.GUI_NUM_EVENTS];
+      events[IEventsGui.PID_00] = IEventsGui.PID_00_XX;
+      events[IEventsGui.PID_01] = IEventsGui.PID_01_XX;
+      events[IEventsGui.PID_02] = IEventsGui.PID_02_XX;
+      return events;
    }
 
    public void a_Init() {
@@ -367,6 +381,10 @@ public class GuiCtx extends ABOCtx implements ITechCtxSettingsAppGui {
 
    public CoreFrameworkCtx getCFC() {
       return ic.getCFC();
+   }
+
+   public IHostFeature getHostFeature() {
+      return cfc.getHostFeature();
    }
 
    public StyleClass[] getClasses() {
@@ -657,9 +675,9 @@ public class GuiCtx extends ABOCtx implements ITechCtxSettingsAppGui {
       return vcGhost;
    }
 
-   public ViewCommandListener getViewCommandListener() {
+   public CmdProcessorGui getCmdProcessorGui() {
       if (vcl == null) {
-         vcl = new ViewCommandListener(this);
+         vcl = new CmdProcessorGui(this);
       }
       return vcl;
    }
@@ -730,8 +748,9 @@ public class GuiCtx extends ABOCtx implements ITechCtxSettingsAppGui {
 
    }
 
-   public void showIndependant(InputConfig ic, IDrawable drawable) {
-      if (getCFC().getHostCore().hasFeatureSupport(ITechHostCore.SUP_ID_24_MULTIPLE_WINDOWS)) {
+   public void showIndependant(ExecutionContextCanvasGui ec, IDrawable drawable) {
+      IHostFeature feats = cfc.getHostFeature();
+      if (feats.isHostFeatureSupported(ITechHostFeatureDrawUI.SUP_ID_24_MULTIPLE_WINDOWS)) {
          ByteObject techCanvasHost = getCUC().createBOCanvasHostDefault();
          ByteObject techCanvasAppli = createBOCanvasAppliDrawableDefault();
 
@@ -747,7 +766,7 @@ public class GuiCtx extends ABOCtx implements ITechCtxSettingsAppGui {
       //show it over
       ViewContext viewContext = drawable.getViewContext();
       CanvasDrawControl drawCtrlAppli = viewContext.getDrawCtrlAppli();
-      drawCtrlAppli.shShowDrawableOver(ic, drawable);
+      drawCtrlAppli.shShowDrawableOver(ec, drawable);
    }
 
    //#mdebug
@@ -813,6 +832,10 @@ public class GuiCtx extends ABOCtx implements ITechCtxSettingsAppGui {
 
    public void toStringSetFlagDraw(int flag, boolean b) {
       toStringFlagsDraw = BitUtils.setFlag(toStringFlagsDraw, flag, b);
+   }
+
+   public CmdFactoryGui getCmdFactoryGui() {
+      return cmdFactoryGui;
    }
 
    //#enddebug

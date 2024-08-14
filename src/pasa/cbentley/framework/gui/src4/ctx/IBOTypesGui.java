@@ -2,10 +2,10 @@ package pasa.cbentley.framework.gui.src4.ctx;
 
 import pasa.cbentley.byteobjects.src4.ctx.IBOTypesBOC;
 import pasa.cbentley.byteobjects.src4.ctx.IBOTypesExtendedBOC;
-import pasa.cbentley.framework.core.src4.ctx.IBOTypesCoreFramework;
-import pasa.cbentley.framework.coredata.src4.ctx.IBOTypesCoreData;
+import pasa.cbentley.framework.core.data.src4.ctx.IBOTypesCoreData;
+import pasa.cbentley.framework.core.framework.src4.ctx.IBOTypesCoreFramework;
+import pasa.cbentley.framework.core.ui.src4.ctx.IBOTypesCoreUi;
 import pasa.cbentley.framework.coredraw.src4.ctx.IBOTypesCoreDraw;
-import pasa.cbentley.framework.coreui.src4.ctx.IBOTypesCoreUI;
 import pasa.cbentley.framework.datamodel.src4.ctx.IBOTypesDataModel;
 import pasa.cbentley.framework.drawx.src4.ctx.IBOTypesDrawX;
 import pasa.cbentley.framework.input.src4.ctx.IBOTypesInput;
@@ -22,7 +22,7 @@ import pasa.cbentley.layouter.src4.ctx.IBOTypesLayout;
  * <li> {@link IBOTypesDataModel}
  * 
  * <li> {@link IBOTypesCoreDraw}
- * <li> {@link IBOTypesCoreUI}
+ * <li> {@link IBOTypesCoreUi}
  * <li> {@link IBOTypesCoreFramework}
  * <li> {@link IBOTypesCoreData}
  * <li>
@@ -53,28 +53,16 @@ public interface IBOTypesGui extends IBOTypesBOC {
     */
    public static final int TYPE_GUI_06_CELL_POLICY              = SID_VIEWTYPE_A + 6;
 
+
+
    /**
     * Technical options for displaying string of characters.
     */
-   public static final int TYPE_124_STRING_DATA                 = SID_VIEWTYPE_A + 7;
-
+   public static final int TYPE_DRWX_07_STRING_AUX_0_DATA       = IBOTypesDrawX.TYPE_DRWX_07_STRING_AUX_XXX + 0;
    /**
     * Technical options for editing a string of characters.
     */
-   public static final int TYPE_125_STRING_EDIT_TECH            = SID_VIEWTYPE_A + 8;
-
-   public static final int TYPE_DRWX_07_STRING_AUX_0_DATA       = IBOTypesDrawX.TYPE_DRWX_07_STRING_AUX_XXX + 0;
-
    public static final int TYPE_DRWX_07_STRING_AUX_1_EDIT       = IBOTypesDrawX.TYPE_DRWX_07_STRING_AUX_XXX + 1;
-
-   public static final int TYPE_DRWX_07_STRING_AUX_2_PREDICTION = IBOTypesDrawX.TYPE_DRWX_07_STRING_AUX_XXX + 2;
-
-   public static final int TYPE_DRWX_07_STRING_AUX_3_GLOBAL     = IBOTypesDrawX.TYPE_DRWX_07_STRING_AUX_XXX + 3;
-
-   /**
-    * Global options that are user specific and apply to all string edition items
-    */
-   public static final int TYPE_GUI_09_STRING_GLOBAL            = SID_VIEWTYPE_A + 9;
 
    /**
     * Parameters for prediction types.
@@ -85,7 +73,12 @@ public interface IBOTypesGui extends IBOTypesBOC {
     * <br>
     * Prediction Engine to use
     */
-   public static final int TYPE_127_STRING_PREDITION            = SID_VIEWTYPE_A + 10;
+   public static final int TYPE_DRWX_07_STRING_AUX_2_PREDICTION = IBOTypesDrawX.TYPE_DRWX_07_STRING_AUX_XXX + 2;
+   /**
+    * Global options that are user specific and apply to all string edition items
+    */
+   public static final int TYPE_DRWX_07_STRING_AUX_3_GLOBAL     = IBOTypesDrawX.TYPE_DRWX_07_STRING_AUX_XXX + 3;
+
 
    /**
     * Defines animation parameters.

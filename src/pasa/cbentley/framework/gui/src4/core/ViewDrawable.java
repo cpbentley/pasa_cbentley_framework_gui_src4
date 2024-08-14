@@ -8,12 +8,11 @@ import pasa.cbentley.core.src4.stator.StatorWriter;
 import pasa.cbentley.core.src4.utils.BitUtils;
 import pasa.cbentley.core.src4.utils.IntUtils;
 import pasa.cbentley.framework.cmd.src4.engine.CmdInstance;
-import pasa.cbentley.framework.coreui.src4.tech.ITechGestures;
+import pasa.cbentley.framework.core.ui.src4.tech.ITechGestures;
 import pasa.cbentley.framework.drawx.src4.engine.GraphicsX;
 import pasa.cbentley.framework.drawx.src4.engine.RgbImage;
 import pasa.cbentley.framework.drawx.src4.string.StringMetrics;
 import pasa.cbentley.framework.gui.src4.anim.move.Move;
-import pasa.cbentley.framework.gui.src4.canvas.ExecutionContextGui;
 import pasa.cbentley.framework.gui.src4.canvas.InputConfig;
 import pasa.cbentley.framework.gui.src4.canvas.PointerGestureDrawable;
 import pasa.cbentley.framework.gui.src4.canvas.ViewContext;
@@ -21,6 +20,7 @@ import pasa.cbentley.framework.gui.src4.ctx.GuiCtx;
 import pasa.cbentley.framework.gui.src4.ctx.IToStringFlagsDraw;
 import pasa.cbentley.framework.gui.src4.ctx.IToStringFlagsGui;
 import pasa.cbentley.framework.gui.src4.ctx.ToStringStaticGui;
+import pasa.cbentley.framework.gui.src4.exec.ExecutionContextCanvasGui;
 import pasa.cbentley.framework.gui.src4.factories.interfaces.IBOViewPane;
 import pasa.cbentley.framework.gui.src4.interfaces.IBODrawable;
 import pasa.cbentley.framework.gui.src4.interfaces.IDrawable;
@@ -106,8 +106,8 @@ public class ViewDrawable extends Drawable implements ITechViewDrawable, ITechVi
     * @param ic
     * @return
     */
-   public static boolean isInsideViewPort(ViewPane viewPane, InputConfig ic) {
-      return DrawableUtilz.isInside(ic, viewPane.getViewPortXAbs(), viewPane.getViewPortYAbs(), viewPane.getViewPortWidth(), viewPane.getViewPortHeight());
+   public static boolean isInsideViewPort(ViewPane viewPane, ExecutionContextCanvasGui ec) {
+      return DrawableUtilz.isInside(ec, viewPane.getViewPortXAbs(), viewPane.getViewPortYAbs(), viewPane.getViewPortWidth(), viewPane.getViewPortHeight());
    }
 
    protected int      flagsGene;
@@ -144,9 +144,9 @@ public class ViewDrawable extends Drawable implements ITechViewDrawable, ITechVi
     */
    protected ViewPane viewPane;
 
-   private int expandW;
+   protected int      expandW;
 
-   private int expandH;
+   protected int      expandH;
 
    /**
     * Creates a blank ViewDrawable. No content
@@ -179,6 +179,8 @@ public class ViewDrawable extends Drawable implements ITechViewDrawable, ITechVi
       int pw = layEngine.getPw();
       int dw = getDw();
       boolean isShrinkW = false;
+      unShrankW = 0;
+      expandW = 0;
       if (pw < dw) {
          if (hasFlagGene(FLAG_GENE_29_SHRINKABLE_W)) {
             isShrinkW = true;
@@ -186,7 +188,7 @@ public class ViewDrawable extends Drawable implements ITechViewDrawable, ITechVi
             isShrinkW = true;
          }
          if (isShrinkW) {
-            if (unShrankW != 0) { //make sure its the first time. we want to keep the original
+            if (unShrankW == 0) { //make sure its the first time. we want to keep the original
                unShrankW = dw;
             }
             setDw(pw);
@@ -199,10 +201,12 @@ public class ViewDrawable extends Drawable implements ITechViewDrawable, ITechVi
             setDw(pw);
          }
       }
-    
+
       int ph = layEngine.getPh();
       int dh = getDh();
       boolean isShrinkH = false;
+      unShrankH = 0;
+      expandH = 0;
       if (ph < dh) {
          if (layEngine.hasFlagSizerH(IBOSizer.SIZER_FLAG_2_ALLOW_SHRINK)) {
             isShrinkH = true;
@@ -211,7 +215,7 @@ public class ViewDrawable extends Drawable implements ITechViewDrawable, ITechVi
             isShrinkH = true;
          }
          if (isShrinkH) {
-            if (unShrankH != 0) { //make sure its the first time. we want to keep the original
+            if (unShrankH == 0) { //make sure its the first time. we want to keep the original
                unShrankH = dh;
             }
             setDh(ph);
@@ -223,7 +227,7 @@ public class ViewDrawable extends Drawable implements ITechViewDrawable, ITechVi
             setDh(ph);
          }
       }
- 
+
       if (isShrinkH || isShrinkW) {
          super.styleCache.invalidateValues();
          super.initStyleCache();
@@ -233,11 +237,11 @@ public class ViewDrawable extends Drawable implements ITechViewDrawable, ITechVi
    public int computeContentPh() {
       return 0;
    }
-   
+
    public int computeContentPw() {
       return 0;
    }
-   
+
    /**
     * Method called by Stringer?
     * <br>
@@ -418,15 +422,6 @@ public class ViewDrawable extends Drawable implements ITechViewDrawable, ITechVi
    }
 
    /**
-    * When state no content is set, how to size drawable?
-    * Minimum sizer by sizer ?
-    * By Parent Sizer?
-    */
-   public void emptyW() {
-      boStringDrawable.get1(IBODrawable.DTECH_OFFSET_02_FLAGX);
-   }
-
-   /**
     * Draws style layers on ViewPort area using style of {@link Drawable}. When {@link ViewPane} is null, draws normally.
     * <br>
     * <br>
@@ -596,7 +591,7 @@ public class ViewDrawable extends Drawable implements ITechViewDrawable, ITechVi
       }
    }
 
-   public IDrawable getDrawable(int x, int y, ExecutionContextGui ex) {
+   public IDrawable getDrawable(int x, int y, ExecutionContextCanvasGui ex) {
       if (viewPane != null) {
          return viewPane.getDrawable(x, y, null);
       } else {
@@ -604,7 +599,7 @@ public class ViewDrawable extends Drawable implements ITechViewDrawable, ITechVi
       }
    }
 
-   public IDrawable getDrawableViewPort(int x, int y, ExecutionContextGui ex) {
+   public IDrawable getDrawableViewPort(int x, int y, ExecutionContextCanvasGui ex) {
       return this;
    }
 
@@ -708,7 +703,7 @@ public class ViewDrawable extends Drawable implements ITechViewDrawable, ITechVi
     * Must be called after the initViewDrawable method returns. (i.e. when ph has been fully computed)
     * @return
     */
-   public int getPreferredContentHeight() {
+   public int getSizePreferredContentHeight() {
       if (viewPane == null) {
          return getSizePreferredHeight() - getStyleHConsumed();
       } else {
@@ -720,13 +715,12 @@ public class ViewDrawable extends Drawable implements ITechViewDrawable, ITechVi
     * The preferred width without the decoration.
     * @return
     */
-   public int getPreferredContentWidth() {
+   public int getSizePreferredContentWidth() {
       if (viewPane == null) {
          return getSizePreferredWidth() - getStyleWConsumed();
       } else {
          return getSizePreferredWidth();
       }
-
    }
 
    /**
@@ -947,6 +941,14 @@ public class ViewDrawable extends Drawable implements ITechViewDrawable, ITechVi
       return (flagsGene & flag) == flag;
    }
 
+   public boolean hasFlagGeneShrinkableW() {
+      return hasFlagGene(FLAG_GENE_29_SHRINKABLE_W);
+   }
+
+   public boolean hasFlagGeneShrinkableH() {
+      return hasFlagGene(FLAG_GENE_30_SHRINKABLE_H);
+   }
+
    /**
     * <li>
     * @param flag
@@ -954,6 +956,22 @@ public class ViewDrawable extends Drawable implements ITechViewDrawable, ITechVi
     */
    public boolean hasFlagView(int flag) {
       return (flagsView & flag) == flag;
+   }
+
+   public boolean hasFlagViewMustExpandHeight() {
+      return hasFlagView(FLAG_VSTATE_07_NO_EAT_H_MUST_EXPAND);
+   }
+
+   public boolean hasFlagViewMustExpandWidth() {
+      return hasFlagView(FLAG_VSTATE_06_NO_EAT_W_MUST_EXPAND);
+   }
+
+   public boolean hasFlagViewContentWidthDependsViewPort() {
+      return hasFlagView(FLAG_VSTATE_12_CONTENT_W_DEPENDS_VIEWPORT);
+   }
+
+   public boolean hasFlagViewNotScrollable() {
+      return hasFlagView(FLAG_GENE_28_NOT_SCROLLABLE);
    }
 
    /**
@@ -1033,6 +1051,7 @@ public class ViewDrawable extends Drawable implements ITechViewDrawable, ITechVi
 
          //viewpane initSize is not called. so the computation of stylearea
          viewPane.initViewPane(viewPaneInitWidth, viewPaneInitHeigh);
+
       } else {
          viewPane = null;
       }
@@ -1049,7 +1068,10 @@ public class ViewDrawable extends Drawable implements ITechViewDrawable, ITechVi
          //Shrinking modifies dw and dh, potentially invalidating style size computations that
          //rely on dw and/or dh
          activateShrinkExpandFlags();
+      } else {
+         //shrink flags are dealt by viewpane in Viewpane#applyBehaviorShrinking
       }
+
       //when 
       //      if (viewPane != null && isMalleable()) {
       //         //init again with viewport dimensions at least headers planetaries.
@@ -1058,6 +1080,16 @@ public class ViewDrawable extends Drawable implements ITechViewDrawable, ITechVi
 
       ////////////////////////////////////////////////////////////
       //unload init style if any
+
+      initViewDrawableEnd();
+   }
+
+   /**
+    * Called at the end of
+    * Time for anchoring computation
+    */
+   protected void initViewDrawableEnd() {
+
    }
 
    /**
@@ -1188,7 +1220,13 @@ public class ViewDrawable extends Drawable implements ITechViewDrawable, ITechVi
     * @param scY {@link ScrollConfig} for the vertical scrollbar. Null if no vertical scrolling is possible.
     */
    public void initScrollingConfig(ScrollConfig scX, ScrollConfig scY) {
-
+      //default uses
+      if (scX != null) {
+         DrawableUtilz.initConfigX(this, scX);
+      }
+      if (scY != null) {
+         DrawableUtilz.initConfigY(this, scY);
+      }
    }
 
    /**
@@ -1412,9 +1450,9 @@ public class ViewDrawable extends Drawable implements ITechViewDrawable, ITechVi
    /**
     * Sub class should call this when they want the ViewPane to manage Up-Down-Left-Right scrollbar control. <br>
     */
-   public void manageKeyInput(InputConfig ic) {
+   public void manageKeyInput(ExecutionContextCanvasGui ec) {
       if (viewPane != null) {
-         viewPane.manageKeyInput(ic);
+         viewPane.manageKeyInput(ec);
       }
    }
 
@@ -1426,9 +1464,10 @@ public class ViewDrawable extends Drawable implements ITechViewDrawable, ITechVi
     * 
     * @param ic
     */
-   public void managePointerGesture(InputConfig ic) {
+   public void managePointerGesture(ExecutionContextCanvasGui ec) {
       //System.out.println("#ViewDrawable#managePointerGesture " + pg.toStringOneLine());
-      GestureDetector pg = ic.is.getOrCreateGesture(this);
+      GestureDetector pg = ec.getInputStateDrawable().getOrCreateGesture(this);
+      InputConfig ic = ec.getInputConfig();
       //how to stop the gesture? when a new press event occurs
       if (ic.isGestured()) {
          //#debug
@@ -1436,12 +1475,12 @@ public class ViewDrawable extends Drawable implements ITechViewDrawable, ITechVi
          //do an update on the vector.
          if (pg.hasValueFlag(PointerGestureDrawable.ID_0_X, ITechGestures.FLAG_10_IS_GESTURING)) {
             int pos = pg.getPosition(PointerGestureDrawable.ID_0_X);
-            viewPane.moveSetX(ic, pos);
+            viewPane.moveSetX(ec, pos);
          }
          if (pg.hasValueFlag(PointerGestureDrawable.ID_1_Y, ITechGestures.FLAG_10_IS_GESTURING)) {
             int pos = pg.getPosition(PointerGestureDrawable.ID_1_Y);
             //SystemLog.printFlow("#ViewDrawable#managePointerGesture setting Y start Increment to " + pos);
-            viewPane.moveSetY(ic, pos);
+            viewPane.moveSetY(ec, pos);
          }
          //#debug
          String msg = "[" + pg.getPosition(PointerGestureDrawable.ID_0_X) + "," + pg.getPosition(PointerGestureDrawable.ID_1_Y) + "]";
@@ -1454,7 +1493,7 @@ public class ViewDrawable extends Drawable implements ITechViewDrawable, ITechVi
             //Gesture is auto started
             int pressedX = (getSChorizontal() != null) ? getSChorizontal().getSIStart() : -1;
             int pressedY = (getSCvertical() != null) ? getSCvertical().getSIStart() : -1;
-            pg.simplePress(pressedX, pressedY, ic.is);
+            pg.simplePress(pressedX, pressedY, ic.getInputStateDrawable());
          }
          //the release is automatically 
          if (ic.isReleased()) {
@@ -1472,7 +1511,7 @@ public class ViewDrawable extends Drawable implements ITechViewDrawable, ITechVi
 
             //sets the hooks for the release call in the Drawable.
 
-            pg.simpleReleaseGesture(ic.is, relX, relY, ITechGestures.GESTURE_1_BOUNDARY, null);
+            pg.simpleReleaseGesture(ic.getInputStateDrawable(), relX, relY, ITechGestures.GESTURE_1_BOUNDARY, null);
             //compute the gesture amplitude and generate a timer for modyfing scroll config start increment 
             //Controller.getMe().draggedRemover(this, ic);
          }
@@ -1491,7 +1530,7 @@ public class ViewDrawable extends Drawable implements ITechViewDrawable, ITechVi
                   if (ic.getDraggedDiffX() < 0) {
                      mod = -mod;
                   }
-                  viewPane.moveSetX(ic, pressedX - mod);
+                  viewPane.moveSetX(ec, pressedX - mod);
                }
             }
             if (pressedY != -1) {
@@ -1501,7 +1540,7 @@ public class ViewDrawable extends Drawable implements ITechViewDrawable, ITechVi
                   if (ic.getDraggedDiffY() < 0) {
                      mod = -mod;
                   }
-                  viewPane.moveSetY(ic, pressedY - mod);
+                  viewPane.moveSetY(ec, pressedY - mod);
                }
             }
             ic.srActionDoneRepaint(this);
@@ -1517,7 +1556,7 @@ public class ViewDrawable extends Drawable implements ITechViewDrawable, ITechVi
     * Subclass overrides this method for managing content input. Super calling when subclass delegates.
     * <br>
     * <br>
-    * Sub class must be able to call {@link Drawable#managePointerInput(InputConfig)} without going through {@link ViewDrawable} logic
+    * Sub class must be able to call {@link Drawable#managePointerInput(ExecutionContextCanvasGui)} without going through {@link ViewDrawable} logic
     * <br>
     * <br>
     * It is dangerous for a sub class to override this method.
@@ -1531,18 +1570,19 @@ public class ViewDrawable extends Drawable implements ITechViewDrawable, ITechVi
     * 
     * It is easy to get lost in the different calls
     * 
-    * @see ViewPane#managePointerInput(InputConfig)
-    * @see Drawable#managePointerInput(InputConfig)
+    * @see ViewPane#managePointerInput(ExecutionContextCanvasGui)
+    * @see Drawable#managePointerInput(ExecutionContextCanvasGui)
     */
-   public void managePointerInput(InputConfig ic) {
+   public void managePointerInput(ExecutionContextCanvasGui ec) {
+      InputConfig ic = ec.getInputConfig();
       //don't we want first Drawable top down management? not if viewpane exists
       if (viewPane != null) {
          //this method will call managePointerInputViewPort eventually if pointer is indeed inside
-         viewPane.managePointerInput(ic);
+         viewPane.managePointerInput(ec);
       } else {
          //what to call before? viewport first
          //pointer is inside the ViewPort since there is none :)
-         managePointerInputViewPort(ic);
+         managePointerInputViewPort(ec);
          //TODO is that right?
          //when the ViewPort does not process the pointer event, asks the Drawable to set the states.
 
@@ -1553,12 +1593,12 @@ public class ViewDrawable extends Drawable implements ITechViewDrawable, ITechVi
       //dangerous.. if user forget to set action done flag? in the viewport?
       if (!ic.isActionDone()) {
          //SystemLog.printFlow("#ViewDrawable#managePointerInput No Action in ViewPort/ViewPane => Calling Drawable#managePointerInput " + this.toStringOneLine());
-         super.managePointerInput(ic);
+         super.managePointerInput(ec);
       } else {
          //case when no viewpane satellites have been acted upon. So if no drawable was set any new states
          //the only remaining case is the content of the viewdrawable. so go up to Drawable states.
-         if (!ic.sr.isDrawableStatesSet()) {
-            super.managePointerStateStyle(ic);
+         if (!ic.getCanvasResultDrawable().isDrawableStatesSet()) {
+            super.managePointerStateStyle(ec);
          }
       }
    }
@@ -1566,7 +1606,7 @@ public class ViewDrawable extends Drawable implements ITechViewDrawable, ITechVi
    /**
     * Called in the Top-Down approach.
     * <br>
-    * {@link ViewDrawable} can still hi-jack by overriding {@link ViewDrawable#managePointerInput(InputConfig)}.
+    * {@link ViewDrawable} can still hi-jack by overriding {@link ViewDrawable#managePointerInput(ExecutionContextCanvasGui)}.
     * <br>
     * <br>
     * But the preferred way is to override this method and implement stuff here.
@@ -1574,7 +1614,7 @@ public class ViewDrawable extends Drawable implements ITechViewDrawable, ITechVi
     * This method will be called even if the ViewPane is not there
     * @param ic
     */
-   public void managePointerInputViewPort(InputConfig ic) {
+   public void managePointerInputViewPort(ExecutionContextCanvasGui ec) {
 
    }
 
@@ -1824,7 +1864,11 @@ public class ViewDrawable extends Drawable implements ITechViewDrawable, ITechVi
    }
 
    /**
-    * Use this method for figure scrolling
+    * Hard sets the preferred size in the {@link LayouterEngineDrawable}.
+    * 
+    * <p>
+    * Can be used for testing purposes before calling {@link Drawable#initSize()}
+    * </p>
     * @param w
     * @param h
     */
@@ -1959,13 +2003,13 @@ public class ViewDrawable extends Drawable implements ITechViewDrawable, ITechVi
 
       dc.appendVarWithNewLine("expandW", expandW);
       dc.appendVarWithSpace("expandH", expandH);
-     
+
       dc.appendVarWithSpace("unShrankW", unShrankW);
       dc.appendVarWithSpace("unShrankH", unShrankH);
       ///
       dc.appendVarWithNewLine("computeContentPw", computeContentPw());
       dc.appendVarWithSpace("computeContentPh", computeContentPh());
-      
+
       dc.append(" ");
       if (viewPane != null) {
          dc.append("Actual=(" + getActualDrawableW() + "," + getActualDrawableH());

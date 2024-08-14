@@ -7,6 +7,7 @@ import pasa.cbentley.framework.gui.src4.core.Drawable;
 import pasa.cbentley.framework.gui.src4.core.MyDrawables;
 import pasa.cbentley.framework.gui.src4.core.ScrollConfig;
 import pasa.cbentley.framework.gui.src4.core.ViewPane;
+import pasa.cbentley.framework.gui.src4.exec.ExecutionContextCanvasGui;
 import pasa.cbentley.framework.gui.src4.factories.interfaces.IBOViewPane;
 import pasa.cbentley.framework.gui.src4.interfaces.IDrawable;
 import pasa.cbentley.framework.gui.src4.interfaces.ITechDrawable;
@@ -132,7 +133,7 @@ public interface IBOTableView extends IByteObject {
    public static final int T_FLAGF_1_SELECT_KEPT_WITHOUT_FOCUS_KEY   = 1;
 
    /**
-    * When selection moves, does not move the selected focus {@link Controller#newFocusKey(mordan.controller.InputConfig, IDrawable)} to the new selected cell.
+    * When selection moves, does not move the selected focus {@link Controller#newFocusKey(ExecutionContextCanvasGui, IDrawable)} to the new selected cell.
     * <br>
     * In the default {@link TableView#selectionMove(mordan.controller.InputConfig, int, int)}.
     * <br>

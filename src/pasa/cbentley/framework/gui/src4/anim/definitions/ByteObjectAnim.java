@@ -115,7 +115,7 @@ public class ByteObjectAnim extends DrawableAnim {
          target = ((FigDrawable) d).getFigure();
       } else {
          ByteObject style = d.getStyle();
-         int offset = IBOStyle.STYLE_OFFSET_2_FLAGB;
+         int offset = IBOStyle.STYLE_OFFSET_2_FLAG_B;
          int flag = 1;
          for (int i = 0; i < targetType; i++) {
             flag <<= 1;
@@ -137,13 +137,13 @@ public class ByteObjectAnim extends DrawableAnim {
 
    /**
     * We may have to initialized the Animation function.
-    * <br>
+    * 
     * Some gradient function take into input the drawable color and/or dimensions.
-    * <br>
-    * <br>
     * 
     */
    public void lifeStart() {
+      
+      //step Function provides colors from a gradient.
       if (definition.get1(IBOAnim.ANIM_OFFSET_01_TYPE1) == ITechAnim.ANIM_TYPE_08_GRADIENT) {
 
          //decides of the target

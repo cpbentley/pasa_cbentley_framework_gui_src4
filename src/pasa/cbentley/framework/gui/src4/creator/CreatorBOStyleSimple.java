@@ -4,11 +4,12 @@ import pasa.cbentley.byteobjects.src4.core.ByteObject;
 import pasa.cbentley.byteobjects.src4.objects.color.ColorRepo;
 import pasa.cbentley.byteobjects.src4.objects.color.ColorSet;
 import pasa.cbentley.byteobjects.src4.objects.color.ITechGradient;
-import pasa.cbentley.byteobjects.src4.objects.pointer.MergeMaskFactory;
+import pasa.cbentley.byteobjects.src4.objects.pointer.MergeFactory;
 import pasa.cbentley.core.src4.utils.ColorUtils;
 import pasa.cbentley.framework.coredraw.src4.interfaces.ITechFont;
 import pasa.cbentley.framework.drawx.src4.string.interfaces.IBOFigString;
 import pasa.cbentley.framework.drawx.src4.style.IBOStyle;
+import pasa.cbentley.framework.drawx.src4.tech.ITechStyle;
 import pasa.cbentley.layouter.src4.ctx.IBOTypesLayout;
 import pasa.cbentley.layouter.src4.tech.ITechLayout;
 
@@ -73,8 +74,8 @@ public class CreatorBOStyleSimple extends CreatorAbstractBOStyle {
       ByteObject bgGradient = gradFac.getGradient(colorBgGrad, 100, ITechGradient.GRADIENT_TYPE_RECT_00_SQUARE);
       ByteObject bg1Rect = figureFac.getFigRect(colorBg1, bgGradient);
 
-      ByteObject sizerBorder = sizerFactory.getSizerXPixelForYPixel(1, 400, ITechLayout.ET_FUN_4_MAX);
-      ByteObject sizerPaddin = sizerFactory.getSizerXPixelForYPixel(1, 300, ITechLayout.ET_FUN_4_MAX);
+      ByteObject sizerBorder = sizerFactory.getSizerXPixelForYPixel(1, 400, ITechLayout.ET_FUN_04_MAX);
+      ByteObject sizerPaddin = sizerFactory.getSizerXPixelForYPixel(1, 300, ITechLayout.ET_FUN_04_MAX);
 
       ByteObject marginTBLR = null;
       ByteObject borderTBLR = tblrFac.getTBLRSizer(sizerBorder);
@@ -102,7 +103,7 @@ public class CreatorBOStyleSimple extends CreatorAbstractBOStyle {
       ByteObject bgGradient = gradFac.getGradient(colorBgGrad, 50, type, step, colorBg3);
       ByteObject bg1Rect = figureFac.getFigRect(colorBg1, bgGradient);
 
-      ByteObject sizerBorder = sizerFactory.getSizerXPixelForYPixel(1, 200, ITechLayout.ET_FUN_4_MAX);
+      ByteObject sizerBorder = sizerFactory.getSizerXPixelForYPixel(1, 200, ITechLayout.ET_FUN_04_MAX);
 
       ByteObject marginTBLR = null;
       ByteObject borderTBLR = tblrFac.getTBLRSizer(sizerBorder);
@@ -126,9 +127,9 @@ public class CreatorBOStyleSimple extends CreatorAbstractBOStyle {
       ByteObject bgGradient = gradFac.getGradient(colorBgGrad, 100, ITechGradient.GRADIENT_TYPE_RECT_00_SQUARE);
       ByteObject bg1Rect = figureFac.getFigRect(colorBg1, bgGradient);
 
-      ByteObject sizerMargin = sizerFactory.getSizerXPixelForYPixel(1, 30, ITechLayout.ET_FUN_4_MAX);
-      ByteObject sizerBorder = sizerFactory.getSizerXPixelForYPixel(1, 40, ITechLayout.ET_FUN_3_MIN);
-      ByteObject sizerPaddin = sizerFactory.getSizerXPixelForYPixel(1, 30, ITechLayout.ET_FUN_4_MAX);
+      ByteObject sizerMargin = sizerFactory.getSizerXPixelForYPixel(1, 30, ITechLayout.ET_FUN_04_MAX);
+      ByteObject sizerBorder = sizerFactory.getSizerXPixelForYPixel(1, 40, ITechLayout.ET_FUN_03_MIN);
+      ByteObject sizerPaddin = sizerFactory.getSizerXPixelForYPixel(1, 30, ITechLayout.ET_FUN_04_MAX);
 
       ByteObject marginTBLR = tblrFac.getTBLRSizer(sizerMargin);
       ByteObject borderTBLR = tblrFac.getTBLRSizer(sizerBorder);
@@ -151,7 +152,7 @@ public class CreatorBOStyleSimple extends CreatorAbstractBOStyle {
 
       ByteObject bgGradient = gradFac.getGradient(colorBgGrad, 100, ITechGradient.GRADIENT_TYPE_RECT_00_SQUARE);
 
-      ByteObject sizerBorder = sizerFactory.getSizerXPixelForYPixel(1, 20, ITechLayout.ET_FUN_3_MIN);
+      ByteObject sizerBorder = sizerFactory.getSizerXPixelForYPixel(1, 20, ITechLayout.ET_FUN_03_MIN);
 
       ByteObject marginTBLR = null;
       ByteObject borderTBLR = tblrFac.getTBLRSizer(sizerBorder);
@@ -200,9 +201,9 @@ public class CreatorBOStyleSimple extends CreatorAbstractBOStyle {
       ByteObject bgGradient = gradFac.getGradient(colorBgGrad, 100, ITechGradient.GRADIENT_TYPE_RECT_00_SQUARE);
       ByteObject bg1Rect = figureFac.getFigRect(colorBg1, bgGradient);
 
-      ByteObject sizerMargin = sizerFactory.getSizerXPixelForYPixel(1, 30, ITechLayout.ET_FUN_4_MAX);
-      ByteObject sizerBorder = sizerFactory.getSizerXPixelForYPixel(1, 40, ITechLayout.ET_FUN_4_MAX);
-      ByteObject sizerPaddin = sizerFactory.getSizerXPixelForYPixel(1, 30, ITechLayout.ET_FUN_4_MAX);
+      ByteObject sizerMargin = sizerFactory.getSizerXPixelForYPixel(1, 30, ITechLayout.ET_FUN_04_MAX);
+      ByteObject sizerBorder = sizerFactory.getSizerXPixelForYPixel(1, 40, ITechLayout.ET_FUN_04_MAX);
+      ByteObject sizerPaddin = sizerFactory.getSizerXPixelForYPixel(1, 30, ITechLayout.ET_FUN_04_MAX);
 
       ByteObject marginTBLR = tblrFac.getTBLRSizer(sizerMargin);
       ByteObject borderTBLR = tblrFac.getTBLRSizer(sizerBorder);
@@ -239,7 +240,7 @@ public class CreatorBOStyleSimple extends CreatorAbstractBOStyle {
       return style;
    }
 
-   public ByteObject getStyleGrey() {
+   public ByteObject getStyleGreyed() {
       int arcBg = 0;
       int colorBorderBg = FULLY_OPAQUE_GREY;
       //BG Vert
@@ -261,7 +262,7 @@ public class CreatorBOStyleSimple extends CreatorAbstractBOStyle {
 
       ByteObject bgGradient = gradFac.getGradient(colorBgGrad, 100, ITechGradient.GRADIENT_TYPE_RECT_00_SQUARE);
 
-      ByteObject sizerBorder = sizerFactory.getSizerXPixelForYPixel(1, 20, ITechLayout.ET_FUN_3_MIN);
+      ByteObject sizerBorder = sizerFactory.getSizerXPixelForYPixel(1, 20, ITechLayout.ET_FUN_03_MIN);
 
       ByteObject marginTBLR = null;
       ByteObject borderTBLR = tblrFac.getTBLRSizer(sizerBorder);
@@ -289,9 +290,9 @@ public class CreatorBOStyleSimple extends CreatorAbstractBOStyle {
       ByteObject bgGradient = gradFac.getGradient(colorBgGrad, 100, ITechGradient.GRADIENT_TYPE_RECT_00_SQUARE);
       ByteObject bg1Rect = figureFac.getFigRect(colorBg1, bgGradient);
 
-      ByteObject sizerMargin = sizerFactory.getSizerXPixelForYPixel(1, 30, ITechLayout.ET_FUN_3_MIN);
-      ByteObject sizerBorder = sizerFactory.getSizerXPixelForYPixel(1, 30, ITechLayout.ET_FUN_3_MIN);
-      ByteObject sizerPaddin = sizerFactory.getSizerXPixelForYPixel(1, 30, ITechLayout.ET_FUN_3_MIN);
+      ByteObject sizerMargin = sizerFactory.getSizerXPixelForYPixel(1, 30, ITechLayout.ET_FUN_03_MIN);
+      ByteObject sizerBorder = sizerFactory.getSizerXPixelForYPixel(1, 30, ITechLayout.ET_FUN_03_MIN);
+      ByteObject sizerPaddin = sizerFactory.getSizerXPixelForYPixel(1, 30, ITechLayout.ET_FUN_03_MIN);
 
       ByteObject marginTBLR = null;
       ByteObject borderTBLR = tblrFac.getTBLRSizer(sizerBorder);
@@ -324,7 +325,7 @@ public class CreatorBOStyleSimple extends CreatorAbstractBOStyle {
       ByteObject bgGradient = gradFac.getGradient(colorBgGrad, 100, ITechGradient.GRADIENT_TYPE_RECT_00_SQUARE);
       ByteObject bg1Rect = figureFac.getFigRect(colorBg1, bgGradient);
 
-      ByteObject sizerMargin = sizerFactory.getSizerXPixelForYPixel(1, 30, ITechLayout.ET_FUN_4_MAX);
+      ByteObject sizerMargin = sizerFactory.getSizerXPixelForYPixel(1, 30, ITechLayout.ET_FUN_04_MAX);
       //ByteObject sizerBorder = sizerFactory.getSizerXPixelForYPixel(1, 40, ITechLayout.ET_FUN_3_MIN);
       //ByteObject sizerPaddin = sizerFactory.getSizerXPixelForYPixel(1, 30, ITechLayout.ET_FUN_4_MAX);
       ByteObject sizerBorder = sizerFactory.getSizerPixel(4);
@@ -351,7 +352,7 @@ public class CreatorBOStyleSimple extends CreatorAbstractBOStyle {
       ByteObject bgGradient = gradFac.getGradient(colorBgGrad, 100, ITechGradient.GRADIENT_TYPE_RECT_00_SQUARE);
       ByteObject bg1Rect = figureFac.getFigRect(colorBg1, bgGradient);
 
-      ByteObject sizerMargin = sizerFactory.getSizerXPixelForYPixel(1, 30, ITechLayout.ET_FUN_4_MAX);
+      ByteObject sizerMargin = sizerFactory.getSizerXPixelForYPixel(1, 30, ITechLayout.ET_FUN_04_MAX);
       //ByteObject sizerBorder = sizerFactory.getSizerXPixelForYPixel(1, 40, ITechLayout.ET_FUN_3_MIN);
       ///ByteObject sizerPaddin = sizerFactory.getSizerXPixelForYPixel(1, 30, ITechLayout.ET_FUN_4_MAX);
       ByteObject sizerBorder = sizerFactory.getSizerPixel(4);
@@ -376,7 +377,7 @@ public class CreatorBOStyleSimple extends CreatorAbstractBOStyle {
       ByteObject bgWrapper = figureFac.getFigRect(colorBg1, gradBg);
 
       int colorBorder1 = cs.getBorder1();
-      ByteObject borderSize = sizerFactory.getSizerXPixelForYPixel(1, 40, ITechLayout.ET_FUN_3_MIN);
+      ByteObject borderSize = sizerFactory.getSizerXPixelForYPixel(1, 40, ITechLayout.ET_FUN_03_MIN);
       ByteObject borderWrapper = figureFac.getFigBorder(colorBg1, colorBorder1);
       ByteObject sizer = null;
       ByteObject pad = tblrFac.getTBLRSizer(sizer);
@@ -387,37 +388,61 @@ public class CreatorBOStyleSimple extends CreatorAbstractBOStyle {
    }
 
    public ByteObject getStyleSelected() {
-      
+
       ColorRepo colorRepo = getRepo();
       int pcolor = colorRepo.getBg2();
       int ccolor = colorRepo.getContent2();
 
-      MergeMaskFactory mmop = boc.getMergeMaskFactory();
-      ByteObject content = figureFactory.getFigStringTColor(ccolor);
-      mmop.addOpaque(content, FIG_STRING_OFFSET_04_STYLE1, 1, STYLE_BOLD, MERGE_MASK_OFFSET_6VALUES1, MERGE_MASK_FLAG6_2);
-      mmop.addOpaque(content, FIG_STRING_OFFSET_05_SIZE1, 1, SIZE_4_LARGE, MERGE_MASK_OFFSET_6VALUES1, MERGE_MASK_FLAG6_3);
-      
-      
-      ByteObject anchor = anchorFac.getLeftTop();
+      ByteObject content = figureFactory.getFigStringT_StyleColor(ccolor, STYLE_BOLD);
 
+      ByteObject anchor = null;
       ByteObject margin = null;
       ByteObject pad = null;
+      ByteObject border = null;
 
-      ByteObject bg = figureFactory.getFigRect(pcolor);
-
-      int borderColor1 = colorRepo.getBorder2();
-      ByteObject rectT = figureFac.getRect(borderColor1);
-      ByteObject figBorder = figureFactory.getFigBorder(3, borderColor1);
-      ByteObject border = figBorder.getSubFirst(IBOTypesLayout.FTYPE_2_TBLR);
-
-      ByteObject[] bgs = new ByteObject[] { bg, figBorder };
+      ByteObject bgMargin = figureFactory.getFigRect(pcolor);
+      ByteObject[] bgs = new ByteObject[] { bgMargin };
 
       ByteObject style = styleFactory.getStyle(bgs, content, anchor, pad, border, margin);
+
+      styleOp.setGAnchorsBG1_Margin(style);
       
-      style.setFlag(IBOStyle.STYLE_OFFSET_4_FLAG_PERF, IBOStyle.STYLE_FLAG_PERF_7_INCOMPLETE, true);
-      
+      style.setFlag(IBOStyle.STYLE_OFFSET_5_FLAG_X, IBOStyle.STYLE_FLAG_X_1_INCOMPLETE, true);
+
+      //#debug
+      style.toStringSetName("CreatorBOStyleSimple#getStyleSelected");
+
       return style;
    }
+   
+   
+   public ByteObject getStyleMarked() {
+      ByteObject content = null;
+      ByteObject anchor = null;
+      ByteObject margin = null;
+      ByteObject pad = null;
+      ByteObject border = null;
+
+      int colorGrey = ColorUtils.getRGBInt(128, 250, 128, 128);
+      ByteObject fg1 = figureFactory.getFigRect(colorGrey);
+      fg1.setFlag(FIG__OFFSET_02_FLAG, FIG_FLAGP_5_IGNORE_ALPHA, false);
+      fg1.setFlag(FIG__OFFSET_03_FLAGP, FIG_FLAGP_3_OPAQUE, false);
+
+      ByteObject[] bgs = null;
+      ByteObject[] fgs = new ByteObject[] { fg1 };
+
+      ByteObject style = styleFactory.getStyle(bgs, content, anchor, pad, border, margin, fgs);
+
+      styleOp.setGAnchorsFG1_Content(style);
+      
+      style.setFlag(IBOStyle.STYLE_OFFSET_5_FLAG_X, IBOStyle.STYLE_FLAG_X_1_INCOMPLETE, true);
+
+      //#debug
+      style.toStringSetName("MarkedIncomplete");
+
+      return style;
+   }
+   
 
    public ByteObject getStyleTextReader() {
       ColorRepo colorRepo = getRepo();
@@ -439,6 +464,54 @@ public class CreatorBOStyleSimple extends CreatorAbstractBOStyle {
       ByteObject[] bgs = new ByteObject[] { bg, figBorder };
 
       ByteObject style = styleFactory.getStyle(bgs, content, anchor, pad, border, margin);
+
+      //#debug
+      style.toStringSetName("StyleReader");
+
+      return style;
+   }
+
+   public ByteObject getStyleTextReaderH() {
+      ColorRepo colorRepo = getRepo();
+
+      int pcolor = colorRepo.getBg1();
+      int bg2 = colorRepo.getBg2();
+      int bg3 = colorRepo.getBg3();
+
+      int ccolor = colorRepo.getContent1();
+
+      int br1 = colorRepo.getBorder1();
+      int br2 = colorRepo.getBorder2();
+      int br3 = colorRepo.getBorder3();
+
+      ByteObject content = figureFactory.getFigString(FACE_PROPORTIONAL, STYLE_PLAIN, ITechFont.SIZE_3_MEDIUM, ccolor);
+      ByteObject anchor = anchorFac.getLeftTop();
+
+      ByteObject margin = tblrFactory.getTBLRPixel(5);
+      ByteObject border = tblrFactory.getTBLRPixel(4);
+      ByteObject pad = tblrFactory.getTBLRPixel(3);
+
+      ByteObject bg = figureFactory.getFigRect(pcolor);
+
+      ByteObject gradientMargin = gradFac.getGradient(br3, 50, ITechGradient.GRADIENT_TYPE_RECT_02_VERT);
+      ByteObject bgMargin = figureFactory.getFigRect(pcolor, gradientMargin);
+
+      int borderColor1 = br1;
+      int borderColor2 = br3;
+      int arcSize = 4;
+      ByteObject gradientBorder = gradFac.getGradient(borderColor2, 100, ITechGradient.GRADIENT_TYPE_RECT_00_SQUARE);
+      ByteObject figBorder = figureFactory.getFigBorder(border, arcSize, arcSize, borderColor1, gradientBorder);
+
+      ByteObject[] bgs = new ByteObject[] { bgMargin, bg, figBorder };
+
+      ByteObject style = styleFactory.getStyle(bgs, content, anchor, pad, border, margin);
+      styleOp.setGAnchors(style, IBOStyle.STYLE_FLAG_B_1_BG, ITechStyle.STYLE_ANC_1_MARGIN);
+      styleOp.setGAnchors(style, IBOStyle.STYLE_FLAG_B_2_BG, ITechStyle.STYLE_ANC_2_CONTENT);
+      styleOp.setGAnchors(style, IBOStyle.STYLE_FLAG_B_3_BG, ITechStyle.STYLE_ANC_0_BORDER);
+
+      //#debug
+      style.toStringSetName("StyleReaderH");
+
       return style;
    }
 
@@ -491,6 +564,49 @@ public class CreatorBOStyleSimple extends CreatorAbstractBOStyle {
       ByteObject[] bgs = new ByteObject[] { bgRect, bgBorder };
 
       ByteObject style = styleFactory.getStyle(bgs, text, anchor, pad, border, margin);
+      return style;
+   }
+
+   public ByteObject getStyleBackgroundIncomplete() {
+      int colorMargin = FULLY_OPAQUE_YELLOW;
+      int colorBorder = FULLY_OPAQUE_GREEN;
+      int colorPadding = FULLY_OPAQUE_BLUE;
+      int colorContent = FULLY_OPAQUE_RED;
+
+      int cg = FULLY_OPAQUE_GREY;
+      boolean isReverse = true;
+      
+      ByteObject content = null;
+      ByteObject anchor = null;
+
+      ByteObject margin = null; 
+      ByteObject border = null;
+      ByteObject pad = null;
+
+      Integer arcSize = new Integer(0);
+
+      ByteObject gradientMargin = gradFac.getGradient(cg, 50, ITechGradient.GRADIENT_TYPE_RECT_00_SQUARE, isReverse);
+      ByteObject bgMargin = figureFactory.getFigBorderT(margin, arcSize, arcSize, colorMargin, gradientMargin);
+
+      ByteObject gradientBorder = gradFac.getGradient(cg, 50, ITechGradient.GRADIENT_TYPE_RECT_00_SQUARE, isReverse);
+      ByteObject bgBorder = figureFactory.getFigBorderT(border, arcSize, arcSize, colorBorder, gradientBorder);
+
+      ByteObject gradientPadding = gradFac.getGradient(cg, 50, ITechGradient.GRADIENT_TYPE_RECT_00_SQUARE, isReverse);
+      ByteObject bgPadding = figureFactory.getFigBorderT(pad, arcSize, arcSize, colorPadding, gradientPadding);
+       
+      ByteObject gradientContent = gradFac.getGradient(cg, 0, ITechGradient.GRADIENT_TYPE_RECT_00_SQUARE);
+      ByteObject bgContent = figureFactory.getFigRect(colorContent, gradientContent);
+
+      ByteObject[] bgs = new ByteObject[] { bgMargin, bgBorder, bgPadding, bgContent };
+
+      ByteObject style = styleFactory.getStyle(bgs, content, anchor, pad, border, margin);
+
+      styleOp.setGAnchors(style, IBOStyle.STYLE_FLAG_B_1_BG, ITechStyle.STYLE_ANC_1_MARGIN);
+      styleOp.setGAnchors(style, IBOStyle.STYLE_FLAG_B_2_BG, ITechStyle.STYLE_ANC_0_BORDER);
+      styleOp.setGAnchors(style, IBOStyle.STYLE_FLAG_B_3_BG, ITechStyle.STYLE_ANC_3_PADDING);
+      styleOp.setGAnchors(style, IBOStyle.STYLE_FLAG_B_4_BG, ITechStyle.STYLE_ANC_2_CONTENT);
+      
+      styleOp.setStyleIncomplete(style);
       return style;
    }
 

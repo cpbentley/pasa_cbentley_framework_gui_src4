@@ -4,6 +4,7 @@ import pasa.cbentley.core.src4.structs.IntToStrings;
 import pasa.cbentley.framework.cmd.src4.interfaces.INavTech;
 import pasa.cbentley.framework.gui.src4.canvas.InputConfig;
 import pasa.cbentley.framework.gui.src4.ctx.GuiCtx;
+import pasa.cbentley.framework.gui.src4.exec.ExecutionContextCanvasGui;
 import pasa.cbentley.framework.gui.src4.interfaces.ITechCanvasDrawable;
 import pasa.cbentley.framework.gui.src4.interfaces.ITechDrawable;
 import pasa.cbentley.framework.gui.src4.table.TableView;
@@ -25,11 +26,11 @@ public class SearchPrefixRunnable implements Runnable {
 
    private GuiCtx         gc;
 
-   private InputConfig ic;
+   private ExecutionContextCanvasGui ic;
 
    private IntToStrings results;
 
-   public SearchPrefixRunnable(GuiCtx gc, InputConfig ic, IntToStrings results) {
+   public SearchPrefixRunnable(GuiCtx gc, ExecutionContextCanvasGui ic, IntToStrings results) {
       this.gc = gc;
       this.ic = ic;
       this.results = results;

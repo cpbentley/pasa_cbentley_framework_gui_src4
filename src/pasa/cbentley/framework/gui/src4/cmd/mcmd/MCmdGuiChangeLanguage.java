@@ -1,4 +1,4 @@
-package pasa.cbentley.framework.gui.src4.cmd;
+package pasa.cbentley.framework.gui.src4.cmd.mcmd;
 
 import pasa.cbentley.byteobjects.src4.core.ByteObject;
 import pasa.cbentley.core.src4.ctx.IEventsCore;
@@ -10,10 +10,13 @@ import pasa.cbentley.core.src4.interfaces.C;
 import pasa.cbentley.framework.cmd.src4.engine.CmdInstance;
 import pasa.cbentley.framework.datamodel.src4.table.ObjectTableModel;
 import pasa.cbentley.framework.gui.src4.canvas.InputConfig;
+import pasa.cbentley.framework.gui.src4.cmd.CmdProcessorGui;
+import pasa.cbentley.framework.gui.src4.cmd.CommanderGui;
 import pasa.cbentley.framework.gui.src4.core.StyleClass;
 import pasa.cbentley.framework.gui.src4.ctx.GuiCtx;
+import pasa.cbentley.framework.gui.src4.exec.ExecutionContextCanvasGui;
 import pasa.cbentley.framework.gui.src4.factories.TableCellPolicyFactory;
-import pasa.cbentley.framework.gui.src4.interfaces.ICmdsView;
+import pasa.cbentley.framework.gui.src4.interfaces.ICmdsGui;
 import pasa.cbentley.framework.gui.src4.interfaces.IUIView;
 import pasa.cbentley.framework.gui.src4.table.TableView;
 import pasa.cbentley.framework.gui.src4.table.interfaces.ITechTable;
@@ -27,7 +30,7 @@ import pasa.cbentley.framework.gui.src4.tech.ITechLinks;
 public class MCmdGuiChangeLanguage extends MCmdGui implements IEventConsumer {
 
    public MCmdGuiChangeLanguage(GuiCtx gc) {
-      super(gc, ICmdsView.CMD_40_LANGUAGE_CHANGE);
+      super(gc, ICmdsGui.CMD_40_LANGUAGE_CHANGE);
    }
 
    protected CmdInstance activeCmdLang;
@@ -46,7 +49,7 @@ public class MCmdGuiChangeLanguage extends MCmdGui implements IEventConsumer {
          activeCmdLang.setParamO(suffix);
 
          //#debug
-         toDLog().pEvent("Suffix=" + suffix + " Selected Row=" + row + " out of " + otm.getNumRows(), this, ViewCommandListener.class, "consumeEvent", LVL_05_FINE, true);
+         toDLog().pEvent("Suffix=" + suffix + " Selected Row=" + row + " out of " + otm.getNumRows(), this, CmdProcessorGui.class, "consumeEvent", LVL_05_FINE, true);
 
          cc.commandAction(activeCmdLang);
          //hide table view
@@ -63,8 +66,8 @@ public class MCmdGuiChangeLanguage extends MCmdGui implements IEventConsumer {
     * 
     * @param cmd
     */
-   public void execute(InputConfig ic) {
-      CmdInstance cmd = ic.getCmdInstance();
+   public void execute(ExecutionContextCanvasGui ec) {
+      CmdInstance cmd = ec.getCmdInstance();
       if (cmd.paramO != null) {
          LocaleID suffix = (LocaleID) cmd.paramO;
          IStringProducer strLoader = gc.getStrings();
@@ -76,7 +79,7 @@ public class MCmdGuiChangeLanguage extends MCmdGui implements IEventConsumer {
          int responseType = FLAG_04_RENEW_LAYOUT | FLAG_02_FULL_REPAINT | FLAG_06_DATA_REFRESH;
          //invalidate all layouts generated full refresh event, cleaning of non visible elements.
          if (langTable != null) {
-            langTable.removeDrawable((InputConfig) cmd.getFeedback(), null);
+            langTable.removeDrawable(ec, null);
             langTable = null;
          }
          //generates an event
@@ -110,14 +113,14 @@ public class MCmdGuiChangeLanguage extends MCmdGui implements IEventConsumer {
             langTable = tv;
             activeCmdLang = cmd;
          }
-         langTable.shShowDrawableOver((InputConfig) cmd.getFeedback());
+         langTable.shShowDrawableOver(ec);
          LocaleID lang = strLoader.getLocaleID();
          int index = ((ObjectTableModel) langTable.getTableModel()).findIndexObjectFirst(lang);
          if (index == -1) {
             index = 0;
          }
          //give focus to selected
-         langTable.setSelectedIndex(index, (InputConfig) cmd.getFeedback(), true);
+         langTable.setSelectedIndex(index, ec, true);
 
          //create an OK/CANCEL interaction cmd ctx. modal?
          //TODO actually menu listen to active cmd ctx and update itself automatically

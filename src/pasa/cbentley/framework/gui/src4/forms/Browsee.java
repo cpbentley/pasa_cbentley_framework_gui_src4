@@ -1,8 +1,8 @@
 package pasa.cbentley.framework.gui.src4.forms;
 
-import pasa.cbentley.framework.coredata.src4.db.IByteCache;
-import pasa.cbentley.framework.coredata.src4.db.IByteInterpreter;
-import pasa.cbentley.framework.coredata.src4.interfaces.IBoIndex;
+import pasa.cbentley.framework.core.data.src4.db.IByteCache;
+import pasa.cbentley.framework.core.data.src4.db.IByteInterpreter;
+import pasa.cbentley.framework.core.data.src4.interfaces.IBoIndex;
 import pasa.cbentley.framework.datamodel.src4.engine.MByteObjectEnum;
 import pasa.cbentley.framework.datamodel.src4.engine.MByteObjectStore;
 import pasa.cbentley.framework.datamodel.src4.engine.MByteObjectTableModel;

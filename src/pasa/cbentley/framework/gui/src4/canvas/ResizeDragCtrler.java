@@ -6,15 +6,15 @@ import pasa.cbentley.core.src4.logging.IDLog;
 import pasa.cbentley.framework.cmd.src4.ctx.CmdCtx;
 import pasa.cbentley.framework.cmd.src4.interfaces.ICmdsCmd;
 import pasa.cbentley.framework.cmd.src4.trigger.CmdTrigger;
-import pasa.cbentley.framework.coreui.src4.event.GesturePointer;
-import pasa.cbentley.framework.coreui.src4.tech.IInput;
-import pasa.cbentley.framework.gui.src4.cmd.CmdInstanceDrawable;
+import pasa.cbentley.framework.core.ui.src4.event.GesturePointer;
+import pasa.cbentley.framework.core.ui.src4.input.InputState;
+import pasa.cbentley.framework.core.ui.src4.tech.IInput;
+import pasa.cbentley.framework.gui.src4.cmd.CmdInstanceGui;
 import pasa.cbentley.framework.gui.src4.core.Drawable;
 import pasa.cbentley.framework.gui.src4.ctx.GuiCtx;
 import pasa.cbentley.framework.gui.src4.interfaces.IDrawable;
 import pasa.cbentley.framework.gui.src4.interfaces.IDrawableListener;
 import pasa.cbentley.framework.gui.src4.utils.DrawableUtilz;
-import pasa.cbentley.framework.input.src4.InputState;
 
 /**
  * Command controller for pointer event in resizing a Drawable.
@@ -84,7 +84,7 @@ public class ResizeDragCtrler implements IDrawableListener {
    /**
     * Nav command
     */
-   public void commandAction(CmdInstanceDrawable cd) {
+   public void commandAction(CmdInstanceGui cd) {
       if (cd.getCmdID() == ICmdsCmd.CMD_18_NAV_PRE_SELECT) {
          cmdCueSelect(cd);
       }
@@ -98,8 +98,8 @@ public class ResizeDragCtrler implements IDrawableListener {
     * {@link ICmdsCmd#CMD_18_NAV_PRE_SELECT}
     * @param cd
     */
-   public void cmdCueSelect(CmdInstanceDrawable cd) {
-      if (DrawableUtilz.isInsideBorder(cd.getIC(), drawable, slack)) {
+   public void cmdCueSelect(CmdInstanceGui cd) {
+      if (DrawableUtilz.isInsideBorder(cd.getExecutionCtxGui(), drawable, slack)) {
          //we detected a condition for a new command state.
          //this command result changes future outcome
          isResizeMode = true;
@@ -115,7 +115,7 @@ public class ResizeDragCtrler implements IDrawableListener {
     * 
     * @param cd
     */
-   public void cmdResize(CmdInstanceDrawable cd) {
+   public void cmdResize(CmdInstanceGui cd) {
 
    }
 
@@ -136,7 +136,7 @@ public class ResizeDragCtrler implements IDrawableListener {
     * Several commands
     * @param cd
     */
-   public void cmdMove(CmdInstanceDrawable cd) {
+   public void cmdMove(CmdInstanceGui cd) {
       if (cd.isUndoMode()) {
          int x = cd.getParamInt(0);
          int y = cd.getParamInt(1);
@@ -156,7 +156,7 @@ public class ResizeDragCtrler implements IDrawableListener {
          if (mod == IInput.MOD_3_MOVED) {
             //do we have access to input state here?
             //what if
-            InputState is = cd.getIC().is;
+            InputState is = cd.getIC().getInputStateDrawable();
             GesturePointer gp = is.getGesturePointer0(pointer);
             //get the parameter from the gesture pointer
             dragIt(cd, drawable, gp);
@@ -191,7 +191,7 @@ public class ResizeDragCtrler implements IDrawableListener {
     * 
     * @param cd
     */
-   public void cmdResizeBorder(CmdInstanceDrawable cd) {
+   public void cmdResizeBorder(CmdInstanceGui cd) {
 
    }
 //
@@ -202,7 +202,7 @@ public class ResizeDragCtrler implements IDrawableListener {
 //    * For the Help.
 //    * 
 //    */
-//   public void managePointerEvent(IDrawable d, InputConfig ic) {
+//   public void managePointerEvent(IDrawable d, ExecutionContextCanvasGui ec) {
 //      if (d == drawable) {
 //         Drawable g = drawable;
 //         //manage the gesture
@@ -251,7 +251,7 @@ public class ResizeDragCtrler implements IDrawableListener {
 //      }
 //   }
 
-   protected void dragIt(CmdInstanceDrawable cd, Drawable g, GesturePointer pg) {
+   protected void dragIt(CmdInstanceGui cd, Drawable g, GesturePointer pg) {
       int pressedX = pg.getPressedX();
       int pressedY = pg.getPressedY();
       int modX = pg.getVectorX();

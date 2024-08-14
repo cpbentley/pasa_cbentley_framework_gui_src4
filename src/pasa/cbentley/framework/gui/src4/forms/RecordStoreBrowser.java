@@ -6,7 +6,7 @@ import pasa.cbentley.framework.cmd.src4.ctx.CmdCtx;
 import pasa.cbentley.framework.cmd.src4.engine.CmdInstance;
 import pasa.cbentley.framework.cmd.src4.engine.CmdNode;
 import pasa.cbentley.framework.cmd.src4.engine.MCmd;
-import pasa.cbentley.framework.coreui.src4.interfaces.IActionFeedback;
+import pasa.cbentley.framework.core.ui.src4.interfaces.IActionFeedback;
 import pasa.cbentley.framework.datamodel.src4.engine.MByteObjectTableModel;
 import pasa.cbentley.framework.datamodel.src4.filter.MBoFilterSet;
 import pasa.cbentley.framework.datamodel.src4.interfaces.IBOEnum;
@@ -15,7 +15,8 @@ import pasa.cbentley.framework.drawx.src4.engine.RgbImage;
 import pasa.cbentley.framework.gui.src4.canvas.InputConfig;
 import pasa.cbentley.framework.gui.src4.core.StyleClass;
 import pasa.cbentley.framework.gui.src4.ctx.GuiCtx;
-import pasa.cbentley.framework.gui.src4.interfaces.ICmdsView;
+import pasa.cbentley.framework.gui.src4.exec.ExecutionContextCanvasGui;
+import pasa.cbentley.framework.gui.src4.interfaces.ICmdsGui;
 import pasa.cbentley.framework.gui.src4.string.RequestStringInput;
 import pasa.cbentley.framework.gui.src4.table.TableLayoutView;
 import pasa.cbentley.framework.gui.src4.tech.ITechStringDrawable;
@@ -27,7 +28,7 @@ import pasa.cbentley.framework.gui.src4.tech.ITechStringDrawable;
  * @author cbentley
  *
  */
-public class RecordStoreBrowser extends TableLayoutView implements IAppendable, ICmdsView {
+public class RecordStoreBrowser extends TableLayoutView implements IAppendable, ICmdsGui {
 
    /**
     * Class that views individual items.
@@ -178,10 +179,10 @@ public class RecordStoreBrowser extends TableLayoutView implements IAppendable, 
       int sort = browseSrc.getEnum().getTech().get1(IBOEnum.BO_ENUM_OFFSET_03_SORT_TYPE1);
       MCmd m = gc.getCmdMapperGui().getCmdInverse();
       if (sort == IBOEnum.SORT_1_ASC) {
-         m.doUpdateLabel(ci.getExCtx(), "Sort DESC");
+         m.doUpdateLabel(ci.getExecutionContext(), "Sort DESC");
          browseSrc.getEnum().getTech().set1(IBOEnum.BO_ENUM_OFFSET_03_SORT_TYPE1, IBOEnum.SORT_2_DEC);
       } else {
-         m.doUpdateLabel(ci.getExCtx(), "Sort ASC");
+         m.doUpdateLabel(ci.getExecutionContext(), "Sort ASC");
          browseSrc.getEnum().getTech().set1(IBOEnum.BO_ENUM_OFFSET_03_SORT_TYPE1, IBOEnum.SORT_1_ASC);
       }
       browseSrc.enumClearReload();
@@ -212,10 +213,10 @@ public class RecordStoreBrowser extends TableLayoutView implements IAppendable, 
     * Manages the NEXT and PREVIOUS commands for the {@link IBrowseeView}
     */
    public void commandAction(CmdInstance cmd) {
-      InputConfig ic = (InputConfig) cmd.getFeedback();
-      int c = cmd.cmdID;
+      ExecutionContextCanvasGui ec = (ExecutionContextCanvasGui) cmd.getExecutionContext();
+      int c = cmd.getCmdID();
       CmdCtx cc = gc.getCC();
-      if (cmd.ctx == browseeView.getCmdNode()) {
+      if (cmd.getCmdNode() == browseeView.getCmdNode()) {
          //individually go to the next
          if (c == CMD_30_NEXT) {
             int maxRID = browseSrc.getLink().getNextBID();
@@ -258,7 +259,7 @@ public class RecordStoreBrowser extends TableLayoutView implements IAppendable, 
       }
       if (c == VCMD_10_SHOW_FILTERS) {
          if (filterForm != null) {
-            filterForm.shShowDrawableOver(ic);
+            filterForm.shShowDrawableOver(ec);
          }
       }
 
@@ -337,8 +338,8 @@ public class RecordStoreBrowser extends TableLayoutView implements IAppendable, 
 
    public void setBrowseeView(IBrowseeView bv) {
       browseeView = bv;
-      bv.getCmdNode().addMenuCmd(gc.getViewCommandListener().CMD_30_NEXT);
-      bv.getCmdNode().addMenuCmd(gc.getViewCommandListener().CMD_31_PREVIOUS);
+      bv.getCmdNode().addMenuCmd(gc.getCmdProcessorGui().CMD_30_NEXT);
+      bv.getCmdNode().addMenuCmd(gc.getCmdProcessorGui().CMD_31_PREVIOUS);
    }
 
    public void setFilterForm(FilterForm filterForm) {

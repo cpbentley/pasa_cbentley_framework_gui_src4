@@ -2,8 +2,8 @@ package pasa.cbentley.framework.gui.src4.canvas;
 
 import pasa.cbentley.core.src4.helpers.StringBBuilder;
 import pasa.cbentley.core.src4.logging.Dctx;
+import pasa.cbentley.framework.core.ui.src4.ctx.ToStringStaticCoreUi;
 import pasa.cbentley.framework.coredraw.src4.interfaces.IMFont;
-import pasa.cbentley.framework.coreui.src4.ctx.ToStringStaticCoreUi;
 import pasa.cbentley.framework.drawx.src4.engine.GraphicsX;
 import pasa.cbentley.framework.drawx.src4.string.CharOpt;
 import pasa.cbentley.framework.gui.src4.anim.AnimManager;
@@ -14,6 +14,7 @@ import pasa.cbentley.framework.gui.src4.ctx.GuiCtx;
 import pasa.cbentley.framework.gui.src4.ctx.ITechCtxSettingsAppGui;
 import pasa.cbentley.framework.gui.src4.ctx.IToStringFlagsGui;
 import pasa.cbentley.framework.gui.src4.ctx.ToStringStaticGui;
+import pasa.cbentley.framework.gui.src4.exec.InputStateCanvasGui;
 import pasa.cbentley.framework.gui.src4.interfaces.ITechCanvasDrawable;
 import pasa.cbentley.framework.gui.src4.string.StringDrawable;
 import pasa.cbentley.framework.gui.src4.utils.RenderMetrics;
@@ -171,7 +172,7 @@ public class CanvasDebugger extends Drawable {
       dx += CharOpt.draw(g, " Ev:", dx, dy, f);
       //returns input state that triggered this repaint
       if (g instanceof GraphicsXD) {
-         InputStateDrawable isd = ((GraphicsXD) g).isd;
+         InputStateCanvasGui isd = ((GraphicsXD) g).isd;
          int x = isd.getX();
          dx += CharOpt.draw(g, x, dx, dy, f);
          dx += CharOpt.draw(g, ",", dx, dy, f);

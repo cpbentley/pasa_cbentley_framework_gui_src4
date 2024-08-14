@@ -4,7 +4,11 @@ import pasa.cbentley.byteobjects.src4.core.BOAbstractFactory;
 import pasa.cbentley.byteobjects.src4.core.ByteObject;
 import pasa.cbentley.byteobjects.src4.ctx.IBOTypesBOC;
 import pasa.cbentley.byteobjects.src4.objects.function.Function;
+import pasa.cbentley.byteobjects.src4.objects.function.IBOFunction;
 import pasa.cbentley.byteobjects.src4.objects.function.ITechFunction;
+import pasa.cbentley.byteobjects.src4.objects.move.FunctionMove;
+import pasa.cbentley.byteobjects.src4.objects.move.IBOMoveFunction;
+import pasa.cbentley.byteobjects.src4.objects.move.ITechMoveFunction;
 import pasa.cbentley.core.src4.interfaces.C;
 import pasa.cbentley.framework.drawx.src4.ctx.IBOTypesDrawX;
 import pasa.cbentley.framework.drawx.src4.factories.interfaces.IBOFigure;
@@ -15,9 +19,6 @@ import pasa.cbentley.framework.gui.src4.anim.definitions.Pixeler;
 import pasa.cbentley.framework.gui.src4.anim.definitions.Reverse;
 import pasa.cbentley.framework.gui.src4.anim.definitions.ShiftLines;
 import pasa.cbentley.framework.gui.src4.anim.definitions.SizeMod;
-import pasa.cbentley.framework.gui.src4.anim.move.FunctionMove;
-import pasa.cbentley.framework.gui.src4.anim.move.IBOMoveFunction;
-import pasa.cbentley.framework.gui.src4.anim.move.ITechMoveFunction;
 import pasa.cbentley.framework.gui.src4.anim.move.Move;
 import pasa.cbentley.framework.gui.src4.canvas.ViewContext;
 import pasa.cbentley.framework.gui.src4.core.Drawable;
@@ -66,7 +67,7 @@ public class AnimFactory extends BOAbstractFactory implements IBOAnim, ITechShif
             int position = function.get1(IBOMoveFunction.MOVE_OFFSET_1TYPE1);
             boolean origin = anim.get1(ANIM_OFFSET_05_TIME1) == ANIM_TIME_1_ENTRY;
             int moveType = function.get1(IBOMoveFunction.MOVE_OFFSET_1TYPE1);
-            boolean isHidden = function.hasFlag(ITechFunction.FUN_OFFSET_02_FLAG, ITechFunction.FUN_FLAG_7_CUSTOM);
+            boolean isHidden = function.hasFlag(IBOFunction.FUN_OFFSET_02_FLAG, IBOFunction.FUN_FLAG_7_CUSTOM);
             FunctionMove f = getMoveFunction(d, d.getVC(), origin, position, isHidden, moveType);
             ianim = new Move(gc, d, f);
             break;
@@ -427,7 +428,7 @@ public class AnimFactory extends BOAbstractFactory implements IBOAnim, ITechShif
     * 
     */
    public FunctionMove getMoveFunction(int type, int xo, int yo, int xd, int yd) {
-      FunctionMove mf = new FunctionMove(gc, type, xo, yo, xd, yd);
+      FunctionMove mf = new FunctionMove(gc.getBOC(), type, xo, yo, xd, yd);
       return mf;
    }
 
@@ -542,7 +543,7 @@ public class AnimFactory extends BOAbstractFactory implements IBOAnim, ITechShif
          xDest = dx;
          yDest = dy;
       }
-      FunctionMove mf = new FunctionMove(gc, moveType, xOrigin, yOrigin, xDest, yDest);
+      FunctionMove mf = new FunctionMove(gc.getBOC(), moveType, xOrigin, yOrigin, xDest, yDest);
       return mf;
    }
 
@@ -576,7 +577,7 @@ public class AnimFactory extends BOAbstractFactory implements IBOAnim, ITechShif
    }
 
    public FunctionMove getMoveFunctionTo(IDrawable d, int xd, int yd) {
-      FunctionMove mf = new FunctionMove(gc, d.getX(), d.getY(), xd, yd);
+      FunctionMove mf = new FunctionMove(gc.getBOC(), d.getX(), d.getY(), xd, yd);
       return mf;
    }
 

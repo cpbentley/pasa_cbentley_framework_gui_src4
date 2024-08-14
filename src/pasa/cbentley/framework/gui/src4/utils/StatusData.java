@@ -1,5 +1,6 @@
 package pasa.cbentley.framework.gui.src4.utils;
 
+import pasa.cbentley.framework.gui.src4.core.StyleClass;
 import pasa.cbentley.framework.gui.src4.ctx.GuiCtx;
 
 /**

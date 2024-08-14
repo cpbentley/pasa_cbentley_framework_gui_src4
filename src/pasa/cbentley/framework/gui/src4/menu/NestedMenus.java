@@ -10,10 +10,10 @@ import pasa.cbentley.framework.cmd.src4.engine.MCmd;
 import pasa.cbentley.framework.cmd.src4.interfaces.ICmdsCmd;
 import pasa.cbentley.framework.cmd.src4.interfaces.INavTech;
 import pasa.cbentley.framework.datamodel.src4.table.ObjectTableModel;
-import pasa.cbentley.framework.gui.src4.cmd.CmdInstanceDrawable;
+import pasa.cbentley.framework.gui.src4.cmd.CmdInstanceGui;
 import pasa.cbentley.framework.gui.src4.core.StyleClass;
 import pasa.cbentley.framework.gui.src4.ctx.GuiCtx;
-import pasa.cbentley.framework.gui.src4.interfaces.ICmdsView;
+import pasa.cbentley.framework.gui.src4.interfaces.ICmdsGui;
 import pasa.cbentley.framework.gui.src4.interfaces.IDrawable;
 import pasa.cbentley.framework.gui.src4.interfaces.ITechDrawable;
 import pasa.cbentley.framework.gui.src4.string.StringDrawable;
@@ -37,7 +37,7 @@ import pasa.cbentley.layouter.src4.tech.ITechLayout;
  * @author Charles-Philip Bentley
  * @see TableView
  */
-public class NestedMenus extends TableView implements IEventConsumer, ICmdsView, ITableIconable, INavTech {
+public class NestedMenus extends TableView implements IEventConsumer, ICmdsGui, ITableIconable, INavTech {
 
    private StringDrawable   button;
 
@@ -69,7 +69,7 @@ public class NestedMenus extends TableView implements IEventConsumer, ICmdsView,
    }
 
    public void addCommand(int cmdid) {
-      this.addCommand(gc.getViewCommandListener().getCmd(cmdid));
+      this.addCommand(gc.getCmdProcessorGui().getCmd(cmdid));
    }
 
    public void addCommand(MCmd cmd) {
@@ -91,7 +91,7 @@ public class NestedMenus extends TableView implements IEventConsumer, ICmdsView,
     * {@link ICmdsCmd#CMD_18_NAV_PRE_SELECT}
     * @param cd
     */
-   public void cmdCueSelect(CmdInstanceDrawable cd) {
+   public void cmdCueSelect(CmdInstanceGui cd) {
 
       this.getCanvas().doCuePress(cd);
    }
@@ -100,7 +100,7 @@ public class NestedMenus extends TableView implements IEventConsumer, ICmdsView,
     * From the selected index of the Table. Action
     * @param cd
     */
-   public void cmdSelect(CmdInstanceDrawable cd) {
+   public void cmdSelect(CmdInstanceGui cd) {
 
       //remove the cue
 
@@ -120,7 +120,7 @@ public class NestedMenus extends TableView implements IEventConsumer, ICmdsView,
       }
    }
 
-   private void cmdSelectMenu(CmdInstanceDrawable cd, NestedMenus menu) {
+   private void cmdSelectMenu(CmdInstanceGui cd, NestedMenus menu) {
 
       //drawable representing the menu
       IDrawable menuItem = null;
@@ -174,7 +174,7 @@ public class NestedMenus extends TableView implements IEventConsumer, ICmdsView,
          //max size is ViewContext area from position. size depends on position...
          ByteObject sizerWRoomOnTheLeft = sizerFac.getSizerFromPozer1Pozer2Implicit(posXEndOfVC);
 
-         ByteObject maxH = sizerFac.getSizerFromFunctionOfSizer1Sizer2(sizerVc, null, ITechLayout.ET_FUN_6_DIFF);
+         ByteObject maxH = sizerFac.getSizerFromFunctionOfSizer1Sizer2(sizerVc, null, ITechLayout.ET_FUN_06_DIFF);
          
          ByteObject sizerW = sizerFac.getSizerPref(sizerWRoomOnTheLeft);
          ByteObject sizerH = sizerFac.getSizerPref(maxH);
@@ -187,10 +187,10 @@ public class NestedMenus extends TableView implements IEventConsumer, ICmdsView,
       }
       menu.setParent(this);
       menu.setStateFlag(ITechDrawable.STATE_28_NOT_CONTAINED_IN_PARENT_AREA, true);
-      cd.getDExCtx().addDrawn(menu);
+      cd.getExecutionCtxGui().addDrawn(menu);
    }
 
-   private void cmdSelectCmd(CmdInstanceDrawable cd, MCmd c) {
+   private void cmdSelectCmd(CmdInstanceGui cd, MCmd c) {
       //hide menu? if must be hidden
       hideMenu(cd);
 
@@ -207,7 +207,7 @@ public class NestedMenus extends TableView implements IEventConsumer, ICmdsView,
    /**
     * Nav command
     */
-   public void commandAction(CmdInstanceDrawable cd) {
+   public void commandAction(CmdInstanceGui cd) {
       if (cd.getCmdID() == ICmdsCmd.CMD_18_NAV_PRE_SELECT) {
          cmdCueSelect(cd);
       }
@@ -226,9 +226,9 @@ public class NestedMenus extends TableView implements IEventConsumer, ICmdsView,
       return title;
    }
 
-   private void hideMenu(CmdInstanceDrawable cd) {
+   private void hideMenu(CmdInstanceGui cd) {
       if (isTemp()) {
-         cd.getDExCtx().addDrawnHide(this);
+         cd.getExecutionCtxGui().addDrawnHide(this);
          if (parent != null) {
             parent.hideMenu(cd);
          }
@@ -243,7 +243,7 @@ public class NestedMenus extends TableView implements IEventConsumer, ICmdsView,
       return isVertical;
    }
 
-   public void manageNavigate(CmdInstanceDrawable cd, int navEvent) {
+   public void manageNavigate(CmdInstanceGui cd, int navEvent) {
       if (navEvent == INavTech.NAV_6_UNSELECT) {
          //give back focus to parent menu
          gc.getFocusCtrl().drawableHide(cd, this, parent);

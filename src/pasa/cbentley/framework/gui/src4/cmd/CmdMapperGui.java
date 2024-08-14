@@ -3,9 +3,9 @@ package pasa.cbentley.framework.gui.src4.cmd;
 import pasa.cbentley.framework.cmd.src4.engine.CmdFactoryCore;
 import pasa.cbentley.framework.cmd.src4.engine.MCmd;
 import pasa.cbentley.framework.gui.src4.ctx.GuiCtx;
-import pasa.cbentley.framework.gui.src4.interfaces.ICmdsView;
+import pasa.cbentley.framework.gui.src4.interfaces.ICmdsGui;
 
-public class CmdMapperGui extends CmdFactoryCore implements ICmdsView {
+public class CmdMapperGui extends CmdFactoryCore implements ICmdsGui {
 
    private MCmd                        cCue;
 
@@ -25,14 +25,14 @@ public class CmdMapperGui extends CmdFactoryCore implements ICmdsView {
 
    private MCmd                        cUIAToggle;
 
-   protected final ViewCommandListener vc;
+   protected final CmdProcessorGui vc;
 
    protected final GuiCtx              gc;
 
    public CmdMapperGui(GuiCtx gc) {
       super(gc.getCC());
       this.gc = gc;
-      vc = gc.getViewCommandListener();
+      vc = gc.getCmdProcessorGui();
    }
 
    public MCmd get(String str, int id) {
@@ -98,63 +98,63 @@ public class CmdMapperGui extends CmdFactoryCore implements ICmdsView {
 
    private MCmd getCmdCue() {
       if (cCue == null) {
-         cCue = get("Cue Pointer", ICmdsView.VCMD_16_CUE_PARAM_NUMBER);
+         cCue = get("Cue Pointer", ICmdsGui.VCMD_16_CUE_PARAM_NUMBER);
       }
       return cCue;
    }
 
    private MCmd getCmdFilters() {
       if (cShowFilters == null) {
-         cShowFilters = get("Show Filters", ICmdsView.VCMD_08_PAGE_NEXT);
+         cShowFilters = get("Show Filters", ICmdsGui.VCMD_08_PAGE_NEXT);
       }
       return cShowFilters;
    }
 
    public MCmd getCmdGoto() {
       if (cGoTo == null) {
-         cGoTo = get("Go To", ICmdsView.VCMD_12_GO_TO);
+         cGoTo = get("Go To", ICmdsGui.VCMD_12_GO_TO);
       }
       return cGoTo;
    }
 
    private MCmd getCmdHide() {
       if (cHide == null) {
-         cHide = get("Hide", ICmdsView.VCMD_13_HIDE);
+         cHide = get("Hide", ICmdsGui.VCMD_13_HIDE);
       }
       return cHide;
    }
 
    public MCmd getCmdInverse() {
       if (cInverse == null) {
-         cInverse = get("Sort ASC", ICmdsView.VCMD_11_INVERSE);
+         cInverse = get("Sort ASC", ICmdsGui.VCMD_11_INVERSE);
       }
       return cInverse;
    }
 
    public MCmd getCmdNavUp() {
       if (cNavUp == null) {
-         cNavUp = get("NavUp", ICmdsView.CMD_11_NAV_UP);
+         cNavUp = get("NavUp", ICmdsGui.CMD_11_NAV_UP);
       }
       return cNavUp;
    }
 
    private MCmd getCmdPageNext() {
       if (cPageNext == null) {
-         cPageNext = get("Page Next", ICmdsView.VCMD_08_PAGE_NEXT);
+         cPageNext = get("Page Next", ICmdsGui.VCMD_08_PAGE_NEXT);
       }
       return cPageNext;
    }
 
    private MCmd getCmdPagePrevious() {
       if (cPagePrev == null) {
-         cPagePrev = get("Page Previous", ICmdsView.VCMD_09_PAGE_PREVIOUS);
+         cPagePrev = get("Page Previous", ICmdsGui.VCMD_09_PAGE_PREVIOUS);
       }
       return cPagePrev;
    }
 
    private MCmd getCmdUIAToggle() {
       if (cUIAToggle == null) {
-         cUIAToggle = get("UIA Toggle", ICmdsView.VCMD_02_UIA_TOGGLE);
+         cUIAToggle = get("UIA Toggle", ICmdsGui.VCMD_02_UIA_TOGGLE);
       }
       return cUIAToggle;
    }

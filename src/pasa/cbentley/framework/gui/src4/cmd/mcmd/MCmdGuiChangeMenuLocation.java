@@ -1,4 +1,4 @@
-package pasa.cbentley.framework.gui.src4.cmd;
+package pasa.cbentley.framework.gui.src4.cmd.mcmd;
 
 import pasa.cbentley.byteobjects.src4.core.ByteObject;
 import pasa.cbentley.core.src4.event.BusEvent;
@@ -6,12 +6,12 @@ import pasa.cbentley.core.src4.event.IEventConsumer;
 import pasa.cbentley.core.src4.interfaces.C;
 import pasa.cbentley.framework.cmd.src4.engine.CmdInstance;
 import pasa.cbentley.framework.datamodel.src4.table.ObjectTableModel;
-import pasa.cbentley.framework.gui.src4.canvas.InputConfig;
 import pasa.cbentley.framework.gui.src4.core.StyleClass;
 import pasa.cbentley.framework.gui.src4.ctx.GuiCtx;
+import pasa.cbentley.framework.gui.src4.exec.ExecutionContextCanvasGui;
 import pasa.cbentley.framework.gui.src4.factories.TableCellPolicyFactory;
 import pasa.cbentley.framework.gui.src4.factories.TablePolicyFactory;
-import pasa.cbentley.framework.gui.src4.interfaces.ICmdsView;
+import pasa.cbentley.framework.gui.src4.interfaces.ICmdsGui;
 import pasa.cbentley.framework.gui.src4.interfaces.IUIView;
 import pasa.cbentley.framework.gui.src4.menu.CmdMenuBar;
 import pasa.cbentley.framework.gui.src4.menu.IMenus;
@@ -31,7 +31,7 @@ public class MCmdGuiChangeMenuLocation extends MCmdGui implements IEventConsumer
    private TableView   menuPosTable;
 
    public MCmdGuiChangeMenuLocation(GuiCtx gc) {
-      super(gc, ICmdsView.CMD_75_CHANGE_MENU_POSITION);
+      super(gc, ICmdsGui.CMD_75_CHANGE_MENU_POSITION);
    }
 
    public void consumeEvent(BusEvent e) {
@@ -45,8 +45,8 @@ public class MCmdGuiChangeMenuLocation extends MCmdGui implements IEventConsumer
       }
    }
 
-   public void execute(InputConfig ic) {
-      CmdInstance cmd = ic.getCmdInstance();
+   public void execute(ExecutionContextCanvasGui ec) {
+      CmdInstance cmd = ec.getCmdInstance();
       //default menu bar is the one of the root canvas
       CmdMenuBar cm = gc.getCanvasGCRoot().getMenuBar();
       ByteObject boMenuBar = cm.getMenuBarTech();

@@ -3,6 +3,7 @@ package pasa.cbentley.framework.gui.src4.factories.interfaces;
 import pasa.cbentley.byteobjects.src4.core.ByteObject;
 import pasa.cbentley.byteobjects.src4.core.interfaces.IByteObject;
 import pasa.cbentley.framework.drawx.src4.string.interfaces.IBOStrAux;
+import pasa.cbentley.framework.drawx.src4.string.interfaces.IBOStrAuxFormat;
 import pasa.cbentley.framework.gui.src4.core.ViewDrawable;
 import pasa.cbentley.framework.gui.src4.ctx.IBOTypesGui;
 import pasa.cbentley.framework.gui.src4.interfaces.ITechDrawable;
@@ -75,7 +76,8 @@ public interface IBOStrAuxData extends IBOStrAux {
 
    /**
     * Arrangement of characters in the string relative to a rectangular area and the {@link ISizer} constraints.
-    * Override string type from String figure.
+    * 
+    * Preset overrides relevant String figure parameters from {@link IBOStrAuxFormat}.
     * 
     * <li>{@link ITechStringDrawable#PRESET_CONFIG_0_NONE}
     * <li>{@link ITechStringDrawable#PRESET_CONFIG_1_TITLE}

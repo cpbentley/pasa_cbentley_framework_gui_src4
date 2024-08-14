@@ -13,7 +13,6 @@ import pasa.cbentley.framework.gui.src4.anim.ITechAnim;
 import pasa.cbentley.framework.gui.src4.anim.Realisator;
 import pasa.cbentley.framework.gui.src4.anim.definitions.AlphaChangeRgb;
 import pasa.cbentley.framework.gui.src4.anim.definitions.ByteObjectAnim;
-import pasa.cbentley.framework.gui.src4.anim.move.FunctionMove;
 import pasa.cbentley.framework.gui.src4.anim.move.Move;
 import pasa.cbentley.framework.gui.src4.ctx.GuiCtx;
 import pasa.cbentley.framework.gui.src4.ctx.IBOTypesGui;

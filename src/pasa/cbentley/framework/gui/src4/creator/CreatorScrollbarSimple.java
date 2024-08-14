@@ -39,10 +39,10 @@ public class CreatorScrollbarSimple extends CreatorAbstractScrollbar {
       int scrollbar1Size = 16;
       int scrollbar2Size = 15;
       int scrollbar3Size = 10;
-      boSB.setValue(SB_OFFSET_03_PRIMARY_SIZE4, scrollbar1Size, 4);
-      boSB.setValue(SB_OFFSET_04_SECOND_SIZE4, scrollbar2Size, 4);
-      boSB.setValue(SB_OFFSET_05_THIRD_SIZE4, scrollbar3Size, 4);
-      boSB.setValue(SB_OFFSET_06_MIN_SIZE4, 10, 4);
+      boSB.set4(SB_OFFSET_03_PRIMARY_SIZE4, scrollbar1Size);
+      boSB.set4(SB_OFFSET_04_SECOND_SIZE4, scrollbar2Size);
+      boSB.set4(SB_OFFSET_05_THIRD_SIZE4, scrollbar3Size);
+      boSB.set4(SB_OFFSET_06_MIN_SIZE4, 10);
       boSB.setFlag(SB_OFFSET_01_FLAG, SB_FLAG_1_VERT, vertical);
       boSB.setFlag(SB_OFFSET_01_FLAG, SB_FLAG_3_WRAPPER, isWrapper);
       boSB.setFlag(SB_OFFSET_01_FLAG, SB_FLAG_4_WRAPPER_FILL, isWrapperFill);

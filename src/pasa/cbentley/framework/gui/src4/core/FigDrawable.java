@@ -10,10 +10,10 @@ import pasa.cbentley.framework.drawx.src4.factories.interfaces.IBOFigure;
 import pasa.cbentley.framework.drawx.src4.tech.ITechFigure;
 import pasa.cbentley.framework.gui.src4.anim.IBOAnim;
 import pasa.cbentley.framework.gui.src4.anim.ITechAnim;
-import pasa.cbentley.framework.gui.src4.canvas.InputConfig;
 import pasa.cbentley.framework.gui.src4.ctx.GuiCtx;
 import pasa.cbentley.framework.gui.src4.ctx.IBOTypesGui;
 import pasa.cbentley.framework.gui.src4.ctx.IToStringFlagsDraw;
+import pasa.cbentley.framework.gui.src4.exec.ExecutionContextCanvasGui;
 import pasa.cbentley.framework.gui.src4.interfaces.IAnimable;
 import pasa.cbentley.framework.gui.src4.interfaces.ITechDrawable;
 import pasa.cbentley.framework.gui.src4.utils.SourceCache;
@@ -162,9 +162,9 @@ public class FigDrawable extends Drawable implements ITechFigure {
    public void initDrawable(LayouterEngineDrawable ds) {
    }
 
-   public void managePointerInput(InputConfig ic) {
+   public void managePointerInput(ExecutionContextCanvasGui ec) {
       //#debug
-      toDLog().pEvent1("x=" + ic.is.getX() + " y=" + ic.is.getY(), null, FigDrawable.class, "managePointerInput");
+      toDLog().pEvent1("x=" + ec.getInputStateDrawable().getX() + " y=" + ec.getInputStateDrawable().getY(), null, FigDrawable.class, "managePointerInput");
    }
 
    /**

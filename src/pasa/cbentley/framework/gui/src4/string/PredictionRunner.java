@@ -6,6 +6,7 @@ import pasa.cbentley.core.src4.thread.IBRunnable;
 import pasa.cbentley.framework.datamodel.src4.table.ObjectTableModel;
 import pasa.cbentley.framework.gui.src4.canvas.InputConfig;
 import pasa.cbentley.framework.gui.src4.ctx.GuiCtx;
+import pasa.cbentley.framework.gui.src4.exec.ExecutionContextCanvasGui;
 import pasa.cbentley.powerdata.spec.src4.power.IPowerCharCollector;
 
 /**
@@ -32,7 +33,9 @@ public class PredictionRunner extends AbstractBRunnable implements IBRunnable {
     */
    int                         caretWordStart;
 
-   private InputConfig         ic;
+   protected final GuiCtx      gc;
+
+   private ExecutionContextCanvasGui         ic;
 
    /**
     * Model. This is read from one column model.
@@ -48,8 +51,6 @@ public class PredictionRunner extends AbstractBRunnable implements IBRunnable {
    int                         py;
 
    StringEditControl           sec;
-
-   protected final GuiCtx gc;
 
    /**
     * Constructor in a thread
@@ -104,7 +105,7 @@ public class PredictionRunner extends AbstractBRunnable implements IBRunnable {
       sec.searchPrefix(ic, prefix);
    }
 
-   public void setInputConfig(InputConfig ic) {
+   public void setInputConfig(ExecutionContextCanvasGui ec) {
       this.ic = ic;
    }
 }

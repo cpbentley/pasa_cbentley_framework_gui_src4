@@ -84,8 +84,7 @@ public interface IBOAnim extends IByteObject {
 
    /**
     * Tips about when to play the animation.
-    * <br>
-    * <br>
+    * 
     * <li> {@link ITechAnim#ANIM_TIME_0_MAIN}
     * <li> {@link ITechAnim#ANIM_TIME_1_ENTRY}
     * <li> {@link ITechAnim#ANIM_TIME_2_EXIT}
@@ -96,7 +95,11 @@ public interface IBOAnim extends IByteObject {
     * <li> {@link ITechAnim#ANIM_TARGET_0_FULL}
     * <li> {@link ITechAnim#ANIM_TARGET_1_DLAYER1}
     * <li> {@link ITechAnim#ANIM_TARGET_2_DLAYER1}
-    * <li> ...
+    * <li> {@link ITechAnim#ANIM_TARGET_3_DLAYER1}
+    * <li> {@link ITechAnim#ANIM_TARGET_4_DLAYER1}
+    * <li> {@link ITechAnim#ANIM_TARGET_6_DLAYER1}
+    * <li> {@link ITechAnim#ANIM_TARGET_7_DLAYER1}
+    * <li> {@link ITechAnim#ANIM_TARGET_8_DLAYER1}
     * <li> {@link ITechAnim#ANIM_TARGET_9_CONTENT}
     * 
     */
@@ -108,9 +111,7 @@ public interface IBOAnim extends IByteObject {
     * <li> 0 infinite looping
     * <li> 1 default of 1 occurence
     * <li> 2
-    * <br>
-    * <br>
-    * Infinite loop when flag {@link IBOAnim#ANIM_FLAG_3_LOOP} is set <br>
+    * Infinite loop when flag {@link IBOAnim#ANIM_FLAG_3_LOOP} is set
     */
    public static final int ANIM_OFFSET_07_REPEAT1        = A_OBJECT_BASIC_SIZE + 6;
 
@@ -124,5 +125,5 @@ public interface IBOAnim extends IByteObject {
     * Some animation don't have a number of steps defined. those will use this value.
     * .e.g a gradient animation
     */
-   public static final int ANIM_OFFSET_09_NUM_STEPS2         = A_OBJECT_BASIC_SIZE + 9;
+   public static final int ANIM_OFFSET_09_NUM_STEPS2     = A_OBJECT_BASIC_SIZE + 9;
 }

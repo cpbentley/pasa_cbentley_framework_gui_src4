@@ -1,33 +1,34 @@
 package pasa.cbentley.framework.gui.src4.canvas;
 
 import pasa.cbentley.core.src4.logging.Dctx;
-import pasa.cbentley.framework.coreui.src4.tech.ITechInputFeedback;
+import pasa.cbentley.framework.core.ui.src4.tech.ITechInputFeedback;
 import pasa.cbentley.framework.gui.src4.anim.Realisator;
 import pasa.cbentley.framework.gui.src4.core.Drawable;
 import pasa.cbentley.framework.gui.src4.ctx.GuiCtx;
-import pasa.cbentley.framework.gui.src4.interfaces.ITechCanvasDrawable;
+import pasa.cbentley.framework.gui.src4.exec.OutputStateCanvasGui;
 import pasa.cbentley.framework.gui.src4.interfaces.IDrawable;
-import pasa.cbentley.framework.input.src4.CanvasAppliInput;
-import pasa.cbentley.framework.input.src4.RepaintCtrl;
-import pasa.cbentley.framework.input.src4.CanvasResult;
+import pasa.cbentley.framework.gui.src4.interfaces.ITechCanvasDrawable;
 import pasa.cbentley.framework.input.src4.ctx.IFlagsToStringInput;
-import pasa.cbentley.framework.input.src4.interfaces.ITechPaintThread;
+import pasa.cbentley.framework.input.src4.engine.CanvasAppliInput;
+import pasa.cbentley.framework.input.src4.engine.OutputStateCanvas;
+import pasa.cbentley.framework.input.src4.engine.RepaintHelper;
+import pasa.cbentley.framework.input.src4.interfaces.ITechThreadPaint;
 
-public class RepaintCtrlGui extends RepaintCtrl {
+public class RepaintHelperGui extends RepaintHelper {
 
    /**
     * Base {@link ScreenResult}.
     * <br>
     * When active, Controller creates a new one.
     */
-   private CanvasResultDrawable screenResultEvent;
+   private OutputStateCanvasGui screenResultEvent;
 
    protected final GuiCtx gc;
 
-   public RepaintCtrlGui(GuiCtx gc, CanvasAppliInput canvas) {
+   public RepaintHelperGui(GuiCtx gc, CanvasAppliInput canvas) {
       super(gc.getIC(), canvas);
       this.gc = gc;
-      if(this.getClass() == RepaintCtrlGui.class) {
+      if(this.getClass() == RepaintHelperGui.class) {
          constructHelpers();
       }
    }
@@ -36,8 +37,8 @@ public class RepaintCtrlGui extends RepaintCtrl {
       return  (CanvasAppliInputGui)canvas;
    }
 
-   public CanvasResult create(int id) {
-      return new CanvasResultDrawable(gc,canvas, id);
+   public OutputStateCanvas create(int id) {
+      return new OutputStateCanvasGui(gc,canvas, id);
    }
    
    public void constructHelpers() {
@@ -45,7 +46,7 @@ public class RepaintCtrlGui extends RepaintCtrl {
    }
 
    /**
-    * Appends the {@link CanvasResultDrawable} with other pending results in the queue and
+    * Appends the {@link OutputStateCanvasGui} with other pending results in the queue and
     * blocks until that results has been rendered.
     * <br>
     * <b>Active Rendering Mode</b>: Wake up and accelerates Rendering. Returns.
@@ -77,7 +78,7 @@ public class RepaintCtrlGui extends RepaintCtrl {
     * @param screenResultAnimation {@link ScreenResult} specyfying which {@link Drawable} have to be repainted
     * @throws InterruptedException 
     */
-   public void repaintAnimationLock(CanvasResultDrawable screenResultAnimation) throws InterruptedException {
+   public void repaintAnimationLock(OutputStateCanvasGui screenResultAnimation) throws InterruptedException {
 
       screenResultAnimation.setRepaintFlag(ITechCanvasDrawable.REPAINT_04_ANIMATION, true);
 
@@ -120,14 +121,14 @@ public class RepaintCtrlGui extends RepaintCtrl {
    }
 
    /**
-    * Appends the {@link CanvasResultDrawable} with other pending results in the queue and return.
+    * Appends the {@link OutputStateCanvasGui} with other pending results in the queue and return.
     * <br>
     * Method called inside an Animation Thread that allows frame slipping.
     * <br>
     * When rendering thread is too slow, the Animation Thread goes several turn for each
     * Render Turn. Some Animations Frames will be skipped.
     */
-   public void repaintAnimationFast(CanvasResultDrawable screenResultAnimation) {
+   public void repaintAnimationFast(OutputStateCanvasGui screenResultAnimation) {
       //call for a repaint. in passive mode sends an event what if repaint call goes faster?
       repaint(screenResultAnimation);
 
@@ -136,7 +137,7 @@ public class RepaintCtrlGui extends RepaintCtrl {
    /**
     * The {@link Runnable} is the code that updates the render state.
     * <br>
-    * It will be run in the {@link ITechPaintThread#THREAD_1_UPDATE} that writes to 
+    * It will be run in the {@link ITechThreadPaint#THREAD_1_UPDATE} that writes to 
     * the render state.
     * <br>
     * It is added to the queue
@@ -179,7 +180,7 @@ public class RepaintCtrlGui extends RepaintCtrl {
          screenResultEvent.setActionDoneRepaint(d);
          return;
       } else {
-         CanvasResultDrawable businessSR = getWorkSD();
+         OutputStateCanvasGui businessSR = getWorkSD();
          //we are not in the GUI Event Thread. update the 
          businessSR.setActionDoneRepaint(d);
 
@@ -201,17 +202,17 @@ public class RepaintCtrlGui extends RepaintCtrl {
       repaintDrawableCycleBusiness(null);
    }
 
-   public CanvasResultDrawable getWorkSD() {
-      return (CanvasResultDrawable) canvasResultBusiness;
+   public OutputStateCanvasGui getWorkSD() {
+      return (OutputStateCanvasGui) canvasResultBusiness;
    }
 
-   public CanvasResultDrawable getSD() {
-      return (CanvasResultDrawable) getScreenResult();
+   public OutputStateCanvasGui getSD() {
+      return (OutputStateCanvasGui) getScreenResult();
    }
    
    //#mdebug
    public void toString(Dctx dc) {
-      dc.root(this, RepaintCtrlGui.class, 220);
+      dc.root(this, RepaintHelperGui.class, 220);
       toStringPrivate(dc);
       super.toString(dc.sup());
    }
@@ -221,7 +222,7 @@ public class RepaintCtrlGui extends RepaintCtrl {
    }
 
    public void toString1Line(Dctx dc) {
-      dc.root1Line(this, RepaintCtrlGui.class);
+      dc.root1Line(this, RepaintHelperGui.class);
       toStringPrivate(dc);
       super.toString1Line(dc.sup1Line());
    }

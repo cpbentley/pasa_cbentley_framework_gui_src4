@@ -10,6 +10,7 @@ import pasa.cbentley.framework.datamodel.src4.table.ObjectTableModel;
 import pasa.cbentley.framework.gui.src4.canvas.InputConfig;
 import pasa.cbentley.framework.gui.src4.core.StyleClass;
 import pasa.cbentley.framework.gui.src4.ctx.GuiCtx;
+import pasa.cbentley.framework.gui.src4.exec.ExecutionContextCanvasGui;
 import pasa.cbentley.framework.gui.src4.interfaces.ITechViewDrawable;
 import pasa.cbentley.framework.gui.src4.table.TableView;
 
@@ -106,7 +107,8 @@ public class MLogViewer extends TableView implements IMLog, IMemFreeable {
 
    }
 
-   public void navigateSelect(InputConfig ic) {
+   public void navigateSelect(ExecutionContextCanvasGui ec) {
+      InputConfig ic = ec.getInputConfig();
       if (ic.isPressed()) {
          ic.srActionDoneRepaint(true, false);
       }

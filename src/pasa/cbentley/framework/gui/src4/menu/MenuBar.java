@@ -3,14 +3,15 @@ package pasa.cbentley.framework.gui.src4.menu;
 import pasa.cbentley.byteobjects.src4.core.ByteObject;
 import pasa.cbentley.core.src4.logging.Dctx;
 import pasa.cbentley.framework.cmd.src4.engine.MCmd;
-import pasa.cbentley.framework.coreui.src4.tech.ITechCodes;
-import pasa.cbentley.framework.coreui.src4.tech.IInput;
+import pasa.cbentley.framework.core.ui.src4.tech.IInput;
+import pasa.cbentley.framework.core.ui.src4.tech.ITechCodes;
 import pasa.cbentley.framework.datamodel.src4.table.ObjectTableModel;
 import pasa.cbentley.framework.drawx.src4.engine.GraphicsX;
 import pasa.cbentley.framework.gui.src4.canvas.InputConfig;
 import pasa.cbentley.framework.gui.src4.core.Drawable;
 import pasa.cbentley.framework.gui.src4.core.StyleClass;
 import pasa.cbentley.framework.gui.src4.ctx.GuiCtx;
+import pasa.cbentley.framework.gui.src4.exec.ExecutionContextCanvasGui;
 import pasa.cbentley.framework.gui.src4.interfaces.IDrawable;
 import pasa.cbentley.framework.gui.src4.interfaces.ITechDrawable;
 import pasa.cbentley.framework.gui.src4.string.StringDrawable;
@@ -46,7 +47,7 @@ import pasa.cbentley.framework.gui.src4.tech.ITechStringDrawable;
  * The menu context: The current Drawable gives its CmdContext = Forms have their own and add commands using {@link Displayable#addCommand(Command)}
  * Each form has its menu model.
  * <br>
- * <li>In Prototyping, Menu Model for a Drawable are the actions implemented in {@link Drawable#manageKeyInput(InputConfig)}.
+ * <li>In Prototyping, Menu Model for a Drawable are the actions implemented in {@link Drawable#manageKeyInput(ExecutionContextCanvasGui)}.
  * <br>
  * <li>In the {@link ClassKey} model, commands modify Classed Fields. View/Model refresh based on updated ClassKey.
  * <br>
@@ -241,7 +242,8 @@ public class MenuBar extends Drawable {
       return policy;
    }
 
-   private void icRelease(InputConfig ic) {
+   private void icRelease(ExecutionContextCanvasGui ec) {
+      InputConfig ic = ec.getInputConfig();
       if (ic.getIdKeyBut() == ITechCodes.KEY_MENU_LEFT) {
          mLeft.setStateStyle(ITechDrawable.STYLE_05_SELECTED, false);
          //send a menu repaint
@@ -272,9 +274,10 @@ public class MenuBar extends Drawable {
     * Controller code matching KeyInput to graphical action
     * Uses system command, Show Menu Left, Show Menu Right
     */
-   public void manageKeyInput(InputConfig ic) {
-      if (ic.is.getMode() == IInput.MOD_1_RELEASED) {
-         icRelease(ic);
+   public void manageKeyInput(ExecutionContextCanvasGui ec) {
+      InputConfig ic = ec.getInputConfig();
+      if (ic.getInputStateDrawable().getMode() == IInput.MOD_1_RELEASED) {
+         icRelease(ec);
       } else {
          if (ic.isCancel() && state != STATE_0NONE) {
             state = STATE_0NONE;
@@ -304,7 +307,7 @@ public class MenuBar extends Drawable {
                         leftView.notifyEventShow();
                         state = STATE_1LEFT;
                      } else if (o instanceof MCmd) {
-                        gc.getViewCommandListener().executeMenuCmd((MCmd) o);
+                        gc.getCmdProcessorGui().executeMenuCmd((MCmd) o);
                      }
                      ic.srActionDoneRepaint();
                   }
@@ -345,8 +348,8 @@ public class MenuBar extends Drawable {
     * 2: for the menu action to be fired, the
     * 
     */
-   public void managePointerInput(InputConfig ic) {
-      tv.managePointerInput(ic);
+   public void managePointerInput(ExecutionContextCanvasGui ec) {
+      tv.managePointerInput(ec);
       if (mLeft.hasStateStyle(ITechDrawable.STYLE_05_SELECTED)) {
          //show Left Menu
       }

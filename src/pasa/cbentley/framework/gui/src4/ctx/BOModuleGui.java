@@ -2,6 +2,7 @@ package pasa.cbentley.framework.gui.src4.ctx;
 
 import pasa.cbentley.byteobjects.src4.core.BOModuleAbstract;
 import pasa.cbentley.byteobjects.src4.core.ByteObject;
+import pasa.cbentley.byteobjects.src4.ctx.ToStringStaticBO;
 import pasa.cbentley.core.src4.logging.Dctx;
 import pasa.cbentley.core.src4.logging.IDebugStringable;
 import pasa.cbentley.core.src4.logging.ToStringStaticC;
@@ -201,9 +202,9 @@ public class BOModuleGui extends BOModuleAbstract implements IBOTypesGui, IBOCan
          case DID_15_TABLEVIEW_PSELECT_MODE:
             return ToStringStaticGui.toStringPSelectMode(value);
          case DID_45_ANIM_MOVE_TYPE:
-            return ToStringStaticGui.toStringMoveType(value);
+            return ToStringStaticBO.toStringMoveType(value);
          case DID_46_ANIM_INCREMENT_TYPE:
-            return ToStringStaticGui.toStringMoveIncrementType(value);
+            return ToStringStaticBO.toStringMoveIncrementType(value);
          default:
             break;
       }

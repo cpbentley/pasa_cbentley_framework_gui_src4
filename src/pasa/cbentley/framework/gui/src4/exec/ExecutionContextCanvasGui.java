@@ -1,15 +1,20 @@
-package pasa.cbentley.framework.gui.src4.canvas;
+package pasa.cbentley.framework.gui.src4.exec;
 
 import pasa.cbentley.core.src4.structs.IntToObjects;
-import pasa.cbentley.framework.coreui.src4.exec.ExecEntry;
-import pasa.cbentley.framework.coreui.src4.exec.ExecutionContext;
-import pasa.cbentley.framework.gui.src4.cmd.CmdInstanceDrawable;
+import pasa.cbentley.framework.core.ui.src4.exec.ExecEntry;
+import pasa.cbentley.framework.core.ui.src4.exec.ExecutionContext;
+import pasa.cbentley.framework.gui.src4.canvas.InputConfig;
+import pasa.cbentley.framework.gui.src4.cmd.CmdInstanceGui;
+import pasa.cbentley.framework.gui.src4.core.Drawable;
 import pasa.cbentley.framework.gui.src4.ctx.GuiCtx;
 import pasa.cbentley.framework.gui.src4.interfaces.IDrawable;
 import pasa.cbentley.framework.gui.src4.interfaces.ITechExecutionContextGui;
+import pasa.cbentley.framework.gui.src4.string.StringListInput;
+import pasa.cbentley.framework.input.src4.engine.ExecutionContextCanvas;
 
 /**
  * Execution context of a GUI event in the Drawable Bentley framework.
+ * 
  * It collects {@link IDrawable} and pages page IDs.
  * A Page is like a Screen in Android or a form in J2ME. It replaces everything that 
  * was drawn previously.
@@ -22,30 +27,30 @@ import pasa.cbentley.framework.gui.src4.interfaces.ITechExecutionContextGui;
  * @author Charles Bentley
  *
  */
-public class ExecutionContextGui extends ExecutionContext implements ITechExecutionContextGui {
+public class ExecutionContextCanvasGui extends ExecutionContextCanvas implements ITechExecutionContextGui {
 
-   public int                 addressX;
+   public int              addressX;
 
    /**
     * Pointed Drawable Y address.
     */
-   public int                 addressY;
+   public int              addressY;
 
    /**
     * Set when a command is found
     */
-   public CmdInstanceDrawable cd;
+   public CmdInstanceGui   cd;
 
-   public volatile boolean    finished;
+   public volatile boolean finished;
 
-   protected final GuiCtx     gc;
+   protected final GuiCtx  gc;
 
-   private InputConfig        icc;
+   private InputConfig     icc;
 
-   private IntToObjects       renders;
+   private IntToObjects    renders;
 
-   public ExecutionContextGui(GuiCtx gc) {
-      super(gc.getCUC());
+   public ExecutionContextCanvasGui(GuiCtx gc) {
+      super(gc.getIC());
       this.gc = gc;
       renders = new IntToObjects(gc.getUC());
    }
@@ -127,7 +132,7 @@ public class ExecutionContextGui extends ExecutionContext implements ITechExecut
    private void execTypePage(ExecEntry ee) {
       int newPageID = ee.action;
       boolean addToHistory = true;
-      ExecutionContextGui ex = this;
+      ExecutionContextCanvasGui ex = this;
       gc.getTopLvl().showPage(ex, newPageID, addToHistory);
    }
 
@@ -136,8 +141,40 @@ public class ExecutionContextGui extends ExecutionContext implements ITechExecut
       d.run();
    }
 
+   public OutputStateCanvasGui getCanvasResultDrawable() {
+      return (OutputStateCanvasGui) os;
+   }
+
+   public CmdInstanceGui createCmd(int cmdid) {
+      CmdInstanceGui cd = new CmdInstanceGui(gc, cmdid);
+      cd.setFeedback(os);
+      return cd;
+   }
+
+   public CmdInstanceGui getCmdInstanceGui() {
+      return ci;
+   }
+
+   public CmdInstanceGui getCmdInstance() {
+      return ci;
+   }
+
+   public void checkCmdInstanceNotNull() {
+      if (ci == null) {
+         throw new NullPointerException();
+      }
+   }
+
    public InputConfig getInputConfig() {
       return icc;
+   }
+
+   public InputStateCanvasGui getInputStateDrawable() {
+      return (InputStateCanvasGui) is;
+   }
+
+   public OutputStateCanvasGui getOutputStateCanvasGui() {
+      return (OutputStateCanvasGui) os;
    }
 
    public void renderStart() {
@@ -158,7 +195,24 @@ public class ExecutionContextGui extends ExecutionContext implements ITechExecut
       }
    }
 
+   private CmdInstanceGui ci;
+
+   public void cmdActionOnDrawable(IDrawable d) {
+      if (ci != null) {
+         ci.actionDone();
+      }
+      getCanvasResultDrawable().setActionDoneRepaint(d);
+   }
+
    public void setInputConfig(InputConfig icc) {
       this.icc = icc;
+   }
+
+   public void srActionDoneRepaint() {
+      icc.srActionDoneRepaint();
+   }
+
+   public void srActionDoneRepaint(IDrawable d) {
+      icc.srActionDoneRepaint(d);
    }
 }

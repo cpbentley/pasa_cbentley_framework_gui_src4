@@ -271,7 +271,7 @@ public class SymbolTable extends TableView {
     * @param g
     */
    public void initDataDraw(GraphicsX g) {
-      f = gc.getDC().getCoreDrawCtx().getFontFactory().getFont(IMFont.FACE_MONOSPACE, IMFont.STYLE_BOLD, IMFont.SIZE_3_MEDIUM);
+      f = gc.getDC().getCoreDrawCtx().getFontFactory().getFont(IMFont.FACE_01_MONOSPACE, IMFont.STYLE_1_BOLD, IMFont.SIZE_3_MEDIUM);
       //MStyle.getStyleFont(style);
       isMonoSpaced = true;
       charWidth = f.charWidth('m');

@@ -332,14 +332,14 @@ public class CommanderGui extends CommanderAbstract implements ICmdsGui, ITechIn
          if (hasMultiWindows && cd.param == ITechCmdViewLog.PARAM_1_OUTSIDE) {
             //check if params already have data for this canvas
             ByteObject bo = gc.getCUC().createBOCanvasHostDefault();
-            bo.setFlag(IBOCanvasHost.TCANVAS_OFFSET_01_FLAG, IBOCanvasHost.TCANVAS_FLAG_2_WINDOW, true);
+            bo.setFlag(IBOCanvasHost.CANVAS_HOST_OFFSET_01_FLAG, IBOCanvasHost.CANVAS_HOST_FLAG_2_WINDOW, true);
             //sets the IDs
-            bo.set2(IBOCanvasHost.TCANVAS_OFFSET_03_ID2, ITechCtxSettingsAppGui.CANVAS_ID_LOGVIEWER);
+            bo.set2(IBOCanvasHost.CANVAS_HOST_OFFSET_03_ID2, ITechCtxSettingsAppGui.CANVAS_ID_LOGVIEWER);
 
             //creation of a canvas goes through the 
             CanvasAppliInputGui canvas = new CanvasAppliInputGui(gc, bo);
 
-            canvas.getCanvasHost().setDefaultStartPosition();
+            canvas.getCanvasHost().setStartPositionAndSize();
             canvas.showNotify();
             canvas.getCanvasHost().canvasShow();
 

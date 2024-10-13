@@ -13,42 +13,46 @@ public class ScenarioNode extends ScenarioItemAbstract {
     */
    private IDrawable drawable;
 
-   /**
-    * The owner of this node. Never null
-    */
-   private Scenario scenarioParent;
+   private int       nodeID;
 
    /**
     * The scenario that starts from this node.
     * null if this node is just a single drawable witout its own scenario
     */
-   private Scenario scenario;
-   
-   private int nodeID;
+   private Scenario  scenario;
+
+   /**
+    * The owner of this node. Never null
+    */
+   private Scenario  scenarioParent;
 
    public ScenarioNode(GuiCtx gc) {
       super(gc);
    }
 
    public void addLink(ScenarioNodeLink link) {
-      
+
    }
+
+   public IDrawable getNodeDrawable() {
+      return drawable;
+   }
+
    public int getStatorableClassID() {
       throw new RuntimeException("Must be implemented by subclass");
    }
 
-   public void stateWriteTo(StatorWriter state) {
-      // TODO Auto-generated method stub
-      
-   }
-
    public void stateReadFrom(StatorReader state) {
       // TODO Auto-generated method stub
-      
+
    }
 
-   
-   public IDrawable getNodeDrawable() {
-      return drawable;
+   public void stateWriteTo(StatorWriter state) {
+      // TODO Auto-generated method stub
+
+   }
+
+   public void stateWriteToParamSub(StatorWriter state) {
+      // TODO Auto-generated method stub
    }
 }

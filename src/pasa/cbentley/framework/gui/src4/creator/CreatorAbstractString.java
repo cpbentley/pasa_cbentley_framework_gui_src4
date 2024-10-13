@@ -36,8 +36,8 @@ public abstract class CreatorAbstractString extends CreatorAbstract {
    }
 
    public ByteObject getBOStringFigureScrollReader() {
-      int face = ITechFont.FACE_PROPORTIONAL;
-      int style = ITechFont.STYLE_PLAIN;
+      int face = ITechFont.FACE_02_PROPORTIONAL;
+      int style = ITechFont.STYLE_0_PLAIN;
       int size = ITechFont.SIZE_3_MEDIUM;
       int color = getRepo().getContent1();
 
@@ -53,8 +53,8 @@ public abstract class CreatorAbstractString extends CreatorAbstract {
    }
 
    public ByteObject getBOStringFigurePreset() {
-      int face = ITechFont.FACE_PROPORTIONAL;
-      int style = ITechFont.STYLE_PLAIN;
+      int face = ITechFont.FACE_02_PROPORTIONAL;
+      int style = ITechFont.STYLE_0_PLAIN;
       int size = ITechFont.SIZE_3_MEDIUM;
       int color = getRepo().getContent1();
 
@@ -71,8 +71,8 @@ public abstract class CreatorAbstractString extends CreatorAbstract {
 
    public ByteObject getBOStringFigure() {
 
-      int face = ITechFont.FACE_MONOSPACE;
-      int style = ITechFont.STYLE_PLAIN;
+      int face = ITechFont.FACE_01_MONOSPACE;
+      int style = ITechFont.STYLE_0_PLAIN;
       int size = ITechFont.SIZE_3_MEDIUM;
       int color = getRepo().getContent1();
 

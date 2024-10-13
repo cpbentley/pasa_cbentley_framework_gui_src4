@@ -151,7 +151,7 @@ public class RepaintHelperGui extends RepaintHelper {
    }
 
    /**
-    * Called from a thread not know what it is and requesting a repaint of the drawable.
+    * Called from a thread that does not know what it is and requesting a repaint of the drawable.
     * <br>
     * If current thread is the event thread (passive mode), updates
     * ScreenResult.

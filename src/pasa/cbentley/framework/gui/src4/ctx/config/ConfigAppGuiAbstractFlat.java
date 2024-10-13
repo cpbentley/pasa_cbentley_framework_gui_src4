@@ -5,6 +5,7 @@ import pasa.cbentley.core.src4.ctx.UCtx;
 import pasa.cbentley.core.src4.interfaces.C;
 import pasa.cbentley.framework.core.framework.src4.app.ConfigAppAbstract;
 import pasa.cbentley.framework.core.ui.src4.tech.ITechInputConstants;
+import pasa.cbentley.framework.coredraw.src4.interfaces.ITechFont;
 import pasa.cbentley.framework.drawx.src4.tech.ITechGraphicsX;
 import pasa.cbentley.framework.gui.src4.interfaces.ITechCanvasDrawable;
 
@@ -22,7 +23,14 @@ public abstract class ConfigAppGuiAbstractFlat extends ConfigAppAbstract impleme
       super.cloneMeSet(config);
    }
 
+   public int getDefaultFontSize() {
+      return ITechFont.SIZE_3_MEDIUM;
+   }
 
+   public boolean isUsingFontCache() {
+      return true;
+   }
+   
    public boolean isOneThumb() {
       return false;
    }

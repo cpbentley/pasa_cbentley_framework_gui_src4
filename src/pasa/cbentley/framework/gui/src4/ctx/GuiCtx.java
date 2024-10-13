@@ -380,7 +380,7 @@ public class GuiCtx extends ABOCtx implements ITechCtxSettingsAppGui {
    }
 
    public CoreFrameworkCtx getCFC() {
-      return ic.getCFC();
+      return cfc;
    }
 
    public IHostFeature getHostFeature() {
@@ -759,7 +759,7 @@ public class GuiCtx extends ABOCtx implements ITechCtxSettingsAppGui {
          drawable.setViewContext(canvas.getVCAppli());
 
          //show it on a screen area not already covered by a Canvas?
-         canvas.getCanvasHost().setDefaultStartPosition();
+         canvas.getCanvasHost().setStartPositionAndSize();
          canvas.getCanvasHost().canvasShow();
       }
 

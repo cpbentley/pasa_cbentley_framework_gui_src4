@@ -60,7 +60,7 @@ public class DefaultStyles extends BOAbstractFactory implements IBOStyle, ITechF
    public StyleClass getDefaultStyleClass() {
 
       ByteObject figBg = figureFactory.getFigRectOpaque(IColors.FULLY_OPAQUE_WHITE);
-      ByteObject text = figureFactory.getFigString(IMFont.FACE_SYSTEM, IMFont.STYLE_PLAIN, IMFont.SIZE_3_MEDIUM, IColors.FULLY_OPAQUE_BLACK);
+      ByteObject text = figureFactory.getFigString(IMFont.FACE_00_SYSTEM, IMFont.STYLE_0_PLAIN, IMFont.SIZE_3_MEDIUM, IColors.FULLY_OPAQUE_BLACK);
       ByteObject anchor = boxFac.getBoxCenterCenterT_WH();
       ByteObject style = styleFactory.getStyle(figBg, text, anchor);
       StyleClass defStyle = new StyleClass(gc, style);
@@ -83,7 +83,7 @@ public class DefaultStyles extends BOAbstractFactory implements IBOStyle, ITechF
       int scolor = ColorUtils.getRGBInt(255, 0, 200);
       boolean horiz = true;
 
-      ByteObject text = figureFactory.getFigString(IMFont.FACE_SYSTEM, IMFont.STYLE_PLAIN, IMFont.SIZE_3_MEDIUM, 0);
+      ByteObject text = figureFactory.getFigString(IMFont.FACE_00_SYSTEM, IMFont.STYLE_0_PLAIN, IMFont.SIZE_3_MEDIUM, 0);
       ByteObject anchor = anchorFac.getCenterCenter();
       //simple 2 border
       ByteObject border = tblrFactory.getTBLRCoded(2);
@@ -102,7 +102,7 @@ public class DefaultStyles extends BOAbstractFactory implements IBOStyle, ITechF
       int scolor = ColorUtils.getRGBInt(255, 0, 200);
       boolean horiz = true;
 
-      ByteObject text = figureFactory.getFigString(IMFont.FACE_SYSTEM, IMFont.STYLE_PLAIN, IMFont.SIZE_3_MEDIUM, 0);
+      ByteObject text = figureFactory.getFigString(IMFont.FACE_00_SYSTEM, IMFont.STYLE_0_PLAIN, IMFont.SIZE_3_MEDIUM, 0);
       ByteObject anchor = anchorFac.getCenterCenter();
       //simple 2 border
       ByteObject border = tblrFactory.getTBLRCoded(2);
@@ -124,7 +124,7 @@ public class DefaultStyles extends BOAbstractFactory implements IBOStyle, ITechF
 
       boolean horiz = true;
 
-      ByteObject text = figureFactory.getFigString(IMFont.FACE_SYSTEM, IMFont.STYLE_PLAIN, IMFont.SIZE_3_MEDIUM, 0);
+      ByteObject text = figureFactory.getFigString(IMFont.FACE_00_SYSTEM, IMFont.STYLE_0_PLAIN, IMFont.SIZE_3_MEDIUM, 0);
       ByteObject anchor = anchorFac.getCenterCenter();
       //simple 2 border
       //simple background gradient
@@ -209,7 +209,7 @@ public class DefaultStyles extends BOAbstractFactory implements IBOStyle, ITechF
     */
    public ByteObject getStyleSelectedBlackBg() {
       //null for letting it know to use parent definition when merging
-      ByteObject txt = figureFactory.getFigString(IMFont.FACE_MONOSPACE, IMFont.STYLE_BOLD, IMFont.SIZE_2_SMALL, ColorUtils.getRGBInt(200, 200, 255));
+      ByteObject txt = figureFactory.getFigString(IMFont.FACE_01_MONOSPACE, IMFont.STYLE_1_BOLD, IMFont.SIZE_2_SMALL, ColorUtils.getRGBInt(200, 200, 255));
       ByteObject bg = figureFactory.getFigRectOpaque(ColorUtils.FULLY_OPAQUE_BLACK);
       ByteObject style = styleFactory.getStyle(bg, txt, null);
       return style;

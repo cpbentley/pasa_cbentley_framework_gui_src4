@@ -10,6 +10,7 @@ import pasa.cbentley.framework.core.framework.src4.app.AppCtx;
 import pasa.cbentley.framework.core.framework.src4.app.AppliAbstract;
 import pasa.cbentley.framework.core.ui.src4.interfaces.ICanvasAppli;
 import pasa.cbentley.framework.core.ui.src4.tech.IBOCanvasHost;
+import pasa.cbentley.framework.core.ui.src4.tech.ITechWrapper;
 import pasa.cbentley.framework.core.ui.src4.utils.ViewState;
 import pasa.cbentley.framework.gui.src4.canvas.CanvasAppliInputGui;
 import pasa.cbentley.framework.gui.src4.canvas.ICanvasDrawable;
@@ -126,11 +127,11 @@ public abstract class AppliGui extends AppliAbstract {
       if (root0 == null) {
          //do we create it here? we load it from save state. the AppManager will look up the Canvas ID in the current screen config
          ByteObject techCanvasHost = gc.getCUC().createBOCanvasHostDefault();
-         techCanvasHost.set2(IBOCanvasHost.TCANVAS_OFFSET_03_ID2, IBOCanvasHost.TCANVAS_ID_1_ROOT);
+         techCanvasHost.set2(IBOCanvasHost.CANVAS_HOST_OFFSET_03_ID2, ITechWrapper.TCANVAS_ID_1_ROOT);
          //title and icon are taken from the LaunchValues no.
          //they are localized
-         techCanvasHost.set2(IBOCanvasHost.TCANVAS_OFFSET_07_ICON_ID2, 0);
-         techCanvasHost.set2(IBOCanvasHost.TCANVAS_OFFSET_08_TITLE_ID_ID2, 0);
+         techCanvasHost.set2(IBOCanvasHost.CANVAS_HOST_OFFSET_07_ICON_ID2, 0);
+         techCanvasHost.set2(IBOCanvasHost.CANVAS_HOST_OFFSET_08_TITLE_ID_ID2, 0);
          //TODO problem when root. root MUST always be shown on start up ?
          root0 = (CanvasAppliInputGui) createCanvas(1, techCanvasHost, null);
       }
@@ -248,6 +249,10 @@ public abstract class AppliGui extends AppliAbstract {
 
    }
 
+   protected void subAppResumed() {
+      
+   }
+
    protected void subAppLoadPostCtxSettings() {
       //theme needs device to compute device specific
       //what is theme needs size of canvas?. theme is invaliadated and reloaded 
@@ -284,10 +289,6 @@ public abstract class AppliGui extends AppliAbstract {
 
       //TODO check if started from scratch or with saved state.
 
-      ICanvasDrawable canvasRoot = gc.getCanvasRoot();
-      InputStateCanvasGui isd = (InputStateCanvasGui) canvasRoot.getEventController().getInputState();
-      OutputStateCanvasGui srd = canvasRoot.getRepaintCtrlDraw().getSD();
-      InputConfig ic = new InputConfig(gc, canvasRoot, isd, srd);
       IDrawable draw = null;
       try {
          draw = getFirstDrawable();
@@ -314,17 +315,19 @@ public abstract class AppliGui extends AppliAbstract {
       }
       firstDrawableCreated = draw;
 
+      ICanvasDrawable canvasRoot = gc.getCanvasRoot();
+
       //#debug
       toDLog().pInit("CanvasView after FirstDrawable is created", canvasRoot, AppliGui.class, "subAppStarted@289", LVL_05_FINE, false);
 
       //set GUI State from saved view state. send CMD App Start
-      
+
       //we are still in the gui thread here
       //generate a cmd event and put it on the queue for this canvas.
-      
-      
+
       CmdProcessorGui viewCommandListener = gc.getCmdProcessorGui();
-      viewCommandListener.processCmd(ICmdsGui.VCMD_00_LAST_LOGIN);
+      ExecutionContextCanvasGui ec = canvasRoot.createExecutionContextCmdGui();
+      viewCommandListener.processCmd(ICmdsGui.VCMD_00_LAST_LOGIN, ec);
 
    }
 

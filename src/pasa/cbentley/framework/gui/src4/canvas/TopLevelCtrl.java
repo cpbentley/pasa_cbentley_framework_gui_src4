@@ -24,6 +24,9 @@ import pasa.cbentley.framework.gui.src4.interfaces.IPageCreator;
 
 /**
  * Page Manager. Backstack manager
+ * 
+ * A Page is like a Screen in Android or a form in J2ME. 
+ * 
  * User action generates or removes pages.
  * <br>
  * Uses of back/forward

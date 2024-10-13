@@ -3,7 +3,10 @@ package pasa.cbentley.framework.gui.src4.exec;
 import pasa.cbentley.core.src4.structs.IntToObjects;
 import pasa.cbentley.framework.core.ui.src4.exec.ExecEntry;
 import pasa.cbentley.framework.core.ui.src4.exec.ExecutionContext;
+import pasa.cbentley.framework.gui.src4.canvas.CanvasAppliInputDrawable;
+import pasa.cbentley.framework.gui.src4.canvas.CanvasAppliInputGui;
 import pasa.cbentley.framework.gui.src4.canvas.InputConfig;
+import pasa.cbentley.framework.gui.src4.canvas.TopLevelCtrl;
 import pasa.cbentley.framework.gui.src4.cmd.CmdInstanceGui;
 import pasa.cbentley.framework.gui.src4.core.Drawable;
 import pasa.cbentley.framework.gui.src4.ctx.GuiCtx;
@@ -13,17 +16,18 @@ import pasa.cbentley.framework.gui.src4.string.StringListInput;
 import pasa.cbentley.framework.input.src4.engine.ExecutionContextCanvas;
 
 /**
- * Execution context of a GUI event in the Drawable Bentley framework.
+ * {@link ExecutionContext} inside an {@link CanvasAppliInputGui}.
  * 
- * It collects {@link IDrawable} and pages page IDs.
- * A Page is like a Screen in Android or a form in J2ME. It replaces everything that 
- * was drawn previously.
+ * <p>
+ * <li> It collects {@link IDrawable} and pages page IDs from {@link TopLevelCtrl}
+ * </p>
  * 
- * Events {@link IEventsKernel} that modify UI state, add modifications on this context.
+ * It is created by  {@link CanvasAppliInputGui#createExecutionContextCanvasGui()}
  * 
+ * @see ExecutionContextCanvas
+ * @see ExecutionContext
  * 
- * As described by {@link ExecutionContext}.
- * 
+ * @see CanvasAppliInputDrawable
  * @author Charles Bentley
  *
  */

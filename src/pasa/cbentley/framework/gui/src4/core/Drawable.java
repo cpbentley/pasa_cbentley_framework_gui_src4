@@ -1996,15 +1996,15 @@ public class Drawable extends ObjectGC implements IDrawable, IBOStyle, IStringab
    public boolean hasState(int flag) {
       return (states & flag) == flag;
    }
-   
+
    public boolean hasFlagStateStyled() {
       return hasState(STATE_06_STYLED);
    }
-   
+
    public boolean hasFlagStateLayouted() {
       return hasState(STATE_05_LAYOUTED);
    }
-   
+
    public boolean hasStateNav(int flag) {
       return (statesNav & flag) == flag;
    }
@@ -3601,6 +3601,9 @@ public class Drawable extends ObjectGC implements IDrawable, IBOStyle, IStringab
    public void stateWriteTo(StatorWriter state) {
    }
 
+   public void stateWriteToParamSub(StatorWriter state) {
+   }
+
    public void stringUpdate() {
       //nothing to update here
    }
@@ -3685,7 +3688,7 @@ public class Drawable extends ObjectGC implements IDrawable, IBOStyle, IStringab
 
       style = styleClass.getStyle(styleStates, ctype, styleStruct);
       styleCache.setNewStyle(style);
-      
+
       //check for global animations
       ByteObject currentStyle = getStyle();
       //remove animation in the array
@@ -3698,8 +3701,8 @@ public class Drawable extends ObjectGC implements IDrawable, IBOStyle, IStringab
 
       //state style previously made are set.
       setStateFlag(STATE_06_STYLED, true);
-      
-      if(style.hasFlag(IBOStyle.STYLE_OFFSET_5_FLAG_X, IBOStyle.STYLE_FLAG_X_3_MERGED_STRUCT)) {
+
+      if (style.hasFlag(IBOStyle.STYLE_OFFSET_5_FLAG_X, IBOStyle.STYLE_FLAG_X_3_MERGED_STRUCT)) {
          this.invalidateLayout();
       }
    }

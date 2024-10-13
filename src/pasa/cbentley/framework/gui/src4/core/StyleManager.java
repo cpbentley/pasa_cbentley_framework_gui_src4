@@ -57,7 +57,7 @@ public class StyleManager extends ObjectGC implements IBOStyle {
     * <br>
     * <br>
     * Every font has a fontID to identify it. When Font cannot be found,
-    * it falls back on font {@link IMFont#FACE_SYSTEM}
+    * it falls back on font {@link IMFont#FACE_00_SYSTEM}
     * <br>
     * <br>
     * 

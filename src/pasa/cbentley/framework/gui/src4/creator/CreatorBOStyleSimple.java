@@ -34,7 +34,7 @@ public class CreatorBOStyleSimple extends CreatorAbstractBOStyle {
 
       ByteObject bg2Border = figureFac.getFigBorder(borderTBLR, colorBorder1);
       ByteObject anchor = anchorFac.getCenterCenter();
-      ByteObject content = figureFac.getFigString(FACE_MONOSPACE, STYLE_PLAIN, SIZE_4_LARGE, colorFont);
+      ByteObject content = figureFac.getFigString(FACE_01_MONOSPACE, STYLE_0_PLAIN, SIZE_4_LARGE, colorFont);
       ByteObject style = styleFac.getStyle(new ByteObject[] { bg1Rect, bg2Border }, content, anchor, paddinTBLR, borderTBLR, marginTBLR);
       style.toStringSetName("Style111");
       return style;
@@ -44,7 +44,7 @@ public class CreatorBOStyleSimple extends CreatorAbstractBOStyle {
 
       boolean horiz = true;
 
-      ByteObject text = figureFactory.getFigString(FACE_SYSTEM, STYLE_PLAIN, ITechFont.SIZE_3_MEDIUM, 0);
+      ByteObject text = figureFactory.getFigString(FACE_00_SYSTEM, STYLE_0_PLAIN, ITechFont.SIZE_3_MEDIUM, 0);
       ByteObject anchor = anchorFac.getCenterCenter();
       ColorRepo colorRepo = getRepo();
       int pcolor = colorRepo.getBg1();
@@ -83,7 +83,7 @@ public class CreatorBOStyleSimple extends CreatorAbstractBOStyle {
 
       ByteObject bg2Border = figureFac.getFigBorder(sizerBorder, colorBorder1);
       ByteObject anchor = anchorFac.getCenterCenter();
-      ByteObject content = figureFac.getFigString(FACE_MONOSPACE, STYLE_PLAIN, SIZE_4_LARGE, colorFont);
+      ByteObject content = figureFac.getFigString(FACE_01_MONOSPACE, STYLE_0_PLAIN, SIZE_4_LARGE, colorFont);
       ByteObject style = styleFac.getStyle(new ByteObject[] { bg1Rect, bg2Border }, content, anchor, paddinTBLR, borderTBLR, marginTBLR);
       style.toStringSetName("StyleBorderPad");
       return style;
@@ -111,7 +111,7 @@ public class CreatorBOStyleSimple extends CreatorAbstractBOStyle {
 
       ByteObject bg2Border = figureFac.getFigBorder(sizerBorder, colorBorder1);
       ByteObject anchor = anchorFac.getCenterCenter();
-      ByteObject content = figureFac.getFigString(FACE_MONOSPACE, STYLE_PLAIN, SIZE_4_LARGE, colorFont);
+      ByteObject content = figureFac.getFigString(FACE_01_MONOSPACE, STYLE_0_PLAIN, SIZE_4_LARGE, colorFont);
       ByteObject style = styleFac.getStyle(new ByteObject[] { bg1Rect, bg2Border }, content, anchor, paddinTBLR, borderTBLR, marginTBLR);
       style.toStringSetName("StyleBorderSmallOnly");
       return style;
@@ -137,7 +137,7 @@ public class CreatorBOStyleSimple extends CreatorAbstractBOStyle {
 
       ByteObject bg2Border = figureFac.getFigBorder(sizerBorder, colorBorder1);
       ByteObject anchor = anchorFac.getCenterCenter();
-      ByteObject content = figureFac.getFigString(FACE_MONOSPACE, STYLE_PLAIN, SIZE_4_LARGE, colorFont);
+      ByteObject content = figureFac.getFigString(FACE_01_MONOSPACE, STYLE_0_PLAIN, SIZE_4_LARGE, colorFont);
       ByteObject style = styleFac.getStyle(new ByteObject[] { bg1Rect, bg2Border }, content, anchor, paddinTBLR, borderTBLR, marginTBLR);
       style.toStringSetName("StyleDrawableBig");
       return style;
@@ -164,7 +164,7 @@ public class CreatorBOStyleSimple extends CreatorAbstractBOStyle {
       ByteObject bg1Rect = figureFac.getFigRect(cs.getBg1(), bgGradient);
 
       ByteObject anchor = anchorFac.getCenterCenter();
-      ByteObject content = figureFac.getFigString(FACE_MONOSPACE, STYLE_PLAIN, SIZE_4_LARGE, colorFont);
+      ByteObject content = figureFac.getFigString(FACE_01_MONOSPACE, STYLE_0_PLAIN, SIZE_4_LARGE, colorFont);
       ByteObject style = styleFac.getStyle(new ByteObject[] { bg1Rect, bg2Border }, content, anchor, paddinTBLR, borderTBLR, marginTBLR);
       style.toStringSetName("StyleDrawableOnlyBorder");
       return style;
@@ -185,7 +185,7 @@ public class CreatorBOStyleSimple extends CreatorAbstractBOStyle {
 
       ByteObject bg2Border = figureFac.getFigBorder(borderTBLR, colorBorder1);
       ByteObject anchor = anchorFac.getCenterCenter();
-      ByteObject content = figureFac.getFigString(FACE_MONOSPACE, STYLE_PLAIN, SIZE_4_LARGE, colorFont);
+      ByteObject content = figureFac.getFigString(FACE_01_MONOSPACE, STYLE_0_PLAIN, SIZE_4_LARGE, colorFont);
       ByteObject style = styleFac.getStyle(new ByteObject[] { bg1Rect, bg2Border }, content, anchor, paddinTBLR, borderTBLR, marginTBLR);
       style.toStringSetName("StyleFigure");
       return style;
@@ -211,7 +211,7 @@ public class CreatorBOStyleSimple extends CreatorAbstractBOStyle {
 
       ByteObject bg2Border = figureFac.getFigBorder(sizerBorder, colorBorder1);
       ByteObject anchor = anchorFac.getCenterCenter();
-      ByteObject content = figureFac.getFigString(FACE_MONOSPACE, STYLE_PLAIN, SIZE_4_LARGE, colorFont);
+      ByteObject content = figureFac.getFigString(FACE_01_MONOSPACE, STYLE_0_PLAIN, SIZE_4_LARGE, colorFont);
       ByteObject style = styleFac.getStyle(new ByteObject[] { bg1Rect, bg2Border }, content, anchor, paddinTBLR, borderTBLR, marginTBLR);
       style.toStringSetName("StyleGradient");
       return style;
@@ -274,7 +274,7 @@ public class CreatorBOStyleSimple extends CreatorAbstractBOStyle {
       ByteObject bg3Border = figureFac.getFigBorder(borderTBLR, 10, 10, colorBorder1, bgGradient);
 
       ByteObject anchor = anchorFac.getCenterCenter();
-      ByteObject content = figureFac.getFigString(FACE_MONOSPACE, STYLE_PLAIN, SIZE_4_LARGE, colorFont);
+      ByteObject content = figureFac.getFigString(FACE_01_MONOSPACE, STYLE_0_PLAIN, SIZE_4_LARGE, colorFont);
       ByteObject style = styleFac.getStyle(new ByteObject[] { bg1Rect, bg2Border, bg3Border }, content, anchor, paddinTBLR, borderTBLR, marginTBLR);
       style.toStringSetName("StyleHole");
       return style;
@@ -301,7 +301,7 @@ public class CreatorBOStyleSimple extends CreatorAbstractBOStyle {
       ByteObject bg2Border = figureFac.getFigBorder(sizerBorder, colorBorder1);
       bg2Border.toStringSetName("border2StyleRoot");
       ByteObject anchor = anchorFac.getCenterCenter();
-      ByteObject content = figureFac.getFigString(FACE_MONOSPACE, STYLE_PLAIN, SIZE_4_LARGE, colorFont);
+      ByteObject content = figureFac.getFigString(FACE_01_MONOSPACE, STYLE_0_PLAIN, SIZE_4_LARGE, colorFont);
       ByteObject style = styleFac.getStyle(new ByteObject[] { bg1Rect, bg2Border }, content, anchor, paddinTBLR, borderTBLR, marginTBLR);
       return style;
    }
@@ -337,7 +337,7 @@ public class CreatorBOStyleSimple extends CreatorAbstractBOStyle {
 
       ByteObject bg2Border = figureFac.getFigBorder(sizerBorder, colorBorder1);
       ByteObject anchor = anchorFac.getCenterCenter();
-      ByteObject content = figureFac.getFigString(FACE_MONOSPACE, STYLE_PLAIN, SIZE_4_LARGE, colorFont);
+      ByteObject content = figureFac.getFigString(FACE_01_MONOSPACE, STYLE_0_PLAIN, SIZE_4_LARGE, colorFont);
       ByteObject style = styleFac.getStyle(new ByteObject[] { bg1Rect, bg2Border }, content, anchor, paddinTBLR, borderTBLR, marginTBLR);
       return style;
    }
@@ -364,7 +364,7 @@ public class CreatorBOStyleSimple extends CreatorAbstractBOStyle {
 
       ByteObject bg2Border = figureFac.getFigBorder(sizerBorder, colorBorder1);
       ByteObject anchor = anchorFac.getCenterCenter();
-      ByteObject content = figureFac.getFigString(FACE_MONOSPACE, STYLE_PLAIN, SIZE_4_LARGE, colorFont);
+      ByteObject content = figureFac.getFigString(FACE_01_MONOSPACE, STYLE_0_PLAIN, SIZE_4_LARGE, colorFont);
       ByteObject style = styleFac.getStyle(new ByteObject[] { bg1Rect, bg2Border }, content, anchor, paddinTBLR, borderTBLR, marginTBLR);
       return style;
    }
@@ -393,7 +393,7 @@ public class CreatorBOStyleSimple extends CreatorAbstractBOStyle {
       int pcolor = colorRepo.getBg2();
       int ccolor = colorRepo.getContent2();
 
-      ByteObject content = figureFactory.getFigStringT_StyleColor(ccolor, STYLE_BOLD);
+      ByteObject content = figureFactory.getFigStringT_StyleColor(ccolor, STYLE_1_BOLD);
 
       ByteObject anchor = null;
       ByteObject margin = null;
@@ -449,7 +449,7 @@ public class CreatorBOStyleSimple extends CreatorAbstractBOStyle {
       int pcolor = colorRepo.getBg1();
       int ccolor = colorRepo.getContent1();
 
-      ByteObject content = figureFactory.getFigString(FACE_PROPORTIONAL, STYLE_PLAIN, ITechFont.SIZE_3_MEDIUM, ccolor);
+      ByteObject content = figureFactory.getFigString(FACE_02_PROPORTIONAL, STYLE_0_PLAIN, ITechFont.SIZE_3_MEDIUM, ccolor);
       ByteObject anchor = anchorFac.getLeftTop();
 
       ByteObject margin = null;
@@ -484,7 +484,7 @@ public class CreatorBOStyleSimple extends CreatorAbstractBOStyle {
       int br2 = colorRepo.getBorder2();
       int br3 = colorRepo.getBorder3();
 
-      ByteObject content = figureFactory.getFigString(FACE_PROPORTIONAL, STYLE_PLAIN, ITechFont.SIZE_3_MEDIUM, ccolor);
+      ByteObject content = figureFactory.getFigString(FACE_02_PROPORTIONAL, STYLE_0_PLAIN, ITechFont.SIZE_3_MEDIUM, ccolor);
       ByteObject anchor = anchorFac.getLeftTop();
 
       ByteObject margin = tblrFactory.getTBLRPixel(5);
@@ -522,7 +522,7 @@ public class CreatorBOStyleSimple extends CreatorAbstractBOStyle {
 
       int ccolor = colorRepo.getContent1();
 
-      ByteObject text = figureFactory.getFigString(FACE_MONOSPACE, STYLE_BOLD, SIZE_4_LARGE, ccolor);
+      ByteObject text = figureFactory.getFigString(FACE_01_MONOSPACE, STYLE_1_BOLD, SIZE_4_LARGE, ccolor);
       ByteObject anchor = anchorFac.getCenterCenter();
 
       ByteObject margin = null;
@@ -548,7 +548,7 @@ public class CreatorBOStyleSimple extends CreatorAbstractBOStyle {
 
       int ccolor = colorRepo.getContent1();
 
-      ByteObject text = figureFactory.getFigString(FACE_MONOSPACE, STYLE_BOLD, SIZE_4_LARGE, ccolor);
+      ByteObject text = figureFactory.getFigString(FACE_01_MONOSPACE, STYLE_1_BOLD, SIZE_4_LARGE, ccolor);
       ByteObject anchor = anchorFac.getCenterCenter();
 
       ByteObject margin = null;

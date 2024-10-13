@@ -17,7 +17,6 @@ import pasa.cbentley.core.src4.structs.IntToObjects;
 import pasa.cbentley.core.src4.utils.ArrayUtils;
 import pasa.cbentley.core.src4.utils.BitUtils;
 import pasa.cbentley.core.src4.utils.IntUtils;
-import pasa.cbentley.framework.drawx.src4.ctx.BOModuleDrawx;
 import pasa.cbentley.framework.drawx.src4.ctx.IBOTypesDrawX;
 import pasa.cbentley.framework.drawx.src4.style.IBOStyle;
 import pasa.cbentley.framework.drawx.src4.style.StyleOperator;
@@ -241,23 +240,6 @@ public class StyleClass extends ObjectGC implements IStringable, IStatorable {
       setRootStyle(rootStyle);
       cacheStyleInit();
       FLAG_CACHE_STYLE = gc.getSettingsWrapper().hasStyleClassCache();
-   }
-   
-   /**
-    * Does not reset previous 
-    * 
-    * TODO fix it
-    * @param rootStyle
-    */
-   public void setRootStyle(ByteObject rootStyle) {
-      if (rootStyle == null) {
-         throw new NullPointerException("RootStyle is null");
-      }
-      if(rootMODs == null) {
-         rootMODs = new ByteObject[] { rootStyle };
-      } else {
-         rootMODs[0] = rootStyle;
-      }
    }
 
    /**
@@ -507,17 +489,7 @@ public class StyleClass extends ObjectGC implements IStringable, IStatorable {
    public ByteObject getRootStyle() {
       return rootMODs[0];
    }
-   
-   public StyleClass getStyleClassNullEx(int linkID) {
-      Object o = null;
-      if (classes != null) {
-         o = classes.findIntObject(linkID);
-      }
-      if (o == null) {
-         throw new NullPointerException("No StyleClass " + linkID + " for " + this.toString1Line());
-      }
-      return (StyleClass) o;
-   }
+
    /**
     * This method is used to in order to catch un linked style class.
     * Don't call this method if the style class could be null.
@@ -534,7 +506,7 @@ public class StyleClass extends ObjectGC implements IStringable, IStatorable {
       }
       if (o == null) {
          StyleClass sc = gc.getDefaultSC();
-         sc.toStringSetName("default for linkID "+ linkID);
+         sc.toStringSetName("default for linkID " + linkID);
          if (this != sc) {
             o = sc.getStyleClass(linkID);
          }
@@ -621,7 +593,7 @@ public class StyleClass extends ObjectGC implements IStringable, IStatorable {
                   //we know its both styles so right to method
                   //newStyle = newStyle.mergeByteObject(stateStyle);
                   StyleOperator styleOperator = gc.getDC().getStyleOperator();
-                  newStyle = styleOperator.mergeStyle(newStyle,stateStyle);
+                  newStyle = styleOperator.mergeStyle(newStyle, stateStyle);
                } catch (ArrayIndexOutOfBoundsException e) {
                   //#debug
                   toDLog().pNull("msg", stateStyle, StyleClass.class, "getStyle", LVL_05_FINE, true);
@@ -696,6 +668,17 @@ public class StyleClass extends ObjectGC implements IStringable, IStatorable {
       return sc;
    }
 
+   public StyleClass getStyleClassNullEx(int linkID) {
+      Object o = null;
+      if (classes != null) {
+         o = classes.findIntObject(linkID);
+      }
+      if (o == null) {
+         throw new NullPointerException("No StyleClass " + linkID + " for " + this.toString1Line());
+      }
+      return (StyleClass) o;
+   }
+
    public ByteObject getStyleDrwP(int handle) {
       return rootMODs[handle];
    }
@@ -752,17 +735,6 @@ public class StyleClass extends ObjectGC implements IStringable, IStatorable {
       }
    }
 
-   public void linkStyleClassReplace(StyleClass sc, int linkID) {
-      if (classes == null) {
-         classes = new IntToObjects(uc);
-      }
-      int index = classes.findInt(linkID);
-      if (index == -1) {
-         classes.add(sc, linkID);
-      } else {
-         classes.setObject(sc, index);
-      }
-   }
    /**
     * Recipient for linking a {@link ByteObject} other than styling. Usually a Tech paran.
     * <br>
@@ -861,6 +833,18 @@ public class StyleClass extends ObjectGC implements IStringable, IStatorable {
          classes = new IntToObjects(uc);
       }
       classes.add(sc, linkID);
+   }
+
+   public void linkStyleClassReplace(StyleClass sc, int linkID) {
+      if (classes == null) {
+         classes = new IntToObjects(uc);
+      }
+      int index = classes.findInt(linkID);
+      if (index == -1) {
+         classes.add(sc, linkID);
+      } else {
+         classes.setObject(sc, index);
+      }
    }
 
    /**
@@ -1152,6 +1136,22 @@ public class StyleClass extends ObjectGC implements IStringable, IStatorable {
       parent = sc;
    }
 
+   /**
+    * Does not reset previous 
+    * 
+    * TODO fix it
+    * @param rootStyle
+    */
+   public void setRootStyle(ByteObject rootStyle) {
+      if (rootStyle == null) {
+         throw new NullPointerException("RootStyle is null");
+      }
+      if (rootMODs == null) {
+         rootMODs = new ByteObject[] { rootStyle };
+      } else {
+         rootMODs[0] = rootStyle;
+      }
+   }
 
    public void stateReadFrom(StatorReader state) {
       IntToObjects ito = new IntToObjects(uc);
@@ -1164,6 +1164,9 @@ public class StyleClass extends ObjectGC implements IStringable, IStatorable {
       BADataOS dataWriter = state.getWriter();
       IntToObjects ito = new IntToObjects(uc);
       serializeTo(ito, dataWriter);
+   }
+
+   public void stateWriteToParamSub(StatorWriter state) {
    }
 
    //#mdebug
@@ -1195,10 +1198,9 @@ public class StyleClass extends ObjectGC implements IStringable, IStatorable {
 
       ToStringLinkIDs stringableLinks = new ToStringLinkIDs();
       dc.nlLvl(objects, "---> StyleClass Linked [ByteObjects]", "LinkID=", stringableLinks);
-      
+
       dc.nlLvl(ctypeStyles, "---> StyleClass Linked [CTypes] BOStyle", "[CType] Link=", null);
-      
-      
+
       dc.nlLvl(classes, "---> StyleClass Linked [StyleClass]", "[StyleClass] Link=", stringableLinks);
 
       dc.newLevel();

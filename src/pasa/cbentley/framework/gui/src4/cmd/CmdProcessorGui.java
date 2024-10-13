@@ -266,30 +266,7 @@ public class CmdProcessorGui extends CmdProcessor implements ICmdsGui, ICommanda
       return vs;
    }
 
-   /**
-    * Create a {@link CmdInstance} for the view command associated with the ID.
-    * <br>
-    * Queue up the command for execution in the Update Thread.
-    * <br>
-    * Method can be called from any thread.
-    * <br>
-    * A system command is a command executed by code.
-    * <br>
-    * The root cmdctx of this
-    * @param vcmdHome
-    * @throws IllegalArgumentException when cmd id is out of range
-    */
-   public void processCmd(int vcmdID) {
-      //at this stage, we have at least once visible canvas
-      //a cmd has a rootCanvas associated
-      ICanvasDrawable canvasView = gc.getCanvasRoot();
-      InputStateCanvasGui isd = (InputStateCanvasGui) canvasView.getEventController().getInputState();
-      OutputStateCanvasGui srd = canvasView.getRepaintCtrlDraw().getSD();
-      InputConfig ic = new InputConfig(gc, canvasView, isd, srd);
 
-      processCmd(vcmdID, ic);
-
-   }
 
    public void processCmd(int vcmdID, ExecutionContextCanvasGui ec) {
       //user interaction is used to help user modify things he doesn't like about

@@ -371,13 +371,13 @@ public class CanvasAppliInputGui extends CanvasAppliInput implements IDrawableLi
       toDLog().pEvent1("", che, CanvasAppliInputGui.class, "ctrlAppEvent@381");
 
       int actionType = che.getActionType();
-      if (actionType == ITechEventHost.ACTION_1_CLOSE) {
-      } else if (actionType == ITechEventHost.ACTION_2_MOVED) {
-      } else if (actionType == ITechEventHost.ACTION_4_FOCUS_GAIN) {
-      } else if (actionType == ITechEventHost.ACTION_3_RESIZED) {
+      if (actionType == ITechEventHost.ACTION_01_CLOSE) {
+      } else if (actionType == ITechEventHost.ACTION_02_MOVED) {
+      } else if (actionType == ITechEventHost.ACTION_04_FOCUS_GAIN) {
+      } else if (actionType == ITechEventHost.ACTION_03_RESIZED) {
          ctrlAppEventResized(is, sr, che);
-      } else if (actionType == ITechEventHost.ACTION_5_FOCUS_LOSS) {
-      } else if (actionType == ITechEventHost.ACTION_6_NOTIFY_SHOW) {
+      } else if (actionType == ITechEventHost.ACTION_05_FOCUS_LOSS) {
+      } else if (actionType == ITechEventHost.ACTION_06_NOTIFY_SHOW) {
       }
 
    }

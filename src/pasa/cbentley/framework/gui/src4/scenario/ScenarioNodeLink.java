@@ -25,6 +25,9 @@ public class ScenarioNodeLink extends ScenarioItemAbstract {
       // TODO Auto-generated method stub
 
    }
+   public void stateWriteToParamSub(StatorWriter state) {
+      // TODO Auto-generated method stub
+   }
    public int getStatorableClassID() {
       throw new RuntimeException("Must be implemented by subclass");
    }

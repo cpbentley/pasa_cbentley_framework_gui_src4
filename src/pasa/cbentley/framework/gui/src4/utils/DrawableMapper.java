@@ -228,7 +228,7 @@ public class DrawableMapper extends ObjectGC implements IStringable {
       super.toString(dc.sup());
       
       String sc = "StyleClass of Mapper";
-      if (styleClass != null && dc.hasFlagData(gc, IToStringFlagsGui.D_FLAG_02_STYLE_CLASS)) {
+      if (styleClass != null && dc.hasFlagToString(gc, IToStringFlagsGui.D_FLAG_02_STYLE_CLASS)) {
          dc.nlLvl(sc, styleClass);
       } else {
          dc.nlLvl1Line(styleClass, sc);

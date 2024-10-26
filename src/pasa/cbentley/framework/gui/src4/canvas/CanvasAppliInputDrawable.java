@@ -4,7 +4,7 @@ import pasa.cbentley.byteobjects.src4.core.ByteObject;
 import pasa.cbentley.framework.cmd.src4.engine.CmdInstance;
 import pasa.cbentley.framework.cmd.src4.engine.CmdNode;
 import pasa.cbentley.framework.cmd.src4.engine.MCmd;
-import pasa.cbentley.framework.cmd.src4.interfaces.ICmdListener;
+import pasa.cbentley.framework.cmd.src4.interfaces.ITechCmd;
 import pasa.cbentley.framework.core.ui.src4.utils.ViewState;
 import pasa.cbentley.framework.coredraw.src4.interfaces.IGraphics;
 import pasa.cbentley.framework.drawx.src4.engine.GraphicsX;
@@ -21,8 +21,8 @@ import pasa.cbentley.framework.gui.src4.interfaces.IAnimable;
 import pasa.cbentley.framework.gui.src4.interfaces.IDrawable;
 import pasa.cbentley.framework.input.src4.engine.CanvasAppliInput;
 import pasa.cbentley.framework.input.src4.engine.ExecutionContextCanvas;
-import pasa.cbentley.framework.input.src4.engine.OutputStateCanvas;
 import pasa.cbentley.framework.input.src4.engine.InputStateCanvas;
+import pasa.cbentley.framework.input.src4.engine.OutputStateCanvas;
 
 /**
  * Drawable to be used inside another {@link CanvasAppliInputGui}.
@@ -293,8 +293,8 @@ public abstract class CanvasAppliInputDrawable extends CanvasAppliInput implemen
       draw(destGraphicsX);
    }
 
-   public int sendEvent(int evType, Object param) {
-      return ICmdListener.PRO_STATE_0;
+   public int commandEvent(int evType, Object param) {
+      return ITechCmd.PRO_STATE_0_CONTINUE;
    }
 
    public void setBehaviorFlag(int flag, boolean value) {

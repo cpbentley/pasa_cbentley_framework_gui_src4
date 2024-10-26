@@ -4,9 +4,9 @@ import pasa.cbentley.core.src4.interfaces.IEvents;
 
 public interface IEventsGui extends IEvents {
 
-   public static final int A_SID_GUI_EVENT_A            = 21;
+   public static final int A_SID_GUI_EVENT_A            = 26;
 
-   public static final int A_SID_GUI_EVENT_Z            = 25;
+   public static final int A_SID_GUI_EVENT_Z            = 30;
 
    public static final int GUI_NUM_EVENTS               = 2;
 

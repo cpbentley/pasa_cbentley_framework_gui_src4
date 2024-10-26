@@ -1,5 +1,6 @@
 package pasa.cbentley.framework.gui.src4.exec;
 
+import pasa.cbentley.core.src4.logging.Dctx;
 import pasa.cbentley.core.src4.structs.IntToObjects;
 import pasa.cbentley.framework.core.ui.src4.exec.ExecEntry;
 import pasa.cbentley.framework.core.ui.src4.exec.ExecutionContext;
@@ -8,11 +9,9 @@ import pasa.cbentley.framework.gui.src4.canvas.CanvasAppliInputGui;
 import pasa.cbentley.framework.gui.src4.canvas.InputConfig;
 import pasa.cbentley.framework.gui.src4.canvas.TopLevelCtrl;
 import pasa.cbentley.framework.gui.src4.cmd.CmdInstanceGui;
-import pasa.cbentley.framework.gui.src4.core.Drawable;
 import pasa.cbentley.framework.gui.src4.ctx.GuiCtx;
 import pasa.cbentley.framework.gui.src4.interfaces.IDrawable;
 import pasa.cbentley.framework.gui.src4.interfaces.ITechExecutionContextGui;
-import pasa.cbentley.framework.gui.src4.string.StringListInput;
 import pasa.cbentley.framework.input.src4.engine.ExecutionContextCanvas;
 
 /**
@@ -33,17 +32,17 @@ import pasa.cbentley.framework.input.src4.engine.ExecutionContextCanvas;
  */
 public class ExecutionContextCanvasGui extends ExecutionContextCanvas implements ITechExecutionContextGui {
 
-   public int              addressX;
+   private int             addressX;
 
    /**
     * Pointed Drawable Y address.
     */
-   public int              addressY;
+   private int             addressY;
 
    /**
     * Set when a command is found
     */
-   public CmdInstanceGui   cd;
+   private CmdInstanceGui ci;
 
    public volatile boolean finished;
 
@@ -112,10 +111,23 @@ public class ExecutionContextCanvasGui extends ExecutionContextCanvas implements
       renders.add(ee);
    }
 
+   public void checkCmdInstanceNotNull() {
+      if (ci == null) {
+         throw new NullPointerException();
+      }
+   }
+
    /**
     * Reset pointers
     */
    public void clear() {
+   }
+
+   public void cmdActionOnDrawable(IDrawable d) {
+      if (ci != null) {
+         ci.actionDone();
+      }
+      getCanvasResultDrawable().setActionDoneRepaint(d);
    }
 
    private void execTypeDraw(ExecEntry ee) {
@@ -125,7 +137,7 @@ public class ExecutionContextCanvasGui extends ExecutionContextCanvas implements
          //showing? what inputconfig? we are modifying state in the GUI thread
          gc.getFocusCtrl().drawableShow(this, d);
       } else if (action == ACTION_2_HIDE) {
-         gc.getFocusCtrl().drawableHide(cd, d, null);
+         gc.getFocusCtrl().drawableHide(ci, d, null);
       } else if (action == ACTION_1_SHOW_REPLACE) {
          gc.getFocusCtrl().drawableShow(this, d);
       } else if (action == ACTION_3_INVALIDATE) {
@@ -145,28 +157,20 @@ public class ExecutionContextCanvasGui extends ExecutionContextCanvas implements
       d.run();
    }
 
+
+   public int getAddressX() {
+      return addressX;
+   }
+
+   public int getAddressY() {
+      return addressY;
+   }
    public OutputStateCanvasGui getCanvasResultDrawable() {
       return (OutputStateCanvasGui) os;
    }
 
-   public CmdInstanceGui createCmd(int cmdid) {
-      CmdInstanceGui cd = new CmdInstanceGui(gc, cmdid);
-      cd.setFeedback(os);
-      return cd;
-   }
-
    public CmdInstanceGui getCmdInstanceGui() {
       return ci;
-   }
-
-   public CmdInstanceGui getCmdInstance() {
-      return ci;
-   }
-
-   public void checkCmdInstanceNotNull() {
-      if (ci == null) {
-         throw new NullPointerException();
-      }
    }
 
    public InputConfig getInputConfig() {
@@ -199,13 +203,13 @@ public class ExecutionContextCanvasGui extends ExecutionContextCanvas implements
       }
    }
 
-   private CmdInstanceGui ci;
+   public void setAddressCoordinates(int x, int y) {
+      this.addressX = x;
+      this.addressY = y;
+   }
 
-   public void cmdActionOnDrawable(IDrawable d) {
-      if (ci != null) {
-         ci.actionDone();
-      }
-      getCanvasResultDrawable().setActionDoneRepaint(d);
+   public void setCmdInstanceGui(CmdInstanceGui ci) {
+      this.ci = ci;
    }
 
    public void setInputConfig(InputConfig icc) {
@@ -219,4 +223,29 @@ public class ExecutionContextCanvasGui extends ExecutionContextCanvas implements
    public void srActionDoneRepaint(IDrawable d) {
       icc.srActionDoneRepaint(d);
    }
+   
+   //#mdebug
+   public void toString(Dctx dc) {
+      dc.root(this, ExecutionContextCanvasGui.class, toStringGetLine(229));
+      toStringPrivate(dc);
+      super.toString(dc.sup());
+      
+      dc.appendVarWithNewLine("addressX", addressX);
+      dc.appendVarWithSpace("addressY", addressY);
+      
+      dc.nlLvl(ci, "ci");
+   }
+
+   public void toString1Line(Dctx dc) {
+      dc.root1Line(this, ExecutionContextCanvasGui.class, toStringGetLine(229));
+      toStringPrivate(dc);
+      super.toString1Line(dc.sup1Line());
+   }
+
+   private void toStringPrivate(Dctx dc) {
+      dc.appendVarWithSpace("finished", finished);
+   }
+   //#enddebug
+   
+
 }

@@ -29,7 +29,6 @@ public class ObjectGC implements IStringable {
       return toStringGetUCtx().toDLog();
    }
 
-
    public String toString() {
       return Dctx.toString(this);
    }
@@ -46,6 +45,10 @@ public class ObjectGC implements IStringable {
    public void toString1Line(Dctx dc) {
       dc.root1Line(this, ObjectGC.class);
       toStringPrivate(dc);
+   }
+
+   public String toStringGetLine(int value) {
+      return toStringGetUCtx().toStringGetLine(value);
    }
 
    //#mdebug

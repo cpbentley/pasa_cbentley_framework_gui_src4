@@ -3,7 +3,7 @@ package pasa.cbentley.framework.gui.src4.core;
 import pasa.cbentley.byteobjects.src4.core.ByteObject;
 import pasa.cbentley.byteobjects.src4.core.interfaces.IByteObject;
 import pasa.cbentley.core.src4.ctx.ICtx;
-import pasa.cbentley.core.src4.ctx.IToStringFlags;
+import pasa.cbentley.core.src4.ctx.IToStringFlagsUC;
 import pasa.cbentley.core.src4.ctx.UCtx;
 import pasa.cbentley.core.src4.io.BAByteOS;
 import pasa.cbentley.core.src4.io.BADataIS;
@@ -1176,7 +1176,7 @@ public class StyleClass extends ObjectGC implements IStringable, IStatorable {
       super.toString(dc.sup());
 
       ByteObject rootStyle = getRootStyle();
-      if (dc.hasFlagData(uc, IToStringFlags.FLAG_DATA_01_SUCCINT)) {
+      if (dc.hasFlagToString(uc, IToStringFlagsUC.FLAG_UC_01_SUCCINT)) {
          dc.nl();
          dc.append("#RootStyle " + rootStyle.getMyHashCode());
       } else {

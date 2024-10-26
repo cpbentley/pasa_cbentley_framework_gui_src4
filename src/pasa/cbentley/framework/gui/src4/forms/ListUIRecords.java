@@ -6,7 +6,7 @@ import pasa.cbentley.framework.cmd.src4.ctx.CmdCtx;
 import pasa.cbentley.framework.cmd.src4.engine.CmdNode;
 import pasa.cbentley.framework.cmd.src4.engine.MCmd;
 import pasa.cbentley.framework.cmd.src4.interfaces.ICmdsCmd;
-import pasa.cbentley.framework.cmd.src4.interfaces.ICommandable;
+import pasa.cbentley.framework.cmd.src4.interfaces.ICmdExecutor;
 import pasa.cbentley.framework.datamodel.src4.engine.MByteObjectTableModel;
 import pasa.cbentley.framework.datamodel.src4.interfaces.IObjectStore;
 import pasa.cbentley.framework.datamodel.src4.mbo.MBOByteObject;
@@ -22,6 +22,7 @@ import pasa.cbentley.framework.gui.src4.string.RequestStringInput;
 import pasa.cbentley.framework.gui.src4.string.T9;
 import pasa.cbentley.framework.gui.src4.table.TableLayoutView;
 import pasa.cbentley.framework.gui.src4.table.TableView;
+import pasa.cbentley.framework.gui.src4.table.TableViewUtils;
 
 /**
  * Graphical List that keeps track of the record id and the record store of the data.
@@ -113,11 +114,11 @@ public class ListUIRecords extends TableLayoutView implements IValidable {
       return title;
    }
 
-   public void addCmds(ICommandable com, CmdNode cc, MCmd[] cmds) {
+   public void addCmds(ICmdExecutor com, CmdNode cc, MCmd[] cmds) {
       ctxListUI = cc.createChildCtx("ListUI" + title);
       ctxListUI.addMenuCmd(ICmdsCmd.CMD_04_OK);
       ctxListUI.addMenuCmd(ICmdsCmd.CMD_05_CANCEL);
-      ctxListUI.setListener(com);
+      ctxListUI.setExecutor(com);
    }
 
    /**
@@ -231,7 +232,7 @@ public class ListUIRecords extends TableLayoutView implements IValidable {
       //polish is buggy with list selection
       unSelect();
       selectedImplicit = index;
-      ListUIRecords.setSelectedIndex(this, index);
+      TableViewUtils.setSelectedIndex(this, index);
    }
 
    public void setSelectedId(int id) {

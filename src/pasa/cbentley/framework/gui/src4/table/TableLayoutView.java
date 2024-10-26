@@ -4,7 +4,8 @@ import pasa.cbentley.byteobjects.src4.core.ByteObject;
 import pasa.cbentley.core.src4.interfaces.C;
 import pasa.cbentley.core.src4.logging.Dctx;
 import pasa.cbentley.framework.cmd.src4.engine.CmdInstance;
-import pasa.cbentley.framework.cmd.src4.interfaces.ICommandable;
+import pasa.cbentley.framework.cmd.src4.interfaces.ICmdExecutor;
+import pasa.cbentley.framework.cmd.src4.interfaces.ICmdsCmd;
 import pasa.cbentley.framework.datamodel.src4.table.ObjectTableModel;
 import pasa.cbentley.framework.drawx.src4.engine.RgbImage;
 import pasa.cbentley.framework.gui.src4.canvas.InputConfig;
@@ -42,7 +43,7 @@ import pasa.cbentley.framework.gui.src4.tech.ITechViewPane;
  * @author Charles-Philip
  *
  */
-public class TableLayoutView extends TableView implements IBOStrAuxData, ICommandable, ICmdsGui {
+public class TableLayoutView extends TableView implements IBOStrAuxData, ICmdExecutor,  ICmdsCmd, ICmdsGui {
 
    public static final int SC_TITLE_LINK_43 = 43;
 
@@ -57,7 +58,7 @@ public class TableLayoutView extends TableView implements IBOStrAuxData, IComman
     */
    private CmdInstanceGui     executionCtx;
 
-   private ICommandable    icon;
+   private ICmdExecutor    icon;
 
    private NestedMenus     menuHeader;
 
@@ -99,7 +100,7 @@ public class TableLayoutView extends TableView implements IBOStrAuxData, IComman
     * Form parsing is done by the caller
     */
    public void commandAction(CmdInstance cmd) {
-      if (cmd.getCmdID() == CMD_04_OK) {
+      if (cmd.getCmdId() == CMD_04_OK) {
          ci.paramO = this;
          icon.commandAction(ci);
       } else {
@@ -240,7 +241,7 @@ public class TableLayoutView extends TableView implements IBOStrAuxData, IComman
       sd.setStringNoUpdate(str);
    }
 
-   public void setCommandParams(ICommandable icon, CmdInstance ci) {
+   public void setCommandParams(ICmdExecutor icon, CmdInstance ci) {
       this.icon = icon;
       this.ci = ci;
      }

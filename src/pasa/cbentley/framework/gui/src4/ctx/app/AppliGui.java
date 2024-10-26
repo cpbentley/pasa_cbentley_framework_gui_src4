@@ -1,4 +1,4 @@
-package pasa.cbentley.framework.gui.src4.mui;
+package pasa.cbentley.framework.gui.src4.ctx.app;
 
 import pasa.cbentley.byteobjects.src4.core.ByteObject;
 import pasa.cbentley.byteobjects.src4.objects.color.ITechGradient;
@@ -6,6 +6,7 @@ import pasa.cbentley.core.src4.logging.Dctx;
 import pasa.cbentley.core.src4.structs.IntToObjects;
 import pasa.cbentley.core.src4.utils.interfaces.IColorsBase;
 import pasa.cbentley.framework.cmd.src4.ctx.CmdCtx;
+import pasa.cbentley.framework.cmd.src4.interfaces.ICmdControlled;
 import pasa.cbentley.framework.core.framework.src4.app.AppCtx;
 import pasa.cbentley.framework.core.framework.src4.app.AppliAbstract;
 import pasa.cbentley.framework.core.ui.src4.interfaces.ICanvasAppli;
@@ -16,6 +17,7 @@ import pasa.cbentley.framework.gui.src4.canvas.CanvasAppliInputGui;
 import pasa.cbentley.framework.gui.src4.canvas.ICanvasDrawable;
 import pasa.cbentley.framework.gui.src4.canvas.InputConfig;
 import pasa.cbentley.framework.gui.src4.canvas.TopLevelCtrl;
+import pasa.cbentley.framework.gui.src4.cmd.CmdControlledGui;
 import pasa.cbentley.framework.gui.src4.cmd.CmdInstanceGui;
 import pasa.cbentley.framework.gui.src4.cmd.CmdProcessorGui;
 import pasa.cbentley.framework.gui.src4.cmd.mcmd.MCmdGuiNewStart;
@@ -29,6 +31,7 @@ import pasa.cbentley.framework.gui.src4.exec.OutputStateCanvasGui;
 import pasa.cbentley.framework.gui.src4.interfaces.ICmdsGui;
 import pasa.cbentley.framework.gui.src4.interfaces.IDrawable;
 import pasa.cbentley.framework.gui.src4.interfaces.IUIView;
+import pasa.cbentley.framework.gui.src4.mui.MLogViewer;
 
 /**
  * Implemented by Modules using the MUI graphical framework to provide business
@@ -59,15 +62,33 @@ public abstract class AppliGui extends AppliAbstract {
    private int                 verifFlag;
 
    /**
-    * Create an {@link AppliGui} givens the {@link IFrameworkCtx} framework context.
-    * <br>
-    * <br>
-    * Creates the {@link GuiContext} that will control  the module
-    * @param dd
+    * Create an {@link AppliGui} as an {@link ICmdControlled}.
+    * 
+    * @param gc {@link GuiCtx}
+    * @param apc {@link AppCtx}
     */
    public AppliGui(GuiCtx gc, AppCtx apc) {
       super(apc);
       this.gc = gc;
+      
+      ICmdControlled cced = createCmdControlled();
+      
+      gc.getCC().setCmdControlled(cced);
+      
+      //#debug
+      toDLog().pCreate("", this, AppliGui.class, "Created@75", LVL_04_FINER, true);
+
+   }
+   
+   /**
+    * Override this for a more specific {@link ICmdControlled}
+    * 
+    * @return {@link ICmdControlled}
+    * 
+    * @see CmdControlledGui
+    */
+   protected ICmdControlled createCmdControlled() {
+      return new CmdControlledGui(gc);
    }
 
    /**
@@ -194,8 +215,6 @@ public abstract class AppliGui extends AppliAbstract {
     */
    public ViewState getViewState() {
       ViewState vs = new ViewState();
-
-      vs.add(gc.getCmdProcessorGui().getViewState());
       return vs;
    }
 
@@ -276,13 +295,6 @@ public abstract class AppliGui extends AppliAbstract {
    }
 
    /**
-    * Not started in headless mode, console only.
-    * <br>
-    * <br>
-    * {@link GuiCtx} code is using {@link CmdCtx} paradigm, so everything action is a command.
-    * {@link MCmdGuiNewStart}
-    * 
-    * {@link AppliAbstract#amsAppStart} has been called already and the Canvas are shown
     * 
     */
    protected void subAppStarted() {
@@ -325,9 +337,8 @@ public abstract class AppliGui extends AppliAbstract {
       //we are still in the gui thread here
       //generate a cmd event and put it on the queue for this canvas.
 
-      CmdProcessorGui viewCommandListener = gc.getCmdProcessorGui();
       ExecutionContextCanvasGui ec = canvasRoot.createExecutionContextCmdGui();
-      viewCommandListener.processCmd(ICmdsGui.VCMD_00_LAST_LOGIN, ec);
+      gc.getCC().executeInstance(MCmdGuiNewStart.CMD_ID, ec);
 
    }
 

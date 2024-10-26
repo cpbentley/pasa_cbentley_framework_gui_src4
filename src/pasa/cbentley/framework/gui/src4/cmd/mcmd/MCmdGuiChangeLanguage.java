@@ -7,9 +7,12 @@ import pasa.cbentley.core.src4.event.IEventConsumer;
 import pasa.cbentley.core.src4.i8n.IStringProducer;
 import pasa.cbentley.core.src4.i8n.LocaleID;
 import pasa.cbentley.core.src4.interfaces.C;
+import pasa.cbentley.framework.cmd.src4.cmd.MCmdAbstract;
 import pasa.cbentley.framework.cmd.src4.engine.CmdInstance;
+import pasa.cbentley.framework.cmd.src4.interfaces.ICmdsCmd;
 import pasa.cbentley.framework.datamodel.src4.table.ObjectTableModel;
 import pasa.cbentley.framework.gui.src4.canvas.InputConfig;
+import pasa.cbentley.framework.gui.src4.cmd.CmdInstanceGui;
 import pasa.cbentley.framework.gui.src4.cmd.CmdProcessorGui;
 import pasa.cbentley.framework.gui.src4.cmd.CommanderGui;
 import pasa.cbentley.framework.gui.src4.core.StyleClass;
@@ -27,10 +30,10 @@ import pasa.cbentley.framework.gui.src4.tech.ITechLinks;
  * @author Charles Bentley
  *
  */
-public class MCmdGuiChangeLanguage extends MCmdGui implements IEventConsumer {
+public class MCmdGuiChangeLanguage extends MCmdAbstractGui implements IEventConsumer {
 
    public MCmdGuiChangeLanguage(GuiCtx gc) {
-      super(gc, ICmdsGui.CMD_40_LANGUAGE_CHANGE);
+      super(gc, ICmdsCmd.CMD_40_LANGUAGE_CHANGE);
    }
 
    protected CmdInstance activeCmdLang;
@@ -51,7 +54,7 @@ public class MCmdGuiChangeLanguage extends MCmdGui implements IEventConsumer {
          //#debug
          toDLog().pEvent("Suffix=" + suffix + " Selected Row=" + row + " out of " + otm.getNumRows(), this, CmdProcessorGui.class, "consumeEvent", LVL_05_FINE, true);
 
-         cc.commandAction(activeCmdLang);
+         cc.executeInstance(activeCmdLang);
          //hide table view
       }
    }
@@ -66,10 +69,10 @@ public class MCmdGuiChangeLanguage extends MCmdGui implements IEventConsumer {
     * 
     * @param cmd
     */
-   public void execute(ExecutionContextCanvasGui ec) {
-      CmdInstance cmd = ec.getCmdInstance();
-      if (cmd.paramO != null) {
-         LocaleID suffix = (LocaleID) cmd.paramO;
+   public void cmdExecuteFinalGui(CmdInstanceGui cmd) {
+      ExecutionContextCanvasGui ec = cmd.getExecutionContextGui();
+      if (cmd.isParamO(LocaleID.class)) {
+         LocaleID suffix = (LocaleID) cmd.getParamO();
          IStringProducer strLoader = gc.getStrings();
          LocaleID old = strLoader.getLocaleID();
          strLoader.setLocalID(suffix);
@@ -133,6 +136,15 @@ public class MCmdGuiChangeLanguage extends MCmdGui implements IEventConsumer {
          //#debug
          toDLog().pFlow("", langTable, CommanderGui.class, "cmdChangeLanguage", LVL_05_FINE, false);
       }
+   }
+
+   public void cmdExecuteParamGui(CmdInstanceGui ci) {
+      
+   }
+
+
+   public MCmdAbstract createInstance(CmdInstance ci) {
+      return new MCmdGuiChangeLanguage(gc);
    }
 
 }

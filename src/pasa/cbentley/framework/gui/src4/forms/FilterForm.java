@@ -7,11 +7,12 @@ import pasa.cbentley.byteobjects.src4.objects.function.ITechAcceptor;
 import pasa.cbentley.core.src4.i8n.IStringProducer;
 import pasa.cbentley.core.src4.structs.IntToStrings;
 import pasa.cbentley.framework.cmd.src4.ctx.CmdCtx;
+import pasa.cbentley.framework.cmd.src4.engine.CmdFactoryCore;
 import pasa.cbentley.framework.cmd.src4.engine.CmdInstance;
 import pasa.cbentley.framework.cmd.src4.engine.CmdNode;
 import pasa.cbentley.framework.cmd.src4.engine.MCmd;
 import pasa.cbentley.framework.cmd.src4.interfaces.ICmdsCmd;
-import pasa.cbentley.framework.cmd.src4.interfaces.ICommandable;
+import pasa.cbentley.framework.cmd.src4.interfaces.ICmdExecutor;
 import pasa.cbentley.framework.core.data.src4.db.IByteStore;
 import pasa.cbentley.framework.datamodel.src4.filter.FilterCondition;
 import pasa.cbentley.framework.datamodel.src4.filter.IFilterable;
@@ -21,9 +22,11 @@ import pasa.cbentley.framework.gui.src4.core.StyleClass;
 import pasa.cbentley.framework.gui.src4.ctx.GuiCtx;
 import pasa.cbentley.framework.gui.src4.factories.DrawableStringFactory;
 import pasa.cbentley.framework.gui.src4.factories.interfaces.IBOStrAuxData;
+import pasa.cbentley.framework.gui.src4.interfaces.ICmdsGui;
 import pasa.cbentley.framework.gui.src4.interfaces.IDrawable;
 import pasa.cbentley.framework.gui.src4.string.StringDrawable;
 import pasa.cbentley.framework.gui.src4.table.TableLayoutView;
+import pasa.cbentley.framework.gui.src4.table.TableViewUtils;
 import pasa.cbentley.framework.gui.src4.tech.ITechStringDrawable;
 
 /**
@@ -32,7 +35,7 @@ import pasa.cbentley.framework.gui.src4.tech.ITechStringDrawable;
  * @author cbentley
  * 
  */
-public class FilterForm extends TableLayoutView implements ICommandable, IBOStrAuxData, ITechAcceptor {
+public class FilterForm extends TableLayoutView implements ICmdExecutor, IBOStrAuxData, ITechAcceptor {
 
    private static final String MAIN_LIST_TITLE = "Filters";
 
@@ -60,7 +63,6 @@ public class FilterForm extends TableLayoutView implements ICommandable, IBOStrA
 
    private CmdCtx              cc;
 
-
    private MCmd                CMD_SHOW_LIST;
 
    private IByteStore          bs;
@@ -76,9 +78,10 @@ public class FilterForm extends TableLayoutView implements ICommandable, IBOStrA
       sl = gc.getStrings();
 
       cc = gc.getCC();
-      CMD_ShowFilters = new MCmd(cc, "Show Filters");
+      CmdFactoryCore cmdFac = cc.getCmdFactoryCore();
 
-      CMD_SHOW_LIST = new MCmd(cc, "Show List");
+      CMD_ShowFilters = cmdFac.createCmd(ICmdsGui.CMD_GUI_10_SHOW_FILTERS, "Show Filters");
+      CMD_SHOW_LIST = cmdFac.createCmd(ICmdsGui.CMD_GUI_19_SHOW_LIST, "Show List");
 
       filterable = fil;
       filterRoot = new ListRoot(gc, sc, MAIN_LIST_TITLE, db);
@@ -92,7 +95,7 @@ public class FilterForm extends TableLayoutView implements ICommandable, IBOStrA
       ctx.addMenuCmd(ICmdsCmd.CMD_06_APPLY);
       ctx.addMenuCmd(ICmdsCmd.CMD_23_DELETE);
       ctx.addMenuCmd(ICmdsCmd.CMD_26_SAVE);
-      setCmdNote(ctx);
+      setCmdNode(ctx);
 
       this.formAppend(filterRoot);
 
@@ -143,7 +146,7 @@ public class FilterForm extends TableLayoutView implements ICommandable, IBOStrA
       ListRoot fieldList = new ListRoot(gc, getStyleClass(), "", valueLis);
       CmdNode ctx = fieldList.getCmdNode();
       ctx.addMenuCmd(CMD_SHOW_LIST);
-      ctx.setListener(this);
+      ctx.setExecutor(this);
 
       return fieldList;
    }
@@ -164,7 +167,7 @@ public class FilterForm extends TableLayoutView implements ICommandable, IBOStrA
       ListRoot opList = new ListRoot(gc, getStyleClass(), "Op:", opLis);
       CmdNode ctx = opList.getCmdNode();
       ctx.addMenuCmd(CMD_SHOW_LIST);
-      ctx.setListener(this);
+      ctx.setExecutor(this);
       return opList;
    }
 
@@ -201,7 +204,7 @@ public class FilterForm extends TableLayoutView implements ICommandable, IBOStrA
       ListRoot opList = new ListRoot(gc, getStyleClass(), "Op:", opLis);
       CmdNode ctx = opList.getCmdNode();
       ctx.addMenuCmd(CMD_SHOW_LIST);
-      ctx.setListener(this);
+      ctx.setExecutor(this);
       return opList;
    }
 
@@ -224,7 +227,7 @@ public class FilterForm extends TableLayoutView implements ICommandable, IBOStrA
          IDrawable it = (IDrawable) dfields.elementAt(j);
          if (i == it) {
             ListRoot lr = (ListRoot) it;
-            int visualIndex = ListUIRecords.getSelectedIndex(lr.getList());
+            int visualIndex = TableViewUtils.getSelectedIndex(lr.getList());
             int filterId = filterable.getTypes().ints[visualIndex];
             String selString = filterable.getTypes().strings[visualIndex];
             int condition = filterable.getFilterType(filterId);
@@ -317,7 +320,7 @@ public class FilterForm extends TableLayoutView implements ICommandable, IBOStrA
     *
     */
    public void updateFilter() {
-      int seli = ListUIRecords.getSelectedIndex(filterRoot.getList());
+      int seli = TableViewUtils.getSelectedIndex(filterRoot.getList());
       //performance check
       if (previous == seli)
          return;

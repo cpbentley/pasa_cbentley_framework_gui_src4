@@ -8,12 +8,13 @@ import pasa.cbentley.core.src4.logging.Dctx;
 import pasa.cbentley.framework.cmd.src4.ctx.CmdCtx;
 import pasa.cbentley.framework.cmd.src4.engine.CmdInstance;
 import pasa.cbentley.framework.cmd.src4.engine.MCmd;
-import pasa.cbentley.framework.cmd.src4.interfaces.ICommandable;
+import pasa.cbentley.framework.cmd.src4.interfaces.ICmdExecutor;
+import pasa.cbentley.framework.cmd.src4.interfaces.ICmdsCmd;
 import pasa.cbentley.framework.cmd.src4.interfaces.IEventCmds;
 import pasa.cbentley.framework.cmd.src4.interfaces.ITechCmd;
-import pasa.cbentley.framework.core.ui.src4.interfaces.IActionFeedback;
 import pasa.cbentley.framework.core.ui.src4.tech.IInput;
 import pasa.cbentley.framework.core.ui.src4.tech.ITechCodes;
+import pasa.cbentley.framework.core.ui.src4.tech.ITechInputFeedback;
 import pasa.cbentley.framework.datamodel.src4.table.ObjectTableModel;
 import pasa.cbentley.framework.gui.src4.canvas.FocusCtrl;
 import pasa.cbentley.framework.gui.src4.canvas.InputConfig;
@@ -25,9 +26,9 @@ import pasa.cbentley.framework.gui.src4.exec.ExecutionContextCanvasGui;
 import pasa.cbentley.framework.gui.src4.exec.InputStateCanvasGui;
 import pasa.cbentley.framework.gui.src4.exec.OutputStateCanvasGui;
 import pasa.cbentley.framework.gui.src4.factories.TablePolicyFactory;
-import pasa.cbentley.framework.gui.src4.interfaces.ITechCanvasDrawable;
 import pasa.cbentley.framework.gui.src4.interfaces.ICmdsGui;
 import pasa.cbentley.framework.gui.src4.interfaces.IDrawable;
+import pasa.cbentley.framework.gui.src4.interfaces.ITechCanvasDrawable;
 import pasa.cbentley.framework.gui.src4.interfaces.ITechDrawable;
 import pasa.cbentley.framework.gui.src4.string.StringDrawable;
 import pasa.cbentley.framework.gui.src4.table.TableView;
@@ -48,7 +49,7 @@ import pasa.cbentley.framework.gui.src4.utils.DrawableUtilz;
  * When a Drawable is made visible, it sends ist context to the {@link Controller}. 
  * <br>
  * <br>
- * Created when the first {@link ICommandable} is made active in the Controller.
+ * Created when the first {@link ICmdExecutor} is made active in the Controller.
  * <br>
  * <br>
  * The menu context: The current Drawable gives its {@link CmdCtx} = Forms have their own and add commands using {@link Displayable#addCommand(Command)}
@@ -90,7 +91,7 @@ import pasa.cbentley.framework.gui.src4.utils.DrawableUtilz;
  * @author Charles-Philip Bentley
  * @see TableView
  */
-public class CmdMenuBar extends TableView implements IEventConsumer, ICmdsGui {
+public class CmdMenuBar extends TableView implements IEventConsumer, ICmdsCmd, ICmdsGui {
 
    //inner link values
    public static final int    LINK_CHILD_1LEFT_STYLE   = 1;
@@ -315,7 +316,7 @@ public class CmdMenuBar extends TableView implements IEventConsumer, ICmdsGui {
             executeSelectedCmd();
             //check focus change by command how?
             if (focusCount != fc.getKeyFocusCount()) {
-               itemKeyFocusBackUp = fc.getItemInKeyFocus();
+               itemKeyFocusBackUp = fc.getDrawableInKeyFocus();
             }
             ExecutionContextCanvasGui ec = (ExecutionContextCanvasGui) e.getParamO2();
             hideAndGoState0(ec);
@@ -385,7 +386,7 @@ public class CmdMenuBar extends TableView implements IEventConsumer, ICmdsGui {
          toDLog().pCmd("executing", cmd, CmdMenuBar.class, "executeSelectedCmd", LVL_05_FINE, true);
          //execute menu command within the right Feedback
 
-         gc.getCmdProcessorGui().executeMenuCmd(cmd);
+         cc.executeInstanceMenu(cmd);
       } else {
          //#debug
          toDLog().pCmd("No Command Model Active", this, CmdMenuBar.class, "executeSelectedCmd", LVL_05_FINE, true);
@@ -696,7 +697,7 @@ public class CmdMenuBar extends TableView implements IEventConsumer, ICmdsGui {
       OutputStateCanvasGui os = ec.getCanvasResultDrawable();
       os.setActionDoneRepaint(this);
       os.setActionDoneRepaint(cmdTableView);
-      os.setFlag(IActionFeedback.FLAG_01_ACTION_DONE, false);
+      os.setFlag(ITechInputFeedback.FLAG_01_ACTION_DONE, false);
       //remove interceptor
       this.getCanvas().getVCRoot().getTopo().removeInterceptor(this);
    }
@@ -964,7 +965,7 @@ public class CmdMenuBar extends TableView implements IEventConsumer, ICmdsGui {
       this.getCanvas().getVCRoot().getTopo().addInterceptor(this);
 
       //previous focus
-      itemKeyFocusBackUp = gc.getFocusCtrl().getItemInKeyFocus();
+      itemKeyFocusBackUp = gc.getFocusCtrl().getDrawableInKeyFocus();
       //give focus control
       gc.getFocusCtrl().newFocusKey(ec, cmdTableView);
 
@@ -1008,7 +1009,7 @@ public class CmdMenuBar extends TableView implements IEventConsumer, ICmdsGui {
       if (topPriorityCmd != null) {
          cmd = topPriorityCmd;
       }
-      gc.getCmdProcessorGui().executeMenuCmd(cmd);
+      cc.executeInstanceMenu(cmd);
    }
 
 

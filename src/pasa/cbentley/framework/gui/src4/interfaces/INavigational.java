@@ -1,7 +1,7 @@
 package pasa.cbentley.framework.gui.src4.interfaces;
 
 import pasa.cbentley.framework.cmd.src4.engine.CmdInstance;
-import pasa.cbentley.framework.cmd.src4.interfaces.INavTech;
+import pasa.cbentley.framework.cmd.src4.interfaces.ITechNav;
 import pasa.cbentley.framework.gui.src4.canvas.InputConfig;
 import pasa.cbentley.framework.gui.src4.core.Drawable;
 import pasa.cbentley.framework.gui.src4.exec.ExecutionContextCanvasGui;
@@ -61,7 +61,7 @@ import pasa.cbentley.framework.gui.src4.table.TableView;
  *
  * @see IDrawable
  */
-public interface INavigational extends INavTech {
+public interface INavigational extends ITechNav {
 
    public void manageNavigate(ExecutionContextCanvasGui ec, int navEvent);
 
@@ -70,9 +70,9 @@ public interface INavigational extends INavTech {
     * of internal state reasons.
     * <br>
     * The nav command contains info about 
-    * <li> {@link INavTech#NAV_1_UP}
-    * <li> {@link INavTech#NAV_2_DOWN}
-    * <li> {@link INavTech#NAV_3_LEFT}
+    * <li> {@link ITechNav#NAV_1_UP}
+    * <li> {@link ITechNav#NAV_2_DOWN}
+    * <li> {@link ITechNav#NAV_3_LEFT}
     * 
     * <br>
     * <br>

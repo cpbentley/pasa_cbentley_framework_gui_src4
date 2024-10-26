@@ -12,7 +12,7 @@ import pasa.cbentley.core.src4.logging.Dctx;
 import pasa.cbentley.core.src4.structs.IntToStrings;
 import pasa.cbentley.core.src4.thread.IBRunnable;
 import pasa.cbentley.core.src4.thread.PulseThread;
-import pasa.cbentley.framework.cmd.src4.interfaces.INavTech;
+import pasa.cbentley.framework.cmd.src4.interfaces.ITechNav;
 import pasa.cbentley.framework.core.framework.src4.interfaces.IBOHost;
 import pasa.cbentley.framework.core.ui.src4.ctx.CoreUiCtx;
 import pasa.cbentley.framework.core.ui.src4.ctx.IEventsCoreUi;
@@ -851,7 +851,7 @@ public class StringEditControl extends TableView implements IDrawListener, IBOSt
       if (position == ITechStringDrawable.SEDIT_CONTROL_0_CANVAS) {
       } else if (position == ITechStringDrawable.SEDIT_CONTROL_1_TOP && controlledSD != null) {
          //create a Top Center Pozer
-         gc.getNavigator().navInsert(null, controlledSD, INavTech.NAV_1_UP, this);
+         gc.getNavigator().navInsert(null, controlledSD, ITechNav.NAV_1_UP, this);
 
       } else {
          //position it top of canvas as overlay??? depends on settings

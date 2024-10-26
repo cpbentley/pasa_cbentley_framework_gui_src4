@@ -17,6 +17,7 @@ import pasa.cbentley.framework.gui.src4.anim.move.MoveGhost;
 import pasa.cbentley.framework.gui.src4.canvas.InputConfig;
 import pasa.cbentley.framework.gui.src4.canvas.PointerGestureDrawable;
 import pasa.cbentley.framework.gui.src4.canvas.ViewContext;
+import pasa.cbentley.framework.gui.src4.cmd.CmdInstanceGui;
 import pasa.cbentley.framework.gui.src4.ctx.GuiCtx;
 import pasa.cbentley.framework.gui.src4.ctx.IToStringFlagsGui;
 import pasa.cbentley.framework.gui.src4.exec.ExecutionContextCanvasGui;
@@ -4080,7 +4081,7 @@ public class ViewPane extends Drawable implements ITechViewPane, ITechDrawable, 
     * <br>
     * <br>
     */
-   public void navigateDown(ExecutionContextCanvasGui ic) {
+   public void navigateDown(CmdInstanceGui ic) {
       if (vScrollBar != null) {
          vScrollBar.navigateDown(ic);
       }
@@ -4618,7 +4619,7 @@ public class ViewPane extends Drawable implements ITechViewPane, ITechDrawable, 
          // gc.getDrawableCoreFactory().toStringViewPaneTech(boViewPane, dc.newLevel());
       }
 
-      if (dc.hasFlagData(gc, IToStringFlagsGui.D_FLAG_15_VP_SCROLL_CONFIGS)) {
+      if (dc.hasFlagToString(gc, IToStringFlagsGui.D_FLAG_15_VP_SCROLL_CONFIGS)) {
          ScrollConfig scV = getScrollConfigVertical();
          if (scV != null) {
             dc.nlLvl("#VerticalSC", scV);
@@ -4628,10 +4629,10 @@ public class ViewPane extends Drawable implements ITechViewPane, ITechDrawable, 
             dc.nlLvl("#HorizontalSC", scH);
          }
       }
-      if (dc.hasFlagData(gc, IToStringFlagsGui.D_FLAG_11_VP_HEADERS)) {
+      if (dc.hasFlagToString(gc, IToStringFlagsGui.D_FLAG_11_VP_HEADERS)) {
          toStringHeaders(dc.newLevel());
       }
-      if (dc.hasFlagData(gc, IToStringFlagsGui.D_FLAG_12_VP_SCROLLBARS)) {
+      if (dc.hasFlagToString(gc, IToStringFlagsGui.D_FLAG_12_VP_SCROLLBARS)) {
          toStringScrollbars(dc.newLevel());
       }
    }

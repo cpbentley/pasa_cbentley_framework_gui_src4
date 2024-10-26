@@ -16,11 +16,12 @@ import pasa.cbentley.core.src4.stator.StatorReader;
 import pasa.cbentley.core.src4.stator.StatorWriter;
 import pasa.cbentley.core.src4.utils.BitUtils;
 import pasa.cbentley.core.src4.utils.interfaces.IColors;
+import pasa.cbentley.framework.cmd.src4.cmd.MCmdNav;
 import pasa.cbentley.framework.cmd.src4.ctx.CmdCtx;
 import pasa.cbentley.framework.cmd.src4.engine.CmdInstance;
 import pasa.cbentley.framework.cmd.src4.engine.CmdNode;
 import pasa.cbentley.framework.cmd.src4.engine.MCmd;
-import pasa.cbentley.framework.cmd.src4.interfaces.ICmdListener;
+import pasa.cbentley.framework.cmd.src4.interfaces.ITechCmd;
 import pasa.cbentley.framework.core.ui.src4.input.InputState;
 import pasa.cbentley.framework.core.ui.src4.utils.ViewState;
 import pasa.cbentley.framework.coredraw.src4.interfaces.IMFont;
@@ -223,6 +224,12 @@ public class Drawable extends ObjectGC implements IDrawable, IBOStyle, IStringab
     */
    protected int                    canvasID;
 
+   /**
+    * Null by construction.
+    * 
+    * <li>{@link Drawable#getCmdNode()}
+    * <li>{@link Drawable#setCmdNode(CmdNode)}
+    */
    protected CmdNode                cmdNode;
 
    private int                      ctrl;
@@ -1223,7 +1230,7 @@ public class Drawable extends ObjectGC implements IDrawable, IBOStyle, IStringab
       } else if (parent != null) {
          return parent.getCmdNode();
       } else {
-         return gc.getCC().getNodeRoot();
+         return gc.getCC().getCmdNodeRoot();
       }
    }
 
@@ -2654,10 +2661,14 @@ public class Drawable extends ObjectGC implements IDrawable, IBOStyle, IStringab
    }
 
    /**
-    * Call Back for DownCmd
+    * Called by {@link MCmdNav} on the active Drawable with {@link CmdInstanceGui}.
+    * 
+    * <p>
+    * Default implementation inside {@link Drawable} assumes {@link Drawable} is not {@link INavigational}.
+    * </p>
     *
     */
-   public void navigateDown(ExecutionContextCanvasGui ec) {
+   public void navigateDown(CmdInstanceGui ci) {
 
    }
 
@@ -2960,8 +2971,8 @@ public class Drawable extends ObjectGC implements IDrawable, IBOStyle, IStringab
       vc.getRepaintCtrlDraw().repaintDrawableCycleBusiness(this);
    }
 
-   public int sendEvent(int evType, Object param) {
-      return ICmdListener.PRO_STATE_0;
+   public int commandEvent(int evType, Object param) {
+      return ITechCmd.PRO_STATE_0_CONTINUE;
    }
 
    /**
@@ -3006,7 +3017,7 @@ public class Drawable extends ObjectGC implements IDrawable, IBOStyle, IStringab
     * 
     * @param cmdNode
     */
-   public void setCmdNote(CmdNode cmdNode) {
+   public void setCmdNode(CmdNode cmdNode) {
       this.cmdNode = cmdNode;
    }
 
@@ -3738,7 +3749,7 @@ public class Drawable extends ObjectGC implements IDrawable, IBOStyle, IStringab
       if (ctype != 0) {
          dc.nlAppend("CType=" + ctype);
          //get the ctype style if it exists are stored in the StyleID space
-         if (dc.hasFlagData(gc, IToStringFlagsGui.D_FLAG_01_STYLE)) {
+         if (dc.hasFlagToString(gc, IToStringFlagsGui.D_FLAG_01_STYLE)) {
             ByteObject ctypeStyle = styleClass.getCTypeStyle(ctype);
             if (ctypeStyle != null) {
                //the style here does not have a static id yet
@@ -3747,7 +3758,7 @@ public class Drawable extends ObjectGC implements IDrawable, IBOStyle, IStringab
          }
       }
       //-----------------------------
-      if (dc.hasFlagData(gc, IToStringFlagsGui.D_FLAG_27_CACHE)) {
+      if (dc.hasFlagToString(gc, IToStringFlagsGui.D_FLAG_27_CACHE)) {
          dc.nlLvl("Cache " + ToStringStaticGui.debugCacheType(cacheType), cache);
       }
 
@@ -3770,7 +3781,7 @@ public class Drawable extends ObjectGC implements IDrawable, IBOStyle, IStringab
 
       dc.nlLvl(styleCache, "styleCache");
 
-      if (dc.hasFlagData(gc, IToStringFlagsGui.D_FLAG_02_STYLE_CLASS)) {
+      if (dc.hasFlagToString(gc, IToStringFlagsGui.D_FLAG_02_STYLE_CLASS)) {
          //cannot be null
          dc.nlLvl(styleClass);
       } else {
@@ -3779,13 +3790,13 @@ public class Drawable extends ObjectGC implements IDrawable, IBOStyle, IStringab
 
       //-----------------
       //style cannot be null
-      if (dc.hasFlagData(gc, IToStringFlagsGui.D_FLAG_01_STYLE)) {
+      if (dc.hasFlagToString(gc, IToStringFlagsGui.D_FLAG_01_STYLE)) {
          dc.nlLvl("Style", style);
       } else {
          dc.nl();
          dc.append("Style " + style.getMyHashCode());
       }
-      if (dc.hasFlagData(gc, IToStringFlagsGui.D_FLAG_04_ANIMATIONS)) {
+      if (dc.hasFlagToString(gc, IToStringFlagsGui.D_FLAG_04_ANIMATIONS)) {
          dc.nlLvl("DrawableAnimator", da);
       }
 

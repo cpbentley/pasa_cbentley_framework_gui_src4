@@ -11,11 +11,12 @@ import pasa.cbentley.core.src4.stator.StatorReader;
 import pasa.cbentley.core.src4.stator.StatorWriter;
 import pasa.cbentley.core.src4.utils.ColorUtils;
 import pasa.cbentley.framework.cmd.src4.ctx.CmdCtx;
+import pasa.cbentley.framework.cmd.src4.engine.CmdNode;
+import pasa.cbentley.framework.cmd.src4.engine.CmdProcessor;
 import pasa.cbentley.framework.cmd.src4.engine.MCmd;
-import pasa.cbentley.framework.cmd.src4.interfaces.ICmdListener;
 import pasa.cbentley.framework.cmd.src4.interfaces.ICmdMenu;
 import pasa.cbentley.framework.cmd.src4.interfaces.ITechCmd;
-import pasa.cbentley.framework.core.ui.src4.event.CanvasHostEvent;
+import pasa.cbentley.framework.core.ui.src4.event.EventCanvasHost;
 import pasa.cbentley.framework.core.ui.src4.exec.ExecEntry;
 import pasa.cbentley.framework.core.ui.src4.exec.ExecutionContext;
 import pasa.cbentley.framework.core.ui.src4.exec.OutputState;
@@ -162,7 +163,8 @@ public class CanvasAppliInputGui extends CanvasAppliInput implements IDrawableLi
       }
 
       //#debug
-      toDLog().pInit("Size w=" + getWidth() + " h=" + getHeight(), null, CanvasAppliInputGui.class, "Created@170", LVL_05_FINE, true);
+      toDLog().pCreate("Size w=" + getWidth() + " h=" + getHeight(), this, CanvasAppliInputGui.class, "Created@165", LVL_04_FINER, true);
+
    }
 
    /**
@@ -221,23 +223,34 @@ public class CanvasAppliInputGui extends CanvasAppliInput implements IDrawableLi
     * @param cc
     * @param icc
     */
-   private int cmdProCmdCtx(int state, InputConfig icc) {
-      if (state == ICmdListener.PRO_STATE_0) {
-         return cc.getActiveNode().sendEvent(ITechCanvasDrawable.CMD_EVENT_4_UIEVENT, icc); //send event down ctx hierarch
+   private int cmdProCmdCtx(int state, ExecutionContextCanvasGui ec) {
+      if (state == ITechCmd.PRO_STATE_0_CONTINUE) {
+         CmdNode activeNode = cc.getCmdNodeActive();
+         if (activeNode != null) {
+            state = activeNode.sendEvent(ITechCanvasDrawable.CMD_EVENT_4_UIEVENT, ec); //send event down ctx hierarch
+         }
       }
       return state;
    }
 
    /**
     * 
+    * <li> {@link ITechCmd#CTX_CAT_0_KEY}
+    * <li> {@link ITechCmd#CTX_CAT_1_POINTER_PRESSED}
+    * <li> {@link ITechCmd#CTX_CAT_2_POINTER_OVER}
+    * <li> {@link ITechCmd#CTX_CAT_3_POINTER2_PRESSED}
+    * <li> {@link ITechCmd#CTX_CAT_4_POINTER2_OVER}
+    * <li> {@link ITechCmd#CTX_CAT_5_POINTER3_PRESSED}
+    * <li> {@link ITechCmd#CTX_CAT_6_POINTER3_OVER}
+    * @param state
     * @param ec
-    * @param is TODO
-    * @param cc
+    * @param is 
+    * @param ctxcat 
     */
-   private int cmdProCmdRepo(ExecutionContextCanvasGui ec, InputStateCanvasGui is, int state, int ctxcat) {
-      if (state == ICmdListener.PRO_STATE_0) {
-         CmdProcessorGui cmdProcessorGui = gc.getCmdProcessorGui();
-         state = cmdProcessorGui.processGUIEvent(ec, is, ctxcat);
+   private int cmdProCmdRepo(int state, ExecutionContextCanvasGui ec, InputStateCanvasGui is, int ctxcat) {
+      if (state == ITechCmd.PRO_STATE_0_CONTINUE) {
+         CmdProcessor cmdProcessorGui = gc.getCmdProcessorGui();
+         state = cmdProcessorGui.processGUIEvent(ec, is);
          return state;
       }
       return state;
@@ -257,10 +270,9 @@ public class CanvasAppliInputGui extends CanvasAppliInput implements IDrawableLi
     * @param icc
     * @return
     */
-   private int cmdProDrawables(ExecutionContextCanvasGui ec, int state) {
-      InputConfig icc = ec.getInputConfig();
+   private int cmdProDrawables(int state, ExecutionContextCanvasGui ec) {
       //send event down drawable hierarchy why third? why not first? TODO config
-      if (state == ICmdListener.PRO_STATE_0) {
+      if (state == ITechCmd.PRO_STATE_0_CONTINUE) {
          //a cmd was not processed
          //TODO aqcuire lock on topology. business threads might update it
          TopologyDLayer topologyRoot = getTopologyRoot();
@@ -355,20 +367,19 @@ public class CanvasAppliInputGui extends CanvasAppliInput implements IDrawableLi
       return new RepaintHelperGui(gc, this);
    }
 
-
    public OutputStateCanvasGui createScreenResultAnimation() {
       return (OutputStateCanvasGui) repaintHelper.create(ITechInputCycle.CYCLE_2_ANIMATION_EVENT);
    }
 
    /**
-    * Special case when the event is a {@link CanvasHostEvent}
+    * Special case when the event is a {@link EventCanvasHost}
     * @param is
     * @param sr
     * @param che
     */
-   protected void ctrlAppEvent(InputState is, OutputStateCanvas sr, CanvasHostEvent che) {
+   protected void ctrlAppEvent(InputState is, OutputStateCanvas sr, EventCanvasHost che) {
       //#debug
-      toDLog().pEvent1("", che, CanvasAppliInputGui.class, "ctrlAppEvent@381");
+      toDLog().pEvent("", che, CanvasAppliInputGui.class, "ctrlAppEvent@"+toStringGetLine(382));
 
       int actionType = che.getActionType();
       if (actionType == ITechEventHost.ACTION_01_CLOSE) {
@@ -382,7 +393,7 @@ public class CanvasAppliInputGui extends CanvasAppliInput implements IDrawableLi
 
    }
 
-   protected void ctrlAppEventResized(InputState is, OutputStateCanvas sr, CanvasHostEvent e) {
+   protected void ctrlAppEventResized(InputState is, OutputStateCanvas sr, EventCanvasHost e) {
       sizeChanged(e.getW(), e.getH());
    }
 
@@ -433,17 +444,17 @@ public class CanvasAppliInputGui extends CanvasAppliInput implements IDrawableLi
     * <li> Associated context is set.
     */
    protected void ctrlUIEvent(ExecutionContextCanvas exc, InputStateCanvas ixs, OutputStateCanvas oxs) {
+      ExecutionContextCanvasGui ec = (ExecutionContextCanvasGui) exc;
       InputStateCanvasGui is = (InputStateCanvasGui) ixs;
       OutputStateCanvasGui os = (OutputStateCanvasGui) oxs;
-      ExecutionContextCanvasGui ec = (ExecutionContextCanvasGui) exc;
       InputConfig ic = new InputConfig(gc, this, is, os);
       ec.setInputConfig(ic);
 
       //#debug
-      toDLog().pFlow("", this, CanvasAppliInputGui.class, "ctrlUIEvent@line416", LVL_03_FINEST, true);
+      toDLog().pFlow("", this, CanvasAppliInputGui.class, "ctrlUIEvent@"+toStringGetLine(450), LVL_03_FINEST, true);
 
-      if (is.getEventCurrent() instanceof CanvasHostEvent) {
-         CanvasHostEvent hostEvent = (CanvasHostEvent) is.getEventCurrent();
+      if (is.getEventCurrent() instanceof EventCanvasHost) {
+         EventCanvasHost hostEvent = (EventCanvasHost) is.getEventCurrent();
          ctrlAppEvent(is, os, hostEvent);
          return;
       }
@@ -456,7 +467,10 @@ public class CanvasAppliInputGui extends CanvasAppliInput implements IDrawableLi
          toDLog().pAlways("F3 Debug InputState", is, CanvasAppliInputGui.class, "ctrlUIEvent");
       }
       if (is.isKeyPressed(ITechCodes.KEY_F4)) {
-         toDLog().pAlways("F4 Debug Coordinator", gc.getCFC().getCoordinator(), CanvasAppliInputGui.class, "ctrlUIEvent");
+         toDLog().pAlways("F4 Debug OutputState", is, CanvasAppliInputGui.class, "ctrlUIEvent");
+      }
+      if (is.isKeyPressed(ITechCodes.KEY_F5)) {
+         toDLog().pAlways("F5 Debug Coordinator", gc.getCFC().getCoordinator(), CanvasAppliInputGui.class, "ctrlUIEvent");
       }
 
       //wait until previous context has finished rendering. why?
@@ -527,17 +541,17 @@ public class CanvasAppliInputGui extends CanvasAppliInput implements IDrawableLi
       //down open menu. if no left, left will go to next menu, the left is delegated up
       int state = 0;
       if (cmdProcessingMode == ITechCanvasDrawable.CMD_PRO_0_REPO_NODE_UI) {
-         state = cmdProCmdRepo(ec, is, state, ctxCategory);
-         state = cmdProCmdCtx(state, ic);
-         state = cmdProDrawables(ec, state);
+         state = cmdProCmdRepo(state, ec, is, ctxCategory);
+         state = cmdProCmdCtx(state, ec);
+         state = cmdProDrawables(state, ec);
       } else if (cmdProcessingMode == ITechCanvasDrawable.CMD_PRO_2_UI_NODE_REPO) {
-         state = cmdProDrawables(ec, state);
-         state = cmdProCmdCtx(state, ic);
-         state = cmdProCmdRepo(ec, is, state, ctxCategory);
+         state = cmdProDrawables(state, ec);
+         state = cmdProCmdCtx(state, ec);
+         state = cmdProCmdRepo(state, ec, is, ctxCategory);
       } else if (cmdProcessingMode == ITechCanvasDrawable.CMD_PRO_1_REPO_UI_NODE) {
-         state = cmdProCmdRepo(ec, is, state, ctxCategory);
-         state = cmdProDrawables(ec, state);
-         state = cmdProCmdCtx(state, ic);
+         state = cmdProCmdRepo(state, ec, is, ctxCategory);
+         state = cmdProDrawables(state, ec);
+         state = cmdProCmdCtx(state, ec);
       } else {
          //no processing lol
       }
@@ -578,8 +592,8 @@ public class CanvasAppliInputGui extends CanvasAppliInput implements IDrawableLi
     * @param cd
     */
    public void doCuePress(CmdInstanceGui cd) {
-      int cx = cd.getIC().getInputStateDrawable().getX();
-      int cy = cd.getIC().getInputStateDrawable().getY();
+      int cx = cd.getInputConfig().getInputStateDrawable().getX();
+      int cy = cd.getInputConfig().getInputStateDrawable().getY();
       int cueColor = ColorUtils.getRGBInt(128, 128, 128, 128);
       ByteObject fig = gc.getDC().getFigureFactory().getFigEllipse(cueColor);
       IDrawable cue = new FigDrawable(gc, gc.getStyleClass(IUIView.SC_6_EMPTY), fig);
@@ -602,7 +616,7 @@ public class CanvasAppliInputGui extends CanvasAppliInput implements IDrawableLi
 
       //cue.setBehaviorFlag(ITechDrawable.BEHAVIOR_16_IMMATERIAL, true);
       //cue must be shown in a foreground. pure visual
-      cd.getExecutionCtxGui().addDrawn(cue);
+      cd.getExecutionContextGui().addDrawn(cue);
    }
 
    public void doThreadGUI() {
@@ -1078,7 +1092,8 @@ public class CanvasAppliInputGui extends CanvasAppliInput implements IDrawableLi
 
    public void show(CmdInstanceGui cmd) {
       //place it at the bottom
-      vcRoot.getTopo().addDLayer(topoViewDrawableRoot, ITechCanvasDrawable.SHOW_TYPE_0_REPLACE_BOTTOM);
+      TopologyDLayer topo = vcRoot.getTopo();
+      topo.addDLayer(topoViewDrawableRoot, ITechCanvasDrawable.SHOW_TYPE_0_REPLACE_BOTTOM);
    }
 
    /**

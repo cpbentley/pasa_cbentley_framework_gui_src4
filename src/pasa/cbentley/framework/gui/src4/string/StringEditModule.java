@@ -6,6 +6,8 @@ import pasa.cbentley.core.src4.logging.Dctx;
 import pasa.cbentley.core.src4.logging.IDLog;
 import pasa.cbentley.core.src4.logging.IStringable;
 import pasa.cbentley.core.src4.utils.StringUtils;
+import pasa.cbentley.framework.cmd.src4.engine.CmdFactoryCore;
+import pasa.cbentley.framework.cmd.src4.engine.CmdSearch;
 import pasa.cbentley.framework.cmd.src4.engine.MCmd;
 import pasa.cbentley.framework.core.ui.src4.tech.ITechCodes;
 import pasa.cbentley.framework.drawx.src4.engine.GraphicsX;
@@ -21,6 +23,7 @@ import pasa.cbentley.framework.gui.src4.ctx.IEventsGui;
 import pasa.cbentley.framework.gui.src4.exec.ExecutionContextCanvasGui;
 import pasa.cbentley.framework.gui.src4.factories.interfaces.IBOStrAuxData;
 import pasa.cbentley.framework.gui.src4.factories.interfaces.IBOStrAuxEdit;
+import pasa.cbentley.framework.gui.src4.interfaces.ICmdsGui;
 import pasa.cbentley.framework.gui.src4.interfaces.IDrawListener;
 import pasa.cbentley.framework.gui.src4.interfaces.IDrawable;
 import pasa.cbentley.framework.gui.src4.interfaces.ITechDrawable;
@@ -214,7 +217,8 @@ public class StringEditModule implements IDrawListener, IBOStrAuxData, IStringab
    public StringEditModule(GuiCtx gc) {
       this.gc = gc;
       editTech = gc.getDrawableStringFactory().getBOStringEditNormal();
-      CMD_SET_EDIT = new MCmd(gc.getCC(), "Edit Mode True");
+      CmdFactoryCore cmdFac = gc.getCC().getCmdFactoryCore();
+      CMD_SET_EDIT = cmdFac.createCmd(ICmdsGui.CMD_GUI_20_EDIT_MODE, "Edit Mode True");
    }
 
    /**
@@ -654,13 +658,14 @@ public class StringEditModule implements IDrawListener, IBOStrAuxData, IStringab
     * <br>
     * 
     */
-   public void navigateDown(ExecutionContextCanvasGui ec) {
+   public void navigateDown(CmdInstanceGui ci) {
       //inside navitation. updates StringDrawable viewpane
       if (numEditLines > 1) {
          //TODO even in multiline, if a prediction table is shown. down will select first element in table
          //
       }
-      gc.getFocusCtrl().newFocusKey(ec, stringDrawable);
+      
+      gc.getFocusCtrl().newFocusKey(ci.getExecutionContextGui(), stringDrawable);
 
    }
 

@@ -5,8 +5,8 @@ import pasa.cbentley.core.src4.logging.Dctx;
 import pasa.cbentley.framework.cmd.src4.engine.CmdInstance;
 import pasa.cbentley.framework.cmd.src4.engine.CmdNode;
 import pasa.cbentley.framework.cmd.src4.engine.MCmd;
-import pasa.cbentley.framework.cmd.src4.interfaces.ICmdListener;
-import pasa.cbentley.framework.cmd.src4.interfaces.ICommandable;
+import pasa.cbentley.framework.cmd.src4.interfaces.ICmdExecutor;
+import pasa.cbentley.framework.cmd.src4.interfaces.ITechCmd;
 import pasa.cbentley.framework.gui.src4.canvas.InputConfig;
 import pasa.cbentley.framework.gui.src4.core.StyleClass;
 import pasa.cbentley.framework.gui.src4.core.ViewDrawable;
@@ -41,13 +41,13 @@ import pasa.cbentley.framework.gui.src4.tech.ITechViewPane;
  * @author Charles-Philip
  *
  */
-public class RequestStringInput extends ObjectGC implements ICommandable {
+public class RequestStringInput extends ObjectGC implements ICmdExecutor {
 
    protected CmdInstance  ci;
 
    protected CmdNode      cmdNodeEditStr;
 
-   protected ICommandable icon;
+   protected ICmdExecutor icon;
 
    private StringDrawable sd;
 
@@ -60,11 +60,11 @@ public class RequestStringInput extends ObjectGC implements ICommandable {
       cmdNodeEditStr.addMenuCmd(cc.CMD_04_OK);
       cmdNodeEditStr.addMenuCmd(cc.CMD_05_CANCEL);
 
-      cmdNodeEditStr.setListener(this);
+      cmdNodeEditStr.setExecutor(this);
 
       sd = new StringDrawable(gc, scStr, "");
 
-      sd.setCmdNote(cmdNodeEditStr);
+      sd.setCmdNode(cmdNodeEditStr);
 
       sd.getEditModule();
 
@@ -80,7 +80,7 @@ public class RequestStringInput extends ObjectGC implements ICommandable {
     * TODO string validation?
     */
    public void commandAction(CmdInstance cmd) {
-      if (cmd.getCmdID() == cc.CMD_04_OK || cmd.getCmdID() == cc.CMD_04_OK) {
+      if (cmd.getCmdId() == cc.CMD_04_OK || cmd.getCmdId() == cc.CMD_04_OK) {
          ci.paramO = sd.getString();
          icon.commandAction(ci);
          sd.removeEditControl();
@@ -105,11 +105,11 @@ public class RequestStringInput extends ObjectGC implements ICommandable {
       return sd;
    }
 
-   public int sendEvent(int evType, Object param) {
-      return ICmdListener.PRO_STATE_0;
+   public int commandEvent(int evType, Object param) {
+      return ITechCmd.PRO_STATE_0_CONTINUE;
    }
 
-   public void show(ICommandable icon, CmdInstance ci) {
+   public void show(ICmdExecutor icon, CmdInstance ci) {
       this.icon = icon;
       this.ci = ci;
       ExecutionContextCanvasGui ec = (ExecutionContextCanvasGui) ci.getExecutionContext();

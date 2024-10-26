@@ -4,6 +4,7 @@ import pasa.cbentley.byteobjects.src4.core.ByteObject;
 import pasa.cbentley.core.src4.logging.IStringable;
 import pasa.cbentley.framework.cmd.src4.engine.MCmd;
 import pasa.cbentley.framework.core.ui.src4.interfaces.IUserInteraction;
+import pasa.cbentley.framework.core.ui.src4.user.UserInteraction;
 import pasa.cbentley.framework.drawx.src4.engine.GraphicsX;
 import pasa.cbentley.framework.drawx.src4.engine.RgbImage;
 import pasa.cbentley.framework.gui.src4.anim.ITechAnim;
@@ -15,7 +16,6 @@ import pasa.cbentley.framework.gui.src4.canvas.CanvasAppliInputGui;
 import pasa.cbentley.framework.gui.src4.canvas.ViewContext;
 import pasa.cbentley.framework.gui.src4.core.Drawable;
 import pasa.cbentley.framework.gui.src4.core.RgbDrawable;
-import pasa.cbentley.framework.gui.src4.core.UserInteraction;
 
 /**
  * Animates an {@link IDrawable}. For animation an {@link RgbImage}, use the class {@link RgbDrawable}.

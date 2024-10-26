@@ -95,7 +95,7 @@ public class SymbolTable extends TableView {
       techSymbol = styleClass.getByteObject(TECH_ID_CHAR_TABLE);
 
       CmdNode ctx = gc.getCC().createCmdNode("Symbols");
-      setCmdNote(ctx);
+      setCmdNode(ctx);
 
       //create model
       IMFont f = getStyleOp().getStyleFont(style);
@@ -331,7 +331,7 @@ public class SymbolTable extends TableView {
     * <br>
     * 
     */
-   protected void selectionMoveEvent(ExecutionContextCanvasGui ec) {
+   protected void sendSelectionChangeEvent(ExecutionContextCanvasGui ec) {
       int selectedIndex = super.getSelectedIndex();
       if (selectedIndex < myChars.length) {
          this.selectedIndexPrevious = getSelectedIndexPrevious();
@@ -343,7 +343,7 @@ public class SymbolTable extends TableView {
       //#debug
       toDLog().pEvent("selectedIndex=" + selectedIndex, this, SymbolTable.class, "selectionMoveEvent", LVL_05_FINE, true);
 
-      super.selectionMoveEvent(ec);
+      super.sendSelectionChangeEvent(ec);
    }
 
    //#mdebug

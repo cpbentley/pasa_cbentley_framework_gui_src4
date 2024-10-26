@@ -1136,12 +1136,12 @@ public class StringDrawable extends ViewDrawable implements IBOStrAuxData, IDraw
     * When not in edit mode, ask {@link ViewDrawable} to forward event to any {@link ViewPane}
     * <br>
     */
-   public void navigateDown(ExecutionContextCanvasGui ic) {
+   public void navigateDown(CmdInstanceGui ci) {
       if (editModule != null) {
-         editModule.navigateDown(ic);
+         editModule.navigateDown(ci);
       } else {
          if (viewPane != null) {
-            viewPane.navigateDown(ic);
+            viewPane.navigateDown(ci);
          }
       }
 

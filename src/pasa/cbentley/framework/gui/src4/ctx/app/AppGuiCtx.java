@@ -13,7 +13,6 @@ import pasa.cbentley.framework.datamodel.src4.ctx.DataModelCtx;
 import pasa.cbentley.framework.drawx.src4.ctx.DrwCtx;
 import pasa.cbentley.framework.gui.src4.ctx.GuiCtx;
 import pasa.cbentley.framework.gui.src4.ctx.ITechCtxSettingsAppGui;
-import pasa.cbentley.framework.gui.src4.ctx.config.IConfigAppGui;
 import pasa.cbentley.framework.input.src4.ctx.InputCtx;
 import pasa.cbentley.powerdata.spec.src4.ctx.PDCtxA;
 

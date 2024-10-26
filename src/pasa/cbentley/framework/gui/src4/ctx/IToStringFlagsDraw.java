@@ -1,8 +1,8 @@
 package pasa.cbentley.framework.gui.src4.ctx;
 
-import pasa.cbentley.core.src4.ctx.IToStringFlags;
+import pasa.cbentley.core.src4.ctx.IToStringFlagsUC;
 
-public interface IToStringFlagsDraw extends IToStringFlags {
+public interface IToStringFlagsDraw extends IToStringFlagsUC {
 
    public static final int FLAG_DRAW_01_SCROLL_BAR_BOUNDARY      = 1 << 0;
 

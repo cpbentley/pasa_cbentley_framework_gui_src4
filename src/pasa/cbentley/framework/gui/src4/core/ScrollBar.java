@@ -322,8 +322,8 @@ public class ScrollBar extends Drawable implements IBOScrollBar, IDrawableListen
    }
 
    public void commandAction(CmdInstanceGui cd) {
-      if (cd.getCmdID() == ICmdsCmd.CMD_11_NAV_UP) {
-         ExecutionContextCanvasGui ec = cd.getExecutionCtxGui();
+      if (cd.getCmdId() == ICmdsCmd.CMD_11_NAV_UP) {
+         ExecutionContextCanvasGui ec = cd.getExecutionContextGui();
          navigateUp(ec);
       } else {
          super.commandAction(cd);

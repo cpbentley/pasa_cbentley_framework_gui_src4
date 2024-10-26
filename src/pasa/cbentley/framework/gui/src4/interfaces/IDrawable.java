@@ -5,7 +5,7 @@ import pasa.cbentley.core.src4.interfaces.C;
 import pasa.cbentley.core.src4.logging.IStringable;
 import pasa.cbentley.core.src4.stator.IStatorable;
 import pasa.cbentley.framework.cmd.src4.ctx.CmdCtx;
-import pasa.cbentley.framework.cmd.src4.interfaces.INavTech;
+import pasa.cbentley.framework.cmd.src4.interfaces.ITechNav;
 import pasa.cbentley.framework.core.ui.src4.interfaces.IBentleyFwSerial;
 import pasa.cbentley.framework.core.ui.src4.tech.IInput;
 import pasa.cbentley.framework.core.ui.src4.utils.ViewState;
@@ -245,10 +245,10 @@ public interface IDrawable extends IStringable, ITechDrawable, IStatorable, IBen
    /**
     * Returns the target {@link IDrawable} reachable by the given navEvent
     * 
-    * <li>{@link INavTech#NAV_1_UP}
-    * <li>{@link INavTech#NAV_2_DOWN}
-    * <li>{@link INavTech#NAV_3_LEFT}
-    * <li>{@link INavTech#NAV_4_RIGHT}
+    * <li>{@link ITechNav#NAV_1_UP}
+    * <li>{@link ITechNav#NAV_2_DOWN}
+    * <li>{@link ITechNav#NAV_3_LEFT}
+    * <li>{@link ITechNav#NAV_4_RIGHT}
     * <br>
     * <br>
     * 

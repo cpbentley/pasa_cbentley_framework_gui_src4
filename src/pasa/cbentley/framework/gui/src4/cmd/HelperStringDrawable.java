@@ -2,6 +2,7 @@ package pasa.cbentley.framework.gui.src4.cmd;
 
 import pasa.cbentley.core.src4.interfaces.C;
 import pasa.cbentley.framework.cmd.src4.engine.CmdNode;
+import pasa.cbentley.framework.cmd.src4.interfaces.ICmdsCmd;
 import pasa.cbentley.framework.core.ui.src4.tech.ITechGestures;
 import pasa.cbentley.framework.gui.src4.canvas.InputConfig;
 import pasa.cbentley.framework.gui.src4.canvas.PointerGestureDrawable;
@@ -22,7 +23,7 @@ import pasa.cbentley.framework.gui.src4.tech.ITechViewPane;
 import pasa.cbentley.framework.gui.src4.utils.DrawableUtilz;
 import pasa.cbentley.framework.input.src4.gesture.GestureDetector;
 
-public class HelperStringDrawable extends StringDrawable implements IDrawableListener {
+public class HelperStringDrawable extends StringDrawable implements IDrawableListener, ICmdsCmd {
 
    private StringDrawable titleHelp;
 
@@ -47,9 +48,9 @@ public class HelperStringDrawable extends StringDrawable implements IDrawableLis
       //commander stuff
       CmdNode helpCtx = gc.getCC().createCmdNode("help");
       //help menu may stay there
-      helpCtx.addMenuCmd(ICmdsGui.CMD_04_OK);
-      helpCtx.addMenuCmd(ICmdsGui.CMD_51_SHOW_HOME);
-      helpCtx.addMenuCmd(ICmdsGui.CMD_50_SHOW_SYSTEM_MENU);
+      helpCtx.addMenuCmd(CMD_04_OK);
+      helpCtx.addMenuCmd(CMD_51_SHOW_HOME);
+      helpCtx.addMenuCmd(CMD_50_SHOW_SYSTEM_MENU);
 
    }
 

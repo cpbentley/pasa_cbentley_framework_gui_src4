@@ -3,6 +3,7 @@ package pasa.cbentley.framework.gui.src4.ctx.app;
 import pasa.cbentley.byteobjects.src4.ctx.BOCtx;
 import pasa.cbentley.core.src4.ctx.UCtx;
 import pasa.cbentley.core.src4.i8n.IStringProducer;
+import pasa.cbentley.core.src4.logging.Dctx;
 import pasa.cbentley.framework.cmd.src4.ctx.CmdCtx;
 import pasa.cbentley.framework.cmd.src4.ctx.ConfigCmdCtxDef;
 import pasa.cbentley.framework.cmd.src4.ctx.IConfigCmdCtx;
@@ -19,7 +20,6 @@ import pasa.cbentley.framework.drawx.src4.ctx.DrwCtx;
 import pasa.cbentley.framework.drawx.src4.ctx.IConfigDrawX;
 import pasa.cbentley.framework.gui.src4.ctx.GuiCtx;
 import pasa.cbentley.framework.gui.src4.ctx.config.ConfigGuiDef;
-import pasa.cbentley.framework.gui.src4.ctx.config.IConfigAppGui;
 import pasa.cbentley.framework.gui.src4.ctx.config.IConfigGui;
 import pasa.cbentley.framework.input.src4.ctx.ConfigInputDefault;
 import pasa.cbentley.framework.input.src4.ctx.IConfigInput;
@@ -30,7 +30,7 @@ import pasa.cbentley.layouter.src4.ctx.LayouterCtx;
 import pasa.cbentley.powerdata.spec.src4.ctx.PDCtxA;
 
 /**
- * {@link CreatorAppliAbstract}
+ * {@link CreatorAppliAbstract} using the {@link GuiCtx} module.
  * 
  * Specific configurations for a GUI Appli
  * <li> {@link IConfigAppGui}
@@ -39,16 +39,18 @@ import pasa.cbentley.powerdata.spec.src4.ctx.PDCtxA;
  * @author Charles Bentley
  *
  */
-public abstract class CreatorAppliAbstractGui extends CreatorAppliAbstract {
+public abstract class CreatorAppliGuiAbstract extends CreatorAppliAbstract {
 
-   protected final BOCtx boc;
+   public CreatorAppliGuiAbstract(UCtx uc) {
+      super(uc);
+   }
 
-   public CreatorAppliAbstractGui(BOCtx boc) {
-      super(boc.getUC());
-      this.boc = boc;
+   public CreatorAppliGuiAbstract(UCtx uc, IConfigAppGui configApp) {
+      super(uc, configApp);
    }
 
    public IAppli createAppOnFramework(CoreFrameworkCtx cfc) {
+      BOCtx boc = cfc.getBOC();
       CoreDataCtx coreDataCtx = cfc.getCoreDataCtx();
       CoreDrawCtx cdc = cfc.getCUC().getCDC();
       LayouterCtx lac = new LayouterCtx(boc);
@@ -68,7 +70,7 @@ public abstract class CreatorAppliAbstractGui extends CreatorAppliAbstract {
 
       IConfigGui config = getConfigGui(cfc);
       GuiCtx gc = new GuiCtx(config, cfc, ic, cc, boc, dc, dmc, stringProducer);
-      return createAppMod(gc);
+      return createAppliGui(gc);
    }
 
    /**
@@ -147,5 +149,24 @@ public abstract class CreatorAppliAbstractGui extends CreatorAppliAbstract {
     * @param gc
     * @return
     */
-   protected abstract IAppli createAppMod(GuiCtx gc);
+   protected abstract IAppli createAppliGui(GuiCtx gc);
+
+   //#mdebug
+   public void toString(Dctx dc) {
+      dc.root(this, CreatorAppliGuiAbstract.class, toStringGetLine(160));
+      toStringPrivate(dc);
+      super.toString(dc.sup());
+   }
+
+   public void toString1Line(Dctx dc) {
+      dc.root1Line(this, CreatorAppliGuiAbstract.class, toStringGetLine(160));
+      toStringPrivate(dc);
+      super.toString1Line(dc.sup1Line());
+   }
+
+   private void toStringPrivate(Dctx dc) {
+
+   }
+   //#enddebug
+
 }

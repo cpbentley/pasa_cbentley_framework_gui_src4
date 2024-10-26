@@ -9,20 +9,18 @@ import pasa.cbentley.framework.core.ui.src4.ctx.ToStringStaticCoreUi;
 import pasa.cbentley.framework.core.ui.src4.event.RepeatEvent;
 import pasa.cbentley.framework.core.ui.src4.exec.ExecutionContext;
 import pasa.cbentley.framework.core.ui.src4.input.InputState;
-import pasa.cbentley.framework.core.ui.src4.interfaces.IActionFeedback;
 import pasa.cbentley.framework.core.ui.src4.tech.IInput;
 import pasa.cbentley.framework.core.ui.src4.tech.ITechCodes;
 import pasa.cbentley.framework.core.ui.src4.tech.ITechInputFeedback;
 import pasa.cbentley.framework.drawx.src4.engine.GraphicsX;
-import pasa.cbentley.framework.gui.src4.cmd.CmdInstanceGui;
 import pasa.cbentley.framework.gui.src4.core.Drawable;
 import pasa.cbentley.framework.gui.src4.core.ViewDrawable;
 import pasa.cbentley.framework.gui.src4.ctx.GuiCtx;
+import pasa.cbentley.framework.gui.src4.ctx.ObjectGC;
 import pasa.cbentley.framework.gui.src4.exec.InputStateCanvasGui;
 import pasa.cbentley.framework.gui.src4.exec.OutputStateCanvasGui;
 import pasa.cbentley.framework.gui.src4.interfaces.IDrawable;
 import pasa.cbentley.framework.gui.src4.interfaces.ITechDrawable;
-import pasa.cbentley.framework.gui.src4.utils.DrawableUtilz;
 import pasa.cbentley.framework.input.src4.engine.OutputStateCanvas;
 
 /**
@@ -42,47 +40,24 @@ import pasa.cbentley.framework.input.src4.engine.OutputStateCanvas;
  * @author Charles-Philip Bentley
  *
  */
-public class InputConfig implements IStringable, IInput, IActionFeedback {
+public class InputConfig extends ObjectGC implements IStringable, IInput {
 
- 
+   protected final ICanvasDrawable canvas;
+
    //#debug
    private IDrawable               d;
 
    private ExecutionContext        ex;
 
-   private GuiCtx                  gc;
+   private InputStateCanvasGui     is;
 
-   private InputStateCanvasGui       is;
-
-   private OutputStateCanvasGui     sr;
-
-   protected final ICanvasDrawable canvas;
-
-   public OutputStateCanvasGui getCRD() {
-      return getCanvasResultDrawable();
-   }
-
-   public InputStateCanvasGui getISD() {
-      return getInputStateDrawable();
-   }
+   private OutputStateCanvasGui    sr;
 
    public InputConfig(GuiCtx gc, ICanvasDrawable canvas, InputStateCanvasGui isd, OutputStateCanvasGui srd) {
+      super(gc);
       this.canvas = canvas;
       setInputStateDrawable(isd);
       setCanvasResultDrawable(srd);
-      this.gc = gc;
-   }
-
-   public InputStateCanvasGui getInputState() {
-      return getInputStateDrawable();
-   }
-
-   public GuiCtx getGC() {
-      return gc;
-   }
-
-   public ICanvasDrawable getCanvas() {
-      return canvas;
    }
 
    public void actionDone() {
@@ -93,6 +68,21 @@ public class InputConfig implements IStringable, IInput, IActionFeedback {
       getCanvasResultDrawable().actionDone(o, type);
    }
 
+   public void debugSrActionDoneRepaint(String actionStr) {
+      getCanvasResultDrawable().debugSetActionDoneRepaint(actionStr);
+   }
+
+   public ICanvasDrawable getCanvas() {
+      return canvas;
+   }
+
+   public OutputStateCanvasGui getCanvasResultDrawable() {
+      return sr;
+   }
+
+   public OutputStateCanvasGui getCRD() {
+      return getCanvasResultDrawable();
+   }
 
    public int getDraggedDiffX() {
       return getInputStateDrawable().getDraggedDiffX();
@@ -125,8 +115,24 @@ public class InputConfig implements IStringable, IInput, IActionFeedback {
       return ex;
    }
 
+   public GuiCtx getGC() {
+      return gc;
+   }
+
    public int getIdKeyBut() {
       return getInputStateDrawable().getKeyCode();
+   }
+
+   public InputStateCanvasGui getInputState() {
+      return getInputStateDrawable();
+   }
+
+   public InputStateCanvasGui getInputStateDrawable() {
+      return is;
+   }
+
+   public InputStateCanvasGui getISD() {
+      return getInputStateDrawable();
    }
 
    /**
@@ -170,10 +176,6 @@ public class InputConfig implements IStringable, IInput, IActionFeedback {
 
    public boolean is1() {
       return getIdKeyBut() == ITechCodes.KEY_NUM1;
-   }
-
-   public void debugSrActionDoneRepaint(String actionStr) {
-      getCanvasResultDrawable().debugSetActionDoneRepaint(actionStr);
    }
 
    public boolean is1P() {
@@ -514,6 +516,8 @@ public class InputConfig implements IStringable, IInput, IActionFeedback {
       return getInputStateDrawable().isUpActive();
    }
 
+   //#enddebug
+
    public boolean isUpP() {
       return getInputStateDrawable().isUpP();
    }
@@ -521,8 +525,6 @@ public class InputConfig implements IStringable, IInput, IActionFeedback {
    public boolean isWheeled() {
       return getInputStateDrawable().isWheeled();
    }
-
-   //#enddebug
 
    public boolean isZeroP() {
       return getInputStateDrawable().isZeroP();
@@ -543,6 +545,14 @@ public class InputConfig implements IStringable, IInput, IActionFeedback {
 
    public void setActionString(String string) {
       getCanvasResultDrawable().setActionString(string);
+   }
+
+   public void setCanvasResultDrawable(OutputStateCanvasGui sr) {
+      this.sr = sr;
+   }
+
+   public void setInputStateDrawable(InputStateCanvasGui is) {
+      this.is = is;
    }
 
    public void srActionDone() {
@@ -664,6 +674,8 @@ public class InputConfig implements IStringable, IInput, IActionFeedback {
       toStringPrivate(dc);
    }
 
+   //#enddebug
+
    public String toString1Line() {
       return Dctx.toString1Line(this);
    }
@@ -682,26 +694,8 @@ public class InputConfig implements IStringable, IInput, IActionFeedback {
    }
    //#enddebug
 
-   //#enddebug
-
    private void toStringPrivate(Dctx dc) {
 
-   }
-
-   public InputStateCanvasGui getInputStateDrawable() {
-      return is;
-   }
-
-   public void setInputStateDrawable(InputStateCanvasGui is) {
-      this.is = is;
-   }
-
-   public OutputStateCanvasGui getCanvasResultDrawable() {
-      return sr;
-   }
-
-   public void setCanvasResultDrawable(OutputStateCanvasGui sr) {
-      this.sr = sr;
    }
 
 }

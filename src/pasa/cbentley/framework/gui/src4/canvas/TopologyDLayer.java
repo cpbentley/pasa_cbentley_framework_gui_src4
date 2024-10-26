@@ -398,9 +398,9 @@ public class TopologyDLayer extends ObjectGC {
    }
 
    /**
-    * Is the event accepted
-    * @param ec TODO
-    * @param d
+    * Is the event accepted. ie action is not done
+    * @param ec {@link ExecutionContextCanvasGui}
+    * @param d {@link IDrawable}. event rejected if null
     * @return
     */
    private boolean isKeyEventAccepted(ExecutionContextCanvasGui ec, IDrawable d) {
@@ -420,7 +420,7 @@ public class TopologyDLayer extends ObjectGC {
       InputState is = ec.getInputState();
       InputConfig ic = ec.getInputConfig();
       //#debug
-      toDLog().pFlow("Current BEvent", is.getEventCurrent(), TopologyDLayer.class, "manageInput@line414", LVL_03_FINEST, true);
+      toDLog().pFlow("Current BEvent", is.getEventCurrent(), TopologyDLayer.class, "manageInput@"+toStringGetLine(423), LVL_05_FINE, true);
       //
       if (is.isGestured()) {
          manageGestureInput(ec);
@@ -444,7 +444,7 @@ public class TopologyDLayer extends ObjectGC {
    public void manageKeyInput(ExecutionContextCanvasGui ec) {
       InputState is = ec.getInputState();
       //#debug
-      toDLog().pFlow("KeyCode=", is.getLastDeviceEvent(), TopologyDLayer.class, "manageKeyInput", LVL_03_FINEST, true);
+      toDLog().pFlow("KeyCode=", is.getLastDeviceEvent(), TopologyDLayer.class, "manageKeyInput@"+toStringGetLine(443), LVL_03_FINEST, true);
       for (int i = dlayerNextEmpty - 1; i >= 0; i--) {
          if (isKeyEventAccepted(ec, dlayers[i])) {
             dlayers[i].manageKeyInput(ec);
@@ -467,7 +467,7 @@ public class TopologyDLayer extends ObjectGC {
    public void manageOtherInput(ExecutionContextCanvasGui ec) {
       InputState is = ec.getInputState();
       //#debug
-      toDLog().pFlow("KeyCode=", is.getLastDeviceEvent(), TopologyDLayer.class, "manageOtherInput", LVL_03_FINEST, true);
+      toDLog().pFlow("", is.getEventCurrent(), TopologyDLayer.class, "manageOtherInput@"+toStringGetLine(473), LVL_03_FINEST, true);
 
       for (int i = dlayerNextEmpty - 1; i >= 0; i--) {
          if (isKeyEventAccepted(ec, dlayers[i])) {
@@ -479,7 +479,7 @@ public class TopologyDLayer extends ObjectGC {
    public void manageGestureInput(ExecutionContextCanvasGui ec) {
       InputState is = ec.getInputState();
       //#debug
-      toDLog().pFlow("KeyCode=", is.getLastDeviceEvent(), TopologyDLayer.class, "manageGestureInput", LVL_03_FINEST, true);
+      toDLog().pFlow("KeyCode=", is.getLastDeviceEvent(), TopologyDLayer.class, "manageGestureInput@"+toStringGetLine(483), LVL_03_FINEST, true);
 
       for (int i = dlayerNextEmpty - 1; i >= 0; i--) {
          if (isKeyEventAccepted(ec, dlayers[i])) {
@@ -524,12 +524,12 @@ public class TopologyDLayer extends ObjectGC {
     * @param y
     * @return
     */
-   public IDrawable getDrawable(int x, int y, ExecutionContextCanvasGui ex) {
+   public IDrawable getDrawable(int x, int y, ExecutionContextCanvasGui ec) {
       for (int i = dlayerNextEmpty - 1; i >= 0; i--) {
          IDrawable d = dlayers[i];
          if (d != null) {
             if (DrawableUtilz.isInside(x, y, d)) {
-               return d.getDrawable(x, y, ex);
+               return d.getDrawable(x, y, ec);
             }
          }
       }

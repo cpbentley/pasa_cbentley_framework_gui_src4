@@ -2,11 +2,14 @@ package pasa.cbentley.framework.gui.src4.nav;
 
 import pasa.cbentley.core.src4.logging.Dctx;
 import pasa.cbentley.framework.cmd.src4.cmd.MCmdAbstract;
+import pasa.cbentley.framework.cmd.src4.cmd.MCmdMove;
+import pasa.cbentley.framework.cmd.src4.cmd.MCmdNav;
 import pasa.cbentley.framework.cmd.src4.ctx.CmdCtx;
 import pasa.cbentley.framework.cmd.src4.engine.CmdInstance;
 import pasa.cbentley.framework.cmd.src4.interfaces.ICmdsCmd;
-import pasa.cbentley.framework.cmd.src4.interfaces.INavTech;
+import pasa.cbentley.framework.cmd.src4.interfaces.ITechNav;
 import pasa.cbentley.framework.cmd.src4.interfaces.IStringsCmd;
+import pasa.cbentley.framework.cmd.src4.interfaces.ITechCmd;
 import pasa.cbentley.framework.cmd.src4.trigger.CmdTrigger;
 import pasa.cbentley.framework.core.ui.src4.input.InputState;
 import pasa.cbentley.framework.core.ui.src4.tech.IInput;
@@ -24,6 +27,9 @@ import pasa.cbentley.framework.gui.src4.interfaces.INavigational;
  * A command used to navigate between {@link INavigational}.
  * <br>
  * <br>
+ * 
+ * {@link MCmdNav} and {@link MCmdMove} ?
+ * 
  * In a Menu, this command will ask for a parameters. up/down/ but it is incomplete.
  * 
  * <br>
@@ -42,11 +48,11 @@ import pasa.cbentley.framework.gui.src4.interfaces.INavigational;
  * <li> Single Pointer Press and Drag activate Scrollbar navigation
  * 
  * If a keyboard was connected u and down would?
- * <li> {@link INavTech#NAV_1_UP}
- * <li> {@link INavTech#NAV_2_DOWN}
- * <li> {@link INavTech#NAV_3_LEFT}
- * <li> {@link INavTech#NAV_4_RIGHT}
- * <li> {@link INavTech#NAV_3_LEFT}
+ * <li> {@link ITechNav#NAV_1_UP}
+ * <li> {@link ITechNav#NAV_2_DOWN}
+ * <li> {@link ITechNav#NAV_3_LEFT}
+ * <li> {@link ITechNav#NAV_4_RIGHT}
+ * <li> {@link ITechNav#NAV_3_LEFT}
  * So over the ViewDrawable we have a pointer context for wheel up and dragging.
  * <br>
  * When a {@link ViewPane} appears, the Navigational {@link CmdCtx} is added to the Context of the {@link ViewDrawable}.
@@ -68,8 +74,8 @@ import pasa.cbentley.framework.gui.src4.interfaces.INavigational;
  * <br>
  * <br>
  * Every items is an instance of the {@link NavigationCmd} initialized with a parameter 
- * <li> {@link INavTech#NAV_1_UP}
- * <li> {@link INavTech#NAV_2_DOWN}
+ * <li> {@link ITechNav#NAV_1_UP}
+ * <li> {@link ITechNav#NAV_2_DOWN}
  * And the page/scroll is relative to the fact we nagivate on a Scroll bar. So the ShowCtxMenu
  * command will provide the context to the {@link NavigationCmd} so it can get the right
  * String key 
@@ -77,9 +83,11 @@ import pasa.cbentley.framework.gui.src4.interfaces.INavigational;
  * @author Charles Bentley
 
  */
-public class NavigationCmd extends MCmdAbstract implements INavTech {
+public class NavigationCmd extends MCmdAbstract implements ITechNav {
 
    protected final GuiCtx gc;
+
+   protected int          param;
 
    /**
     * Generic Nav command where direction will be computed from the trigger.
@@ -89,7 +97,7 @@ public class NavigationCmd extends MCmdAbstract implements INavTech {
     * @param labelPointer
     */
    public NavigationCmd(GuiCtx gc) {
-      super(gc.getCC(), 0);
+      super(gc.getCC(), ICmdsCmd.CMD_19_NAV_GENERIC);
       this.gc = gc;
       labelID = IStringsCmd.STR_CMD_050_NAVIGATE;
    }
@@ -103,7 +111,7 @@ public class NavigationCmd extends MCmdAbstract implements INavTech {
     * @param direction
     */
    public NavigationCmd(GuiCtx gc, int direction) {
-      super(gc.getCC(), 0);
+      super(gc.getCC(), ICmdsCmd.CMD_19_NAV_GENERIC);
       this.gc = gc;
       this.param = direction;
    }
@@ -115,7 +123,7 @@ public class NavigationCmd extends MCmdAbstract implements INavTech {
     * @param cmdID
     */
    public NavigationCmd(GuiCtx gc, int direction, int cmdID) {
-      super(gc.getCC(), 0);
+      super(gc.getCC(), ICmdsCmd.CMD_19_NAV_GENERIC);
       this.gc = gc;
       int[] labelsID = new int[2];
       labelsID[0] = 0; //unknown yet. might be scroll/page/move will depends on context
@@ -148,13 +156,13 @@ public class NavigationCmd extends MCmdAbstract implements INavTech {
 
       //navigation command was selected in a Menu
       if (ci.getTrigger() == cc.getMenuTrigger()) {
-         nav = fc.getItemInKeyFocus();
+         nav = fc.getDrawableInKeyFocus();
       } else if (isPointerTrigger()) {
          //how do we know here what nav
          nav = fc.getItemInPointerFocus();
       } else {
          //
-         nav = fc.getItemInKeyFocus();
+         nav = fc.getDrawableInKeyFocus();
       }
       int direction = getNavDir(cd);
 
@@ -186,7 +194,7 @@ public class NavigationCmd extends MCmdAbstract implements INavTech {
       cmdExecuteFinal((CmdInstanceGui) cd);
    }
 
-   public void cmdExecuteParam() {
+   public void cmdExecuteParam(CmdInstance ci) {
       // TODO Auto-generated method stub
 
    }
@@ -196,11 +204,14 @@ public class NavigationCmd extends MCmdAbstract implements INavTech {
 
    }
 
-   public void cmdUndo() {
+   public void cmdUndo(CmdInstance ci) {
       // TODO Auto-generated method stub
 
    }
 
+   /**
+    * 
+    */
    public MCmdAbstract createInstance(CmdInstance ci) {
       // TODO Auto-generated method stub
       return null;
@@ -231,9 +242,9 @@ public class NavigationCmd extends MCmdAbstract implements INavTech {
    private int getNavDir(CmdInstanceGui cd) {
       int direction = param;
       //do we have a direction associated?
-      if (!hasFlag(FLAG_13_PARAMED)) {
+      if (!hasFlag(ITechCmd.GENE_FLAG_13_PARAM_REQUIRED)) {
          //read the CmdInstance trigger
-         InputConfig ic = cd.getIC();
+         InputConfig ic = cd.getInputConfig();
          InputState is = ic.getInputStateDrawable();
          if (is.isTypeDevicePointer()) {
             if (is.getKeyCode() == ITechCodes.PBUTTON_0_DEFAULT) {
@@ -285,20 +296,22 @@ public class NavigationCmd extends MCmdAbstract implements INavTech {
       return type == IInput.DEVICE_1_MOUSE || type == IInput.DEVICE_3_FINGER;
    }
 
-   public void toString(Dctx sb) {
-      sb.root(this, NavigationCmd.class, 289);
-      if (!hasFlag(FLAG_13_PARAMED)) {
-
-      } else {
-         //parameter 
-         sb.append("Parameter From Trigger");
-      }
-      super.toString(sb.sup());
-
+   //#mdebug
+   public void toString(Dctx dc) {
+      dc.root(this, NavigationCmd.class, 300);
+      toStringPrivate(dc);
+      super.toString(dc.sup());
    }
 
    public void toString1Line(Dctx dc) {
-      dc.root1Line(this, "NavigationCmd");
-      super.toString1Line(dc.sup());
+      dc.root1Line(this, NavigationCmd.class, 300);
+      toStringPrivate(dc);
+      super.toString1Line(dc.sup1Line());
    }
+
+   private void toStringPrivate(Dctx dc) {
+
+   }
+   //#enddebug
+
 }

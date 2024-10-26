@@ -3,6 +3,7 @@ package pasa.cbentley.framework.gui.src4.nav;
 import pasa.cbentley.framework.cmd.src4.ctx.CmdCtx;
 import pasa.cbentley.framework.cmd.src4.engine.CmdNode;
 import pasa.cbentley.framework.cmd.src4.engine.MCmd;
+import pasa.cbentley.framework.cmd.src4.interfaces.ICmdsCmd;
 import pasa.cbentley.framework.cmd.src4.trigger.CmdTrigger;
 import pasa.cbentley.framework.cmd.src4.trigger.FacTrig;
 import pasa.cbentley.framework.core.ui.src4.tech.ITechCodes;
@@ -13,7 +14,7 @@ import pasa.cbentley.framework.gui.src4.exec.ExecutionContextCanvasGui;
 import pasa.cbentley.framework.gui.src4.interfaces.ICmdsGui;
 import pasa.cbentley.framework.gui.src4.interfaces.IDrawable;
 
-public class Navigator extends ObjectGC implements ICmdsGui {
+public class Navigator extends ObjectGC implements  ICmdsCmd, ICmdsGui {
 
    protected CmdNode navCtx;
 
@@ -104,9 +105,9 @@ public class Navigator extends ObjectGC implements ICmdsGui {
       navCtx.addCmdLink(ctPointerType, navCmd);
 
       CmdTrigger ctEx = triggerFactory.createTypedRepeat(ITechCodes.KEY_ESCAPE, 5, ITechCodes.TIMING_3_FAST);
-      cc.getNodeRoot().addCmdLink(ctEx, CMD_03_EXIT);
+      cc.getCmdNodeRoot().addCmdLink(ctEx, CMD_03_EXIT);
       CmdTrigger ctF1 = triggerFactory.createKeyP(ITechCodes.KEY_F1);
-      cc.getNodeRoot().addCmdLink(ctF1, CMD_19_HELP);
+      cc.getCmdNodeRoot().addCmdLink(ctF1, CMD_39_HELP);
 
       //#debug
       toDLog().pCmd("After", navCtx, Navigator.class, "initDefNav");

@@ -307,7 +307,7 @@ public class MenuBar extends Drawable {
                         leftView.notifyEventShow();
                         state = STATE_1LEFT;
                      } else if (o instanceof MCmd) {
-                        gc.getCmdProcessorGui().executeMenuCmd((MCmd) o);
+                        cc.executeInstanceMenu((MCmd) o);
                      }
                      ic.srActionDoneRepaint();
                   }

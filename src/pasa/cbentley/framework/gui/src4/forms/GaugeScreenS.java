@@ -9,6 +9,7 @@ import pasa.cbentley.core.src4.thread.ITechRunnable;
 import pasa.cbentley.core.src4.utils.BitUtils;
 import pasa.cbentley.framework.cmd.src4.ctx.CmdCtx;
 import pasa.cbentley.framework.cmd.src4.engine.CmdNode;
+import pasa.cbentley.framework.cmd.src4.interfaces.ICmdsCmd;
 import pasa.cbentley.framework.gui.src4.core.StyleClass;
 import pasa.cbentley.framework.gui.src4.ctx.GuiCtx;
 import pasa.cbentley.framework.gui.src4.exec.ExecutionContextCanvasGui;
@@ -28,7 +29,7 @@ import pasa.cbentley.framework.gui.src4.tech.ITechStringDrawable;
  * @author cbentley
  *
  */
-public class GaugeScreenS extends TableLayoutView implements IBProgessable {
+public class GaugeScreenS extends TableLayoutView implements  ICmdsCmd, IBProgessable {
 
    private Runnable       cancel;
 
@@ -53,10 +54,10 @@ public class GaugeScreenS extends TableLayoutView implements IBProgessable {
 
       CmdCtx cc = gc.getCC();
       CmdNode ctx = cc.createCmdNode("gauge");
-      ctx.addMenuCmd(ICmdsGui.CMD_05_CANCEL);
-      ctx.addMenuCmd(ICmdsGui.VCMD_13_HIDE);
+      ctx.addMenuCmd(ICmdsCmd.CMD_05_CANCEL);
+      ctx.addMenuCmd(CMD_GUI_13_HIDE);
 
-      setCmdNote(ctx);
+      setCmdNode(ctx);
    }
 
    /**
@@ -273,14 +274,14 @@ public class GaugeScreenS extends TableLayoutView implements IBProgessable {
       CmdCtx cc = gc.getCC();
       CmdNode ctx = getCmdNode();
       if (BitUtils.isSet(options, ITechRunnable.FLAG_04_CANCELABLE)) {
-         ctx.addMenuCmd(ICmdsGui.CMD_05_CANCEL);
+         ctx.addMenuCmd(CMD_05_CANCEL);
       } else {
-         ctx.removeMenuCmd(ICmdsGui.CMD_05_CANCEL);
+         ctx.removeMenuCmd(CMD_05_CANCEL);
       }
       if (BitUtils.isSet(options, ITechRunnable.FLAG_05_UI_HIDABLE)) {
-         ctx.addMenuCmd(ICmdsGui.VCMD_13_HIDE);
+         ctx.addMenuCmd(CMD_GUI_13_HIDE);
       } else {
-         ctx.removeMenuCmd(ICmdsGui.VCMD_13_HIDE);
+         ctx.removeMenuCmd(CMD_GUI_13_HIDE);
       }
       this.open(ec);
    }

@@ -85,7 +85,7 @@ public class ResizeDragCtrler implements IDrawableListener {
     * Nav command
     */
    public void commandAction(CmdInstanceGui cd) {
-      if (cd.getCmdID() == ICmdsCmd.CMD_18_NAV_PRE_SELECT) {
+      if (cd.getCmdId() == ICmdsCmd.CMD_18_NAV_PRE_SELECT) {
          cmdCueSelect(cd);
       }
    }
@@ -99,7 +99,7 @@ public class ResizeDragCtrler implements IDrawableListener {
     * @param cd
     */
    public void cmdCueSelect(CmdInstanceGui cd) {
-      if (DrawableUtilz.isInsideBorder(cd.getExecutionCtxGui(), drawable, slack)) {
+      if (DrawableUtilz.isInsideBorder(cd.getExecutionContextGui(), drawable, slack)) {
          //we detected a condition for a new command state.
          //this command result changes future outcome
          isResizeMode = true;
@@ -156,7 +156,7 @@ public class ResizeDragCtrler implements IDrawableListener {
          if (mod == IInput.MOD_3_MOVED) {
             //do we have access to input state here?
             //what if
-            InputState is = cd.getIC().getInputStateDrawable();
+            InputState is = cd.getInputConfig().getInputStateDrawable();
             GesturePointer gp = is.getGesturePointer0(pointer);
             //get the parameter from the gesture pointer
             dragIt(cd, drawable, gp);

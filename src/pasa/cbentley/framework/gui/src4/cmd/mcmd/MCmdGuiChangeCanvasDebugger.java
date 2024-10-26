@@ -1,12 +1,14 @@
 package pasa.cbentley.framework.gui.src4.cmd.mcmd;
 
 import pasa.cbentley.byteobjects.src4.core.ByteObject;
-import pasa.cbentley.core.src4.event.BusEvent;
 import pasa.cbentley.core.src4.event.IEventConsumer;
 import pasa.cbentley.core.src4.i8n.IStringProducer;
 import pasa.cbentley.core.src4.interfaces.C;
 import pasa.cbentley.core.src4.logging.Dctx;
 import pasa.cbentley.core.src4.structs.IntToObjects;
+import pasa.cbentley.framework.cmd.src4.cmd.MCmdAbstract;
+import pasa.cbentley.framework.cmd.src4.engine.CmdInstance;
+import pasa.cbentley.framework.cmd.src4.engine.MCmd;
 import pasa.cbentley.framework.cmd.src4.interfaces.ITechCmd;
 import pasa.cbentley.framework.datamodel.src4.table.ObjectTableModel;
 import pasa.cbentley.framework.gui.src4.canvas.CanvasDebugger;
@@ -44,11 +46,14 @@ import pasa.cbentley.layouter.src4.tech.ITechLayout;
  * It knows how to read and write parameters on the {@link CmdInstanceGui}
  * </p>
  * 
+ * @see MCmdAbstractGui
+ * @see MCmdAbstract
+ * @see MCmd
  * 
  * @author Charles Bentley
  *
  */
-public class MCmdGuiChangeCanvasDebugger extends MCmdGui implements IEventConsumer {
+public class MCmdGuiChangeCanvasDebugger extends MCmdAbstractGui implements IEventConsumer {
 
    /**
     * 
@@ -58,80 +63,11 @@ public class MCmdGuiChangeCanvasDebugger extends MCmdGui implements IEventConsum
    private int position;
 
    public MCmdGuiChangeCanvasDebugger(GuiCtx gc) {
-      super(gc, ICmdsGui.VCMD_15_CANVAS_DEBUGGER);
+      super(gc, ICmdsGui.CMD_GUI_15_CANVAS_DEBUGGER);
    }
 
-   public void consumeEvent(BusEvent e) {
-      // TODO Auto-generated method stub
-
-   }
-
-   private void execute(ExecutionContextCanvasGui ec, CmdInstanceGui cd, ICanvasDrawable canvas, int modeParam, int positionParam) {
-      
-      ExecutionContextCanvasGui dExCtx = cd.getExecutionCtxGui();
-      TopoViewDrawable topoViewDrawable = canvas.getTopoViewDrawable();
-
-      CanvasDebugger canvasDebug = canvas.getExtras().getDebugCanvas(); //null if not already created
-
-      //get current values if the same.. check if those values are correct physically
-      int positionCurrent = canvas.getCanvasBOHelper().getDebugBarPosition();
-      int modeCurrent = canvas.getCanvasBOHelper().getDebugMode();
-
-      int positionReal = topoViewDrawable.getSatteliteFlag(canvasDebug);
-
-      if (positionReal == ITechViewPane.SAT_FLAG_XX_NONE) {
-
-      }
-      
-      if (modeParam == ITechCanvasDrawable.DEBUG_0_NONE) {
-         if (canvasDebug == null) {
-            cd.setActionString("Debug Mode No Changes. CanvasDebug was already Null");
-            //remove it from
-         } else {
-            topoViewDrawable.removeDrawable(canvasDebug);
-            dExCtx.addDrawnHide(canvasDebug);
-            dExCtx.addDrawnInvalidated(topoViewDrawable);
-            cd.setActionString("Debug Mode removed. CanvasDebug set to Null");
-         }
-      } else {
-         if (canvasDebug == null) {
-            StyleClass sc = gc.getStyleClass(IUIView.SC_3_LOG);
-            ViewContext vcRoot = topoViewDrawable.getVC();
-            canvasDebug = new CanvasDebugger(gc, sc, vcRoot);
-         }
-         SizerFactory sf = gc.getLAC().getFactorySizer();
-         ByteObject sizerH = null;
-         ByteObject sizerW = sf.getSizerFitParentLazy();
-         
-         if (modeParam == ITechCanvasDrawable.DEBUG_1_LIGHT) {
-        
-             sizerH = sf.getSizerFontHeightRatio(100, ITechLayout.ET_FONT_2_DEBUG);
-    
-            //sets the header with no specific sizer. ViewPane sets its own.
-            topoViewDrawable.setHeader(canvasDebug, C.POS_0_TOP, ITechViewPane.PLANET_MODE_0_EAT);
-
-            dExCtx.addDrawnShow(canvasDebug);
-            dExCtx.addDrawnInvalidated(topoViewDrawable);
-         } else if (modeParam == ITechCanvasDrawable.DEBUG_2_COMPLETE_1LINE) {
-             sizerH = sf.getSizerFontHeightTimes(1, ITechLayout.ET_FONT_2_DEBUG);
-             //TODO  or use ViewDrawable without a viewpane
-             canvasDebug.setSizerHContent(sizerH);
-         } else if (modeParam == ITechCanvasDrawable.DEBUG_3_COMPLETE_2LINES) {
-            sizerH = sf.getSizerFontHeightTimes(2, ITechLayout.ET_FONT_2_DEBUG);
-         } else {
-            cd.setActionString("Bad Parameter " + modeParam);
-         }
-         
-         canvasDebug.setDebugMode(modeParam);
-         canvasDebug.setOrientation(positionParam);
-      }
-
-      int type = FLAG_02_FULL_REPAINT | FLAG_04_RENEW_LAYOUT;
-      cd.actionDone(null, type);
-   }
-
-   public void execute(ExecutionContextCanvasGui ec) {
-
+   public void cmdExecuteFinalGui(CmdInstanceGui ci) {
+      ExecutionContextCanvasGui ec = ci.getExecutionContextGui();
       ec.checkCmdInstanceNotNull();
 
       //the cmdinstance knows on which canvas to change
@@ -151,6 +87,74 @@ public class MCmdGuiChangeCanvasDebugger extends MCmdGui implements IEventConsum
       execute(ec, cd, canvas, mode, position);
    }
 
+   public MCmdAbstract createInstance(CmdInstance ci) {
+      return new MCmdGuiChangeCanvasDebugger(gc);
+   }
+
+   private void execute(ExecutionContextCanvasGui ec, CmdInstanceGui cd, ICanvasDrawable canvas, int modeParam, int positionParam) {
+
+      ExecutionContextCanvasGui dExCtx = cd.getExecutionContextGui();
+      TopoViewDrawable topoViewDrawable = canvas.getTopoViewDrawable();
+
+      CanvasDebugger canvasDebug = canvas.getExtras().getDebugCanvas(); //null if not already created
+
+      //get current values if the same.. check if those values are correct physically
+      int positionCurrent = canvas.getCanvasBOHelper().getDebugBarPosition();
+      int modeCurrent = canvas.getCanvasBOHelper().getDebugMode();
+
+      int positionReal = topoViewDrawable.getSatteliteFlag(canvasDebug);
+
+      if (positionReal == ITechViewPane.SAT_FLAG_XX_NONE) {
+
+      }
+
+      if (modeParam == ITechCanvasDrawable.DEBUG_0_NONE) {
+         if (canvasDebug == null) {
+            cd.setActionString("Debug Mode No Changes. CanvasDebug was already Null");
+            //remove it from
+         } else {
+            topoViewDrawable.removeDrawable(canvasDebug);
+            dExCtx.addDrawnHide(canvasDebug);
+            dExCtx.addDrawnInvalidated(topoViewDrawable);
+            cd.setActionString("Debug Mode removed. CanvasDebug set to Null");
+         }
+      } else {
+         if (canvasDebug == null) {
+            StyleClass sc = gc.getStyleClass(IUIView.SC_3_LOG);
+            ViewContext vcRoot = topoViewDrawable.getVC();
+            canvasDebug = new CanvasDebugger(gc, sc, vcRoot);
+         }
+         SizerFactory sf = gc.getLAC().getFactorySizer();
+         ByteObject sizerH = null;
+         ByteObject sizerW = sf.getSizerFitParentLazy();
+
+         if (modeParam == ITechCanvasDrawable.DEBUG_1_LIGHT) {
+
+            sizerH = sf.getSizerFontHeightRatio(100, ITechLayout.ET_FONT_2_DEBUG);
+
+            //sets the header with no specific sizer. ViewPane sets its own.
+            topoViewDrawable.setHeader(canvasDebug, C.POS_0_TOP, ITechViewPane.PLANET_MODE_0_EAT);
+
+            dExCtx.addDrawnShow(canvasDebug);
+            dExCtx.addDrawnInvalidated(topoViewDrawable);
+         } else if (modeParam == ITechCanvasDrawable.DEBUG_2_COMPLETE_1LINE) {
+            sizerH = sf.getSizerFontHeightTimes(1, ITechLayout.ET_FONT_2_DEBUG);
+            //TODO  or use ViewDrawable without a viewpane
+            canvasDebug.setSizerHContent(sizerH);
+         } else if (modeParam == ITechCanvasDrawable.DEBUG_3_COMPLETE_2LINES) {
+            sizerH = sf.getSizerFontHeightTimes(2, ITechLayout.ET_FONT_2_DEBUG);
+         } else {
+            cd.setActionString("Bad Parameter " + modeParam);
+         }
+
+         canvasDebug.setDebugMode(modeParam);
+         canvasDebug.setOrientation(positionParam);
+      }
+
+      int type = FLAG_02_FULL_REPAINT | FLAG_04_RENEW_LAYOUT;
+      cd.actionDone(null, type);
+   }
+
    /**
     * Works on the active Canvas.. {@link CanvasGuiCtx}.
     * 
@@ -161,13 +165,13 @@ public class MCmdGuiChangeCanvasDebugger extends MCmdGui implements IEventConsum
       IStringProducer strLoader = gc.getStrings();
       //show the table
       if (tableParamSelection == null) {
-         
+
          StyleClass scTitle = gc.getStyleClass(IUIView.SC_2_TITLE);
          StringDrawable sd = new StringDrawable(gc, scTitle, "Debug Mode");
          tableParamSelection.setHeaderExpandTop(sd);
-         
+
          TableCellPolicyFactory cellFac = gc.getTableCellPolicyFactory();
-        
+
          ByteObject colPol = cellFac.getGeneric(2, 0);
          ByteObject rowPol = cellFac.getGeneric(0, 0);
          ByteObject policyTable = gc.getTablePolicyFactory().getTablePolicy(colPol, rowPol);
@@ -176,7 +180,7 @@ public class MCmdGuiChangeCanvasDebugger extends MCmdGui implements IEventConsum
 
          TableView tv = new TableView(gc, scMenuItems, policyTable);
          //position it bottom left or center center logical position relative to parent/screen
-       
+
          tv.setXYLogic(C.LOGIC_3_BOTTOM_RIGHT, C.LOGIC_3_BOTTOM_RIGHT);
          //set the selection to the language
          //init once the model has been set.
@@ -184,10 +188,10 @@ public class MCmdGuiChangeCanvasDebugger extends MCmdGui implements IEventConsum
 
          tv.addEventListener(this, ITechTable.EVENT_ID_00_SELECT);
          //show the form as child of current front drawable
-         
+
          tableParamSelection = tv;
       }
-      
+
       IntToObjects its = new IntToObjects(gc.getUC(), 10);
       its.add(ITechCanvasDrawable.DEBUG_0_NONE, "None");
       its.add(ITechCanvasDrawable.DEBUG_1_LIGHT, "Light");
@@ -195,7 +199,6 @@ public class MCmdGuiChangeCanvasDebugger extends MCmdGui implements IEventConsum
       its.add(ITechCanvasDrawable.DEBUG_3_COMPLETE_2LINES, "Full on 2 Lines");
       ObjectTableModel otm = new ObjectTableModel(gc.getDMC(), its);
       tableParamSelection.setDataModel(otm);
-      
 
       ICanvasDrawable canvas = null;
 
@@ -203,38 +206,24 @@ public class MCmdGuiChangeCanvasDebugger extends MCmdGui implements IEventConsum
       int positionCurrent = canvas.getCanvasBOHelper().getDebugBarPosition();
       int modeCurrent = canvas.getCanvasBOHelper().getDebugMode();
 
-      
       int index = ((ObjectTableModel) tableParamSelection.getTableModel()).findIndexIntFirst(modeCurrent);
       if (index == -1) {
          index = 0;
       }
       tableParamSelection.shShowDrawableOver(ec);
-      
-      
+
       //give focus to selected.. uses a separate command to host the animation
       tableParamSelection.setSelectedIndex(index, ec, true);
 
-      
       //create an OK/CANCEL interaction cmd ctx. modal?
       //TODO actually menu listen to active cmd ctx and update itself automatically
       //based on it
       //set menu to model mode with OK / CANCEL
       String menuLabel = "Select";
       tableParamSelection.getCanvas().getMenuBar().setCmdModelOKCAncel(menuLabel);
-      
+
       cd.actionDone(tableParamSelection, 0);
 
-   }
-
-   public void setParamsToggle(CmdInstanceGui cd, ICanvasDrawable canvas) {
-      this.setParamsDirective(cd, canvas, ITechCmd.DIRECTIVE_1_TOGGLE);
-   }
-
-   public void setParamsDirective(CmdInstanceGui cd, ICanvasDrawable canvas, int directive) {
-      cd.paramO = canvas;
-      //directive
-      cd.setDirective(directive);
-      cd.setParamed();
    }
 
    public void setParams(CmdInstanceGui cd, ICanvasDrawable canvas, int mode, int pos) {
@@ -244,7 +233,17 @@ public class MCmdGuiChangeCanvasDebugger extends MCmdGui implements IEventConsum
       cd.setParamed();
    }
 
-   
+   public void setParamsDirective(CmdInstanceGui cd, ICanvasDrawable canvas, int directive) {
+      cd.paramO = canvas;
+      //directive
+      cd.setDirective(directive);
+      cd.setParamed();
+   }
+
+   public void setParamsToggle(CmdInstanceGui cd, ICanvasDrawable canvas) {
+      this.setParamsDirective(cd, canvas, ITechCmd.DIRECTIVE_1_TOGGLE);
+   }
+
    //#mdebug
    public void toString(Dctx dc) {
       dc.root(this, MCmdGuiChangeCanvasDebugger.class, 260);
@@ -259,9 +258,8 @@ public class MCmdGuiChangeCanvasDebugger extends MCmdGui implements IEventConsum
    }
 
    private void toStringPrivate(Dctx dc) {
-      
+
    }
    //#enddebug
-   
 
 }

@@ -45,8 +45,8 @@ public class TopoViewDrawable extends ViewDrawable {
       topology.drawLayers(g);
    }
 
-   public IDrawable getDrawableViewPort(int x, int y, ExecutionContextCanvasGui ex) {
-      return topology.getDrawable(x, y, null);
+   public IDrawable getDrawableViewPort(int x, int y, ExecutionContextCanvasGui ec) {
+      return topology.getDrawable(x, y, ec);
    }
 
    public ViewContext getViewContextContent() {

@@ -117,13 +117,6 @@ public abstract class ImgAnimable extends DrawableAnim implements IEventConsumer
     */
    protected int[]    workBuffer;
 
-   /**
-    * Creates an image from a figure
-    * @param fig
-    * @param w
-    * @param h
-    * @param f
-    */
    //   public ImgAnimable(ByteObject fig, int x, int y, int w, int h, Function f) {
    //      super(getRgbImage(fig, x, y, w, h), f);
    //      this.img = d.getRgbImage(IDrawable.IMAGE_0_ALL);

@@ -591,15 +591,15 @@ public class ViewDrawable extends Drawable implements ITechViewDrawable, ITechVi
       }
    }
 
-   public IDrawable getDrawable(int x, int y, ExecutionContextCanvasGui ex) {
+   public IDrawable getDrawable(int x, int y, ExecutionContextCanvasGui ec) {
       if (viewPane != null) {
-         return viewPane.getDrawable(x, y, null);
+         return viewPane.getDrawable(x, y, ec);
       } else {
-         return getDrawableViewPort(x, y, ex);
+         return getDrawableViewPort(x, y, ec);
       }
    }
 
-   public IDrawable getDrawableViewPort(int x, int y, ExecutionContextCanvasGui ex) {
+   public IDrawable getDrawableViewPort(int x, int y, ExecutionContextCanvasGui ec) {
       return this;
    }
 
@@ -1448,7 +1448,9 @@ public class ViewDrawable extends Drawable implements ITechViewDrawable, ITechVi
    }
 
    /**
-    * Sub class should call this when they want the ViewPane to manage Up-Down-Left-Right scrollbar control. <br>
+    * Sub class should call this when they want the ViewPane to manage Up-Down-Left-Right scrollbar control. 
+    * 
+    * @param ec {@link ExecutionContextCanvasGui}
     */
    public void manageKeyInput(ExecutionContextCanvasGui ec) {
       if (viewPane != null) {
@@ -2031,7 +2033,7 @@ public class ViewDrawable extends Drawable implements ITechViewDrawable, ITechVi
       dc.append(" Malleable=" + isMalleable());
       dc.append(" ScrollingNeeded=" + isScrollingNeeded());
 
-      if (dc.hasFlagData(gc, IToStringFlagsGui.D_FLAG_17_VIEW_PANE)) {
+      if (dc.hasFlagToString(gc, IToStringFlagsGui.D_FLAG_17_VIEW_PANE)) {
          //Debug the ViewPane
          dc.nlLvl(viewPane, "ViewPane");
       } else {

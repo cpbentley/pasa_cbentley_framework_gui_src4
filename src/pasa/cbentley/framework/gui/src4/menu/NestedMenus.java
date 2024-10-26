@@ -8,7 +8,7 @@ import pasa.cbentley.core.src4.logging.Dctx;
 import pasa.cbentley.framework.cmd.src4.ctx.CmdCtx;
 import pasa.cbentley.framework.cmd.src4.engine.MCmd;
 import pasa.cbentley.framework.cmd.src4.interfaces.ICmdsCmd;
-import pasa.cbentley.framework.cmd.src4.interfaces.INavTech;
+import pasa.cbentley.framework.cmd.src4.interfaces.ITechNav;
 import pasa.cbentley.framework.datamodel.src4.table.ObjectTableModel;
 import pasa.cbentley.framework.gui.src4.cmd.CmdInstanceGui;
 import pasa.cbentley.framework.gui.src4.core.StyleClass;
@@ -37,7 +37,7 @@ import pasa.cbentley.layouter.src4.tech.ITechLayout;
  * @author Charles-Philip Bentley
  * @see TableView
  */
-public class NestedMenus extends TableView implements IEventConsumer, ICmdsGui, ITableIconable, INavTech {
+public class NestedMenus extends TableView implements IEventConsumer, ICmdsGui, ITableIconable, ITechNav {
 
    private StringDrawable   button;
 
@@ -69,7 +69,7 @@ public class NestedMenus extends TableView implements IEventConsumer, ICmdsGui, 
    }
 
    public void addCommand(int cmdid) {
-      this.addCommand(gc.getCmdProcessorGui().getCmd(cmdid));
+      this.addCommand(cc.getCmd(cmdid));
    }
 
    public void addCommand(MCmd cmd) {
@@ -187,7 +187,7 @@ public class NestedMenus extends TableView implements IEventConsumer, ICmdsGui, 
       }
       menu.setParent(this);
       menu.setStateFlag(ITechDrawable.STATE_28_NOT_CONTAINED_IN_PARENT_AREA, true);
-      cd.getExecutionCtxGui().addDrawn(menu);
+      cd.getExecutionContextGui().addDrawn(menu);
    }
 
    private void cmdSelectCmd(CmdInstanceGui cd, MCmd c) {
@@ -197,7 +197,7 @@ public class NestedMenus extends TableView implements IEventConsumer, ICmdsGui, 
     
       //execute with trigger being Select Cmd?
       //add the command to the execution ctx
-      cd.queueMenuCmd(c);
+      cd.queueCmd(c);
 
       //update trigger for select menued?
 
@@ -208,7 +208,7 @@ public class NestedMenus extends TableView implements IEventConsumer, ICmdsGui, 
     * Nav command
     */
    public void commandAction(CmdInstanceGui cd) {
-      if (cd.getCmdID() == ICmdsCmd.CMD_18_NAV_PRE_SELECT) {
+      if (cd.getCmdId() == ICmdsCmd.CMD_18_NAV_PRE_SELECT) {
          cmdCueSelect(cd);
       }
    }
@@ -228,7 +228,7 @@ public class NestedMenus extends TableView implements IEventConsumer, ICmdsGui, 
 
    private void hideMenu(CmdInstanceGui cd) {
       if (isTemp()) {
-         cd.getExecutionCtxGui().addDrawnHide(this);
+         cd.getExecutionContextGui().addDrawnHide(this);
          if (parent != null) {
             parent.hideMenu(cd);
          }
@@ -244,31 +244,31 @@ public class NestedMenus extends TableView implements IEventConsumer, ICmdsGui, 
    }
 
    public void manageNavigate(CmdInstanceGui cd, int navEvent) {
-      if (navEvent == INavTech.NAV_6_UNSELECT) {
+      if (navEvent == ITechNav.NAV_6_UNSELECT) {
          //give back focus to parent menu
          gc.getFocusCtrl().drawableHide(cd, this, parent);
          //else give back focus to parent drawable
       }
-      if (navEvent == INavTech.NAV_5_SELECT) {
+      if (navEvent == ITechNav.NAV_5_SELECT) {
          cmdSelect(cd);
       }
       if (isVertical()) {
-         if (navEvent == INavTech.NAV_1_UP) {
+         if (navEvent == ITechNav.NAV_1_UP) {
             //if we are vertical menu
             //ask for a navigation
             tv.navigateUp(cd);
-         } else if (navEvent == INavTech.NAV_2_DOWN) {
+         } else if (navEvent == ITechNav.NAV_2_DOWN) {
             //if we are vertical menu
             //ask for a navigation
             tv.navigateDown(cd);
          }
       } else {
          //horizontal
-         if (navEvent == INavTech.NAV_3_LEFT) {
+         if (navEvent == ITechNav.NAV_3_LEFT) {
             //if we are vertical menu
             //ask for a navigation
             tv.navigateLeft(cd);
-         } else if (navEvent == INavTech.NAV_4_RIGHT) {
+         } else if (navEvent == ITechNav.NAV_4_RIGHT) {
             //if we are vertical menu
             //ask for a navigation
             tv.navigateRight(cd);
@@ -279,9 +279,9 @@ public class NestedMenus extends TableView implements IEventConsumer, ICmdsGui, 
          boolean b = false;
          //3 possibilities to delegate to parent menu
          if (isVertical()) {
-            b = navEvent == INavTech.NAV_3_LEFT || navEvent == INavTech.NAV_4_RIGHT;
+            b = navEvent == ITechNav.NAV_3_LEFT || navEvent == ITechNav.NAV_4_RIGHT;
          } else {
-            b = navEvent == INavTech.NAV_1_UP || navEvent == INavTech.NAV_2_DOWN;
+            b = navEvent == ITechNav.NAV_1_UP || navEvent == ITechNav.NAV_2_DOWN;
          }
          //was nav command succesfull?
          b = b || cd.isContinue();

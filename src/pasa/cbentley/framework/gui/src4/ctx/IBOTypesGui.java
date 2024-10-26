@@ -53,12 +53,11 @@ public interface IBOTypesGui extends IBOTypesBOC {
     */
    public static final int TYPE_GUI_06_CELL_POLICY              = SID_VIEWTYPE_A + 6;
 
-
-
    /**
     * Technical options for displaying string of characters.
     */
    public static final int TYPE_DRWX_07_STRING_AUX_0_DATA       = IBOTypesDrawX.TYPE_DRWX_07_STRING_AUX_XXX + 0;
+
    /**
     * Technical options for editing a string of characters.
     */
@@ -74,11 +73,11 @@ public interface IBOTypesGui extends IBOTypesBOC {
     * Prediction Engine to use
     */
    public static final int TYPE_DRWX_07_STRING_AUX_2_PREDICTION = IBOTypesDrawX.TYPE_DRWX_07_STRING_AUX_XXX + 2;
+
    /**
     * Global options that are user specific and apply to all string edition items
     */
    public static final int TYPE_DRWX_07_STRING_AUX_3_GLOBAL     = IBOTypesDrawX.TYPE_DRWX_07_STRING_AUX_XXX + 3;
-
 
    /**
     * Defines animation parameters.
@@ -91,7 +90,7 @@ public interface IBOTypesGui extends IBOTypesBOC {
     */
    public static final int TYPE_GUI_11_ANIMATION                = SID_VIEWTYPE_A + 11;
 
-   public static final int TYPE_GUI_12_USER_INTERACTION         = SID_VIEWTYPE_A + 12;
+   public static final int TYPE_GUI_12_                         = SID_VIEWTYPE_A + 12;
 
    public static final int TYPE_GUI_13_ANIM                     = SID_VIEWTYPE_A + 13;
 

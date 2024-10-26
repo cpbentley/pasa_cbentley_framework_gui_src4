@@ -9,6 +9,7 @@ import pasa.cbentley.framework.datamodel.src4.table.ObjectTableModel;
 import pasa.cbentley.framework.gui.src4.core.StyleClass;
 import pasa.cbentley.framework.gui.src4.ctx.GuiCtx;
 import pasa.cbentley.framework.gui.src4.factories.TablePolicyFactory;
+import pasa.cbentley.framework.gui.src4.table.TableViewUtils;
 
 public class FormFactory {
 
@@ -62,7 +63,7 @@ public class FormFactory {
       lu.appendAll();
 
       //get the last used index
-      lu.setSelectedIndex(lu, vo.selected);
+      TableViewUtils.setSelectedIndex(lu, vo.selected);
       return lu;
    }
 

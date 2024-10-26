@@ -10,11 +10,13 @@ import pasa.cbentley.core.src4.stator.StatorReader;
 import pasa.cbentley.core.src4.stator.StatorWriter;
 import pasa.cbentley.core.src4.utils.BitUtils;
 import pasa.cbentley.core.src4.utils.IntUtils;
+import pasa.cbentley.framework.cmd.src4.cmd.MCmdNav;
+import pasa.cbentley.framework.cmd.src4.ctx.CmdCtx;
 import pasa.cbentley.framework.cmd.src4.engine.MCmd;
 import pasa.cbentley.framework.cmd.src4.interfaces.ICmdListener;
 import pasa.cbentley.framework.cmd.src4.interfaces.ICmdsCmd;
-import pasa.cbentley.framework.cmd.src4.interfaces.ICommandable;
-import pasa.cbentley.framework.cmd.src4.interfaces.INavTech;
+import pasa.cbentley.framework.cmd.src4.interfaces.ICmdExecutor;
+import pasa.cbentley.framework.cmd.src4.interfaces.ITechNav;
 import pasa.cbentley.framework.core.ui.src4.ctx.ToStringStaticCoreUi;
 import pasa.cbentley.framework.core.ui.src4.exec.ExecutionContext;
 import pasa.cbentley.framework.core.ui.src4.input.InputState;
@@ -291,136 +293,13 @@ import pasa.cbentley.layouter.src4.ctx.IBOTypesLayout;
  * @see ViewDrawable
  * @see IBOCellPolicy
  */
-public class TableView extends ViewDrawable implements IDrawableListener, IEventConsumer, IDrawListener, ITechCell, IBOTypesDrawX, IBOCellPolicy, IBOGenetics, IBOTableView, ICommandable, ITechTable {
+public class TableView extends ViewDrawable implements IDrawableListener, IEventConsumer, IDrawListener, ITechCell, IBOTypesDrawX, IBOCellPolicy, IBOGenetics, IBOTableView, ICmdExecutor, ITechTable {
 
    private static final int SETUP_WEAK              = Integer.MIN_VALUE;
 
    private static final int SPAN_PADDING            = 1;
 
    public static int        TRANSITION_HISTORY_SIZE = 5;
-
-   /**
-    * Gets the integer value are index i.
-    * <br>
-    * <br>
-    * only exception is if array is of length 1. it returns value at index 0
-    * When index is bigger than array, return last value
-    * <br>
-    * <br>
-    * @param sizes
-    * @param i
-    * @return integer at i or 0
-    * @throws IndexOutOfBoundsException
-    *             if i is too big
-    */
-   public static int getArrayFirstValOrIndex(int[] sizes, int i) {
-      if (sizes.length == 0) {
-         throw new IllegalArgumentException("No Sizes for i=" + i);
-      }
-      if (i >= sizes.length) {
-         return sizes[sizes.length - 1];
-      }
-      return sizes[i];
-   }
-
-   /**
-    * @param l
-    * @return -1 if none selected
-    */
-   public static int getFirstSelected(TableView l) {
-      boolean[] bs = new boolean[l.getSize()];
-      l.getSelectedFlags(bs);
-      for (int i = 0; i < bs.length; i++) {
-         if (bs[i])
-            return i;
-      }
-      return -1;
-   }
-
-   /**
-    * 
-    * @param l the List
-    * @return first selected index or -1 if none
-    */
-   public static int getSelectedIndex(TableView l) {
-      boolean[] b = new boolean[l.getSize()];
-      l.getSelectedFlags(b);
-      for (int i = 0; i < b.length; i++) {
-         if (b[i] == true) {
-            return i;
-         }
-      }
-      return -1;
-   }
-
-   /**
-    * 
-    * @param l the List
-    * @return first selected index or -1 if none
-    */
-   public static int[] getSelectedIndexes(TableView l) {
-      boolean[] b = new boolean[l.getSize()];
-      int si = l.getSelectedFlags(b);
-      int[] ints = new int[si];
-      int count = 0;
-      for (int i = 0; i < b.length; i++) {
-         if (b[i] == true) {
-            ints[count] = i;
-            count++;
-         }
-      }
-      return ints;
-   }
-
-   public static String getSelectedString(TableView list) {
-      return list.getString(getSelectedIndex(list));
-   }
-
-   public static String[] getSelectedStrings(TableView list) {
-      boolean[] selectedIDs = new boolean[list.getSize()];
-      int numSelected = list.getSelectedFlags(selectedIDs);
-      String[] langs = new String[numSelected];
-      int count = 0;
-      for (int i = 0; i < selectedIDs.length; i++) {
-         if (selectedIDs[i]) {
-            langs[count] = list.getString(i);
-         }
-      }
-      return langs;
-   }
-
-   /**
-    * indexing starts at 0
-    * @param l
-    * @param index visualIndex - 1
-    */
-   public static void setSelectedIndex(TableView l, int index) {
-      if (l.getSize() > index) {
-         boolean[] bols = new boolean[l.getSize()];
-         for (int i = 0; i < bols.length; i++) {
-            if (i == index) {
-               bols[i] = true;
-            } else
-               bols[i] = false;
-         }
-         l.setSelectedFlags(bols);
-      }
-   }
-
-   /**
-    * Attempts to select str in list. Deselects all others
-    * @param list
-    * @param str
-    */
-   public static void setSelectedString(TableView list, String str) {
-      int size = list.getSize();
-      for (int i = 0; i < size; i++) {
-         if (list.getString(i).equals(str)) {
-            setSelectedIndex(list, i);
-            return;
-         }
-      }
-   }
 
    /**
     * Technical parameters for the {@link TableView}.
@@ -804,13 +683,13 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
     */
    private int applyMinMax(int index, int value, int[] minSizes, int[] maxSizes) {
       if (minSizes != null) {
-         int minColSize = getArrayFirstValOrIndex(minSizes, index);
+         int minColSize = TableViewUtils.getArrayFirstValOrIndex(minSizes, index);
          if (minColSize != 0 && value < minColSize) {
             value = minColSize;
          }
       }
       if (maxSizes != null) {
-         int maxColSize = getArrayFirstValOrIndex(maxSizes, index);
+         int maxColSize = TableViewUtils.getArrayFirstValOrIndex(maxSizes, index);
          if (maxColSize != 0 && value > maxColSize) {
             value = maxColSize;
          }
@@ -1823,7 +1702,7 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
     * Throws an exception if call is made while TableView is not initialized
     * 
     */
-   public IDrawable getDrawableViewPort(int x, int y, ExecutionContextCanvasGui ex) {
+   public IDrawable getDrawableViewPort(int x, int y, ExecutionContextCanvasGui ec) {
       checkInit();
       int firstRowAbs = modelRow.firstCellAbs;
       int lastRowAbs = modelRow.lastCellAbs;
@@ -1843,8 +1722,7 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
                //toLog().printEvent("#TableView#getPointerDrawableCoordinates ----[" + i + "," + j + "] = Point(" + ic.x + ", " + ic.y + ") isInside [" + cellX + "," + cellY + " " + (cellX + r[0])
                //      + ", " + (cellY + r[1]));
                IDrawable d = getModelDrawable(i, j);
-               ex.addressX = i;
-               ex.addressY = j;
+               ec.setAddressCoordinates(i, j);
                return d;
             }
          }
@@ -1942,7 +1820,7 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
       for (int i = 0; i < modelRow.numCells; i++) {
          if (i == h)
             break;
-         total += getArrayFirstValOrIndex(sizes, i);
+         total += TableViewUtils.getArrayFirstValOrIndex(sizes, i);
       }
       return total;
    }
@@ -1957,7 +1835,7 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
       for (int i = 0; i < modelCol.numCells; i++) {
          if (i == w)
             break;
-         total += getArrayFirstValOrIndex(sizes, i);
+         total += TableViewUtils.getArrayFirstValOrIndex(sizes, i);
       }
       return total;
    }
@@ -2830,7 +2708,7 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
          IDrawable d = getModelDrawableStyled(colAbs, rowAbs);
          if (d != null) {
             // they might not have been layout before
-            int height = getArrayFirstValOrIndex(rowSizes, j);
+            int height = TableViewUtils.getArrayFirstValOrIndex(rowSizes, j);
             d.setSizePixels(width, height);
             d.initSize();
             // maximum height is available room
@@ -2884,7 +2762,7 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
          //take each row
          IDrawable d = getModelDrawableStyled(colAbs, rowAbs);
          if (d != null) {
-            int width = getArrayFirstValOrIndex(colSizes, j);
+            int width = TableViewUtils.getArrayFirstValOrIndex(colSizes, j);
             d.setSizePixels(width, height);
             d.initSize();
             // maximum height is available room
@@ -3168,13 +3046,27 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
       layEngine.layoutInvalidateSize();
    }
 
+   /**
+    * Be carefull when calling this from toString. workCellSizes might be null TODO
+    */
    public int computeContentPh() {
+      //#mdebug
+      //might be called
+      if(modelRow.workCellSizes == null) {
+         return 0;
+      }
+      //#enddebug
       int ph = IntUtils.sum(modelRow.workCellSizes);
       ph += getSizeGridH() * (modelRow.numCells - 1);
       return ph;
    }
 
    public int computeContentPw() {
+      //#mdebug
+      if(modelCol.workCellSizes == null) {
+         return 0;
+      }
+      //#enddebug
       int pw = IntUtils.sum(modelCol.workCellSizes);
       pw += getSizeGridV() * (modelCol.numCells - 1);
       return pw;
@@ -3353,25 +3245,28 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
    }
 
    /**
-    * Manages Navigational keys itself via the {@link Controller}.
-    * <br>
-    * <br>
-    * <br>
+    * Key management is done through {@link CmdCtx} and {@link MCmdNav}.
     */
    public void manageKeyInput(ExecutionContextCanvasGui ec) {
       super.manageKeyInput(ec);
    }
 
+   
    public void manageNavigate(CmdInstanceGui cd, int navEvent) {
-      if (navEvent == INavTech.NAV_1_UP) {
-         ExecutionContextCanvasGui ec = cd.getExecutionCtxGui();
+      if (navEvent == ITechNav.NAV_1_UP) {
+         ExecutionContextCanvasGui ec = cd.getExecutionContextGui();
          navigateUp(ec);
-      } else if (navEvent == INavTech.NAV_5_SELECT) {
+      } else if (navEvent == ITechNav.NAV_5_SELECT) {
 
       }
    }
 
-   public void managePointerEvent(IDrawable slave, ExecutionContextCanvasGui ec) {
+   /**
+    * The event forwarding to {@link IDrawable}
+    * @param ec
+    * @param slave
+    */
+   public void managePointerEvent(ExecutionContextCanvasGui ec, IDrawable slave) {
       InputConfig ic = ec.getInputConfig();
       if (slave == modelCol.titlesView) {
          //we have an event on the column titles.
@@ -3437,11 +3332,12 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
 
    /**
     * Called by {@link ViewPane} when pointer event is inside the ViewPort area.
-    * <br>
-    * <br>
+    * 
+    * <p>
     * 2 pass method. 
     * <li>1st time slave drawable is null.
     * <li>2nd time, if the slave is not null, calls {@link TableView#managePointerInputSlave(InputConfig)}
+    * </p>
     */
    public void managePointerInputViewPort(ExecutionContextCanvasGui ec) {
       if (boTable.hasFlag(T_OFFSET_02_FLAGX, T_FLAGX_7_VIEW_PORT_BLIND)) {
@@ -3633,46 +3529,48 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
    }
 
    /**
-    * Tries to navigate. it may fail because
-    * <li> No navi
-    * <li> reached the end of table and no circle flag
+    * Navigates the {@link TableView} using raw events.
     * 
-    * @param cd
+    * @param cd {@link CmdInstanceGui}
     */
    public void navigateDown(CmdInstanceGui cd) {
       // table has its own navigation
+      ExecutionContextCanvasGui ec = cd.getExecutionContextGui();
+      boolean success = navigateDownInternal(ec);
+      if(success) {
+         cd.setProcessed();;
+      }
+   }
+   
+   /**
+    * Tries to navigate down. It may fail because
+    * 
+    * <li> No navi. decided by {@link CellModel#CELL_H_FLAG_10_OWN_NAVIGATION}.
+    * <li> reached the end of table and no circle flag
+    * <li>
+    * 
+    * @param ec {@link ExecutionContextCanvasGui}
+    * @return true if down navigation was successful.
+    */
+   protected boolean navigateDownInternal(ExecutionContextCanvasGui ec) {
       if (modelRow.hasHelperFlag(CELL_H_FLAG_10_OWN_NAVIGATION)) {
          int nextRow = getNextSelectableDown();
          if (nextRow != modelRow.selectedCellAbs) {
-            ExecutionContextCanvasGui ec = cd.getExecutionCtxGui();
-            selectionMove(ec, modelCol.selectedCellAbs, nextRow);
+           return selectionMove(ec, modelCol.selectedCellAbs, nextRow);
          }
       }
+      return false;
    }
-
+      
    /**
-    * In most configurations, the {@link TableView} navigates key Navs on its own.
-    * <br>
-    * <br>
-    * This is decided by {@link CellModel#CELL_H_FLAG_10_OWN_NAVIGATION}.
-    * <br>
-    * Apply selectability
-    * <br> 
-    * <li> Logic scrolling
-    * Otherwise, delegate to the {@link ViewPane} if any.
-    * <br>
-    * When 
+    * Navigates the {@link TableView} using raw events.
+    * 
+    * @param ec {@link ExecutionContextCanvasGui}
     */
    public void navigateDown(ExecutionContextCanvasGui ec) {
       InputConfig ic = ec.getInputConfig();
       if (ic.isPressed() || ic.isWheeled()) {
-         // table has its own navigation
-         if (modelRow.hasHelperFlag(CELL_H_FLAG_10_OWN_NAVIGATION)) {
-            int nextRow = getNextSelectableDown();
-            if (nextRow != modelRow.selectedCellAbs) {
-               selectionMove(ec, modelCol.selectedCellAbs, nextRow);
-            }
-         }
+         navigateDownInternal(ec);
       }
    }
 
@@ -3680,7 +3578,7 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
       if (modelCol.hasHelperFlag(CELL_H_FLAG_10_OWN_NAVIGATION)) {
          int nextCol = getNextSelectableLeft();
          if (nextCol != modelCol.selectedCellAbs) {
-            selectionMove(cd.getExecutionCtxGui(), nextCol, modelRow.selectedCellAbs);
+            selectionMove(cd.getExecutionContextGui(), nextCol, modelRow.selectedCellAbs);
          }
       }
    }
@@ -3705,7 +3603,7 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
       if (modelCol.hasHelperFlag(CELL_H_FLAG_10_OWN_NAVIGATION)) {
          int nextCol = getNextSelectableRight();
          if (nextCol != modelCol.selectedCellAbs) {
-            selectionMove(cd.getExecutionCtxGui(), nextCol, modelRow.selectedCellAbs);
+            selectionMove(cd.getExecutionContextGui(), nextCol, modelRow.selectedCellAbs);
          }
       }
    }
@@ -3774,7 +3672,7 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
 
    public void notifyEvent(IDrawable d, int event, Object o) {
       if (event == ITechDrawable.EVENT_14_POINTER_EVENT) {
-         managePointerEvent(d, (ExecutionContextCanvasGui) o);
+         managePointerEvent((ExecutionContextCanvasGui) o, d);
       }
    }
 
@@ -3901,14 +3799,14 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
     * When moving the selection programmatically, one may not want to give the focus
     * <br>
     * <br>
-    * @param ic {@link InputConfig}. Cannot be null even when it is programmatically moved. 
+    * @param ec {@link ExecutionContextCanvasGui}.
     * @param colAbs caller is responsible to select a selectable cell
     * @param rowAbs are cells pre-checked?
     * 
     */
-   public void selectionMove(ExecutionContextCanvasGui ec, int colAbs, int rowAbs) {
+   public boolean selectionMove(ExecutionContextCanvasGui ec, int colAbs, int rowAbs) {
       boolean giveFocus = !hasTechF(T_FLAGF_2_SELECT_MOVE_NOT_GIVES_FOCUS);
-      selectionMove(ec, colAbs, rowAbs, giveFocus);
+      return selectionMove(ec, colAbs, rowAbs, giveFocus);
    }
 
    /**
@@ -3922,17 +3820,17 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
     * @param rowAbs
     * @param giveFocus
     */
-   public void selectionMove(ExecutionContextCanvasGui ec, int colAbs, int rowAbs, boolean giveFocus) {
+   public boolean selectionMove(ExecutionContextCanvasGui ec, int colAbs, int rowAbs, boolean giveFocus) {
       //#debug
       toDLog().pFlow("col=" + colAbs + " row=" + rowAbs, this, TableView.class, "selectionMove@3927", LVL_05_FINE, true);
 
       InputConfig ic = ec.getInputConfig();
       // only do the move if the destination cell is valid
       if (rowAbs < 0 || rowAbs > modelRow.numCells) {
-         return;
+         return false;
       }
       if (colAbs < 0 || colAbs > modelCol.numCells) {
-         return;
+         return false;
       }
 
       //check if cell is selectable. if not return false
@@ -4026,20 +3924,21 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
       if (boTable.hasFlag(T_OFFSET_01_FLAG, T_FLAG_8_STYLE_ANIMATION)) {
 
       }
-      selectionMoveEvent(ec);
+      sendSelectionChangeEvent(ec);
+      return true;
    }
 
-   protected void selectionMoveEvent(ExecutionContextCanvasGui ic) {
+   protected void sendSelectionChangeEvent(ExecutionContextCanvasGui ic) {
       gc.getEventsBusGui().sendNewEvent(producerID, EVENT_ID_01_SELECTION_CHANGE, this);
    }
 
    /**
-    * Method calledd when selected cell is "selected" by means of the keyboard or the pointer. 
-    * <br>
-    * <br>
+    * Method called when selected cell is "selected" by means of the keyboard or the pointer. 
+    * 
+    * <p>
     * Depending on key assignments and tech pointer behavior. Keyboard usually uses the ENTER key.
-    * <br>
-    * <br>
+    * </p>
+    * 
     * @param ec
     */
    protected void selectionSelectEvent(ExecutionContextCanvasGui ec) {
@@ -4050,6 +3949,13 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
       be.putOnBus();
    }
 
+   /**
+    * Sets the Object that will be in the {@link BusEvent} when a selection is made
+    * @param o
+    */
+   public void setEventParamObject(Object o) {
+      this.eventParamO = o;
+   }
    /**
     * Setting the model nullifies
     * @param model
@@ -4728,8 +4634,8 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
       cm.frames = frames;
 
       for (int i = 0; i < setupSizes.length; i++) {
-         int val = getArrayFirstValOrIndex(policies, i);
-         int size = getArrayFirstValOrIndex(sizes, i);
+         int val = TableViewUtils.getArrayFirstValOrIndex(policies, i);
+         int size = TableViewUtils.getArrayFirstValOrIndex(sizes, i);
          switch (val) {
             case ITechCell.CELL_3_FILL_STRONG:
                // that might change
@@ -4949,21 +4855,21 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
 
       sb.nlLvlIgnoreNull("#Titles ROW", modelRow.titlesView);
 
-      if (sb.hasFlagData(gc, IToStringFlagsGui.D_FLAG_01_STYLE)) {
+      if (sb.hasFlagToString(gc, IToStringFlagsGui.D_FLAG_01_STYLE)) {
          sb.nlLvl("Cell StyleKey", tableCellStyleClass);
       }
 
-      if (sb.hasFlagData(gc, IToStringFlagsGui.D_FLAG_10_TABLE_SELECTED_DRAWABLE)) {
+      if (sb.hasFlagToString(gc, IToStringFlagsGui.D_FLAG_10_TABLE_SELECTED_DRAWABLE)) {
          if (getSize() > 0) {
             int selectedIndex = getGridIndexFromAbs(modelCol.selectedCellAbs, modelRow.selectedCellAbs);
             IDrawable d = getModelDrawable(selectedIndex);
             sb.nlLvl("#Selected Drawable", d);
          }
       }
-      if (sb.hasFlagData(gc, IToStringFlagsGui.D_FLAG_06_TABLE_MODEL)) {
+      if (sb.hasFlagToString(gc, IToStringFlagsGui.D_FLAG_06_TABLE_MODEL)) {
          sb.nlLvl("TableModel", model);
       }
-      if (sb.hasFlagData(gc, IToStringFlagsGui.D_FLAG_07_TABLE_MAPPER)) {
+      if (sb.hasFlagToString(gc, IToStringFlagsGui.D_FLAG_07_TABLE_MAPPER)) {
          sb.nlLvl("Mapper", mapperObjectDrawable);
       }
    }

@@ -4,7 +4,7 @@ import pasa.cbentley.byteobjects.src4.core.ByteObject;
 import pasa.cbentley.framework.cmd.src4.engine.CmdInstance;
 import pasa.cbentley.framework.cmd.src4.engine.CmdNode;
 import pasa.cbentley.framework.cmd.src4.engine.MCmd;
-import pasa.cbentley.framework.cmd.src4.interfaces.ICmdListener;
+import pasa.cbentley.framework.cmd.src4.interfaces.ITechCmd;
 import pasa.cbentley.framework.core.ui.src4.event.BEvent;
 import pasa.cbentley.framework.core.ui.src4.utils.ViewState;
 import pasa.cbentley.framework.drawx.src4.engine.GraphicsX;
@@ -282,8 +282,8 @@ public abstract class CanvasDrawable2 extends ObjectGC implements IDrawable {
    }
 
 
-   public int sendEvent(int evType, Object param) {
-      return ICmdListener.PRO_STATE_0;
+   public int commandEvent(int evType, Object param) {
+      return ITechCmd.PRO_STATE_0_CONTINUE;
    }
 
    public void setBehaviorFlag(int flag, boolean value) {

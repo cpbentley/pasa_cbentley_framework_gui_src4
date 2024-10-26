@@ -11,6 +11,7 @@ import pasa.cbentley.framework.gui.src4.ctx.GuiCtx;
 import pasa.cbentley.framework.gui.src4.exec.ExecutionContextCanvasGui;
 import pasa.cbentley.framework.gui.src4.string.StringDrawable;
 import pasa.cbentley.framework.gui.src4.table.TableView;
+import pasa.cbentley.framework.gui.src4.table.TableViewUtils;
 
 /**
  * NOW StringListInput
@@ -100,7 +101,7 @@ public class ListRoot extends StringDrawable {
       int selectedSize = listStr.getSelectedFlags(ar);
       if (listStr.getSize() == 0)
          return EMTPY;
-      int selIndex = ListUIRecords.getFirstSelected(listStr);
+      int selIndex = TableViewUtils.getFirstSelected(listStr);
       if (selIndex == -1) {
          if (startingText != null)
             return startingText;

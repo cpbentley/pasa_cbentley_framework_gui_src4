@@ -363,13 +363,13 @@ public class CellModel extends ObjectGC implements IStringable, ITechCell, IBOCe
       inspectFill(ts, root, totalSize, policies, setupCellSizes, sepSize);
       // System.out.println("#computeFromSetupFromRoot root=" + root +
       // " finalSizes.length=" + finalSizes.length);
-      workSizes[root] = TableView.getArrayFirstValOrIndex(setupCellSizes, root);
+      workSizes[root] = TableViewUtils.getArrayFirstValOrIndex(setupCellSizes, root);
       int count = 1;
       while (ts[TRACK_1END] == 0 && count < maxNumCells) {
          int indexAbs = (master) ? root + count : root - count;
          inspectFill(ts, indexAbs, totalSize, policies, setupCellSizes, sepSize);
          if (ts[TRACK_1END] == 0) {
-            workSizes[indexAbs] = TableView.getArrayFirstValOrIndex(setupCellSizes, indexAbs);
+            workSizes[indexAbs] = TableViewUtils.getArrayFirstValOrIndex(setupCellSizes, indexAbs);
          }
          count++;
       }
@@ -882,7 +882,7 @@ public class CellModel extends ObjectGC implements IStringable, ITechCell, IBOCe
          workCellSizes = new int[numCells];
       }
       for (int i = 0; i < numCells; i++) {
-         workCellSizes[i] = TableView.getArrayFirstValOrIndex(setupSizes, i);
+         workCellSizes[i] = TableViewUtils.getArrayFirstValOrIndex(setupSizes, i);
       }
 
    }
@@ -949,8 +949,8 @@ public class CellModel extends ObjectGC implements IStringable, ITechCell, IBOCe
     * @param partial
     */
    public void inspectFill(int[] ts, int index, int totalSize, int[] policies, int[] sizes, int sepSize) {
-      int pol = TableView.getArrayFirstValOrIndex(policies, index);
-      int mySize = TableView.getArrayFirstValOrIndex(sizes, index);
+      int pol = TableViewUtils.getArrayFirstValOrIndex(policies, index);
+      int mySize = TableViewUtils.getArrayFirstValOrIndex(sizes, index);
       if (pol == ITechCell.CELL_3_FILL_STRONG) {
          ts[TRACK_1END] = 1;
          if (ts[TRACK_0COUNT] == 0) {

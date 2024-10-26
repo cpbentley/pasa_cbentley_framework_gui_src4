@@ -6,19 +6,20 @@ import pasa.cbentley.framework.cmd.src4.ctx.CmdCtx;
 import pasa.cbentley.framework.cmd.src4.engine.CmdInstance;
 import pasa.cbentley.framework.cmd.src4.engine.CmdNode;
 import pasa.cbentley.framework.cmd.src4.engine.MCmd;
-import pasa.cbentley.framework.core.ui.src4.interfaces.IActionFeedback;
+import pasa.cbentley.framework.cmd.src4.interfaces.ICmdsCmd;
+import pasa.cbentley.framework.core.ui.src4.tech.ITechInputFeedback;
 import pasa.cbentley.framework.datamodel.src4.engine.MByteObjectTableModel;
 import pasa.cbentley.framework.datamodel.src4.filter.MBoFilterSet;
 import pasa.cbentley.framework.datamodel.src4.interfaces.IBOEnum;
 import pasa.cbentley.framework.datamodel.src4.mbo.MBOByteObject;
 import pasa.cbentley.framework.drawx.src4.engine.RgbImage;
-import pasa.cbentley.framework.gui.src4.canvas.InputConfig;
 import pasa.cbentley.framework.gui.src4.core.StyleClass;
 import pasa.cbentley.framework.gui.src4.ctx.GuiCtx;
 import pasa.cbentley.framework.gui.src4.exec.ExecutionContextCanvasGui;
 import pasa.cbentley.framework.gui.src4.interfaces.ICmdsGui;
 import pasa.cbentley.framework.gui.src4.string.RequestStringInput;
 import pasa.cbentley.framework.gui.src4.table.TableLayoutView;
+import pasa.cbentley.framework.gui.src4.table.TableViewUtils;
 import pasa.cbentley.framework.gui.src4.tech.ITechStringDrawable;
 
 /**
@@ -28,7 +29,7 @@ import pasa.cbentley.framework.gui.src4.tech.ITechStringDrawable;
  * @author cbentley
  *
  */
-public class RecordStoreBrowser extends TableLayoutView implements IAppendable, ICmdsGui {
+public class RecordStoreBrowser extends TableLayoutView implements IAppendable, ICmdsCmd, ICmdsGui {
 
    /**
     * Class that views individual items.
@@ -92,10 +93,10 @@ public class RecordStoreBrowser extends TableLayoutView implements IAppendable, 
 
       ctxMain.addMenuCmd(CMD_30_NEXT);
       ctxMain.addMenuCmd(CMD_31_PREVIOUS);
-      ctxMain.addMenuCmd(VCMD_12_GO_TO);
+      ctxMain.addMenuCmd(CMD_GUI_12_GO_TO);
       ctxMain.addMenuCmd(CMD_23_DELETE);
-      ctxMain.addMenuCmd(VCMD_11_INVERSE);
-      ctxMain.addMenuCmd(VCMD_10_SHOW_FILTERS);
+      ctxMain.addMenuCmd(CMD_GUI_11_SORT_INVERSE);
+      ctxMain.addMenuCmd(CMD_GUI_10_SHOW_FILTERS);
 
       this.setBrowseeView(bv);
 
@@ -148,7 +149,7 @@ public class RecordStoreBrowser extends TableLayoutView implements IAppendable, 
          if (cmd.param == 1) {
             browseeView.getBrowsee().delete(getSelectedRID());
             populate();
-            cmd.actionDone(this, IActionFeedback.FLAG_07_OBJECT_REPAINT);
+            cmd.actionDone(this, ITechInputFeedback.FLAG_07_OBJECT_REPAINT);
          }
       }
    }
@@ -177,7 +178,7 @@ public class RecordStoreBrowser extends TableLayoutView implements IAppendable, 
 
    private void cmdInverse(CmdInstance ci) {
       int sort = browseSrc.getEnum().getTech().get1(IBOEnum.BO_ENUM_OFFSET_03_SORT_TYPE1);
-      MCmd m = gc.getCmdMapperGui().getCmdInverse();
+      MCmd m = gc.getCmdMapperGui().getCmdSortInverse();
       if (sort == IBOEnum.SORT_1_ASC) {
          m.doUpdateLabel(ci.getExecutionContext(), "Sort DESC");
          browseSrc.getEnum().getTech().set1(IBOEnum.BO_ENUM_OFFSET_03_SORT_TYPE1, IBOEnum.SORT_2_DEC);
@@ -214,7 +215,7 @@ public class RecordStoreBrowser extends TableLayoutView implements IAppendable, 
     */
    public void commandAction(CmdInstance cmd) {
       ExecutionContextCanvasGui ec = (ExecutionContextCanvasGui) cmd.getExecutionContext();
-      int c = cmd.getCmdID();
+      int c = cmd.getCmdId();
       CmdCtx cc = gc.getCC();
       if (cmd.getCmdNode() == browseeView.getCmdNode()) {
          //individually go to the next
@@ -243,7 +244,7 @@ public class RecordStoreBrowser extends TableLayoutView implements IAppendable, 
       if (c == CMD_23_DELETE) {
          cmdDelete(cmd);
       }
-      if (c == VCMD_11_INVERSE) {
+      if (c == CMD_GUI_11_SORT_INVERSE) {
          cmdInverse(cmd);
       }
       if (CMD_31_PREVIOUS == c) {
@@ -254,10 +255,10 @@ public class RecordStoreBrowser extends TableLayoutView implements IAppendable, 
          cmdNext();
       }
 
-      if (VCMD_12_GO_TO == c) {
+      if (CMD_GUI_12_GO_TO == c) {
          gc.runAsWorker(gotorunnable);
       }
-      if (c == VCMD_10_SHOW_FILTERS) {
+      if (c == CMD_GUI_10_SHOW_FILTERS) {
          if (filterForm != null) {
             filterForm.shShowDrawableOver(ec);
          }
@@ -319,7 +320,7 @@ public class RecordStoreBrowser extends TableLayoutView implements IAppendable, 
       if (isReload) {
          isReload = false;
          populate();
-         ListUIRecords.setSelectedIndex(this, selectedVisualIndex);
+         TableViewUtils.setSelectedIndex(this, selectedVisualIndex);
       } else {
          //#debug
          System.out.println("No Reload For Browser after GoingVisible");

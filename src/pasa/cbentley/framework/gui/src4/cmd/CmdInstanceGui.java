@@ -2,9 +2,7 @@ package pasa.cbentley.framework.gui.src4.cmd;
 
 import pasa.cbentley.core.src4.logging.Dctx;
 import pasa.cbentley.framework.cmd.src4.engine.CmdInstance;
-import pasa.cbentley.framework.cmd.src4.engine.CmdNode;
 import pasa.cbentley.framework.cmd.src4.engine.MCmd;
-import pasa.cbentley.framework.cmd.src4.trigger.CmdTrigger;
 import pasa.cbentley.framework.core.ui.src4.tech.ITechInputFeedback;
 import pasa.cbentley.framework.gui.src4.canvas.InputConfig;
 import pasa.cbentley.framework.gui.src4.ctx.GuiCtx;
@@ -12,7 +10,11 @@ import pasa.cbentley.framework.gui.src4.exec.ExecutionContextCanvasGui;
 import pasa.cbentley.framework.gui.src4.interfaces.IDrawable;
 
 /**
- * The execution context of a command 
+ * Specialisation of {@link CmdInstance} for the {@link GuiCtx} and its {@link IDrawable} ui kit.
+ * 
+ * 
+ * @see ExecutionContextCanvasGui
+ * 
  * @author Charles Bentley
  *
  */
@@ -20,37 +22,16 @@ public class CmdInstanceGui extends CmdInstance {
 
    private String           actionString;
 
-   private CmdInstanceGui   childCmd;
+   private CmdInstanceGui   cmdDrawableChild;
 
    private IDrawable        d;
 
-   protected CmdInstanceGui parentGui;
-
    protected final GuiCtx   gc;
 
-   public CmdInstanceGui(GuiCtx gc, int vcmdID) {
-      super(gc.getCC(), vcmdID);
-      this.gc = gc;
-   }
-
-   public CmdInstanceGui(GuiCtx gc, int vcmdID, ExecutionContextCanvasGui ec) {
-      super(gc.getCC(), vcmdID);
-      this.gc = gc;
-      this.exeCtx = ec;
-   }
+   protected CmdInstanceGui parentGui;
 
    public CmdInstanceGui(GuiCtx gc, MCmd c) {
       super(gc.getCC(), c);
-      this.gc = gc;
-   }
-
-   public void setParentGui(CmdInstanceGui cmdGui) {
-      this.setParent(cmdGui);
-      this.parentGui = cmdGui;
-   }
-
-   public CmdInstanceGui(GuiCtx gc, MCmd c, CmdNode ctx, CmdTrigger ct) {
-      super(gc.getCC(), c, ctx, ct);
       this.gc = gc;
    }
 
@@ -75,34 +56,23 @@ public class CmdInstanceGui extends CmdInstance {
    }
 
    public CmdInstanceGui getChildCmdDrawable() {
-      return childCmd;
-   }
-
-   public ExecutionContextCanvasGui getExecutionCtxGui() {
-      return (ExecutionContextCanvasGui) getExecutionContext();
-   }
-
-   public InputConfig getIC() {
-      return (InputConfig) getFeedback();
+      return cmdDrawableChild;
    }
 
    public IDrawable getDrawable() {
       return d;
    }
 
-   public int getParamInt(int id) {
-      return paramsDo.getParamInt(id);
+   public ExecutionContextCanvasGui getExecutionContextGui() {
+      ExecutionContextCanvasGui ec = (ExecutionContextCanvasGui) getExecutionContext();
+      ec.setCmdInstanceGui(this);
+      return ec;
    }
 
-   public int getParamUndoInt(int id) {
-      return paramsUndo.getParamInt(id);
+   public InputConfig getInputConfig() {
+      return getExecutionContextGui().getInputConfig();
    }
 
-   public MCmd getRoot() {
-      return getMCmd();
-   }
-
-   //#enddebug
    /**
     * Is there is child command.
     * <br>
@@ -112,11 +82,7 @@ public class CmdInstanceGui extends CmdInstance {
     * @return
     */
    public boolean hasChild() {
-      return childCmd != null;
-   }
-
-   public boolean isRootMode() {
-      return true;
+      return cmdDrawableChild != null;
    }
 
    /**
@@ -140,16 +106,9 @@ public class CmdInstanceGui extends CmdInstance {
       this.d = d;
    }
 
-   public void setParamInt(int id, int param) {
-      paramsDo.setParamInt(id, param);
-   }
-
-   public void setParamUndoInt(int value) {
-      paramsUndo.setParamInt(0, value);
-   }
-
-   public void setParamUndoInt(int id, int value) {
-      paramsUndo.setParamInt(id, value);
+   public void setParentGui(CmdInstanceGui cmdGui) {
+      this.setParent(cmdGui);
+      this.parentGui = cmdGui;
    }
 
    //#mdebug

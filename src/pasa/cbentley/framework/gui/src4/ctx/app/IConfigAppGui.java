@@ -1,4 +1,4 @@
-package pasa.cbentley.framework.gui.src4.ctx.config;
+package pasa.cbentley.framework.gui.src4.ctx.app;
 
 import pasa.cbentley.byteobjects.src4.ctx.IConfigBO;
 import pasa.cbentley.core.src4.interfaces.C;
@@ -6,7 +6,6 @@ import pasa.cbentley.framework.core.framework.src4.app.IConfigApp;
 import pasa.cbentley.framework.drawx.src4.tech.ITechGraphicsX;
 import pasa.cbentley.framework.gui.src4.core.StyleClass;
 import pasa.cbentley.framework.gui.src4.ctx.IToStringFlagsGui;
-import pasa.cbentley.framework.gui.src4.ctx.app.AppGuiCtx;
 import pasa.cbentley.framework.gui.src4.interfaces.ITechCanvasDrawable;
 import pasa.cbentley.framework.input.src4.interfaces.IBOCanvasAppli;
 
@@ -20,12 +19,6 @@ import pasa.cbentley.framework.input.src4.interfaces.IBOCanvasAppli;
  *
  */
 public interface IConfigAppGui extends IConfigApp {
-
-   /**
-    * {@link IToStringFlagsGui}
-    * @return
-    */
-   public int getFlagsGui();
 
    /**
     * 

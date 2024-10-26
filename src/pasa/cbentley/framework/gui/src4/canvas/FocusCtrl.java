@@ -6,9 +6,9 @@ import pasa.cbentley.core.src4.interfaces.C;
 import pasa.cbentley.core.src4.logging.Dctx;
 import pasa.cbentley.core.src4.logging.IStringable;
 import pasa.cbentley.framework.cmd.src4.ctx.CmdCtx;
-import pasa.cbentley.framework.cmd.src4.input.FocusDeviceUser;
+import pasa.cbentley.framework.cmd.src4.input.FocusDeviceCommander;
+import pasa.cbentley.framework.cmd.src4.interfaces.ICmdExecutor;
 import pasa.cbentley.framework.cmd.src4.interfaces.ICmdsCmd;
-import pasa.cbentley.framework.cmd.src4.interfaces.ICommandable;
 import pasa.cbentley.framework.cmd.src4.interfaces.ITechCmd;
 import pasa.cbentley.framework.core.ui.src4.input.InputState;
 import pasa.cbentley.framework.core.ui.src4.tech.IInput;
@@ -217,16 +217,17 @@ public class FocusCtrl extends ObjectGC implements IStringable {
    }
 
    /**
-    * The {@link IDrawable} under focus by the owner
+    * The {@link IDrawable} under focus by the Device represented by {@link FocusDeviceCommander}.
+    * 
     * @param focus
     * @return
     */
-   public IDrawable getItemInFocus(FocusDeviceUser focus) {
+   public IDrawable getDrawableFocusedBy(FocusDeviceCommander focus) {
 
       return null;
    }
 
-   public IDrawable getItemInKeyFocus() {
+   public IDrawable getDrawableInKeyFocus() {
       return itemInKeyFocus;
    }
 
@@ -284,7 +285,7 @@ public class FocusCtrl extends ObjectGC implements IStringable {
     * <b>Focus transfer</b>:
     * <li> Old Drawable gets the {@link IDrawable#notifyEvent(int)} {@link ITechDrawable#EVENT_04_KEY_FOCUS_LOSS}
     * <li> New Drawable gets the {@link IDrawable#notifyEvent(int)} {@link ITechDrawable#EVENT_03_KEY_FOCUS_GAIN}
-    * <li> Register new {@link ICommandable} as the context for key commands.
+    * <li> Register new {@link ICmdExecutor} as the context for key commands.
     * <br>
     * <br>
     * 
@@ -448,10 +449,11 @@ public class FocusCtrl extends ObjectGC implements IStringable {
       }
 
       itemInFocus[ctxCategory] = d;
+      
       gc.getCC().setActiveCommandable(d, ctxCategory);
    }
 
-   public void setNewFocus(InputState is, IDrawable d, FocusDeviceUser focusType) {
+   public void setNewFocus(InputState is, IDrawable d, FocusDeviceCommander focusType) {
       int deviceID = focusType.getDeviceID();
       int deviceType = focusType.getDeviceType();
       //for the most used context we check them. most common case if deviceID 0 for pointer and keyboard
@@ -499,7 +501,12 @@ public class FocusCtrl extends ObjectGC implements IStringable {
     * When a drawable is hidden
     * <li> Key Focus is given to the Drawable below.
     * <br>
-    * The Focus must go back to where it was previously before it was gone.
+    * 
+    * Device Focuses
+    * 
+    * The Keyboard/Gamepad focuses must go back to where it was previously before it was.
+    * 
+    * The mouse and pointer focuses are updated 
     * <br>
     * @param cd
     * @param nestedMenus

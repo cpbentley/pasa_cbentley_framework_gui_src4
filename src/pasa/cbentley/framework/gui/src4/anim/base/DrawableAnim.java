@@ -14,6 +14,7 @@ import pasa.cbentley.framework.gui.src4.anim.Realisator;
 import pasa.cbentley.framework.gui.src4.anim.definitions.AlphaChangeRgb;
 import pasa.cbentley.framework.gui.src4.anim.definitions.ByteObjectAnim;
 import pasa.cbentley.framework.gui.src4.anim.move.Move;
+import pasa.cbentley.framework.gui.src4.canvas.GraphicsXD;
 import pasa.cbentley.framework.gui.src4.ctx.GuiCtx;
 import pasa.cbentley.framework.gui.src4.ctx.IBOTypesGui;
 import pasa.cbentley.framework.gui.src4.ctx.ObjectGC;
@@ -445,9 +446,9 @@ public abstract class DrawableAnim extends ObjectGC implements IAnimable {
     * <br>
     * Method may compute turn based information, though {@link DrawableAnim#nextTurn()} stays the controlling method.
     * <br>
-    * Default behavior simply call {@link IDrawable#draw(GraphicsX)}
+    * Default behavior simply call {@link IDrawable#draw(GraphicsXD)}
     */
-   public void paint(GraphicsX g) {
+   public void paint(GraphicsXD g) {
       d.draw(g);
    }
 

@@ -7,7 +7,7 @@ import pasa.cbentley.core.src4.utils.BitUtils;
 import pasa.cbentley.core.src4.utils.interfaces.IColors;
 import pasa.cbentley.framework.coredraw.src4.interfaces.IGraphics;
 import pasa.cbentley.framework.coredraw.src4.interfaces.ITechGraphics;
-import pasa.cbentley.framework.drawx.src4.engine.GraphicsX;
+import pasa.cbentley.framework.gui.src4.canvas.GraphicsXD;
 import pasa.cbentley.framework.gui.src4.interfaces.IAnimable;
 import pasa.cbentley.framework.gui.src4.interfaces.IDrawable;
 
@@ -27,17 +27,13 @@ public class TestAnimable implements IAnimable {
 
    int           turn   = 0;
 
+   int           type;
+
    int           x;
 
    int           y;
 
    int           zIndex = 0;
-
-   int           type;
-
-   public String toStringOneLine() {
-      return "TestAnimable";
-   }
 
    public TestAnimable(int x, int y, int counter, int speed) {
       this.x = x;
@@ -47,17 +43,13 @@ public class TestAnimable implements IAnimable {
       bounds = new int[] { x, y, 30, 30, IColors.FULLY_TRANSPARENT_WHITE };
    }
 
-   public int getType() {
-      return type;
-   }
-
-   public void lifeEnd() {
-      // TODO Auto-generated method stub
-
-   }
-
    public int[] getBounds() {
       return bounds;
+   }
+
+   public ByteObject getDefinition() {
+      // TODO Auto-generated method stub
+      return null;
    }
 
    public IDrawable getDrawable() {
@@ -65,8 +57,26 @@ public class TestAnimable implements IAnimable {
       return null;
    }
 
+   public int getTarget() {
+      // TODO Auto-generated method stub
+      return 0;
+   }
+
+   public int getTiming() {
+      // TODO Auto-generated method stub
+      return 0;
+   }
+
+   public int getType() {
+      return type;
+   }
+
    public int getZIndex() {
       return zIndex;
+   }
+
+   public boolean hasAnimFlag(int flag) {
+      return BitUtils.hasFlag(stateFlags, flag);
    }
 
    public boolean hasFlag() {
@@ -74,15 +84,31 @@ public class TestAnimable implements IAnimable {
       return false;
    }
 
-   public boolean hasAnimFlag(int flag) {
-      return BitUtils.hasFlag(stateFlags, flag);
-   }
-
    /**
     * Finished when 20 turns have been drawn
     */
    public boolean isFinished() {
       return turn == counter;
+   }
+
+   public void lifeEnd() {
+      // TODO Auto-generated method stub
+
+   }
+
+   public void lifeStart() {
+      // TODO Auto-generated method stub
+
+   }
+
+   public void lifeStartUIThread() {
+      // TODO Auto-generated method stub
+
+   }
+
+   public void loadHeavyResources() {
+      // TODO Auto-generated method stub
+
    }
 
    /**
@@ -97,13 +123,13 @@ public class TestAnimable implements IAnimable {
       return speed;
    }
 
-   public void paint(IGraphics g) {
-      g.drawString("Turn #" + turn + " speed=" + speed, x, y, ITechGraphics.TOP | ITechGraphics.LEFT);
-   }
-
-   public void paint(GraphicsX g) {
+   public void paint(GraphicsXD g) {
       // TODO Auto-generated method stub
 
+   }
+
+   public void paint(IGraphics g) {
+      g.drawString("Turn #" + turn + " speed=" + speed, x, y, ITechGraphics.TOP | ITechGraphics.LEFT);
    }
 
    public void race() {
@@ -112,6 +138,11 @@ public class TestAnimable implements IAnimable {
    }
 
    public void reset() {
+      // TODO Auto-generated method stub
+
+   }
+
+   public void setAnimFlag(int state, boolean v) {
       // TODO Auto-generated method stub
 
    }
@@ -126,49 +157,13 @@ public class TestAnimable implements IAnimable {
 
    }
 
-   public void lifeStart() {
+   public void toString(Dctx dc) {
       // TODO Auto-generated method stub
 
-   }
-
-   public void setAnimFlag(int state, boolean v) {
-      // TODO Auto-generated method stub
-
-   }
-
-   public int getTarget() {
-      // TODO Auto-generated method stub
-      return 0;
    }
 
    public String toString1Line() {
       return Dctx.toString1Line(this);
-   }
-
-   public ByteObject getDefinition() {
-      // TODO Auto-generated method stub
-      return null;
-   }
-
-   public int getTiming() {
-      // TODO Auto-generated method stub
-      return 0;
-   }
-
-   public void lifeStartUIThread() {
-      // TODO Auto-generated method stub
-
-   }
-
-   public void loadHeavyResources() {
-      // TODO Auto-generated method stub
-
-   }
-
-   
-   public void toString(Dctx dc) {
-      // TODO Auto-generated method stub
-
    }
 
    
@@ -177,9 +172,14 @@ public class TestAnimable implements IAnimable {
 
    }
 
+   
    public UCtx toStringGetUCtx() {
       // TODO Auto-generated method stub
       return null;
+   }
+
+   public String toStringOneLine() {
+      return "TestAnimable";
    }
 
 }

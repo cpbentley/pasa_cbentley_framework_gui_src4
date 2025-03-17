@@ -4,6 +4,7 @@ import pasa.cbentley.framework.coredraw.src4.interfaces.IImage;
 import pasa.cbentley.framework.coredraw.src4.interfaces.IMFont;
 import pasa.cbentley.framework.drawx.src4.engine.GraphicsX;
 import pasa.cbentley.framework.drawx.src4.string.StringDrawUtils;
+import pasa.cbentley.framework.gui.src4.canvas.GraphicsXD;
 import pasa.cbentley.framework.gui.src4.ctx.GuiCtx;
 
 /**
@@ -27,8 +28,6 @@ public class ImageText extends ViewDrawable {
 
    private int[][][] breakText;
 
-   private int[][][] subBreaks;
-
    /**
     * Pixels left on the side of the image
     */
@@ -40,6 +39,8 @@ public class ImageText extends ViewDrawable {
    private int[]     numLines;
 
    public Object[]   os;
+
+   private int[][][] subBreaks;
 
    public ImageText(GuiCtx gc, StyleClass styleKey, Object[] os) {
       super(gc, styleKey);
@@ -54,7 +55,7 @@ public class ImageText extends ViewDrawable {
     * Each image has a line value = the number of lines 
     * will always
     */
-   public void drawViewDrawable(GraphicsX g) {
+   public void drawViewDrawable(GraphicsXD g) {
       int vx = getX();
       int vy = getY();
       int widthForData = getContentW();

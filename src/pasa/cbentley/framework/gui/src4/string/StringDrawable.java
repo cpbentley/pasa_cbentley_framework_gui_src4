@@ -8,13 +8,13 @@ import pasa.cbentley.core.src4.logging.Dctx;
 import pasa.cbentley.framework.coredraw.src4.interfaces.IMFont;
 import pasa.cbentley.framework.drawx.src4.ctx.IBOTypesDrawX;
 import pasa.cbentley.framework.drawx.src4.ctx.ToStringStaticDrawx;
-import pasa.cbentley.framework.drawx.src4.engine.GraphicsX;
 import pasa.cbentley.framework.drawx.src4.string.StringMetrics;
 import pasa.cbentley.framework.drawx.src4.string.Stringer;
 import pasa.cbentley.framework.drawx.src4.string.interfaces.IBOFigString;
 import pasa.cbentley.framework.drawx.src4.string.interfaces.ITechStringDrw;
 import pasa.cbentley.framework.drawx.src4.string.interfaces.ITechStringer;
 import pasa.cbentley.framework.drawx.src4.style.IBOStyle;
+import pasa.cbentley.framework.gui.src4.canvas.GraphicsXD;
 import pasa.cbentley.framework.gui.src4.canvas.InputConfig;
 import pasa.cbentley.framework.gui.src4.canvas.ViewContext;
 import pasa.cbentley.framework.gui.src4.cmd.CmdInstanceGui;
@@ -149,6 +149,17 @@ public class StringDrawable extends ViewDrawable implements IBOStrAuxData, IDraw
    private ByteObject   boFigString;
 
    /**
+    * {@link IBOStrAuxData}
+    * 
+    * <p>
+    * Cannot be null as enforced by setter {@link StringDrawable#setBOStrAuxData(ByteObject)}
+    * </p>
+    * 
+    * Contains the Behaviors and View Genes.
+    */
+   protected ByteObject boStrAuxData;
+
+   /**
     * Controls the Input of characters.
     * <br>
     * {@link StringEditModule} calls back {@link StringDrawable} with
@@ -160,17 +171,6 @@ public class StringDrawable extends ViewDrawable implements IBOStrAuxData, IDraw
     * <br>
     */
    StringEditModule     editModule;
-
-   /**
-    * {@link IBOStrAuxData}
-    * 
-    * <p>
-    * Cannot be null as enforced by setter {@link StringDrawable#setBOStrAuxData(ByteObject)}
-    * </p>
-    * 
-    * Contains the Behaviors and View Genes.
-    */
-   protected ByteObject boStrAuxData;
 
    /**
     * Everytime, it is drawn, The Stringer must be updated if the {@link I8nString}
@@ -393,7 +393,7 @@ public class StringDrawable extends ViewDrawable implements IBOStrAuxData, IDraw
    /**
     * 
     */
-   public void drawContentListen(GraphicsX g, int x, int y, int w, int h, Drawable d) {
+   public void drawContentListen(GraphicsXD g, int x, int y, int w, int h, Drawable d) {
       if (editModule != null) {
          editModule.drawContentListen(g, x, y, w, h, d);
       }
@@ -402,7 +402,7 @@ public class StringDrawable extends ViewDrawable implements IBOStrAuxData, IDraw
    /**
     * 
     */
-   public void drawViewDrawableContent(GraphicsX g, int x, int y, ScrollConfig scX, ScrollConfig scY) {
+   public void drawViewDrawableContent(GraphicsXD g, int x, int y, ScrollConfig scX, ScrollConfig scY) {
       //System.out.println("#StringDrawableContent InputMode=" + techDrawable.get1(IStringDrawable.INPUT_OFFSET_06_MODE1));
       int w = getContentW();
       int h = getContentH();
@@ -678,32 +678,6 @@ public class StringDrawable extends ViewDrawable implements IBOStrAuxData, IDraw
       return stringer.getOffsetChar();
    }
 
-   /**
-    * The preferred width of the {@link Stringer} without the decoration.
-    * 
-    * This method builds the {@link Stringer} with currently
-    * @return
-    */
-   public int getSizePreferredContentWidth() {
-      if (hasState(STATE_30_LAYOUTING)) {
-         //the preferred width in layouting mode is always
-         Stringer initStringer = getStringerFxed();
-         return initStringer.getMetrics().getPrefWidth();
-      } else {
-         return super.getSizePreferredContentWidth();
-      }
-   }
-
-   public int getSizePreferredContentHeight() {
-      if (hasState(STATE_30_LAYOUTING)) {
-         //the preferred width in layouting mode is always
-         Stringer initStringer = getStringerFxed();
-         return initStringer.getMetrics().getPrefHeight();
-      } else {
-         return super.getSizePreferredContentHeight();
-      }
-   }
-
    public int getPreferredHeight() {
       if (hasState(STATE_30_LAYOUTING)) {
          int phc =  getSizePreferredContentHeight();
@@ -725,15 +699,7 @@ public class StringDrawable extends ViewDrawable implements IBOStrAuxData, IDraw
          return super.getPreferredWidth();
       }
    }
-   
-   protected void initViewDrawableEnd() {
-      if(unShrankH != 0 || unShrankW != 0) {
-         //update
-         int w = getSizePreferredContentWidth();
-         int h = getSizePreferredContentHeight();
-         stringer.getMetrics().positionString(w,h);
-      }
-   }
+
    /**
     * Value is read from {@link IBOStrAuxData#SDATA_OFFSET_02_PRESET_CONFIG1}
     * 
@@ -750,6 +716,31 @@ public class StringDrawable extends ViewDrawable implements IBOStrAuxData, IDraw
       return boStrAuxData.get1(IBOStrAuxData.SDATA_OFFSET_02_PRESET_CONFIG1);
    }
 
+   public int getSizePreferredContentHeight() {
+      if (hasState(STATE_30_LAYOUTING)) {
+         //the preferred width in layouting mode is always
+         Stringer initStringer = getStringerFxed();
+         return initStringer.getMetrics().getPrefHeight();
+      } else {
+         return super.getSizePreferredContentHeight();
+      }
+   }
+   
+   /**
+    * The preferred width of the {@link Stringer} without the decoration.
+    * 
+    * This method builds the {@link Stringer} with currently
+    * @return
+    */
+   public int getSizePreferredContentWidth() {
+      if (hasState(STATE_30_LAYOUTING)) {
+         //the preferred width in layouting mode is always
+         Stringer initStringer = getStringerFxed();
+         return initStringer.getMetrics().getPrefWidth();
+      } else {
+         return super.getSizePreferredContentWidth();
+      }
+   }
    public int getSizePropertyValueH(int sizeType) {
       return super.getSizePropertyValueH(sizeType);
    }
@@ -999,13 +990,6 @@ public class StringDrawable extends ViewDrawable implements IBOStrAuxData, IDraw
       setPresetConfig(type);
    }
 
-   private void setBOStrAuxData(ByteObject boStringData) {
-      if (boStringData == null) {
-         throw new NullPointerException();
-      }
-      this.boStrAuxData = boStringData;
-   }
-
    /**
     * Compute preferred size based on String preset configuration and sizers.
     * <p>
@@ -1071,6 +1055,15 @@ public class StringDrawable extends ViewDrawable implements IBOStrAuxData, IDraw
       doUpdateNavBehavior();
    }
 
+   protected void initViewDrawableEnd() {
+      if(unShrankH != 0 || unShrankW != 0) {
+         //update
+         int w = getSizePreferredContentWidth();
+         int h = getSizePreferredContentHeight();
+         stringer.getMetrics().positionString(w,h);
+      }
+   }
+
    protected void initViewPortSub(int width, int height) {
       initPreferredSizeFromViewPortArea(layEngine, width, height);
    }
@@ -1100,7 +1093,7 @@ public class StringDrawable extends ViewDrawable implements IBOStrAuxData, IDraw
       }
    }
 
-   public void manageNavigate(CmdInstanceGui cd, int navEvent) {
+   public void navigateCmd(CmdInstanceGui cd, int navEvent) {
       if (editModule != null) {
          editModule.manageNavigate(cd, navEvent);
       }
@@ -1244,6 +1237,13 @@ public class StringDrawable extends ViewDrawable implements IBOStrAuxData, IDraw
       this.stringer.setTextFigure(boFigString);
    }
 
+   private void setBOStrAuxData(ByteObject boStringData) {
+      if (boStringData == null) {
+         throw new NullPointerException();
+      }
+      this.boStrAuxData = boStringData;
+   }
+
    /**
     * User front method for changing.
     * @param boStringData {@link IBOStrAuxData} cannot be null.
@@ -1284,6 +1284,69 @@ public class StringDrawable extends ViewDrawable implements IBOStrAuxData, IDraw
    public void setEditModule(StringEditModule module) {
       editModule = module;
       doUpdateNavBehavior();
+   }
+
+   /**
+    * Changes the way the String is constrained. Changes are applied at the next layout
+    * @param presetConfig
+    */
+   private void setPresetConfig(int presetConfig) {
+      setPresetConfigViewFlags(presetConfig);
+      setPresetConfigShrinkFlags(presetConfig);
+   }
+
+   private void setPresetConfigShrinkFlags(int presetConfig) {
+      switch (presetConfig) {
+         case ITechStringDrawable.PRESET_CONFIG_0_NONE:
+            setShrink(false, false);
+            break;
+         case ITechStringDrawable.PRESET_CONFIG_1_TITLE:
+            setShrink(false, true); //shrink vertically
+            break;
+         case ITechStringDrawable.PRESET_CONFIG_2_SCROLL_H:
+            setShrink(false, true);
+            break;
+         case ITechStringDrawable.PRESET_CONFIG_3_SCROLL_V:
+            setShrink(false, true);
+            break;
+         case ITechStringDrawable.PRESET_CONFIG_4_NATURAL_NO_WRAP:
+            setShrink(false, false);
+            break;
+         case ITechStringDrawable.PRESET_CONFIG_5_CHAR:
+            break;
+         default:
+            break;
+      }
+   }
+
+   /**
+    * Sets flags like {@link ITechViewDrawable#FLAG_VSTATE_10_CONTENT_PW_VIEWPORT_DW}
+    * @param type
+    */
+   private void setPresetConfigViewFlags(int presetConfig) {
+      switch (presetConfig) {
+         case ITechStringDrawable.PRESET_CONFIG_0_NONE:
+            break;
+         case ITechStringDrawable.PRESET_CONFIG_1_TITLE:
+            setFlagView(ITechViewDrawable.FLAG_GENE_28_NOT_SCROLLABLE, true);
+            setFlagView(ITechViewDrawable.FLAG_VSTATE_12_CONTENT_W_DEPENDS_VIEWPORT, true);
+            setFlagView(ITechViewDrawable.FLAG_VSTATE_07_NO_EAT_H_MUST_EXPAND, true);
+            break;
+         case ITechStringDrawable.PRESET_CONFIG_2_SCROLL_H:
+            setFlagView(ITechViewDrawable.FLAG_VSTATE_07_NO_EAT_H_MUST_EXPAND, true);
+            break;
+         case ITechStringDrawable.PRESET_CONFIG_3_SCROLL_V:
+            setFlagView(ITechViewDrawable.FLAG_VSTATE_10_CONTENT_PW_VIEWPORT_DW, true);
+            setFlagView(ITechViewDrawable.FLAG_VSTATE_12_CONTENT_W_DEPENDS_VIEWPORT, true);
+            break;
+         case ITechStringDrawable.PRESET_CONFIG_4_NATURAL_NO_WRAP:
+            break;
+         case ITechStringDrawable.PRESET_CONFIG_5_CHAR:
+            setFlagView(ITechViewDrawable.FLAG_GENE_28_NOT_SCROLLABLE, true);
+            break;
+         default:
+            break;
+      }
    }
 
    public void setSizersPreset_1CharPerLines(int numLinesMax) {
@@ -1378,69 +1441,6 @@ public class StringDrawable extends ViewDrawable implements IBOStrAuxData, IDraw
    public void setStyleClass(StyleClass sc) {
       super.setStyleClass(sc);
       initTech(null);
-   }
-
-   /**
-    * Changes the way the String is constrained. Changes are applied at the next layout
-    * @param presetConfig
-    */
-   private void setPresetConfig(int presetConfig) {
-      setPresetConfigViewFlags(presetConfig);
-      setPresetConfigShrinkFlags(presetConfig);
-   }
-
-   private void setPresetConfigShrinkFlags(int presetConfig) {
-      switch (presetConfig) {
-         case ITechStringDrawable.PRESET_CONFIG_0_NONE:
-            setShrink(false, false);
-            break;
-         case ITechStringDrawable.PRESET_CONFIG_1_TITLE:
-            setShrink(false, true); //shrink vertically
-            break;
-         case ITechStringDrawable.PRESET_CONFIG_2_SCROLL_H:
-            setShrink(false, true);
-            break;
-         case ITechStringDrawable.PRESET_CONFIG_3_SCROLL_V:
-            setShrink(false, true);
-            break;
-         case ITechStringDrawable.PRESET_CONFIG_4_NATURAL_NO_WRAP:
-            setShrink(false, false);
-            break;
-         case ITechStringDrawable.PRESET_CONFIG_5_CHAR:
-            break;
-         default:
-            break;
-      }
-   }
-
-   /**
-    * Sets flags like {@link ITechViewDrawable#FLAG_VSTATE_10_CONTENT_PW_VIEWPORT_DW}
-    * @param type
-    */
-   private void setPresetConfigViewFlags(int presetConfig) {
-      switch (presetConfig) {
-         case ITechStringDrawable.PRESET_CONFIG_0_NONE:
-            break;
-         case ITechStringDrawable.PRESET_CONFIG_1_TITLE:
-            setFlagView(ITechViewDrawable.FLAG_GENE_28_NOT_SCROLLABLE, true);
-            setFlagView(ITechViewDrawable.FLAG_VSTATE_12_CONTENT_W_DEPENDS_VIEWPORT, true);
-            setFlagView(ITechViewDrawable.FLAG_VSTATE_07_NO_EAT_H_MUST_EXPAND, true);
-            break;
-         case ITechStringDrawable.PRESET_CONFIG_2_SCROLL_H:
-            setFlagView(ITechViewDrawable.FLAG_VSTATE_07_NO_EAT_H_MUST_EXPAND, true);
-            break;
-         case ITechStringDrawable.PRESET_CONFIG_3_SCROLL_V:
-            setFlagView(ITechViewDrawable.FLAG_VSTATE_10_CONTENT_PW_VIEWPORT_DW, true);
-            setFlagView(ITechViewDrawable.FLAG_VSTATE_12_CONTENT_W_DEPENDS_VIEWPORT, true);
-            break;
-         case ITechStringDrawable.PRESET_CONFIG_4_NATURAL_NO_WRAP:
-            break;
-         case ITechStringDrawable.PRESET_CONFIG_5_CHAR:
-            setFlagView(ITechViewDrawable.FLAG_GENE_28_NOT_SCROLLABLE, true);
-            break;
-         default:
-            break;
-      }
    }
 
    public void setXY(int x, int y) {

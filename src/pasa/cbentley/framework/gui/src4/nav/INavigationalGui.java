@@ -1,19 +1,23 @@
-package pasa.cbentley.framework.gui.src4.interfaces;
+package pasa.cbentley.framework.gui.src4.nav;
 
 import pasa.cbentley.framework.cmd.src4.engine.CmdInstance;
-import pasa.cbentley.framework.cmd.src4.interfaces.ITechNav;
+import pasa.cbentley.framework.cmd.src4.engine.CmdNode;
+import pasa.cbentley.framework.cmd.src4.interfaces.ITechNavCmd;
+import pasa.cbentley.framework.cmd.src4.nav.INavigational;
+import pasa.cbentley.framework.cmd.src4.nav.MCmdNav;
 import pasa.cbentley.framework.gui.src4.canvas.InputConfig;
-import pasa.cbentley.framework.gui.src4.core.Drawable;
 import pasa.cbentley.framework.gui.src4.exec.ExecutionContextCanvasGui;
+import pasa.cbentley.framework.gui.src4.interfaces.IDrawable;
+import pasa.cbentley.framework.gui.src4.interfaces.ITechDrawable;
 import pasa.cbentley.framework.gui.src4.table.TableView;
 
 /**
- * Any {@link IDrawable} with the concept of horizontal and vertical navigation implements {@link INavigational}.
- * <br>
- * <br>
- * Navigates Focus among Focusable {@link Drawable}.
- * <br>
- * <br>
+ * {@link INavigationalGui} is a specialization of {@link INavigational} for {@link IDrawable}s.
+ * 
+ * <p>
+ * A the command focus of a Device is moved with {@link MCmdNav} instances
+ * The focus of the keyboard, with a few keys, we can reach any CmdNode
+ * The Nav {@link CmdNode} is a patch applied to {@link INavigational}
  * Controls the behavior of competing {@link IDrawable} on the same screen using only key event for navigation.
  * <br>
  * When a Navigational is active, it gets the key Nav events before all other Drawables.
@@ -21,19 +25,15 @@ import pasa.cbentley.framework.gui.src4.table.TableView;
  * <br>
  * For {@link IDrawable} classes, they need the state {@link ITechDrawable#STYLE_06_FOCUSED_KEY} for the Nav event 
  * to be sent.
- * The {@link MasterCanvas} keeps a linked list of active {@link IDrawable} on the screen. 
- * <br>
- * 
- * If it acts on the InputConfig, the event finishes and screen is repainted.
- * <br>
+ * </p>
  * <p>
  * A Navigational drawable may release the focus as the result of a one of the methods in this interface.
- * Using {@link Controller#focusRelease()}
  * <br>
  * <p>
  * Around the Clock behavior implies that it cannot focusout on that axis
  * <br>
- * In many ways, concepts are similar to traversal of {@link javax.microedition.lcdui.CustomItem}. In J2ME, the method {@link javax.microedition.lcdui.CustomItem#getInteractionModes()}
+ * In many ways, concepts are similar to traversal of {@link javax.microedition.lcdui.CustomItem}. 
+ * In J2ME, the method {@link javax.microedition.lcdui.CustomItem#getInteractionModes()}
  * asks the phone implementation if it supports horizontal and vertical traversal. Returns 0 when none is possible.
  * Here we assume nothing. A {@link IDrawable} with both traversals will need UP-DOWN-LEFT_RIGHT keys to work.
  * In J2ME the method {@link javax.microedition.lcdui.CustomItem#traverse()} returns false when next event in that direction traverses out.
@@ -42,6 +42,8 @@ import pasa.cbentley.framework.gui.src4.table.TableView;
  * When a {@link IDrawable} only supports horizontal navigation,  vertical navigation key events are sent to the first
  *  {@link IDrawable} in the linked list that supports vertical navigation.
  * <br>
+ * 
+ * 
  * <p>
  * Navigational focus is sometimes related to the state {@link ITechDrawable#STYLE_05_SELECTED} and the events
  *  {@link ITechDrawable#EVENT_03_KEY_FOCUS_GAIN}
@@ -53,26 +55,45 @@ import pasa.cbentley.framework.gui.src4.table.TableView;
  * <br>
  * In a {@link TableView}, the cell with the {@link ITechDrawable#STYLE_05_SELECTED} and {@link ITechDrawable#STYLE_06_FOCUSED_KEY}
  * states is the same.
- * <br>
- * For Device like the P990i with a Scrolling wheel for Up/Down events, Horizontal and Vertical navigation may be merged.
- * That means scrolling down the wheel will navigate on the first row of the TableView, then go to next row etc.
- * <br>
- * @author Mordan
+ * 
+ * @author Charles-Philip Bentley
  *
  * @see IDrawable
  */
-public interface INavigational extends ITechNav {
+public interface INavigationalGui extends INavigational {
+
+   /**
+    * Returns an integer Flags.<br>
+    * Flag {@link IDrawable#FLAG_1_HORIZ} is set when horizontal traversal is supported. <br>
+    * Flag {@link IDrawable#FLAG_2_VERTI} is set when vertical traversal is supported. <br>
+    * Flag {@link IDrawable#FLAG_3_SELECTABLE} is set when Z traversal is supported. <br>
+    * <br>
+    * Similar to {@link CustomItem#getInteractionModes()}
+    * @return
+    * 
+    */
+   public int getNavFlag();
 
    public void manageNavigate(ExecutionContextCanvasGui ec, int navEvent);
+
+   /**
+    * Query current capabilities.
+    * <br>
+    * this allows a {@link INavigationalGui} to disable calls to 
+    * {@link INavigationalGui#navigateCmd(CmdInstance)} because
+    * @param navEvent
+    * @return
+    */
+   public Object navigateCheck(int navEvent);
 
    /**
     * Try to navigate. If it could not navigate, because
     * of internal state reasons.
     * <br>
     * The nav command contains info about 
-    * <li> {@link ITechNav#NAV_1_UP}
-    * <li> {@link ITechNav#NAV_2_DOWN}
-    * <li> {@link ITechNav#NAV_3_LEFT}
+    * <li> {@link ITechNavCmd#NAV_01_UP}
+    * <li> {@link ITechNavCmd#NAV_02_DOWN}
+    * <li> {@link ITechNavCmd#NAV_03_LEFT}
     * 
     * <br>
     * <br>
@@ -81,23 +102,7 @@ public interface INavigational extends ITechNav {
     * 
     *
     */
-   public void manageNavigate(CmdInstance navCmd);
-
-   /**
-    * Query current capabilities.
-    * <br>
-    * this allows a {@link INavigational} to disable calls to 
-    * {@link INavigational#manageNavigate(CmdInstance)} because
-    * @param navEvent
-    * @return
-    */
-   public boolean canNavigate(int navEvent);
-   /**
-     * Call Back for Up Command
-    * @param ec TODO
-     *
-     */
-   public void navigateUp(ExecutionContextCanvasGui ec);
+   public void navigateCmd(CmdInstance navCmd);
 
    /**
     * Call Back for DownCmd
@@ -129,15 +134,10 @@ public interface INavigational extends ITechNav {
    public void navigateSelect(ExecutionContextCanvasGui ec);
 
    /**
-    * Returns an integer Flags.<br>
-    * Flag {@link IDrawable#FLAG_HORIZ} is set when horizontal traversal is supported. <br>
-    * Flag {@link IDrawable#FLAG_VERTI} is set when vertical traversal is supported. <br>
-    * Flag {@link IDrawable#FLAG_SELECTABLE} is set when Z traversal is supported. <br>
-    * <br>
-    * Similar to {@link CustomItem#getInteractionModes()}
-    * @return
-    * 
-    */
-   public int getNavFlag();
+     * Call Back for Up Command
+    * @param ec TODO
+     *
+     */
+   public void navigateUp(ExecutionContextCanvasGui ec);
 
 }

@@ -42,7 +42,7 @@ public class ExecutionContextCanvasGui extends ExecutionContextCanvas implements
    /**
     * Set when a command is found
     */
-   private CmdInstanceGui ci;
+   private CmdInstanceGui  ci;
 
    public volatile boolean finished;
 
@@ -130,6 +130,15 @@ public class ExecutionContextCanvasGui extends ExecutionContextCanvas implements
       getCanvasResultDrawable().setActionDoneRepaint(d);
    }
 
+   public void eventGuiEnd() {
+      // TODO Auto-generated method stub
+
+   }
+
+   public void eventGuiStart(InputStateCanvasGui is, OutputStateCanvasGui os, CanvasAppliInputGui canvas) {
+      icc = new InputConfig(gc, canvas, is, os);
+   }
+
    private void execTypeDraw(ExecEntry ee) {
       IDrawable d = (IDrawable) ee.o;
       int action = ee.action;
@@ -157,7 +166,6 @@ public class ExecutionContextCanvasGui extends ExecutionContextCanvas implements
       d.run();
    }
 
-
    public int getAddressX() {
       return addressX;
    }
@@ -165,6 +173,7 @@ public class ExecutionContextCanvasGui extends ExecutionContextCanvas implements
    public int getAddressY() {
       return addressY;
    }
+
    public OutputStateCanvasGui getCanvasResultDrawable() {
       return (OutputStateCanvasGui) os;
    }
@@ -177,7 +186,7 @@ public class ExecutionContextCanvasGui extends ExecutionContextCanvas implements
       return icc;
    }
 
-   public InputStateCanvasGui getInputStateDrawable() {
+   public InputStateCanvasGui getInputStateCanvasGui() {
       return (InputStateCanvasGui) is;
    }
 
@@ -185,7 +194,14 @@ public class ExecutionContextCanvasGui extends ExecutionContextCanvas implements
       return (OutputStateCanvasGui) os;
    }
 
-   public void renderStart() {
+   public void renderEnd() {
+
+   }
+
+   public void startRender() {
+      super.startRender();
+      getOutputStateCanvasGui().startRender();
+
       for (int i = 0; i < renders.nextempty; i++) {
          ExecEntry ee = (ExecEntry) renders.objects[i];
          int type = ee.type;
@@ -201,6 +217,7 @@ public class ExecutionContextCanvasGui extends ExecutionContextCanvas implements
             throw new IllegalArgumentException();
          }
       }
+
    }
 
    public void setAddressCoordinates(int x, int y) {
@@ -216,23 +233,26 @@ public class ExecutionContextCanvasGui extends ExecutionContextCanvas implements
       this.icc = icc;
    }
 
+   /**
+    * Shortcut to {@link OutputStateCanvasGui#setActionDoneRepaint()}
+    */
    public void srActionDoneRepaint() {
-      icc.srActionDoneRepaint();
+      icc.setActionDoneRepaint();
    }
 
    public void srActionDoneRepaint(IDrawable d) {
       icc.srActionDoneRepaint(d);
    }
-   
+
    //#mdebug
    public void toString(Dctx dc) {
       dc.root(this, ExecutionContextCanvasGui.class, toStringGetLine(229));
       toStringPrivate(dc);
       super.toString(dc.sup());
-      
+
       dc.appendVarWithNewLine("addressX", addressX);
       dc.appendVarWithSpace("addressY", addressY);
-      
+
       dc.nlLvl(ci, "ci");
    }
 
@@ -246,6 +266,5 @@ public class ExecutionContextCanvasGui extends ExecutionContextCanvas implements
       dc.appendVarWithSpace("finished", finished);
    }
    //#enddebug
-   
 
 }

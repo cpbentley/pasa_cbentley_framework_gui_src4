@@ -8,6 +8,7 @@ import pasa.cbentley.framework.drawx.src4.engine.GraphicsX;
 import pasa.cbentley.framework.drawx.src4.string.CharOpt;
 import pasa.cbentley.framework.gui.src4.anim.base.DrawableAnim;
 import pasa.cbentley.framework.gui.src4.anim.base.ImgAnimable;
+import pasa.cbentley.framework.gui.src4.canvas.GraphicsXD;
 import pasa.cbentley.framework.gui.src4.core.Drawable;
 import pasa.cbentley.framework.gui.src4.core.ViewPane;
 import pasa.cbentley.framework.gui.src4.ctx.GuiCtx;
@@ -102,10 +103,6 @@ public class Move extends ImgAnimable {
     */
    private int             tblrTrail;
 
-   public void setTrail(int trail) {
-      tblrTrail = trail;
-   }
-
    private long        time;
 
    /**
@@ -115,6 +112,10 @@ public class Move extends ImgAnimable {
     */
    private IDrawable[] trail;
 
+   public Move(GuiCtx gc, IDrawable d, ByteObject def) {
+      super(gc, d, def);
+   }
+
    /**
     * Move of a Drawable 
     * @param d
@@ -122,10 +123,6 @@ public class Move extends ImgAnimable {
     */
    public Move(GuiCtx gc, IDrawable d, FunctionMove f) {
       super(gc, d, f);
-   }
-
-   public Move(GuiCtx gc, IDrawable d, ByteObject def) {
-      super(gc, d, def);
    }
 
    public void addTrail(IDrawable trailDrawable) {
@@ -139,7 +136,7 @@ public class Move extends ImgAnimable {
       }
    }
 
-   protected void doDebugTime(GraphicsX g, int x, int y) {
+   protected void doDebugTime(GraphicsXD g, int x, int y) {
       if (hasFlagMove(MOVE_FLAG_3_DEBUG_TIME)) {
          long cur = System.currentTimeMillis();
          int diff = (int) (cur - time);
@@ -197,7 +194,7 @@ public class Move extends ImgAnimable {
     * 
     * @param g {@link GraphicsX}
     */
-   public void paint(GraphicsX g) {
+   public void paint(GraphicsXD g) {
       FunctionMove mf = ((FunctionMove) stepFunction);
       mf.fx();
       int x = mf.getX();
@@ -215,7 +212,7 @@ public class Move extends ImgAnimable {
       doDebugTime(g, x, y);
    }
 
-   protected void paintTrail(GraphicsX g, int x, int y, IDrawable d) {
+   protected void paintTrail(GraphicsXD g, int x, int y, IDrawable d) {
       int dx = x;
       int dy = y;
       if (trail != null) {
@@ -242,12 +239,20 @@ public class Move extends ImgAnimable {
       }
    }
 
+   /**
+    * the Base class {@link DrawableAnim} will call resetCounter on the MoveFunction
+    * {@link FunctionMove#resetCounter()}
+    */
+   public void reset() {
+      super.reset();
+   }
+
    //   /** 
    //    * @param bg is the actual image on which the method draws
    //    * To erase a frame rectangle, you draw that image regio
    //    * @param g the actualy pixels on the screen. reference from the repaint method. 
    //    */
-   //   public void paintErase(GraphicsX g, RgbImage bg) {
+   //   public void paintErase(GraphicsXD g, RgbImage bg) {
    //	 //MUtils.debug(boundsOldTurn);
    //	 //MUtils.debug(boundsTurn);
    //	 //if null no repaint is needed
@@ -268,14 +273,6 @@ public class Move extends ImgAnimable {
    //	 //now draws the drawable/image
    //	 paint(g);
    //   }
-
-   /**
-    * the Base class {@link DrawableAnim} will call resetCounter on the MoveFunction
-    * {@link FunctionMove#resetCounter()}
-    */
-   public void reset() {
-      super.reset();
-   }
 
    /**
     * Sets a specific clip when drawing the move animation
@@ -322,6 +319,10 @@ public class Move extends ImgAnimable {
    public void setShiftDestOffset(int dx, int dy) {
       FunctionMove mf = (FunctionMove) stepFunction;
       mf.shiftDest(dx, dy);
+   }
+
+   public void setTrail(int trail) {
+      tblrTrail = trail;
    }
 
    //#mdebug

@@ -2,8 +2,8 @@ package pasa.cbentley.framework.gui.src4.anim.definitions;
 
 import pasa.cbentley.byteobjects.src4.objects.function.Function;
 import pasa.cbentley.core.src4.logging.Dctx;
-import pasa.cbentley.framework.drawx.src4.engine.GraphicsX;
 import pasa.cbentley.framework.gui.src4.anim.base.DrawableAnim;
+import pasa.cbentley.framework.gui.src4.canvas.GraphicsXD;
 import pasa.cbentley.framework.gui.src4.core.Drawable;
 import pasa.cbentley.framework.gui.src4.ctx.GuiCtx;
 import pasa.cbentley.framework.gui.src4.string.StringDrawable;
@@ -108,7 +108,7 @@ public class RotatingText extends DrawableAnim {
       return speed;
    }
 
-   public void paint(GraphicsX g) {
+   public void paint(GraphicsXD g) {
       sd.draw(g);
    }
 
@@ -120,14 +120,14 @@ public class RotatingText extends DrawableAnim {
       super.toString(dc.sup());
    }
 
-   private void toStringPrivate(Dctx dc) {
-      
-   }
-
    public void toString1Line(Dctx dc) {
       dc.root1Line(this, "RotatingText");
       toStringPrivate(dc);
       super.toString1Line(dc.sup1Line());
+   }
+
+   private void toStringPrivate(Dctx dc) {
+      
    }
 
    //#enddebug

@@ -25,7 +25,7 @@ import pasa.cbentley.framework.core.ui.src4.input.ScreenOrientationCtrl;
 import pasa.cbentley.framework.core.ui.src4.interfaces.ICanvasHost;
 import pasa.cbentley.framework.core.ui.src4.interfaces.ITechEventHost;
 import pasa.cbentley.framework.core.ui.src4.tech.IBOCanvasHost;
-import pasa.cbentley.framework.core.ui.src4.tech.IInput;
+import pasa.cbentley.framework.core.ui.src4.tech.ITechInput;
 import pasa.cbentley.framework.core.ui.src4.tech.ITechCodes;
 import pasa.cbentley.framework.core.ui.src4.tech.ITechHostUI;
 import pasa.cbentley.framework.coredraw.src4.interfaces.IGraphics;
@@ -179,7 +179,8 @@ public class CanvasAppliInputGui extends CanvasAppliInput implements IDrawableLi
 
       constructHelpersDrawable(gc);
 
-      destGraphicsX = new GraphicsXD(gc);
+      destGraphicsX = (GraphicsXD) gc.getDC().getGraphicsXFactory().createGraphicsX();
+
       int paintMode = settingsHelper.getPaintMode();
       destGraphicsX.setPaintMode(paintMode, getWidth(), getHeight());
       destGraphicsX.toStringSetName("RootGraphics");
@@ -191,7 +192,7 @@ public class CanvasAppliInputGui extends CanvasAppliInput implements IDrawableLi
       }
    }
 
-   public void clearCanvasWithBgColor(GraphicsX g) {
+   public void clearCanvasWithBgColor(GraphicsXD g) {
       int dx = 0;
       int dy = 0;
       int dw = this.getWidth();
@@ -291,7 +292,7 @@ public class CanvasAppliInputGui extends CanvasAppliInput implements IDrawableLi
 
    /**
     * Navigational Pointer Event Select
-    * @param ic
+    * @param ec
     */
    public void cmdSelectPointer(ExecutionContextCanvasGui ec) {
       boolean isDone = getTopologyRoot().intercepts(ec);
@@ -447,8 +448,7 @@ public class CanvasAppliInputGui extends CanvasAppliInput implements IDrawableLi
       ExecutionContextCanvasGui ec = (ExecutionContextCanvasGui) exc;
       InputStateCanvasGui is = (InputStateCanvasGui) ixs;
       OutputStateCanvasGui os = (OutputStateCanvasGui) oxs;
-      InputConfig ic = new InputConfig(gc, this, is, os);
-      ec.setInputConfig(ic);
+      ec.eventGuiStart(is,os,this);
 
       //#debug
       toDLog().pFlow("", this, CanvasAppliInputGui.class, "ctrlUIEvent@"+toStringGetLine(450), LVL_03_FINEST, true);
@@ -509,9 +509,9 @@ public class CanvasAppliInputGui extends CanvasAppliInput implements IDrawableLi
       int ctxCategory = ITechCmd.CTX_CAT_0_KEY;
       if (is.isTypeDevicePointer()) {
          //when pointer event, update the pointer context
-         if (is.getMode() == IInput.MOD_0_PRESSED || is.getMode() == IInput.MOD_1_RELEASED) {
+         if (is.getMode() == ITechInput.MOD_0_PRESSED || is.getMode() == ITechInput.MOD_1_RELEASED) {
             ctxCategory = ITechCmd.CTX_CAT_1_POINTER_PRESSED;
-         } else if (is.getMode() == IInput.MOD_3_MOVED) {
+         } else if (is.getMode() == ITechInput.MOD_3_MOVED) {
             ctxCategory = ITechCmd.CTX_CAT_2_POINTER_OVER;
          }
          //TODO drag has a context?
@@ -583,7 +583,9 @@ public class CanvasAppliInputGui extends CanvasAppliInput implements IDrawableLi
 
       os.setExCtx(ec);
 
-      extras.ctrlUIEvent(is, os);
+      extras.ctrlUIEvent(ec, is, os);
+      
+      ec.eventGuiEnd();
 
    }
 
@@ -735,7 +737,7 @@ public class CanvasAppliInputGui extends CanvasAppliInput implements IDrawableLi
       int w = gc.getCanvasRoot().getVCAppli().getWidth();
       int h = gc.getCanvasRoot().getVCAppli().getHeight();
       RgbImage img = gc.getDC().getRgbCache().create(w, h, bgColor);
-      GraphicsX gx = img.getGraphicsX(GraphicsX.MODE_2_RGB_IMAGE);
+      GraphicsXD gx = (GraphicsXD) img.getGraphicsX(GraphicsX.MODE_2_RGB_IMAGE);
       gx.setPaintCtxFlag(ITechCanvasDrawable.REPAINT_01_FULL, true);
       gx.setPaintCtxFlag(ITechCanvasDrawable.REPAINT_15_SCREEN_SHOT, true);
       this.topoViewDrawableRoot.draw(gx);
@@ -818,7 +820,7 @@ public class CanvasAppliInputGui extends CanvasAppliInput implements IDrawableLi
       if (g.hasPaintCtx(ITechCanvasDrawable.REPAINT_06_DRAWABLE)) {
          //must be painted in Order of DLayer index
 
-         g.screenResultCause.paintDrawables(g);
+         g.getOutputStateCanvasGui().paintDrawables(g);
       } else {
          //do a full clear
          clearPhysicalCanvas(g);
@@ -853,7 +855,7 @@ public class CanvasAppliInputGui extends CanvasAppliInput implements IDrawableLi
     * A full repaint must update the background image
     * @param g
     */
-   private void paintFinalToScreen(IGraphics g, GraphicsX gx) {
+   private void paintFinalToScreen(IGraphics g, GraphicsXD gx) {
       //there is only work if not in screen. In Screen Mode everything is already drawn
       //to the screen Graphics
       int transformation = IImage.TRANSFORM_0_NONE;
@@ -915,7 +917,7 @@ public class CanvasAppliInputGui extends CanvasAppliInput implements IDrawableLi
     * <br>
     * During the paint, {@link Controller} {@link InputConfig} and {@link ScreenResult} give the state that generates the painting
     * <br>
-    * Once paint concludes and {@link OutputStateCanvas#paintEnd()} is called, this is no more the case. A new cycle has begun.
+    * Once paint concludes and {@link OutputStateCanvas#endRender()} is called, this is no more the case. A new cycle has begun.
     * Different cycles exist:
     * <li>UserEventAction-Repaint {@link Controller#CYCLE_0_USER_EVENT}
     * <li>BusinessCodeThread-Repaint {@link Controller#CYCLE_1_BUSINESS_EVENT}
@@ -950,7 +952,9 @@ public class CanvasAppliInputGui extends CanvasAppliInput implements IDrawableLi
     * That means there is a lag when a key is pressed during the {@link Canvas#paint} method. The {@link Canvas} allievate this issue
     * by allowing the query of key states during the paint method.
     */
-   public void render(IGraphics g, ExecutionContextCanvas ec, InputStateCanvas is, OutputStateCanvas sr) {
+   public void render(IGraphics g, ExecutionContextCanvas ec, InputStateCanvas is, OutputStateCanvas os) {
+
+      ec.startRender();
 
       //in drawing, first validate layout, invalidate caches. 
       //second pass, draw.
@@ -959,12 +963,7 @@ public class CanvasAppliInputGui extends CanvasAppliInput implements IDrawableLi
 
       //draw strategy
       //1 execute runnables from the execution context in the screenres before
-      ExecutionContext ex = sr.getExecCtx();
-      if (ex != null) {
-         ExecutionContextCanvasGui dec = (ExecutionContextCanvasGui) ex;
-         dec.renderStart();
 
-      }
       //2 validate the layout and positions of the tree, invalidates caching.
 
       //3 draw the tree
@@ -972,9 +971,8 @@ public class CanvasAppliInputGui extends CanvasAppliInput implements IDrawableLi
       //#debug
       String msg = "Clip " + "[" + g.getClipX() + "," + g.getClipY() + " " + g.getClipWidth() + "," + g.getClipHeight() + "] on ";
       //#debug
-      toDLog().pDraw(msg, g, CanvasAppliInputGui.class, "render@934", ITechLvl.LVL_04_FINER, true);
+      toDLog().pDraw(msg, g, CanvasAppliInputGui.class, "render@975", ITechLvl.LVL_04_FINER, true);
 
-      OutputStateCanvasGui renderCause = (OutputStateCanvasGui) sr;
       //clean clip sequence since this is a new paint job
       super.paintStart();
 
@@ -986,8 +984,7 @@ public class CanvasAppliInputGui extends CanvasAppliInput implements IDrawableLi
          //when paint mode is not screen, we have to draw
          destGraphicsX.reset(g);
       }
-      destGraphicsX.screenResultCause = renderCause;
-      destGraphicsX.isd = (InputStateCanvasGui) is;
+      destGraphicsX.setExecutionContextCanvasGui((ExecutionContextCanvasGui) ec); 
 
       ///////////////////////
       //#debug
@@ -1005,7 +1002,7 @@ public class CanvasAppliInputGui extends CanvasAppliInput implements IDrawableLi
       //System.out.println("========== DEBUG MASTERCANVAS JUST BEFORE PAINT METHOD ============");
       //System.out.println(MasterCanvas.getMasterCanvas().toString());
       //draw on the destination GraphicsX object
-      int repaintFlags = renderCause.getRepaintFlag();
+      int repaintFlags = destGraphicsX.getOutputStateCanvasGui().getRepaintFlag();
       if (repaintFlags == 0) {
          //#debug
          toDLog().pDraw("Repaint Flag is Zero. Sync Error or something", this, CanvasAppliInputGui.class, "render", LVL_05_FINE, true);
@@ -1029,7 +1026,8 @@ public class CanvasAppliInputGui extends CanvasAppliInput implements IDrawableLi
 
       //reset repaint flags
       isPainting = false;
-      renderCause.paintEnd();
+      
+      ec.endRender();
       //TODO check if during the paint method, some business process piles up some ScreenResult
       //in which case, call a repaint on those.
    }

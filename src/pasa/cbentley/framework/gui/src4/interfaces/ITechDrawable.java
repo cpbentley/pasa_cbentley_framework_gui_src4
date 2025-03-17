@@ -3,27 +3,28 @@ package pasa.cbentley.framework.gui.src4.interfaces;
 import pasa.cbentley.byteobjects.src4.core.ByteObject;
 import pasa.cbentley.byteobjects.src4.core.interfaces.IByteObject;
 import pasa.cbentley.framework.cmd.src4.ctx.CmdCtx;
+import pasa.cbentley.framework.cmd.src4.interfaces.ICmdsCmd;
 import pasa.cbentley.framework.drawx.src4.engine.GraphicsX;
 import pasa.cbentley.framework.drawx.src4.engine.RgbImage;
 import pasa.cbentley.framework.drawx.src4.style.IBOStyle;
 import pasa.cbentley.framework.gui.src4.anim.ITechAnim;
 import pasa.cbentley.framework.gui.src4.anim.move.Move;
+import pasa.cbentley.framework.gui.src4.canvas.GraphicsXD;
 import pasa.cbentley.framework.gui.src4.canvas.InputConfig;
 import pasa.cbentley.framework.gui.src4.canvas.TopologyDLayer;
 import pasa.cbentley.framework.gui.src4.core.Drawable;
 import pasa.cbentley.framework.gui.src4.core.DrawableAnimator;
 import pasa.cbentley.framework.gui.src4.core.FigDrawable;
 import pasa.cbentley.framework.gui.src4.core.ImageDrawable;
+import pasa.cbentley.framework.gui.src4.core.PinBoardDrawable;
+import pasa.cbentley.framework.gui.src4.core.ScrollBar;
 import pasa.cbentley.framework.gui.src4.core.StyleClass;
 import pasa.cbentley.framework.gui.src4.core.ViewDrawable;
 import pasa.cbentley.framework.gui.src4.exec.ExecutionContextCanvasGui;
+import pasa.cbentley.framework.gui.src4.table.TableView;
 import pasa.cbentley.framework.gui.src4.utils.DrawableUtilz;
 
 public interface ITechDrawable extends IByteObject {
-
-   public static final int DTECH_BEHAVIOR_FLAG_B_1_EMPTY_HIDE    = 1 << 0;
-
-   public static final int DTECH_BEHAVIOR_FLAG_B_2_EMPTY_DEF     = 1 << 1;
 
    /**
     * Genetical switches of the Drawable.
@@ -31,8 +32,11 @@ public interface ITechDrawable extends IByteObject {
    public static final int BEHAVIOR                              = 0;
 
    /**
-    * When a TableView has a policy given to not select a cell, it sets
-    * this flag. Thus the cell is not selected.
+    * Some {@link Drawable}s in a {@link TableView} will not be individually selected.
+    * 
+    * <p>
+    * Allows a mix of selectable and not selectable {@link Drawable}.
+    * </p>
     */
    public static final int BEHAVIOR_01_NOT_SELECTABLE            = 1 << 0;
 
@@ -191,13 +195,6 @@ public interface ITechDrawable extends IByteObject {
    public static final int BEHAVIOR_22_TIP_HEAVY_CONTENT         = 1 << 21;
 
    /**
-    * The drawable content espouses the {@link IBOStyle} fx. i.e {@link IBOStyle} overrides.
-    * 
-    * A {@link FigDrawable} will change the base color of its figure.
-    */
-   public static final int GENE_01_STYLED                        = 1 << 20;
-
-   /**
     * Set when Parent wants to control event of their child drawable.
     * <br>
     * Internal flag. For instance there might be a Drawable in a TableView Title.
@@ -228,7 +225,8 @@ public interface ITechDrawable extends IByteObject {
 
    /**
     * Set to tell that Drawable has inner vertical navigation.
-    * <br>
+    * <li> {@link ICmdsCmd#CMD_11_NAV_UP}
+    * <li> {@link ICmdsCmd#CMD_12_NAV_DOWN}
     * Decided when {@link IDrawable#initSize()} is called.
     * <br>
     */
@@ -236,14 +234,23 @@ public interface ITechDrawable extends IByteObject {
 
    /**
     * Set to tell that Drawable has inner horizontal navigation.
-    * <br>
-    * Decided when {@link IDrawable#initSize()} is called.
-    * <br>
+    * <li> {@link ICmdsCmd#CMD_13_NAV_LEFT}
+    * <li> {@link ICmdsCmd#CMD_14_NAV_RIGHT}
+    * 
+    * <p>
+    * This flag is usally  decided during layouting
+    * </p>
     */
    public static final int BEHAVIOR_27_NAV_HORIZONTAL            = 1 << 26;
 
+   /**
+    * Wide flag saying this {@link IDrawable} is selectable with {@link ICmdsCmd#CMD_15_NAV_SELECT}
+    */
    public static final int BEHAVIOR_28_NAV_SELECTABLE            = 1 << 27;
 
+   /**
+    * Round the clock vertical navigation.
+    */
    public static final int BEHAVIOR_29_NAV_CLOCK_VERTICAL        = 1 << 28;
 
    public static final int BEHAVIOR_30_NAV_CLOCK_HORIZONTAL      = 1 << 29;
@@ -307,9 +314,13 @@ public interface ITechDrawable extends IByteObject {
     */
    public static final int DIMENSION_API                         = 0;
 
+   public static final int DTECH_BEHAVIOR_FLAG_B_1_EMPTY_HIDE    = 1 << 0;
+
+   public static final int DTECH_BEHAVIOR_FLAG_B_2_EMPTY_DEF     = 1 << 1;
+
    /**
     * Sent by {@link MasterCanvas} to {@link Drawable} when the drawable is loaded in a DLayer and thus its
-    * {@link IDrawable#draw(GraphicsX)} method will be called in the next repaint cycle.
+    * {@link IDrawable#draw(GraphicsXD)} method will be called in the next repaint cycle.
     * <br> 
     * <br>
     * Maybe called in a worker thread.
@@ -420,6 +431,13 @@ public interface ITechDrawable extends IByteObject {
 
    public static final int EVENT_17_ANIM_NEXT_TURN               = 17;
 
+   /**
+    * The drawable content espouses the {@link IBOStyle} fx. i.e {@link IBOStyle} overrides.
+    * 
+    * A {@link FigDrawable} will change the base color of its figure.
+    */
+   public static final int GENE_01_STYLED                        = 1 << 20;
+
    public static final int HOLE_0_X                              = 0;
 
    public static final int HOLE_1_Y                              = 1;
@@ -477,7 +495,7 @@ public interface ITechDrawable extends IByteObject {
     * Flag that allows the Control Flow to know whether the Drawable is visible on screen's {@link GraphicsX} at any moment.
     * <br>
     * <br>
-    * Only the {@link IDrawable#draw(GraphicsX)} sets it to true. 
+    * Only the {@link IDrawable#draw(GraphicsXD)} sets it to true. 
     * <br>
     * Drawing on an GraphicsX other than the Screen, does not set it.
     * <br>
@@ -495,7 +513,7 @@ public interface ITechDrawable extends IByteObject {
     * <br>
     * Or to hide it before it should not be drawn.
     * <br>
-    * Draw Control Flow Flag preventing {@link IDrawable#draw(GraphicsX)} from drawing anything because
+    * Draw Control Flow Flag preventing {@link IDrawable#draw(GraphicsXD)} from drawing anything because
     * 
     * <br>
     * <br>
@@ -591,7 +609,7 @@ public interface ITechDrawable extends IByteObject {
     * Drawable is running an animation on either of its layers. 
     * <br>
     * <br>
-    * Animation uses {@link IDrawable#draw(GraphicsX)} method and its control flow to draw each of its step.
+    * Animation uses {@link IDrawable#draw(GraphicsXD)} method and its control flow to draw each of its step.
     * <br>
     * Draw Control Flow Flag. By default the draw method delegates to the animation the draw process
     * (draw method does nothing in this state) 
@@ -661,7 +679,7 @@ public interface ITechDrawable extends IByteObject {
    public static final int STATE_19_HIDDEN_OVER                  = 1 << 18;
 
    /**
-    * {@link Drawable#draw(GraphicsX)} method is in "stand by" as long as animations requiring it are running
+    * {@link Drawable#draw(GraphicsXD)} method is in "stand by" as long as animations requiring it are running
     * <br>
     * <br>
     * Implementation Animation mechanism micro manages this flag,
@@ -670,7 +688,7 @@ public interface ITechDrawable extends IByteObject {
     * Set when animation draws the drawable itself sets this flag.
     * <br>
     * <br>
-    * Some animation ask the drawable to draw using {@link IDrawable#draw(GraphicsX)}.
+    * Some animation ask the drawable to draw using {@link IDrawable#draw(GraphicsXD)}.
     * <br>
     * @see IAnimable#ANIM_24_OVERRIDE_DRAW
     */
@@ -683,7 +701,7 @@ public interface ITechDrawable extends IByteObject {
     * <li> just content
     * <br>
     * <br>
-    * Animation class repeatedly calls {@link IDrawable#draw(GraphicsX)}
+    * Animation class repeatedly calls {@link IDrawable#draw(GraphicsXD)}
     * <br>
     * <br>
     */
@@ -726,11 +744,6 @@ public interface ITechDrawable extends IByteObject {
     * True when position needs to be computed was set / computed
     */
    public static final int STATE_26_POSITIONED                   = 1 << 25;
-
-   /**
-    * Flag telling drawable was moved and need
-    */
-   public static final int ZSTATE_26_MOVED_SINCE_LAST_REPAINT    = 1 << 25;
 
    /**
     * When Drawable has another drawable drawn over it and thus bottom up pointer events cannot work
@@ -799,6 +812,8 @@ public interface ITechDrawable extends IByteObject {
 
    /**
     * Mostly used by end user.
+    * How do you parametrize device selection. gamepad1 vs gamepad2 ? 
+    * One gamepad may use the same selection as the keyboard
     */
    public static final int STYLE_05_SELECTED                     = 1 << 4;
 
@@ -821,21 +836,30 @@ public interface ITechDrawable extends IByteObject {
     * <br>
     * <br>
     * In both cases, Table is inside the pointer focus hierachy through its parenting of tables cells.
+    * 
+    * What about finger focuses ?
     */
    public static final int STYLE_07_FOCUSED_POINTER              = 1 << 6;
 
    /**
-    * State set when Pointer is pressed on {@link IDrawable}.
-    * <br>
+    * State set when Device executes the Press command
+    * 
+    * <p>
+    * <li>Pointer is pressed on {@link IDrawable}.
+    * </p>
+    *  
     * Most of the time, pressing will change the key focus as well.
     */
    public static final int STYLE_08_PRESSED                      = 1 << 7;
 
    /**
-    * When a Drawable is dragged, you may want to change the color of the border.
-    * <br>
-    * <br>
-    * Dragged state is decided by {@link PointerGesture}. After a press and a given amount of movement.
+    * When a Drawable is dragged by a device, you may want to change the color of the border.
+    * 
+    * <p>
+    * Dragged state is decided by
+    * <li> {@link PointerGesture}. After a press and a given amount of movement.
+    * <li> A keyboard/gamepad Start Drag Mode command on the selection.
+    * </p>
     */
    public static final int STYLE_09_DRAGGED                      = 1 << 8;
 
@@ -853,5 +877,19 @@ public interface ITechDrawable extends IByteObject {
     */
    public static final int STYLE_12_CUSTOM                       = 1 << 11;
 
+   public static final int STYLE_DEVICE_01_FOCUSED               = 1 << 0;
+
+   public static final int STYLE_DEVICE_02_SELECTED              = 1 << 1;
+
+   public static final int STYLE_DEVICE_03_PRESSED               = 1 << 2;
+
+   public static final int STYLE_DEVICE_04_DRAGGED               = 1 << 3;
+
+   public static final int STYLE_DEVICE_05_MARKED                = 1 << 4;
+
+   /**
+    * Flag telling drawable was moved and need
+    */
+   public static final int ZSTATE_26_MOVED_SINCE_LAST_REPAINT    = 1 << 25;
 
 }

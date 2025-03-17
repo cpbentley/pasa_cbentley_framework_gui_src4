@@ -1,6 +1,5 @@
 package pasa.cbentley.framework.gui.src4.core;
 
-import pasa.cbentley.core.src4.ctx.UCtx;
 import pasa.cbentley.core.src4.logging.Dctx;
 import pasa.cbentley.core.src4.logging.IStringable;
 import pasa.cbentley.core.src4.utils.BitUtils;

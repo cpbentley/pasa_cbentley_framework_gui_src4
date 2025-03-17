@@ -34,11 +34,14 @@ public interface ITechTable extends ITech {
    public static final int EVENT_ID_02_SELECT_LONG                  = 2;
 
    /**
+    * An Editable Cell is edited. 
+    */
+   public static final int EVENT_ID_03_SELECTION_EDITION_START      = 3;
+
+   /**
     * Sent before Selection Change
     */
-   public static final int EVENT_ID_03_SELECTION_EDITION_END        = 3;
-
-   public static final int EVENT_ID_03_SELECTION_EDITION_START      = 2;
+   public static final int EVENT_ID_04_SELECTION_EDITION_END        = 4;
 
    public static final int EVENT_ID_MAX                             = 2;
 

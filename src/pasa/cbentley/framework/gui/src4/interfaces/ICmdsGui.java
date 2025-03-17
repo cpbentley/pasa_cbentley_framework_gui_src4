@@ -10,9 +10,9 @@ import pasa.cbentley.framework.cmd.src4.interfaces.ICmds;
  */
 public interface ICmdsGui extends ICmds {
 
-   public static final int A_SID_VCMD_A                    = 1000;
+   public static final int A_SID_VCMD_A                       = 1000;
 
-   public static final int A_SID_VCMD_Z                    = 2000;
+   public static final int A_SID_VCMD_Z                       = 2000;
 
    /**
     * Cmd to fall back on the last saved state.
@@ -56,7 +56,7 @@ public interface ICmdsGui extends ICmds {
 
    public static final int CMD_GUI_10_SHOW_FILTERS            = A_SID_VCMD_A + 10;
 
-   public static final int CMD_GUI_11_SORT_INVERSE                 = A_SID_VCMD_A + 11;
+   public static final int CMD_GUI_11_SORT_INVERSE            = A_SID_VCMD_A + 11;
 
    public static final int CMD_GUI_12_GO_TO                   = A_SID_VCMD_A + 12;
 
@@ -79,4 +79,6 @@ public interface ICmdsGui extends ICmds {
    public static final int CMD_GUI_19_SHOW_LIST               = A_SID_VCMD_A + 19;
 
    public static final int CMD_GUI_20_EDIT_MODE               = A_SID_VCMD_A + 20;
+
+   public static final int CMD_GUI_21_SELECT_CELL             = A_SID_VCMD_A + 21;
 }

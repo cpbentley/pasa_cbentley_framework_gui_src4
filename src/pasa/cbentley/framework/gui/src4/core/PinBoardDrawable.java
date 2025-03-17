@@ -3,16 +3,16 @@ package pasa.cbentley.framework.gui.src4.core;
 import pasa.cbentley.core.src4.event.BusEvent;
 import pasa.cbentley.core.src4.logging.Dctx;
 import pasa.cbentley.core.src4.utils.ArrayUtils;
-import pasa.cbentley.core.src4.utils.IntUtils;
 import pasa.cbentley.framework.core.ui.src4.tech.ITechCodes;
 import pasa.cbentley.framework.drawx.src4.engine.GraphicsX;
+import pasa.cbentley.framework.gui.src4.canvas.GraphicsXD;
 import pasa.cbentley.framework.gui.src4.canvas.InputConfig;
 import pasa.cbentley.framework.gui.src4.canvas.PointerGestureDrawable;
 import pasa.cbentley.framework.gui.src4.canvas.TopologyDLayer;
 import pasa.cbentley.framework.gui.src4.ctx.GuiCtx;
 import pasa.cbentley.framework.gui.src4.exec.ExecutionContextCanvasGui;
-import pasa.cbentley.framework.gui.src4.interfaces.ITechCanvasDrawable;
 import pasa.cbentley.framework.gui.src4.interfaces.IDrawable;
+import pasa.cbentley.framework.gui.src4.interfaces.ITechCanvasDrawable;
 import pasa.cbentley.framework.gui.src4.interfaces.ITechDrawable;
 import pasa.cbentley.framework.gui.src4.menu.MenuBar;
 import pasa.cbentley.framework.gui.src4.utils.DrawableArrays;
@@ -106,10 +106,6 @@ public class PinBoardDrawable extends ViewDrawable {
       nextempty++;
    }
 
-   public int getNumDrawables() {
-      return nextempty;
-   }
-
    /**
     * Drags according to 3 modes
     * <li> {@link PinBoardDrawable#DRAG_MODE_0_RESIZE}
@@ -168,7 +164,7 @@ public class PinBoardDrawable extends ViewDrawable {
          //TODO what happens when ViewPane is created but no show notify has been sent?
          //a mean to notify show Viewpane upon dynamic creation, upon creation it looks up ViewDrawable and matches hidden state
          this.init(newX, newY);
-         ic.srActionDoneRepaint();
+         ic.setActionDoneRepaint();
       } else if (draggingMode == DRAG_MODE_1_PINBOARD) {
          this.setStateStyle(ITechDrawable.STYLE_09_DRAGGED, true);
          int newX = pressedX + ic.getDraggedVectorX();
@@ -181,7 +177,7 @@ public class PinBoardDrawable extends ViewDrawable {
    /**
     * 
     */
-   public void drawViewDrawableContent(GraphicsX g, int x, int y, ScrollConfig scX, ScrollConfig scY) {
+   public void drawViewDrawableContent(GraphicsXD g, int x, int y, ScrollConfig scX, ScrollConfig scY) {
       int w = getContentW();
       int h = getContentH();
       //sets the clip directive to intersection. do not allow overriding
@@ -193,6 +189,10 @@ public class PinBoardDrawable extends ViewDrawable {
          }
       }
       g.clipReset();
+   }
+
+   public int getNumDrawables() {
+      return nextempty;
    }
 
    public IDrawable getPointerFocusDrawable() {
@@ -344,7 +344,7 @@ public class PinBoardDrawable extends ViewDrawable {
          draggingMode = DRAG_MODE_0_RESIZE;
          GestureDetector pg = ic.getInputStateDrawable().getOrCreateGesture(this);
          pg.simplePress(getDw(), getDh(), ic.getInputStateDrawable());
-         ic.srActionDoneRepaint();
+         ic.setActionDoneRepaint();
          return;
       }
 
@@ -361,7 +361,7 @@ public class PinBoardDrawable extends ViewDrawable {
                   draggingMode = DRAG_MODE_2_DRAWABLE;
                   GestureDetector pg = ic.getInputStateDrawable().getOrCreateGesture(this);
                   pg.simplePress(d.getX(), d.getY(), ic.getInputStateDrawable());
-                  ic.srActionDoneRepaint();
+                  ic.setActionDoneRepaint();
 
                }
                d.managePointerInput(ec);
@@ -381,7 +381,7 @@ public class PinBoardDrawable extends ViewDrawable {
             this.setStateStyle(ITechDrawable.STYLE_08_PRESSED, true);
          }
          gc.getFocusCtrl().newFocusPointerPress(ec, this);
-         ic.srActionDoneRepaint();
+         ic.setActionDoneRepaint();
          return;
       }
 
@@ -442,16 +442,16 @@ public class PinBoardDrawable extends ViewDrawable {
       }
    }
 
-   private void toStringPrivate(Dctx dc) {
-      dc.appendVarWithSpace("nextempty", nextempty);
-      dc.appendVarWithSpace("allowW", allowW);
-      dc.appendVarWithSpace("allowH", allowH);
-   }
-
    public void toString1Line(Dctx dc) {
       dc.root1Line(this, PinBoardDrawable.class);
       toStringPrivate(dc);
       super.toString1Line(dc.sup1Line());
+   }
+
+   private void toStringPrivate(Dctx dc) {
+      dc.appendVarWithSpace("nextempty", nextempty);
+      dc.appendVarWithSpace("allowW", allowW);
+      dc.appendVarWithSpace("allowH", allowH);
    }
 
    //#enddebug

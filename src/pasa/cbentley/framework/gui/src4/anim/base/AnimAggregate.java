@@ -1,11 +1,11 @@
 package pasa.cbentley.framework.gui.src4.anim.base;
 
 import pasa.cbentley.byteobjects.src4.core.ByteObject;
-import pasa.cbentley.framework.drawx.src4.engine.GraphicsX;
 import pasa.cbentley.framework.gui.src4.anim.definitions.AlphaChangeRgb;
 import pasa.cbentley.framework.gui.src4.anim.definitions.AlphaTrail;
 import pasa.cbentley.framework.gui.src4.anim.definitions.SizeMod;
 import pasa.cbentley.framework.gui.src4.anim.move.Move;
+import pasa.cbentley.framework.gui.src4.canvas.GraphicsXD;
 import pasa.cbentley.framework.gui.src4.core.Drawable;
 import pasa.cbentley.framework.gui.src4.ctx.GuiCtx;
 import pasa.cbentley.framework.gui.src4.interfaces.IAnimable;
@@ -41,19 +41,12 @@ import pasa.cbentley.framework.gui.src4.interfaces.IDrawable;
  */
 public class AnimAggregate extends DrawableAnim {
 
-   
+   public IAnimable[] animations;
+
    public AnimAggregate(GuiCtx gc, IDrawable d, ByteObject tech) {
       super(gc, d, tech);
    }
 
-   public IAnimable[] animations;
-
-   public void paint(GraphicsX g) {
-      for (int i = 0; i < animations.length; i++) {
-         animations[i].paint(g);
-      }
-   }
-   
    public int nextTurn() {
       for (int i = 0; i < animations.length; i++) {
          animations[i].nextTurn();
@@ -61,8 +54,10 @@ public class AnimAggregate extends DrawableAnim {
       return getReturn();
    }
 
+   public void paint(GraphicsXD g) {
+      for (int i = 0; i < animations.length; i++) {
+         animations[i].paint(g);
+      }
+   }
 
-  
-
-   
 }

@@ -80,7 +80,7 @@ public abstract class CanvasDrawable2 extends ObjectGC implements IDrawable {
    /**
     * Sub class 
     */
-   public void draw(GraphicsX g) {
+   public void draw(GraphicsXD g) {
       //#debug
       toDLog().pDraw("Clip " + "[" + g.getClipX() + "," + g.getClipY() + " " + g.getClipWidth() + "," + g.getClipHeight() + "]", null, CanvasAppliInput.class, "render");
 
@@ -88,7 +88,7 @@ public abstract class CanvasDrawable2 extends ObjectGC implements IDrawable {
       canvas.paint(g.getGraphics());
    }
 
-   public void drawDrawable(GraphicsX g) {
+   public void drawDrawable(GraphicsXD g) {
       root.drawDrawable(g);
       canvas.paint(g.getGraphics());
    }
@@ -370,7 +370,7 @@ public abstract class CanvasDrawable2 extends ObjectGC implements IDrawable {
 
    }
 
-   public void show(GraphicsX g) {
+   public void show(GraphicsXD g) {
       // TODO Auto-generated method stub
 
    }

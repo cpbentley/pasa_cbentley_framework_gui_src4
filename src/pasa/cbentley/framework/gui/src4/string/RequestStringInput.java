@@ -7,7 +7,6 @@ import pasa.cbentley.framework.cmd.src4.engine.CmdNode;
 import pasa.cbentley.framework.cmd.src4.engine.MCmd;
 import pasa.cbentley.framework.cmd.src4.interfaces.ICmdExecutor;
 import pasa.cbentley.framework.cmd.src4.interfaces.ITechCmd;
-import pasa.cbentley.framework.gui.src4.canvas.InputConfig;
 import pasa.cbentley.framework.gui.src4.core.StyleClass;
 import pasa.cbentley.framework.gui.src4.core.ViewDrawable;
 import pasa.cbentley.framework.gui.src4.ctx.GuiCtx;

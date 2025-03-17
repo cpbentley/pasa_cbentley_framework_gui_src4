@@ -1,6 +1,7 @@
 package pasa.cbentley.framework.gui.src4.anim.definitions;
 
 import pasa.cbentley.byteobjects.src4.core.ByteObject;
+import pasa.cbentley.byteobjects.src4.objects.function.Function;
 import pasa.cbentley.core.src4.logging.Dctx;
 import pasa.cbentley.framework.gui.src4.anim.base.DrawableAnim;
 import pasa.cbentley.framework.gui.src4.ctx.GuiCtx;

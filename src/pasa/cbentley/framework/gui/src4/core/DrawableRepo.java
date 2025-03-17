@@ -82,22 +82,22 @@ public class DrawableRepo implements ITechNav, IStringable {
 
    public static int navInverse(int navEvent) {
       switch (navEvent) {
-         case NAV_0_REFRESH:
-            return NAV_0_REFRESH;
-         case NAV_1_UP:
-            return NAV_2_DOWN;
-         case NAV_2_DOWN:
-            return NAV_1_UP;
-         case NAV_3_LEFT:
-            return NAV_4_RIGHT;
-         case NAV_4_RIGHT:
-            return NAV_3_LEFT;
-         case NAV_5_SELECT:
-            return NAV_6_UNSELECT;
-         case NAV_6_UNSELECT:
-            return NAV_5_SELECT;
+         case NAV_00_REFRESH:
+            return NAV_00_REFRESH;
+         case NAV_01_UP:
+            return NAV_02_DOWN;
+         case NAV_02_DOWN:
+            return NAV_01_UP;
+         case NAV_03_LEFT:
+            return NAV_04_RIGHT;
+         case NAV_04_RIGHT:
+            return NAV_03_LEFT;
+         case NAV_05_SELECT:
+            return NAV_06_UNSELECT;
+         case NAV_06_UNSELECT:
+            return NAV_05_SELECT;
          default:
-            return NAV_0_REFRESH;
+            return NAV_00_REFRESH;
       }
    }
 

@@ -10,6 +10,7 @@ import pasa.cbentley.framework.drawx.src4.engine.GraphicsX;
 import pasa.cbentley.framework.drawx.src4.factories.interfaces.IBOBox;
 import pasa.cbentley.framework.drawx.src4.tech.ITechAnchor;
 import pasa.cbentley.framework.drawx.src4.utils.AnchorUtils;
+import pasa.cbentley.framework.gui.src4.canvas.GraphicsXD;
 import pasa.cbentley.framework.gui.src4.core.Drawable;
 import pasa.cbentley.framework.gui.src4.core.StyleClass;
 import pasa.cbentley.framework.gui.src4.ctx.GuiCtx;
@@ -55,7 +56,7 @@ public class TableDrawIndex extends TableView {
    /**
     * Model: Color values to be displayed.
     */
-   private int[]           colors;
+   private int[]   colors;
 
    /**
     * Style to be used
@@ -95,7 +96,7 @@ public class TableDrawIndex extends TableView {
    /**
     * 
     */
-   protected void drawModelDrawable(GraphicsX g, int x, int y, int w, int h, int colAbs, int rowAbs) {
+   protected void drawModelDrawable(GraphicsXD g, int x, int y, int w, int h, int colAbs, int rowAbs) {
       int index = getVisualIndex(colAbs, rowAbs);
       drawModelIndex(g, x, y, w, h, index);
    }
@@ -103,7 +104,7 @@ public class TableDrawIndex extends TableView {
    /**
     * Draw index and bg color for that cell.
     */
-   private void drawModelIndex(GraphicsX g, int x, int y, int w, int h, int index) {
+   private void drawModelIndex(GraphicsXD g, int x, int y, int w, int h, int index) {
       if (index >= getColors().length) {
          return;
       }
@@ -125,6 +126,10 @@ public class TableDrawIndex extends TableView {
       g.drawString(ow, x, y, IBOBox.ANCHOR);
    }
 
+   public int[] getColors() {
+      return colors;
+   }
+
    public int getSize() {
       return getColors().length;
    }
@@ -138,15 +143,19 @@ public class TableDrawIndex extends TableView {
     * Set {@link GraphicsX} attributes global to all data cells.
     * @param g
     */
-   public void initDataDraw(GraphicsX g) {
+   public void initDataDraw(GraphicsXD g) {
       f = getStyleOp().getStyleFont(style);
       g.setFont(f);
       selectedIndex = getSelectedIndex();
-      isDrawSelected = !hasTechX(IBOTableView.T_FLAGX_1_NO_SELECTION);
+      isDrawSelected = !hasFlagX(IBOTableView.T_FLAGX_1_NO_SELECTION);
    }
 
    public void modelInit(int w, int h, int index) {
       //nothing to init
+   }
+
+   public void setColors(int[] colors) {
+      this.colors = colors;
    }
 
    //#mdebug
@@ -170,13 +179,5 @@ public class TableDrawIndex extends TableView {
 
    }
    //#enddebug
-
-   public int[] getColors() {
-      return colors;
-   }
-
-   public void setColors(int[] colors) {
-      this.colors = colors;
-   }
 
 }

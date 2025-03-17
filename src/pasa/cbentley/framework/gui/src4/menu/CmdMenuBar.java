@@ -12,7 +12,7 @@ import pasa.cbentley.framework.cmd.src4.interfaces.ICmdExecutor;
 import pasa.cbentley.framework.cmd.src4.interfaces.ICmdsCmd;
 import pasa.cbentley.framework.cmd.src4.interfaces.IEventCmds;
 import pasa.cbentley.framework.cmd.src4.interfaces.ITechCmd;
-import pasa.cbentley.framework.core.ui.src4.tech.IInput;
+import pasa.cbentley.framework.core.ui.src4.tech.ITechInput;
 import pasa.cbentley.framework.core.ui.src4.tech.ITechCodes;
 import pasa.cbentley.framework.core.ui.src4.tech.ITechInputFeedback;
 import pasa.cbentley.framework.datamodel.src4.table.ObjectTableModel;
@@ -456,7 +456,7 @@ public class CmdMenuBar extends TableView implements IEventConsumer, ICmdsCmd, I
    }
 
    private void icRelease(ExecutionContextCanvasGui ec) {
-      InputStateCanvasGui is = ec.getInputStateDrawable();
+      InputStateCanvasGui is = ec.getInputStateCanvasGui();
       if (is.getKeyCode() == ITechCodes.KEY_MENU_LEFT) {
          mLeft.setStateStyle(ITechDrawable.STYLE_08_PRESSED, false);
          //send a menu repaint
@@ -634,12 +634,12 @@ public class CmdMenuBar extends TableView implements IEventConsumer, ICmdsCmd, I
     */
    public void manageKeyInput(ExecutionContextCanvasGui ec) {
       InputConfig ic = ec.getInputConfig();
-      if (ic.getInputStateDrawable().getMode() == IInput.MOD_1_RELEASED) {
+      if (ic.getInputStateDrawable().getMode() == ITechInput.MOD_1_RELEASED) {
          icRelease(ec);
       } else {
          if (ic.isCancel() && state != MENU_STATE_0_NONE) {
             setState(MENU_STATE_0_NONE);
-            ic.srActionDoneRepaint();
+            ic.setActionDoneRepaint();
             return;
          }
          if (ic.isSoftLeftP()) {
@@ -714,7 +714,7 @@ public class CmdMenuBar extends TableView implements IEventConsumer, ICmdsCmd, I
       //#debug
       toDLog().pFlow("", slave, CmdMenuBar.class, "managePointerInputSlaveCell", LVL_05_FINE, true);
       InputConfig ic = ec.getInputConfig();
-      InputStateCanvasGui is = ec.getInputStateDrawable();
+      InputStateCanvasGui is = ec.getInputStateCanvasGui();
       if (ic.isReleased()) {
          if (slave == mLeft && is.isInside(mLeft)) {
             
@@ -937,7 +937,7 @@ public class CmdMenuBar extends TableView implements IEventConsumer, ICmdsCmd, I
       if (cmdTableView != null) {
          initSizeSubMenuTable();
       }
-      InputStateCanvasGui is = ec.getInputStateDrawable();
+      InputStateCanvasGui is = ec.getInputStateCanvasGui();
       int x = is.getX();
       int y = is.getY();
 

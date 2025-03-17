@@ -11,11 +11,11 @@ import pasa.cbentley.framework.cmd.src4.ctx.CmdCtx;
 import pasa.cbentley.framework.cmd.src4.interfaces.ICmdsCmd;
 import pasa.cbentley.framework.core.ui.src4.tech.ITechCodes;
 import pasa.cbentley.framework.drawx.src4.ctx.DrwCtx;
-import pasa.cbentley.framework.drawx.src4.engine.GraphicsX;
 import pasa.cbentley.framework.drawx.src4.factories.FigureFactory;
 import pasa.cbentley.framework.drawx.src4.factories.FigureOperator;
 import pasa.cbentley.framework.drawx.src4.tech.ITechAnchor;
 import pasa.cbentley.framework.drawx.src4.utils.AnchorUtils;
+import pasa.cbentley.framework.gui.src4.canvas.GraphicsXD;
 import pasa.cbentley.framework.gui.src4.canvas.InputConfig;
 import pasa.cbentley.framework.gui.src4.canvas.PointerGestureDrawable;
 import pasa.cbentley.framework.gui.src4.cmd.CmdInstanceGui;
@@ -581,7 +581,7 @@ public class ScrollBar extends Drawable implements IBOScrollBar, IDrawableListen
     * Most used is the {@link #STYLE_FLAG_F_5_FILTER_ALL} that applies to overlay scrollbars
     * @param g
     */
-   private void drawBlockBar(GraphicsX g) {
+   private void drawBlockBar(GraphicsXD g) {
       //since x,y have been set before just lay it down
       super.drawDrawableBg(g);
       if (hasTechFlag(SB_FLAG_5_ARROW_ON_BLOC)) {
@@ -604,7 +604,7 @@ public class ScrollBar extends Drawable implements IBOScrollBar, IDrawableListen
     * @param x
     * @param y
     */
-   public void drawDrawable(GraphicsX g) {
+   public void drawDrawable(GraphicsXD g) {
       //#mdebug
       if (gc.toStringHasFlagDraw(IToStringFlagsDraw.FLAG_DRAW_01_SCROLL_BAR_BOUNDARY)) {
          g.setColor(255, 20, 20);
@@ -624,7 +624,7 @@ public class ScrollBar extends Drawable implements IBOScrollBar, IDrawableListen
     * Draw the two directional figures. 
     * @param g
     */
-   private void drawWrapper(GraphicsX g) {
+   private void drawWrapper(GraphicsXD g) {
       int secondSize = getBOSize2nd();
       int x = getX();
       int y = getY();
@@ -1494,7 +1494,7 @@ public class ScrollBar extends Drawable implements IBOScrollBar, IDrawableListen
          scrollConfig.setSIStartNoEx(vchange);
          doUpdateStructure();
       }
-      ic.srActionDoneRepaint();
+      ic.setActionDoneRepaint();
    }
 
    /**
@@ -1904,7 +1904,7 @@ public class ScrollBar extends Drawable implements IBOScrollBar, IDrawableListen
       return "bbox=[" + boundaryBoxX + "," + boundaryBoxY + " - " + boundaryBoxW + "," + boundaryBoxH + "]";
    }
 
-   private void toStringDrawBoundaryBox(GraphicsX g) {
+   private void toStringDrawBoundaryBox(GraphicsXD g) {
       g.drawRect(boundaryBoxX - 1, boundaryBoxY - 1, boundaryBoxW + 1, boundaryBoxH + 1);
    }
 

@@ -6,7 +6,7 @@ import pasa.cbentley.core.src4.structs.IntBuffer;
 import pasa.cbentley.core.src4.utils.Geo2dUtils;
 import pasa.cbentley.framework.cmd.src4.ctx.CmdCtx;
 import pasa.cbentley.framework.core.ui.src4.input.InputState;
-import pasa.cbentley.framework.core.ui.src4.tech.IInput;
+import pasa.cbentley.framework.core.ui.src4.tech.ITechInput;
 import pasa.cbentley.framework.drawx.src4.engine.GraphicsX;
 import pasa.cbentley.framework.gui.src4.core.Drawable;
 import pasa.cbentley.framework.gui.src4.core.PinBoardDrawable;
@@ -150,12 +150,12 @@ public class TopologyDLayer extends ObjectGC {
    public void addDLayer(IDrawable view, int type) {
       //#debug
       gc.checkNull(view);
-      
+
       switch (type) {
          case ITechCanvasDrawable.SHOW_TYPE_0_REPLACE_BOTTOM:
             //active exit animation of old drawable.
             IDrawable old = dlayers[0];
-            if(old != null) {
+            if (old != null) {
                old.notifyEvent(ITechDrawable.EVENT_02_NOTIFY_HIDE);
             }
             //just add the child as the root
@@ -176,7 +176,7 @@ public class TopologyDLayer extends ObjectGC {
          default:
             throw new IllegalArgumentException();
       }
-      
+
       view.notifyEvent(ITechDrawable.EVENT_01_NOTIFY_SHOW);
    }
 
@@ -218,7 +218,7 @@ public class TopologyDLayer extends ObjectGC {
    }
 
    /**
-    * Calls the {@link IDrawable#draw(GraphicsX)} methods on all
+    * Calls the {@link IDrawable#draw(GraphicsXD)} methods on all
     * <br>
     * <br>
     * <br>
@@ -233,7 +233,7 @@ public class TopologyDLayer extends ObjectGC {
     * <br>
     * @param g
     */
-   public void drawLayers(GraphicsX g) {
+   public void drawLayers(GraphicsXD g) {
       //#debug
       toDLog().pDraw("#layers:" + dlayerNextEmpty, this, TopologyDLayer.class, "drawLayers@241", LVL_05_FINE, true);
 
@@ -258,7 +258,7 @@ public class TopologyDLayer extends ObjectGC {
 
    }
 
-   public void drawLayersExclude(GraphicsX g, IDrawable exclude) {
+   public void drawLayersExclude(GraphicsXD g, IDrawable exclude) {
       for (int i = 0; i < dlayerNextEmpty; i++) {
          if (dlayers[i] != null) {
             IDrawable d = dlayers[i];
@@ -420,7 +420,7 @@ public class TopologyDLayer extends ObjectGC {
       InputState is = ec.getInputState();
       InputConfig ic = ec.getInputConfig();
       //#debug
-      toDLog().pFlow("Current BEvent", is.getEventCurrent(), TopologyDLayer.class, "manageInput@"+toStringGetLine(423), LVL_05_FINE, true);
+      toDLog().o3FlowEvent("Current BEvent", is.getEventCurrent(), toStringGetLine(TopologyDLayer.class, "manageInput", 423));
       //
       if (is.isGestured()) {
          manageGestureInput(ec);
@@ -444,7 +444,8 @@ public class TopologyDLayer extends ObjectGC {
    public void manageKeyInput(ExecutionContextCanvasGui ec) {
       InputState is = ec.getInputState();
       //#debug
-      toDLog().pFlow("KeyCode=", is.getLastDeviceEvent(), TopologyDLayer.class, "manageKeyInput@"+toStringGetLine(443), LVL_03_FINEST, true);
+      toDLog().o3FlowEvent("KeyCode=" + is.getKeyCode(), is.getEventCurrent(), toStringGetLine(TopologyDLayer.class, "manageKeyInput", 443));
+
       for (int i = dlayerNextEmpty - 1; i >= 0; i--) {
          if (isKeyEventAccepted(ec, dlayers[i])) {
             dlayers[i].manageKeyInput(ec);
@@ -467,7 +468,7 @@ public class TopologyDLayer extends ObjectGC {
    public void manageOtherInput(ExecutionContextCanvasGui ec) {
       InputState is = ec.getInputState();
       //#debug
-      toDLog().pFlow("", is.getEventCurrent(), TopologyDLayer.class, "manageOtherInput@"+toStringGetLine(473), LVL_03_FINEST, true);
+      toDLog().pFlow("", is.getEventCurrent(), TopologyDLayer.class, "manageOtherInput@" + toStringGetLine(473), LVL_03_FINEST, true);
 
       for (int i = dlayerNextEmpty - 1; i >= 0; i--) {
          if (isKeyEventAccepted(ec, dlayers[i])) {
@@ -479,7 +480,7 @@ public class TopologyDLayer extends ObjectGC {
    public void manageGestureInput(ExecutionContextCanvasGui ec) {
       InputState is = ec.getInputState();
       //#debug
-      toDLog().pFlow("KeyCode=", is.getLastDeviceEvent(), TopologyDLayer.class, "manageGestureInput@"+toStringGetLine(483), LVL_03_FINEST, true);
+      toDLog().pFlow("KeyCode=", is.getLastDeviceEvent(), TopologyDLayer.class, "manageGestureInput@" + toStringGetLine(483), LVL_03_FINEST, true);
 
       for (int i = dlayerNextEmpty - 1; i >= 0; i--) {
          if (isKeyEventAccepted(ec, dlayers[i])) {
@@ -496,16 +497,16 @@ public class TopologyDLayer extends ObjectGC {
       OutputStateCanvasGui os = ec.getOutputStateCanvasGui();
       for (int i = dlayerNextEmpty - 1; i >= 0; i--) {
          IDrawable drawable = dlayers[i];
-         if(drawable != null) {
-            if(!os.isActionDone()) {
-               if(DrawableUtilz.isInside(ec, drawable)) {
+         if (drawable != null) {
+            if (!os.isActionDone()) {
+               if (DrawableUtilz.isInside(ec, drawable)) {
                   drawable.managePointerInput(ec);
                }
             }
          }
       }
       //when move, check for a move out 
-      if (ec.getInputStateDrawable().getMode() == IInput.MOD_3_MOVED && !os.isActionDone()) {
+      if (ec.getInputStateCanvasGui().getMode() == ITechInput.MOD_3_MOVED && !os.isActionDone()) {
          gc.getFocusCtrl().newFocusPointerPress(ec, null);
       }
    }
@@ -573,7 +574,7 @@ public class TopologyDLayer extends ObjectGC {
     * @param d
     */
    public void removeDrawable(IDrawable d) {
-      if(d == null) {
+      if (d == null) {
          throw new NullPointerException();
       }
       //#debug

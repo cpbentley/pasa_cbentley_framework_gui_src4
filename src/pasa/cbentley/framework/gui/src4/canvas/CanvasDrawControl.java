@@ -4,9 +4,9 @@ import pasa.cbentley.core.src4.interfaces.C;
 import pasa.cbentley.framework.gui.src4.ctx.GuiCtx;
 import pasa.cbentley.framework.gui.src4.exec.ExecutionContextCanvasGui;
 import pasa.cbentley.framework.gui.src4.interfaces.IDrawable;
-import pasa.cbentley.framework.gui.src4.interfaces.INavigational;
 import pasa.cbentley.framework.gui.src4.interfaces.ITechCanvasDrawable;
 import pasa.cbentley.framework.gui.src4.interfaces.ITechDrawable;
+import pasa.cbentley.framework.gui.src4.nav.INavigationalGui;
 import pasa.cbentley.framework.gui.src4.nav.TopologyTBLRNav;
 import pasa.cbentley.framework.gui.src4.string.StringEditControl;
 import pasa.cbentley.framework.gui.src4.table.TableView;
@@ -18,7 +18,7 @@ import pasa.cbentley.framework.gui.src4.table.TableView;
  * 
  * <br>
  * <br>
- * {@link INavigational} are either controlled 
+ * {@link INavigationalGui} are either controlled 
  * <li> by their parents, case of a {@link TableView}
  * <li> By the {@link TopologyTBLRNav}. Because Drawables 
  * <br>

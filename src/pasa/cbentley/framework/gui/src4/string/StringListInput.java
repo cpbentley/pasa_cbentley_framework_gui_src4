@@ -8,8 +8,8 @@ import pasa.cbentley.framework.core.ui.src4.tech.ITechCodes;
 import pasa.cbentley.framework.core.ui.src4.utils.ViewState;
 import pasa.cbentley.framework.datamodel.src4.table.ITableModel;
 import pasa.cbentley.framework.datamodel.src4.table.ObjectTableModel;
-import pasa.cbentley.framework.drawx.src4.engine.GraphicsX;
 import pasa.cbentley.framework.drawx.src4.string.Stringer;
+import pasa.cbentley.framework.gui.src4.canvas.GraphicsXD;
 import pasa.cbentley.framework.gui.src4.canvas.InputConfig;
 import pasa.cbentley.framework.gui.src4.core.LayouterEngineDrawable;
 import pasa.cbentley.framework.gui.src4.core.ScrollConfig;
@@ -70,6 +70,8 @@ public class StringListInput extends StringDrawable implements IEventConsumer {
 
    private static String EMTPY    = "Empty";
 
+   public static final int LAYER_1_SELECTION = 1;
+
    /**
     * Flag in tech of StringListInput.
     */
@@ -83,8 +85,6 @@ public class StringListInput extends StringDrawable implements IEventConsumer {
     */
    TableView             listView;
 
-   private int           selectedModelIndex;
-
    /**
     * If not null, links the List to the DataModel representing the type of data listed by the component.
     * <br>
@@ -93,12 +93,14 @@ public class StringListInput extends StringDrawable implements IEventConsumer {
     */
    ITableModel           model;
 
+   private int           selectedModelIndex;
+
+   private T9            t9;
+
    /**
     * Title to show when displaying possiblities.
     */
    String                tableTitle;
-
-   private T9            t9;
 
    public StringListInput(GuiCtx gc, StyleClass styleKey) {
       super(gc, styleKey, "");
@@ -120,25 +122,14 @@ public class StringListInput extends StringDrawable implements IEventConsumer {
          }
       }
    }
-   public void initViewDrawable(LayouterEngineDrawable ds) {
-      super.initViewDrawable(ds);
-   }
-   public void updateString(ExecutionContextCanvasGui ec) {
-      if (model != null) {
-         int selectedIndex = selectedModelIndex;
-         String str = model.getObject(selectedIndex).toString();
-         super.setStringNoUpdate(str);
-         if (listView != null) {
-            listView.setSelectedIndex(selectedIndex, ec, false);
-         }
-      } else {
-         setStringNoUpdate(EMTPY);
-      }
-   }
 
-   public void drawViewDrawableContent(GraphicsX g, int x, int y, ScrollConfig scX, ScrollConfig scY) {
+   public void drawViewDrawableContent(GraphicsXD g, int x, int y, ScrollConfig scX, ScrollConfig scY) {
       //modify the characters offsets for the alternative style
       super.drawViewDrawableContent(g, x, y, scX, scY);
+   }
+
+   public void initViewDrawable(LayouterEngineDrawable ds) {
+      super.initViewDrawable(ds);
    }
 
    private void keyFunctions(int keyCode, ExecutionContextCanvasGui ec) {
@@ -240,8 +231,6 @@ public class StringListInput extends StringDrawable implements IEventConsumer {
       }
    }
 
-   public static final int LAYER_1_SELECTION = 1;
-
    public void notifyEventKeyFocusGain(BusEvent e) {
       if (model != null && t9 != null) {
          Stringer st = getStringer();
@@ -329,7 +318,7 @@ public class StringListInput extends StringDrawable implements IEventConsumer {
          //show it over
          listView.shShowDrawable(ec, ITechCanvasDrawable.SHOW_TYPE_1_OVER_TOP);
          InputConfig ic = ec.getInputConfig();
-         ic.srActionDoneRepaint();
+         ic.setActionDoneRepaint();
       }
    }
 
@@ -371,6 +360,19 @@ public class StringListInput extends StringDrawable implements IEventConsumer {
          }
          updateString(ec);
          ec.srActionDoneRepaint(this);
+      }
+   }
+
+   public void updateString(ExecutionContextCanvasGui ec) {
+      if (model != null) {
+         int selectedIndex = selectedModelIndex;
+         String str = model.getObject(selectedIndex).toString();
+         super.setStringNoUpdate(str);
+         if (listView != null) {
+            listView.setSelectedIndex(selectedIndex, ec, false);
+         }
+      } else {
+         setStringNoUpdate(EMTPY);
       }
    }
 }

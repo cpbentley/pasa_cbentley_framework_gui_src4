@@ -96,7 +96,7 @@ public class ToStringStaticGui extends ToStringStaticBase {
       }
    }
 
-   public static String debugStateStyle(int sty) {
+   public static String toStringStateStyle(int sty) {
       switch (sty) {
          case ITechDrawable.STYLE_01_CUSTOM:
             return "Custom1";
@@ -129,7 +129,7 @@ public class ToStringStaticGui extends ToStringStaticBase {
 
    private static void debugStateStyleFlag(IDrawable d, int flag, Dctx sb) {
       if (d.hasStateStyle(flag)) {
-         sb.append(debugStateStyle(flag));
+         sb.append(toStringStateStyle(flag));
          sb.append(" ");
       }
    }

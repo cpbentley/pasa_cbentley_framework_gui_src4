@@ -2,9 +2,9 @@ package pasa.cbentley.framework.gui.src4.anim.definitions;
 
 import pasa.cbentley.byteobjects.src4.objects.function.Function;
 import pasa.cbentley.core.src4.logging.Dctx;
-import pasa.cbentley.framework.drawx.src4.engine.GraphicsX;
 import pasa.cbentley.framework.drawx.src4.engine.RgbImage;
 import pasa.cbentley.framework.gui.src4.anim.base.ImgAnimable;
+import pasa.cbentley.framework.gui.src4.canvas.GraphicsXD;
 import pasa.cbentley.framework.gui.src4.core.StyleClass;
 import pasa.cbentley.framework.gui.src4.ctx.GuiCtx;
 import pasa.cbentley.framework.gui.src4.interfaces.IDrawable;
@@ -133,7 +133,7 @@ public class Appearance extends ImgAnimable {
       super.lifeStart();
    }
 
-   public void paint(GraphicsX g) {
+   public void paint(GraphicsXD g) {
       int[] data = img.getRgbData();
       if (data == null) {
          stepFunction.finish();

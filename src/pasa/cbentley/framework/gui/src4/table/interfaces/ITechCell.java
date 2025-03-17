@@ -191,6 +191,13 @@ public interface ITechCell extends ITech {
     */
    public static final int CELL_H_FLAG_08_ALL_CELLS_SAME_SIZE     = 1 << 7;
 
+   /**
+    * Helper flag set by constructor when a {@link TableView}'s {@link CellModel} can be navigated.
+    * 
+    * <p>
+    * a {@link TableView} that is not selectable cannot be navigated, nor horizontally, nor vertically.
+    * </p>
+    */
    public static final int CELL_H_FLAG_10_OWN_NAVIGATION          = 1 << 9;
 
    /**

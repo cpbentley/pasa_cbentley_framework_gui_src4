@@ -1,15 +1,11 @@
 package pasa.cbentley.framework.gui.src4.core;
 
 import pasa.cbentley.byteobjects.src4.core.ByteObject;
-import pasa.cbentley.core.src4.ctx.UCtx;
 import pasa.cbentley.core.src4.logging.Dctx;
-import pasa.cbentley.core.src4.logging.IDLog;
 import pasa.cbentley.core.src4.utils.interfaces.IColors;
 import pasa.cbentley.framework.coredraw.src4.interfaces.IMFont;
 import pasa.cbentley.framework.drawx.src4.ctx.DrwCtx;
 import pasa.cbentley.framework.drawx.src4.style.IBOStyle;
-import pasa.cbentley.framework.drawx.src4.tech.ITechMergeFigure;
-import pasa.cbentley.framework.drawx.src4.tech.ITechMergeFigureString;
 import pasa.cbentley.framework.gui.src4.ctx.GuiCtx;
 import pasa.cbentley.framework.gui.src4.ctx.ObjectGC;
 import pasa.cbentley.framework.gui.src4.interfaces.ITechDrawable;

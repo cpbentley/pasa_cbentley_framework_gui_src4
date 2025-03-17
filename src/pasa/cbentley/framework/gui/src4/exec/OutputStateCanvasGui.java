@@ -1,6 +1,6 @@
 package pasa.cbentley.framework.gui.src4.exec;
 
-import pasa.cbentley.framework.drawx.src4.engine.GraphicsX;
+import pasa.cbentley.framework.gui.src4.canvas.GraphicsXD;
 import pasa.cbentley.framework.gui.src4.canvas.TopologyDLayer;
 import pasa.cbentley.framework.gui.src4.core.Drawable;
 import pasa.cbentley.framework.gui.src4.core.ViewDrawable;
@@ -13,15 +13,17 @@ import pasa.cbentley.framework.input.src4.engine.CanvasAppliInput;
 import pasa.cbentley.framework.input.src4.engine.OutputStateCanvas;
 
 public class OutputStateCanvasGui extends OutputStateCanvas {
+   protected final GuiCtx gc;
+
+   public boolean         isOutside;
+
+   private boolean isStateStyleDrawablesSet = false;
+
    IDrawable[]            repaintDrawables = new IDrawable[5];
 
    private int            repaintDrawablesNum;
 
    private IDrawable      screenMsgDrawable;
-
-   public boolean         isOutside;
-
-   protected final GuiCtx gc;
 
    public OutputStateCanvasGui(GuiCtx gc, CanvasAppliInput ctrl) {
       this(gc, ctrl, CYCLE_0_USER_EVENT);
@@ -36,16 +38,20 @@ public class OutputStateCanvasGui extends OutputStateCanvas {
       return screenMsgDrawable;
    }
 
-   public void resetAll() {
-      super.resetAll();
-      isStateStyleDrawablesSet = false;
+   /**
+    * At least one drawable has been set their state styles with
+    * {@link IDrawable#managePointerStateStyle(ExecutionContextCanvasGui)}
+    * @return
+    */
+   public boolean isDrawableStatesSet() {
+      return isStateStyleDrawablesSet;
    }
 
    /**
     * TODO z ordering
     * @param g
     */
-   public void paintDrawables(GraphicsX g) {
+   public void paintDrawables(GraphicsXD g) {
       for (int i = 0; i < repaintDrawablesNum; i++) {
          IDrawable d = repaintDrawables[i];
          if (d != null) {
@@ -54,30 +60,9 @@ public class OutputStateCanvasGui extends OutputStateCanvas {
       }
    }
 
-   /**
-    * Special repaint on a {@link IDrawable} with an array of integer as parameter.
-    * <br>
-    * <br>
-    * If no other repaint are made that will invalidate this one, when repainted,
-    * {@link IDrawable} will check special flag and fetch integer array it stored.
-    * <br>
-    * This is used to repaint a special part of TableView/Drawable for example that does not
-    * implement. I.e. a paramter of the repaint
-    * @param is
-    */
-   public void setActionDoneRepaintSpecial(IDrawable d) {
-      repaintDrawables[repaintDrawablesNum] = d;
-      repaintDrawablesNum++;
-      setFlag(FLAG_01_ACTION_DONE, true);
-      setFlag(FLAG_07_SPECIAL, true);
-   }
-
-   /**
-    * Force a full flush of all cache
-    */
-   public void srRenewLayout() {
-      this.setFlag(FLAG_03_MENU_REPAINT, true);
-      this.setFlag(FLAG_04_RENEW_LAYOUT, true);
+   public void resetAll() {
+      super.resetAll();
+      isStateStyleDrawablesSet = false;
    }
 
    /**
@@ -89,7 +74,7 @@ public class OutputStateCanvasGui extends OutputStateCanvas {
     * Impact the {@link Controller#screenResult()} method.
     * <br>
     * <br>
-    * When {@link IDrawable} does not have the flag {@link ITechDrawable#STATE_17_OPAQUE}, we force {@link IDrawable#draw(GraphicsX)} to draw
+    * When {@link IDrawable} does not have the flag {@link ITechDrawable#STATE_17_OPAQUE}, we force {@link IDrawable#draw(GraphicsXD)} to draw
     * <li>itself fully
     * <li>only style layers. 
     * <li>nothing
@@ -212,19 +197,22 @@ public class OutputStateCanvasGui extends OutputStateCanvas {
       setFlag(FLAG_02_FULL_REPAINT, true);
    }
 
-   public void srMenuRepaint() {
-      this.setFlag(FLAG_03_MENU_REPAINT, true);
-   }
-
-   private boolean isStateStyleDrawablesSet = false;
-
    /**
-    * At least one drawable has been set their state styles with
-    * {@link IDrawable#managePointerStateStyle(ExecutionContextCanvasGui)}
-    * @return
+    * Special repaint on a {@link IDrawable} with an array of integer as parameter.
+    * <br>
+    * <br>
+    * If no other repaint are made that will invalidate this one, when repainted,
+    * {@link IDrawable} will check special flag and fetch integer array it stored.
+    * <br>
+    * This is used to repaint a special part of TableView/Drawable for example that does not
+    * implement. I.e. a paramter of the repaint
+    * @param is
     */
-   public boolean isDrawableStatesSet() {
-      return isStateStyleDrawablesSet;
+   public void setActionDoneRepaintSpecial(IDrawable d) {
+      repaintDrawables[repaintDrawablesNum] = d;
+      repaintDrawablesNum++;
+      setFlag(FLAG_01_ACTION_DONE, true);
+      setFlag(FLAG_07_SPECIAL, true);
    }
 
    public void setDrawableStates() {
@@ -237,6 +225,23 @@ public class OutputStateCanvasGui extends OutputStateCanvas {
     */
    public void setOutsideDrawable(boolean b) {
       isOutside = b;
+   }
+
+   public void srMenuRepaint() {
+      this.setFlag(FLAG_03_MENU_REPAINT, true);
+   }
+
+   /**
+    * Force a full flush of all cache
+    */
+   public void srRenewLayout() {
+      this.setFlag(FLAG_03_MENU_REPAINT, true);
+      this.setFlag(FLAG_04_RENEW_LAYOUT, true);
+   }
+
+   public void startRender() {
+      // TODO Auto-generated method stub
+
    }
 
 }

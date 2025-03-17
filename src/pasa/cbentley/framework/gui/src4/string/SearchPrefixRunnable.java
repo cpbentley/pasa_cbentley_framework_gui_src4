@@ -1,8 +1,7 @@
 package pasa.cbentley.framework.gui.src4.string;
 
 import pasa.cbentley.core.src4.structs.IntToStrings;
-import pasa.cbentley.framework.cmd.src4.interfaces.ITechNav;
-import pasa.cbentley.framework.gui.src4.canvas.InputConfig;
+import pasa.cbentley.framework.cmd.src4.interfaces.ITechNavCmd;
 import pasa.cbentley.framework.gui.src4.ctx.GuiCtx;
 import pasa.cbentley.framework.gui.src4.exec.ExecutionContextCanvasGui;
 import pasa.cbentley.framework.gui.src4.interfaces.ITechCanvasDrawable;
@@ -51,7 +50,7 @@ public class SearchPrefixRunnable implements Runnable {
 
       //request a repaint
       //make sure the table is shown. set the topology
-      gc.getNavigator().navInsert(ic,controlledSD, ITechNav.NAV_2_DOWN, predictionTable);
+      gc.getNavigator().navInsert(ic,controlledSD, ITechNavCmd.NAV_02_DOWN, predictionTable);
       //TODO flag so Down command from caret context goes to the prediction table
       controlledSD.setStateNav(ITechDrawable.NAV_06_OVERRIDE_DOWN, true);
       predictionTable.shShowDrawable(ic, ITechCanvasDrawable.SHOW_TYPE_1_OVER_TOP);

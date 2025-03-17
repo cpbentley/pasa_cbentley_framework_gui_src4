@@ -11,7 +11,7 @@ import pasa.cbentley.framework.cmd.src4.interfaces.ICmdExecutor;
 import pasa.cbentley.framework.cmd.src4.interfaces.ICmdsCmd;
 import pasa.cbentley.framework.cmd.src4.interfaces.ITechCmd;
 import pasa.cbentley.framework.core.ui.src4.input.InputState;
-import pasa.cbentley.framework.core.ui.src4.tech.IInput;
+import pasa.cbentley.framework.core.ui.src4.tech.ITechInput;
 import pasa.cbentley.framework.gui.src4.cmd.CmdInstanceGui;
 import pasa.cbentley.framework.gui.src4.core.Drawable;
 import pasa.cbentley.framework.gui.src4.ctx.GuiCtx;
@@ -308,7 +308,7 @@ public class FocusCtrl extends ObjectGC implements IStringable {
          if (itemInKeyFocus != null) {
             os.setActionDoneRepaint(itemInKeyFocus);
             //#debug
-            os.debugSetActionDoneRepaint("Removed Old Drawable KeyFocus");
+            os.toStringSetActionDoneRepaint("Removed Old Drawable KeyFocus");
             itemInKeyFocus.notifyEvent(ITechDrawable.EVENT_04_KEY_FOCUS_LOSS, focusChange);
             itemInKeyFocus = null;
          }
@@ -321,7 +321,7 @@ public class FocusCtrl extends ObjectGC implements IStringable {
          if (newKeyFocusDrawable != itemInKeyFocus) {
             os.setActionDoneRepaint(newKeyFocusDrawable);
             //#debug
-            os.debugSetActionDoneRepaint("#Controller New Drawable KeyFocus");
+            os.toStringSetActionDoneRepaint("#Controller New Drawable KeyFocus");
             newKeyFocusDrawable.notifyEvent(ITechDrawable.EVENT_03_KEY_FOCUS_GAIN, focusChange);
             itemInKeyFocus = newKeyFocusDrawable;
          }
@@ -396,7 +396,7 @@ public class FocusCtrl extends ObjectGC implements IStringable {
       }
       gc.getCC().setActiveCommandable(itemInPointerPressedFocus, ITechCmd.CTX_CAT_1_POINTER_PRESSED);
       //action flag is set. this must be done
-      ic.srActionDone();
+      ic.setActionDone();
    }
 
    /**
@@ -419,14 +419,14 @@ public class FocusCtrl extends ObjectGC implements IStringable {
          //the release is done outside the drawable but it got called because 
          //it was the draggable. so it gets a chance to set state
          if (!DrawableUtilz.isInside(ec, d)) {
-            ic.getCanvasResultDrawable().setOutsideDrawable(true);
+            ic.getOutputStateCanvasGui().setOutsideDrawable(true);
          }
       } else if (ic.isDraggedPointer0Button0()) {
          d.setStateStyle(ITechDrawable.STYLE_09_DRAGGED, true);
       } else if (ic.isWheeled()) {
 
       }
-      ic.getCanvasResultDrawable().setDrawableStates();
+      ic.getOutputStateCanvasGui().setDrawableStates();
 
    }
 
@@ -459,10 +459,10 @@ public class FocusCtrl extends ObjectGC implements IStringable {
       //for the most used context we check them. most common case if deviceID 0 for pointer and keyboard
       IDrawable old = null;
       if (deviceID == 0) {
-         if (deviceType == IInput.DEVICE_0_KEYBOARD) {
+         if (deviceType == ITechInput.DEVICE_0_KEYBOARD) {
             old = itemInKeyFocus;
             itemInKeyFocus = d;
-         } else if (deviceType == IInput.DEVICE_1_MOUSE) {
+         } else if (deviceType == ITechInput.DEVICE_1_MOUSE) {
             old = itemInPointerPressedFocus;
             itemInPointerPressedFocus = d;
          } else {

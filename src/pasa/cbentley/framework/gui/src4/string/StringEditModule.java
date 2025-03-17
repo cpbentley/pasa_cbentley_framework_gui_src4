@@ -1,18 +1,20 @@
 package pasa.cbentley.framework.gui.src4.string;
 
 import pasa.cbentley.byteobjects.src4.core.ByteObject;
-import pasa.cbentley.core.src4.ctx.UCtx;
+import pasa.cbentley.core.src4.interfaces.ITechNav;
 import pasa.cbentley.core.src4.logging.Dctx;
-import pasa.cbentley.core.src4.logging.IDLog;
 import pasa.cbentley.core.src4.logging.IStringable;
 import pasa.cbentley.core.src4.utils.StringUtils;
 import pasa.cbentley.framework.cmd.src4.engine.CmdFactoryCore;
-import pasa.cbentley.framework.cmd.src4.engine.CmdSearch;
+import pasa.cbentley.framework.cmd.src4.engine.CmdInstance;
+import pasa.cbentley.framework.cmd.src4.engine.CmdNode;
 import pasa.cbentley.framework.cmd.src4.engine.MCmd;
+import pasa.cbentley.framework.cmd.src4.nav.INavigational;
 import pasa.cbentley.framework.core.ui.src4.tech.ITechCodes;
 import pasa.cbentley.framework.drawx.src4.engine.GraphicsX;
 import pasa.cbentley.framework.drawx.src4.string.StringMetrics;
 import pasa.cbentley.framework.drawx.src4.string.Stringer;
+import pasa.cbentley.framework.gui.src4.canvas.GraphicsXD;
 import pasa.cbentley.framework.gui.src4.canvas.InputConfig;
 import pasa.cbentley.framework.gui.src4.cmd.CmdInstanceGui;
 import pasa.cbentley.framework.gui.src4.core.Drawable;
@@ -20,6 +22,7 @@ import pasa.cbentley.framework.gui.src4.core.DrawableInjected;
 import pasa.cbentley.framework.gui.src4.core.StyleClass;
 import pasa.cbentley.framework.gui.src4.ctx.GuiCtx;
 import pasa.cbentley.framework.gui.src4.ctx.IEventsGui;
+import pasa.cbentley.framework.gui.src4.ctx.ObjectGC;
 import pasa.cbentley.framework.gui.src4.exec.ExecutionContextCanvasGui;
 import pasa.cbentley.framework.gui.src4.factories.interfaces.IBOStrAuxData;
 import pasa.cbentley.framework.gui.src4.factories.interfaces.IBOStrAuxEdit;
@@ -88,11 +91,7 @@ import pasa.cbentley.powerdata.spec.src4.guicontrols.TrieTranslationSearch;
  * @author Charles-Philip Bentley
  *
  */
-public class StringEditModule implements IDrawListener, IBOStrAuxData, IStringable, IEventsGui {
-
-   public static long            caretBlinkMillisOff = 600;
-
-   public static long            caretBlinkMillisOn  = 800;
+public class StringEditModule extends ObjectGC implements INavigational, IDrawListener, IBOStrAuxData, IStringable, IEventsGui {
 
    /**
     * Active caret.
@@ -103,7 +102,7 @@ public class StringEditModule implements IDrawListener, IBOStrAuxData, IStringab
     */
    private Drawable              caret;
 
-   private long                  caretBlinkMillis    = 1000;
+   private long                  caretBlinkMillis = 1000;
 
    /**
     * 
@@ -129,12 +128,12 @@ public class StringEditModule implements IDrawListener, IBOStrAuxData, IStringab
    /**
     * 
     */
-   private int                   caretLineIndex      = 0;
+   private int                   caretLineIndex   = 0;
 
    /**
     * String Edit Style taken from device
     */
-   private int                   caretWidth          = 0;
+   private int                   caretWidth       = 0;
 
    private Drawable              caretX;
 
@@ -146,9 +145,11 @@ public class StringEditModule implements IDrawListener, IBOStrAuxData, IStringab
    /**
     * 
     */
-   private char[][]              charset             = Symbs.setEnglish;
+   private char[][]              charset          = Symbs.setEnglish;
 
    public final MCmd             CMD_SET_EDIT;
+
+   private CmdNode               cmdNode;
 
    int                           currentKey;
 
@@ -161,16 +162,14 @@ public class StringEditModule implements IDrawListener, IBOStrAuxData, IStringab
     */
    private ByteObject            editTech;
 
-   protected final GuiCtx        gc;
+   boolean                       isBlinking       = true;
 
-   boolean                       isBlinking          = true;
-
-   private boolean               isCaretOn           = true;
+   private boolean               isCaretOn        = true;
 
    /**
     * Control value set to true when key is repeateadly pressed for going over the characters associated with that key.
     */
-   private boolean               isGoToNextChar      = true;
+   private boolean               isGoToNextChar   = true;
 
    private boolean               isInsertMode;
 
@@ -178,7 +177,7 @@ public class StringEditModule implements IDrawListener, IBOStrAuxData, IStringab
 
    private int                   lastPressedKey;
 
-   private int                   numEditLines        = 1;
+   private int                   numEditLines     = 1;
 
    /**
     * {@link TableView} to display predictions from Trie dictionnary.
@@ -215,10 +214,11 @@ public class StringEditModule implements IDrawListener, IBOStrAuxData, IStringab
     * 
     */
    public StringEditModule(GuiCtx gc) {
-      this.gc = gc;
+      super(gc);
       editTech = gc.getDrawableStringFactory().getBOStringEditNormal();
-      CmdFactoryCore cmdFac = gc.getCC().getCmdFactoryCore();
+      CmdFactoryCore cmdFac = cc.getCmdFactoryCore();
       CMD_SET_EDIT = cmdFac.createCmd(ICmdsGui.CMD_GUI_20_EDIT_MODE, "Edit Mode True");
+      cmdNode = cc.createCmdNode("StringEdit");
    }
 
    /**
@@ -290,7 +290,7 @@ public class StringEditModule implements IDrawListener, IBOStrAuxData, IStringab
     * <br>
     * @param g
     */
-   public void draw(GraphicsX g) {
+   public void draw(GraphicsXD g) {
       //System.out.println("#EditModule: Drawing Caret \n\t" + caret.toString("\n\t"));
       caret.setStateFlag(ITechDrawable.STATE_03_HIDDEN, false);
       caret.draw(g);
@@ -310,7 +310,7 @@ public class StringEditModule implements IDrawListener, IBOStrAuxData, IStringab
     * @param w size of caret determine the clip. Size of caret when moving is the whole interval
     * @param h
     */
-   private void drawCaretFromContentListener(GraphicsX g, int x, int y, int w, int h) {
+   private void drawCaretFromContentListener(GraphicsXD g, int x, int y, int w, int h) {
       Stringer stringer = stringDrawable.getStringer();
       int cw = 0;
       int ch = stringer.getMetrics().getLineHeight();
@@ -374,7 +374,7 @@ public class StringEditModule implements IDrawListener, IBOStrAuxData, IStringab
     * <br>
     * 
     */
-   public void drawContentListen(GraphicsX g, int x, int y, int w, int h, Drawable d) {
+   public void drawContentListen(GraphicsXD g, int x, int y, int w, int h, Drawable d) {
       drawCaretFromContentListener(g, x, y, w, h);
    }
 
@@ -386,7 +386,7 @@ public class StringEditModule implements IDrawListener, IBOStrAuxData, IStringab
     * @param figW
     * @param figH
     */
-   private void drawMyCaret(GraphicsX g, int x, int y, int figW, int figH) {
+   private void drawMyCaret(GraphicsXD g, int x, int y, int figW, int figH) {
       if (isCaretOn) {
          //System.out.println("#EditModule Drawing Caret [" + x + "," + y + " " + figW + "," + figH + "] Figure : " + caretFigure);
          gc.getDC().getFigureOperator().paintFigure(g, x, y, figW, figH, caretFigure);
@@ -398,7 +398,7 @@ public class StringEditModule implements IDrawListener, IBOStrAuxData, IStringab
     * 
     * @param g
     */
-   private void drawOldCharCaret(GraphicsX g, int index) {
+   private void drawOldCharCaret(GraphicsXD g, int index) {
       Stringer stringer = stringDrawable.getStringer();
       int cw = 0;
 
@@ -447,6 +447,10 @@ public class StringEditModule implements IDrawListener, IBOStrAuxData, IStringab
       return charset;
    }
 
+   public CmdNode getCmdNode() {
+      return cmdNode;
+   }
+
    /**
     * If {@link StringDrawable} is not loaded or does not have one, return the Default One.
     * @return null if not loaded?
@@ -457,6 +461,11 @@ public class StringEditModule implements IDrawListener, IBOStrAuxData, IStringab
 
    private StringMetrics getMetrics() {
       return stringDrawable.getStringer().getMetrics();
+   }
+
+   public int getNavFlag() {
+      // TODO Auto-generated method stub
+      return 0;
    }
 
    /**
@@ -479,6 +488,18 @@ public class StringEditModule implements IDrawListener, IBOStrAuxData, IStringab
 
    public boolean isLeftMost() {
       return caretIndex == 0;
+   }
+
+   public boolean isNavEventSupported(int navEvent) {
+      switch (navEvent) {
+         case ITechNav.NAV_01_UP:
+         case ITechNav.NAV_02_DOWN:
+         case ITechNav.NAV_03_LEFT:
+         case ITechNav.NAV_04_RIGHT:
+            return true;
+         default:
+            return false;
+      }
    }
 
    /**
@@ -551,15 +572,15 @@ public class StringEditModule implements IDrawListener, IBOStrAuxData, IStringab
             if (ic.isCancel()) {
                caretAtDeleteChar();
                isGoToNextChar = true;
-               ic.srActionDoneRepaint();
+               ic.setActionDoneRepaint();
             } else if (key >= ITechCodes.KEY_NUM0 && key <= ITechCodes.KEY_NUM9) {
                manageKey09PressedWrite(ec, key);
-               ic.srActionDoneRepaint();
+               ic.setActionDoneRepaint();
             } else if (ic.isFireP()) {
                //become edit
                //the item become the top Drawable if KeyHelp is true, move input item to the top / bottom
                //draw half transparent gr
-               ic.srActionDoneRepaint();
+               ic.setActionDoneRepaint();
             } else {
                //System.out.println("#EditModule char [" + (char) key + "]");
                //check if key is a valid alpha numeri character depending on the current plane
@@ -642,6 +663,11 @@ public class StringEditModule implements IDrawListener, IBOStrAuxData, IStringab
       }
    }
 
+   public void navigateCmd(CmdInstance navCmd) {
+      // TODO Auto-generated method stub
+
+   }
+
    /**
     * Call Back for DownCmd. What about the NavFlag?
     * <br>
@@ -664,7 +690,7 @@ public class StringEditModule implements IDrawListener, IBOStrAuxData, IStringab
          //TODO even in multiline, if a prediction table is shown. down will select first element in table
          //
       }
-      
+
       gc.getFocusCtrl().newFocusKey(ci.getExecutionContextGui(), stringDrawable);
 
    }
@@ -851,36 +877,26 @@ public class StringEditModule implements IDrawListener, IBOStrAuxData, IStringab
    }
 
    //#mdebug
-   public IDLog toDLog() {
-      return gc.toDLog();
-   }
-
-   public IDLog toLog() {
-      return gc.toDLog();
-   }
-
-   public String toString() {
-      return Dctx.toString(this);
-   }
-
    public void toString(Dctx dc) {
-      dc.root(this, "EditModule");
+      dc.root(this, StringEditModule.class, toStringGetLine(850));
+      toStringPrivate(dc);
+      super.toString(dc.sup());
+
       dc.appendVarWithSpace("isBlinking", isBlinking);
       dc.append(" keyStep=" + currentKeyStep);
       dc.nlLvl("Caret Figure ", caretFigure);
       dc.nlLvl(editTech);
    }
 
-   public String toString1Line() {
-      return Dctx.toString1Line(this);
-   }
-
    public void toString1Line(Dctx dc) {
-      dc.root1Line(this, "EditModule");
+      dc.root1Line(this, StringEditModule.class, toStringGetLine(850));
+      toStringPrivate(dc);
+      super.toString1Line(dc.sup1Line());
    }
 
-   public UCtx toStringGetUCtx() {
-      return gc.getUC();
+   private void toStringPrivate(Dctx dc) {
+
    }
    //#enddebug
+
 }

@@ -1,6 +1,8 @@
 package pasa.cbentley.framework.gui.src4.nav;
 
+import pasa.cbentley.core.src4.interfaces.ITechNav;
 import pasa.cbentley.framework.cmd.src4.ctx.CmdCtx;
+import pasa.cbentley.framework.cmd.src4.engine.CmdFactoryCore;
 import pasa.cbentley.framework.cmd.src4.engine.CmdNode;
 import pasa.cbentley.framework.cmd.src4.engine.MCmd;
 import pasa.cbentley.framework.cmd.src4.interfaces.ICmdsCmd;
@@ -14,46 +16,66 @@ import pasa.cbentley.framework.gui.src4.exec.ExecutionContextCanvasGui;
 import pasa.cbentley.framework.gui.src4.interfaces.ICmdsGui;
 import pasa.cbentley.framework.gui.src4.interfaces.IDrawable;
 
-public class Navigator extends ObjectGC implements  ICmdsCmd, ICmdsGui {
+public class Navigator extends ObjectGC implements ICmdsCmd, ICmdsGui {
 
-   protected CmdNode navCtx;
+   protected CmdNode cmdNodeNav;
+   private CmdNode cmdNodeTblrSelect;
 
    public Navigator(GuiCtx gc) {
       super(gc);
       initDefNav();
    }
 
-   public MCmd getNavCmd(int cmdid) {
-      return new NavigationCmd(gc, 0, cmdid);
-   }
-
    public void cmdPopActive(ExecutionContextCanvasGui ic) {
 
    }
 
-   /**
-    * Position {@link IDrawable} with Pozers so that it is drawn
-    * on top aligned left
-    * @param ic the execution context
-    * @param src
-    * @param dir
-    * @param insert
-    */
-   public void navInsert(ExecutionContextCanvasGui ic, IDrawable src, int dir, IDrawable insert) {
-      
+   public CmdNode getCmdNodeNav() {
+      return cmdNodeNav;
    }
 
    /**
-    * Remove Drawable and reattach links
-    * @param src
-    * @param remove
+    * The {@link CmdNode} with up,down,left,right and select commands
+    * @return
     */
-   public void navRemove(ExecutionContextCanvasGui ic, IDrawable src, IDrawable remove) {
-      
+   public CmdNode getCmdNodeNavTBLRSelect() {
+      if(cmdNodeTblrSelect == null) {
+         cmdNodeTblrSelect = cc.createCmdNode("navtblrselect");
+         this.addTBLRMoves(cmdNodeTblrSelect);
+         this.addFireEscape(cmdNodeTblrSelect);
+      }
+      return cmdNodeTblrSelect;
+   }
+   /**      
+    * not all navigation node will have
+    * 
+    * @param cmdNode
+    */
+   private void addScrollUpDownToNode(CmdNode cmdNode) {
+      FacTrig triggerFactory = cc.getFacTrig();
+      CmdFactoryCore cmdFactoryCore = cc.getCmdFactoryCore();
+
+      //scroll up cmd
+      CmdTrigger ctWheelUp = triggerFactory.createPointerPressed(ITechCodes.PBUTTON_3_WHEEL_UP);
+      cmdNode.addCmdLink(ctWheelUp, cmdFactoryCore.getCmdNavScrollUp());
+      CmdTrigger ctWheelDown = triggerFactory.createPointerPressed(ITechCodes.PBUTTON_4_WHEEL_DOWN);
+      cmdNode.addCmdLink(ctWheelDown, cmdFactoryCore.getCmdNavScrollDown());
+      //first press is a CUE_SELECT
    }
 
-   public CmdNode getCtxNav() {
-      return navCtx;
+   public void addFireEscape(CmdNode cmdNode) {
+      CmdFactoryCore cmdFactoryCore = cc.getCmdFactoryCore();
+      cmdNodeNav.addCmdLink(ITechCodes.KEY_FIRE, cmdFactoryCore.getCmdNavSelect());
+      cmdNodeNav.addCmdLink(ITechCodes.KEY_ESCAPE, cmdFactoryCore.getCmdNavUnSelect());
+
+   }
+
+   public void addTBLRMoves(CmdNode cmdNode) {
+      CmdFactoryCore cmdFactoryCore = cc.getCmdFactoryCore();
+      cmdNode.addCmdLinkRepeated(ITechCodes.KEY_UP, cmdFactoryCore.getCmdNavUp());
+      cmdNode.addCmdLinkRepeated(ITechCodes.KEY_DOWN, cmdFactoryCore.getCmdNavDown());
+      cmdNode.addCmdLinkRepeated(ITechCodes.KEY_LEFT, cmdFactoryCore.getCmdNavLeft());
+      cmdNode.addCmdLinkRepeated(ITechCodes.KEY_RIGHT, cmdFactoryCore.getCmdNavRight());
    }
 
    /**
@@ -65,56 +87,64 @@ public class Navigator extends ObjectGC implements  ICmdsCmd, ICmdsGui {
     */
    public void initDefNav() {
       FacTrig triggerFactory = cc.getFacTrig();
-      navCtx = new CmdNode(cc, "nav", 0, null);
+      cmdNodeNav = new CmdNode(cc, "nav", 0, null);
 
-      //navigate command that requires a parameter
-      NavigationCmd navCmd = new NavigationCmd(gc, 0);
-
-      CmdTrigger ctT = triggerFactory.createKeyP(ITechCodes.KEY_DOWN);
-      navCtx.addCmdLinkRepeated(ctT, navCmd);
-      
       //#debug
-      toDLog().pCmd("Before", ctT, Navigator.class, "initDefNav@76");
+      toDLog().pCmd("Before", cmdNodeNav, Navigator.class, "initDefNav@76");
 
-      CmdTrigger ctB = triggerFactory.createKeyP(ITechCodes.KEY_UP);
-      navCtx.addCmdLinkRepeated(ctB, navCmd);
-      CmdTrigger ctL = triggerFactory.createKeyP(ITechCodes.KEY_LEFT);
-      navCtx.addCmdLinkRepeated(ctL, navCmd);
-      CmdTrigger ctR = triggerFactory.createKeyP(ITechCodes.KEY_RIGHT);
-      navCtx.addCmdLinkRepeated(ctR, navCmd);
+      CmdFactoryCore cmdFactoryCore = cc.getCmdFactoryCore();
+      cmdNodeNav.addCmdLinkRepeated(ITechCodes.KEY_UP, cmdFactoryCore.getCmdNavUp());
+      cmdNodeNav.addCmdLinkRepeated(ITechCodes.KEY_DOWN, cmdFactoryCore.getCmdNavDown());
+      cmdNodeNav.addCmdLinkRepeated(ITechCodes.KEY_LEFT, cmdFactoryCore.getCmdNavLeft());
+      cmdNodeNav.addCmdLinkRepeated(ITechCodes.KEY_RIGHT, cmdFactoryCore.getCmdNavRight());
 
-      CmdTrigger ctF = triggerFactory.createKeyP(ITechCodes.KEY_FIRE);
-      navCtx.addCmdLink(ctF, navCmd);
-      CmdTrigger ctES = triggerFactory.createKeyP(ITechCodes.KEY_ESCAPE);
-      navCtx.addCmdLink(ctES, navCmd);
+      cmdNodeNav.addCmdLink(ITechCodes.KEY_FIRE, cmdFactoryCore.getCmdNavSelect());
+      cmdNodeNav.addCmdLink(ITechCodes.KEY_ESCAPE, cmdFactoryCore.getCmdNavUnSelect());
 
-      CmdTrigger ctWheelUp = triggerFactory.createPointerPressed(ITechCodes.PBUTTON_3_WHEEL_UP);
-      navCtx.addCmdLink(ctWheelUp, navCmd);
-      CmdTrigger ctWheelDown = triggerFactory.createPointerPressed(ITechCodes.PBUTTON_4_WHEEL_DOWN);
-      navCtx.addCmdLink(ctWheelDown, navCmd);
-      //first press is a CUE_SELECT
       CmdTrigger ctPointer1 = triggerFactory.createPointerPressed(ITechCodes.PBUTTON_0_DEFAULT);
-      navCtx.addCmdLink(ctPointer1, CMD_18_NAV_PRE_SELECT);
+      cmdNodeNav.addCmdLink(ctPointer1, CMD_18_NAV_PRE_SELECT);
 
       CmdTrigger ctPointerDrag = triggerFactory.create1stPointerDrag(ITechCodes.PBUTTON_0_DEFAULT);
-      navCtx.addCmdLink(ctPointerDrag, CMD_18_NAV_PRE_SELECT);
+      cmdNodeNav.addCmdLink(ctPointerDrag, CMD_18_NAV_PRE_SELECT);
 
       //first press is a CUE_SELECT. some nav context will want a pointer press selection
       //while others want 
       CmdTrigger ctPointerType = triggerFactory.createPointer(ITechCodes.PBUTTON_0_DEFAULT);
-      navCtx.addCmdLink(ctPointerType, navCmd);
+      cmdNodeNav.addCmdLink(ctPointerType, CMD_18_NAV_PRE_SELECT);
 
+      //5 typed fast for exiting with a confirm dialog
       CmdTrigger ctEx = triggerFactory.createTypedRepeat(ITechCodes.KEY_ESCAPE, 5, ITechCodes.TIMING_3_FAST);
       cc.getCmdNodeRoot().addCmdLink(ctEx, CMD_03_EXIT);
       CmdTrigger ctF1 = triggerFactory.createKeyP(ITechCodes.KEY_F1);
       cc.getCmdNodeRoot().addCmdLink(ctF1, CMD_39_HELP);
 
       //#debug
-      toDLog().pCmd("After", navCtx, Navigator.class, "initDefNav");
+      toDLog().pCmd("After", cmdNodeNav, Navigator.class, "initDefNav");
    }
 
-   public void setNavCtx(CmdNode ct) {
-      navCtx = ct;
+   /**
+    * Position {@link IDrawable} with Pozers so that it is drawn
+    * on top aligned left
+    * @param ic the execution context
+    * @param src
+    * @param dir
+    * @param insert
+    */
+   public void navInsert(ExecutionContextCanvasGui ic, IDrawable src, int dir, IDrawable insert) {
+
+   }
+
+   /**
+    * Remove Drawable and reattach links
+    * @param src
+    * @param remove
+    */
+   public void navRemove(ExecutionContextCanvasGui ic, IDrawable src, IDrawable remove) {
+
+   }
+
+   public void setNavCtx(CmdNode cmdNode) {
+      cmdNodeNav = cmdNode;
    }
 
    /**
@@ -124,9 +154,9 @@ public class Navigator extends ObjectGC implements  ICmdsCmd, ICmdsGui {
     */
    public void setNavCtx(Drawable d, boolean b) {
       if (b) {
-         d.getCmdNode().addBranch(navCtx);
+         d.getCmdNode().addBranch(cmdNodeNav);
       } else {
-         d.getCmdNode().removeBranch(navCtx);
+         d.getCmdNode().removeBranch(cmdNodeNav);
       }
    }
 }

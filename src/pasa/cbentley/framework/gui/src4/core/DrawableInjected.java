@@ -2,7 +2,7 @@ package pasa.cbentley.framework.gui.src4.core;
 
 import pasa.cbentley.byteobjects.src4.core.ByteObject;
 import pasa.cbentley.core.src4.logging.Dctx;
-import pasa.cbentley.framework.drawx.src4.engine.GraphicsX;
+import pasa.cbentley.framework.gui.src4.canvas.GraphicsXD;
 import pasa.cbentley.framework.gui.src4.ctx.GuiCtx;
 import pasa.cbentley.framework.gui.src4.interfaces.IDrawListener;
 import pasa.cbentley.framework.gui.src4.interfaces.IDrawable;
@@ -27,6 +27,10 @@ public class DrawableInjected extends Drawable {
       this.dl = lis;
    }
 
+   protected void drawDrawableContent(GraphicsXD g, int x, int y, int w, int h) {
+      dl.drawContentListen(g, x, y, w, h, this);
+   }
+
    /**
     * Case of ColumnTitle.
     * <li> TableView set the header
@@ -38,10 +42,6 @@ public class DrawableInjected extends Drawable {
    public void init(ByteObject sizerW, ByteObject sizerH) {
       setSizers(sizerW, sizerH);
       dl.initListen(sizerW, sizerH, this);
-   }
-
-   protected void drawDrawableContent(GraphicsX g, int x, int y, int w, int h) {
-      dl.drawContentListen(g, x, y, w, h, this);
    }
 
    public void toString(Dctx sb) {

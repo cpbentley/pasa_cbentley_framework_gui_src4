@@ -5,6 +5,8 @@ import pasa.cbentley.framework.core.ui.src4.input.InputState;
 import pasa.cbentley.framework.gui.src4.cmd.CmdInstanceGui;
 import pasa.cbentley.framework.gui.src4.ctx.GuiCtx;
 import pasa.cbentley.framework.gui.src4.ctx.ObjectGC;
+import pasa.cbentley.framework.gui.src4.exec.ExecutionContextCanvasGui;
+import pasa.cbentley.framework.gui.src4.exec.InputStateCanvasGui;
 import pasa.cbentley.framework.gui.src4.exec.OutputStateCanvasGui;
 import pasa.cbentley.framework.gui.src4.interfaces.IUIView;
 import pasa.cbentley.framework.gui.src4.menu.CmdMenuBar;
@@ -54,9 +56,9 @@ public class CanvasExtras extends ObjectGC {
       this.setMenuBar(cmdMenuBar);
    }
 
-   void ctrlUIEvent(InputState ic, OutputStateCanvasGui sd) {
+   void ctrlUIEvent(ExecutionContextCanvasGui ec, InputStateCanvasGui is, OutputStateCanvasGui os) {
       if (canvasDebug != null) {
-         sd.setActionDoneRepaint(canvasDebug);
+         os.setActionDoneRepaint(canvasDebug);
       }
    }
 

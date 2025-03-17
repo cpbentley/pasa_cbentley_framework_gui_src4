@@ -10,6 +10,7 @@ import pasa.cbentley.framework.drawx.src4.engine.GraphicsX;
 import pasa.cbentley.framework.drawx.src4.factories.interfaces.IBOBox;
 import pasa.cbentley.framework.drawx.src4.tech.ITechAnchor;
 import pasa.cbentley.framework.drawx.src4.utils.AnchorUtils;
+import pasa.cbentley.framework.gui.src4.canvas.GraphicsXD;
 import pasa.cbentley.framework.gui.src4.canvas.InputConfig;
 import pasa.cbentley.framework.gui.src4.core.Drawable;
 import pasa.cbentley.framework.gui.src4.core.ScrollBar;
@@ -188,7 +189,7 @@ public class SymbolTable extends TableView {
    /**
     * Overrides {@link TableView#drawModelDrawable(GraphicsX, int, int, int, int, int, int)}
     */
-   protected void drawModelDrawable(GraphicsX g, int x, int y, int w, int h, int colAbs, int rowAbs) {
+   protected void drawModelDrawable(GraphicsXD g, int x, int y, int w, int h, int colAbs, int rowAbs) {
       int index = getVisualIndex(colAbs, rowAbs);
       drawModelIndex(g, x, y, w, h, index);
    }
@@ -196,7 +197,7 @@ public class SymbolTable extends TableView {
    /**
     * Draw index and bg color for that cell.
     */
-   private void drawModelIndex(GraphicsX g, int x, int y, int w, int h, int index) {
+   private void drawModelIndex(GraphicsXD g, int x, int y, int w, int h, int index) {
       if (index >= myChars.length) {
          return;
       }
@@ -270,7 +271,7 @@ public class SymbolTable extends TableView {
     * Set {@link GraphicsX} attributes global to all data cells.
     * @param g
     */
-   public void initDataDraw(GraphicsX g) {
+   public void initDataDraw(GraphicsXD g) {
       f = gc.getDC().getCoreDrawCtx().getFontFactory().getFont(IMFont.FACE_01_MONOSPACE, IMFont.STYLE_1_BOLD, IMFont.SIZE_3_MEDIUM);
       //MStyle.getStyleFont(style);
       isMonoSpaced = true;
@@ -292,7 +293,7 @@ public class SymbolTable extends TableView {
     */
    public void manageKeyInput(ExecutionContextCanvasGui ec) {
       InputConfig ic = ec.getInputConfig();
-      InputStateCanvasGui is = ec.getInputStateDrawable();
+      InputStateCanvasGui is = ec.getInputStateCanvasGui();
       if (ic.isStarP() && is.getNumKeysPressed() == 1) {
          cmdPreviousPlane(ec);
       }

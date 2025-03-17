@@ -1,8 +1,8 @@
 package pasa.cbentley.framework.gui.src4.core;
 
 import pasa.cbentley.framework.core.ui.src4.utils.ViewState;
-import pasa.cbentley.framework.drawx.src4.engine.GraphicsX;
 import pasa.cbentley.framework.drawx.src4.engine.RgbImage;
+import pasa.cbentley.framework.gui.src4.canvas.GraphicsXD;
 import pasa.cbentley.framework.gui.src4.ctx.GuiCtx;
 
 /**
@@ -60,7 +60,7 @@ public class RgbDrawable extends Drawable {
       throw new RuntimeException();
    }
 
-   public void drawDrawable(GraphicsX g) {
+   public void drawDrawable(GraphicsXD g) {
       g.drawRgbImage(img, getX(), getY());
    }
 

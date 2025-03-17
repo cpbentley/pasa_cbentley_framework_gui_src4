@@ -12,7 +12,6 @@ import pasa.cbentley.framework.drawx.src4.style.ITechStyleCache;
 import pasa.cbentley.framework.drawx.src4.style.StyleCache;
 import pasa.cbentley.framework.gui.src4.canvas.ViewContext;
 import pasa.cbentley.framework.gui.src4.ctx.GuiCtx;
-import pasa.cbentley.framework.gui.src4.ctx.ToStringStaticGui;
 import pasa.cbentley.framework.gui.src4.interfaces.IDrawable;
 import pasa.cbentley.framework.gui.src4.interfaces.ITechDrawable;
 import pasa.cbentley.layouter.src4.engine.LayoutOperator;

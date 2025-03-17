@@ -29,11 +29,13 @@ import pasa.cbentley.framework.core.ui.src4.user.UserInteractionCtrl;
 import pasa.cbentley.framework.coredraw.src4.ctx.CoreDrawCtx;
 import pasa.cbentley.framework.datamodel.src4.ctx.DataModelCtx;
 import pasa.cbentley.framework.drawx.src4.ctx.DrwCtx;
+import pasa.cbentley.framework.drawx.src4.engine.GraphicsXFactory;
 import pasa.cbentley.framework.gui.src4.anim.AnimFactory;
 import pasa.cbentley.framework.gui.src4.anim.AnimOperator;
 import pasa.cbentley.framework.gui.src4.canvas.CanvasAppliInputGui;
 import pasa.cbentley.framework.gui.src4.canvas.CanvasDrawControl;
 import pasa.cbentley.framework.gui.src4.canvas.FocusCtrl;
+import pasa.cbentley.framework.gui.src4.canvas.GraphicsXFactoryGui;
 import pasa.cbentley.framework.gui.src4.canvas.IBOCanvasAppliGui;
 import pasa.cbentley.framework.gui.src4.canvas.ICanvasDrawable;
 import pasa.cbentley.framework.gui.src4.canvas.TopLevelCtrl;
@@ -210,6 +212,8 @@ public class GuiCtx extends ABOCtx implements ITechCtxSettingsAppGui {
       this.ic = ic;
       this.cc = cc;
       this.dc = dc;
+      this.dc.setGraphicsXFactory(new GraphicsXFactoryGui(this,dc));
+      
       this.dmc = dmc;
       this.strings = strings;
       boModule = new BOModuleGui(this);

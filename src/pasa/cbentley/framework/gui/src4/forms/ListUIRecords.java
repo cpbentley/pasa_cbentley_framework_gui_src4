@@ -115,7 +115,7 @@ public class ListUIRecords extends TableLayoutView implements IValidable {
    }
 
    public void addCmds(ICmdExecutor com, CmdNode cc, MCmd[] cmds) {
-      ctxListUI = cc.createChildCtx("ListUI" + title);
+      ctxListUI = cc.createChildNode("ListUI" + title);
       ctxListUI.addMenuCmd(ICmdsCmd.CMD_04_OK);
       ctxListUI.addMenuCmd(ICmdsCmd.CMD_05_CANCEL);
       ctxListUI.setExecutor(com);

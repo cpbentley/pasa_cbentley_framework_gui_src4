@@ -1,7 +1,7 @@
 package pasa.cbentley.framework.gui.src4.core;
 
 import pasa.cbentley.core.src4.logging.Dctx;
-import pasa.cbentley.framework.drawx.src4.engine.GraphicsX;
+import pasa.cbentley.framework.gui.src4.canvas.GraphicsXD;
 import pasa.cbentley.framework.gui.src4.canvas.TopologyDLayer;
 import pasa.cbentley.framework.gui.src4.canvas.ViewContext;
 import pasa.cbentley.framework.gui.src4.ctx.GuiCtx;
@@ -40,7 +40,7 @@ public class TopoViewDrawable extends ViewDrawable {
       this.topology = vcContent.getTopo();
    }
 
-   public void drawViewDrawableContent(GraphicsX g, int x, int y, ScrollConfig scx, ScrollConfig scy) {
+   public void drawViewDrawableContent(GraphicsXD g, int x, int y, ScrollConfig scx, ScrollConfig scy) {
       //to be subclassed
       topology.drawLayers(g);
    }
@@ -107,7 +107,7 @@ public class TopoViewDrawable extends ViewDrawable {
 
    public void manageKeyInput(ExecutionContextCanvasGui ec) {
       //#debug
-      toDLog().pFlow("" + ec.getInputStateDrawable().getLastDeviceEvent().toString1Line(), null, TopoViewDrawable.class, "manageKeyInput@line90", LVL_03_FINEST, true);
+      toDLog().pFlow("" + ec.getInputStateCanvasGui().getLastDeviceEvent().toString1Line(), null, TopoViewDrawable.class, "manageKeyInput@line90", LVL_03_FINEST, true);
       topology.manageKeyInput(ec);
    }
 
@@ -119,7 +119,7 @@ public class TopoViewDrawable extends ViewDrawable {
 
    public void managePointerInput(ExecutionContextCanvasGui ec) {
       //#debug
-      toDLog().pFlow("x=" + ec.getInputStateDrawable().getX() + " y=" + ec.getInputStateDrawable().getY(), null, TopoViewDrawable.class, "managePointerInput@line96", LVL_03_FINEST, true);
+      toDLog().pFlow("x=" + ec.getInputStateCanvasGui().getX() + " y=" + ec.getInputStateCanvasGui().getY(), null, TopoViewDrawable.class, "managePointerInput@line96", LVL_03_FINEST, true);
       topology.managePointerInput(ec);
    }
 
@@ -139,7 +139,7 @@ public class TopoViewDrawable extends ViewDrawable {
    }
 
    public void toString1Line(Dctx dc) {
-      dc.root1Line(this, TopoViewDrawable.class,143);
+      dc.root1Line(this, TopoViewDrawable.class, 143);
       toStringPrivate(dc);
       super.toString1Line(dc.sup1Line());
    }

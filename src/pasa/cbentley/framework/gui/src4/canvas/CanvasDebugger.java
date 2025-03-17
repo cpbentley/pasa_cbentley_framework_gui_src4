@@ -66,12 +66,12 @@ public class CanvasDebugger extends Drawable {
     * Prints painting info into a debug
     * @param g
     */
-   private void debugPaintStart(GraphicsX g) {
+   private void debugPaintStart(GraphicsXD g) {
       sb.append("#CanvasDebug Painting");
       sb.append("(" + Thread.currentThread().getName() + ")");
    }
 
-   public void debugRender1End(GraphicsX g, RenderMetrics renderMetrics) {
+   public void debugRender1End(GraphicsXD g, RenderMetrics renderMetrics) {
 
       paintDebugLight(g, renderMetrics.getLastDuration());
 
@@ -81,7 +81,7 @@ public class CanvasDebugger extends Drawable {
       //#enddebug      
    }
 
-   public void debugRender1Start(GraphicsX g) {
+   public void debugRender1Start(GraphicsXD g) {
       numPaintCalls++;
       //#mdebug
       if (isDebugPainting) {
@@ -106,7 +106,7 @@ public class CanvasDebugger extends Drawable {
     * @param g
     * @param time
     */
-   private void drawDebugDirect(GraphicsX g, long time) {
+   private void drawDebugDirect(GraphicsXD g, long time) {
       int duration = (int) (System.currentTimeMillis() - time);
       //System.out.println(duration);
       IMFont f = gc.getCDC().getFontFactory().getFontDebug();
@@ -172,7 +172,7 @@ public class CanvasDebugger extends Drawable {
       dx += CharOpt.draw(g, " Ev:", dx, dy, f);
       //returns input state that triggered this repaint
       if (g instanceof GraphicsXD) {
-         InputStateCanvasGui isd = ((GraphicsXD) g).isd;
+         InputStateCanvasGui isd = ((GraphicsXD) g).getInputStateCanvasGui();
          int x = isd.getX();
          dx += CharOpt.draw(g, x, dx, dy, f);
          dx += CharOpt.draw(g, ",", dx, dy, f);
@@ -306,7 +306,7 @@ public class CanvasDebugger extends Drawable {
     * @param g
     * @param time
     */
-   private void paintDebugLight(GraphicsX g, long duration) {
+   private void paintDebugLight(GraphicsXD g, long duration) {
       if (debugMode == ITechCanvasDrawable.DEBUG_1_LIGHT) {
          IMFont f = gc.getCDC().getFontFactory().getFontDebug();
          String s = Long.toString(duration);

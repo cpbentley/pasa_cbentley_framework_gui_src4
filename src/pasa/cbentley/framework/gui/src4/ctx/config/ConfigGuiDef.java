@@ -13,4 +13,12 @@ public class ConfigGuiDef extends ConfigAbstractBO implements IConfigGui {
       return 0;
    }
 
+   public int getCaretBlinkMillisOn() {
+      return 800;
+   }
+
+   public int getCaretBlinkMillisOff() {
+      return 600;
+   }
+
 }

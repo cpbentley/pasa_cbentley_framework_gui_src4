@@ -13,12 +13,13 @@ import pasa.cbentley.framework.gui.src4.anim.ITechAnim;
 import pasa.cbentley.framework.gui.src4.anim.base.AnimAggregate;
 import pasa.cbentley.framework.gui.src4.anim.definitions.SizeMod;
 import pasa.cbentley.framework.gui.src4.anim.move.Move;
+import pasa.cbentley.framework.gui.src4.canvas.GraphicsXD;
 import pasa.cbentley.framework.gui.src4.ctx.GuiCtx;
 import pasa.cbentley.framework.gui.src4.ctx.ToStringStaticGui;
 import pasa.cbentley.framework.gui.src4.interfaces.IAnimable;
-import pasa.cbentley.framework.gui.src4.interfaces.ITechCanvasDrawable;
 import pasa.cbentley.framework.gui.src4.interfaces.IDrawable;
 import pasa.cbentley.framework.gui.src4.interfaces.ITechAnimableDrawable;
+import pasa.cbentley.framework.gui.src4.interfaces.ITechCanvasDrawable;
 import pasa.cbentley.framework.gui.src4.interfaces.ITechDrawable;
 
 /**
@@ -72,7 +73,7 @@ import pasa.cbentley.framework.gui.src4.interfaces.ITechDrawable;
  * Aggregate follows an order.<br>
  * <br>
  * <br>
- * For the paint method, they call {@link Drawable#draw(GraphicsX)}.
+ * For the paint method, they call {@link Drawable#draw(GraphicsXD)}.
  * <br>
  * <br>
  * @author Charles-Philip Bentley
@@ -154,12 +155,12 @@ public class DrawableAnimator implements IStringable, ITechAnimableDrawable {
     */
    Drawable                d;
 
+   protected final GuiCtx  gc;
+
    /**
     * Set for animated layer 
     */
    public int              layerFlags;
-
-   protected final GuiCtx  gc;
 
    /**
     * Constructor requires a non null {@link Drawable}.
@@ -324,7 +325,7 @@ public class DrawableAnimator implements IStringable, ITechAnimableDrawable {
    }
 
    /**
-    * Called when {@link IDrawable#draw(GraphicsX)} is called and {@link ITechDrawable#STATE_20_ANIMATED_FULL_HIDDEN} is set.
+    * Called when {@link IDrawable#draw(GraphicsXD)} is called and {@link ITechDrawable#STATE_20_ANIMATED_FULL_HIDDEN} is set.
     * <br>
     * <br>
     * That flag was set by an animation
@@ -340,7 +341,7 @@ public class DrawableAnimator implements IStringable, ITechAnimableDrawable {
     * 
     * @param g
     */
-   public void drawAnimations(GraphicsX g) {
+   public void drawAnimations(GraphicsXD g) {
       //SystemLog.printAnim("#DrawableAnimator#drawAnimations animNextEmpty=" + animNextEmpty);
       for (int i = 0; i < animNextEmpty; i++) {
          IAnimable anim = animations[i];
@@ -349,6 +350,10 @@ public class DrawableAnimator implements IStringable, ITechAnimableDrawable {
             anim.paint(g);
          }
       }
+   }
+
+   public AnimManager getAnimCreator() {
+      return d.getAnimCreator();
    }
 
    public FigDrawable getFg(int i) {
@@ -403,10 +408,6 @@ public class DrawableAnimator implements IStringable, ITechAnimableDrawable {
             animations[i] = null;
          }
       }
-   }
-
-   public AnimManager getAnimCreator() {
-      return d.getAnimCreator();
    }
 
    /**
@@ -509,13 +510,13 @@ public class DrawableAnimator implements IStringable, ITechAnimableDrawable {
       }
    }
 
+   public IDLog toDLog() {
+      return gc.toDLog();
+   }
+
    //#mdebug
    public String toString() {
       return Dctx.toString(this);
-   }
-
-   public IDLog toDLog() {
-      return gc.toDLog();
    }
 
    public void toString(Dctx dc) {

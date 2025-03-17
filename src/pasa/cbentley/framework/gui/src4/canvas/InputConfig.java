@@ -9,10 +9,8 @@ import pasa.cbentley.framework.core.ui.src4.ctx.ToStringStaticCoreUi;
 import pasa.cbentley.framework.core.ui.src4.event.RepeatEvent;
 import pasa.cbentley.framework.core.ui.src4.exec.ExecutionContext;
 import pasa.cbentley.framework.core.ui.src4.input.InputState;
-import pasa.cbentley.framework.core.ui.src4.tech.IInput;
+import pasa.cbentley.framework.core.ui.src4.tech.ITechInput;
 import pasa.cbentley.framework.core.ui.src4.tech.ITechCodes;
-import pasa.cbentley.framework.core.ui.src4.tech.ITechInputFeedback;
-import pasa.cbentley.framework.drawx.src4.engine.GraphicsX;
 import pasa.cbentley.framework.gui.src4.core.Drawable;
 import pasa.cbentley.framework.gui.src4.core.ViewDrawable;
 import pasa.cbentley.framework.gui.src4.ctx.GuiCtx;
@@ -24,23 +22,13 @@ import pasa.cbentley.framework.gui.src4.interfaces.ITechDrawable;
 import pasa.cbentley.framework.input.src4.engine.OutputStateCanvas;
 
 /**
+ * Helper class that provides improved access to {@link InputStateCanvasGui} and {@link OutputStateCanvasGui} important methods.
  * 
- * Aggregates for the View module
- * <li> {@link InputStateCanvasGui} is a {@link InputState}
- * <li> {@link CmdInstance}
- * <li> {@link OutputStateCanvasGui} is a {@link OutputStateCanvas}
- * <li> {@link ExecutionContext}
- * <br>
- * 
- * A method that requires an {@link InputConfig} as parameter means it needs to run
- * inside the execution context (input state, update state, request render)
- * It is initiated by a user event, or by a background thread.
- * That thread takes the root canvas or the canvas to which the drawable it works on belongs to.
  * 
  * @author Charles-Philip Bentley
  *
  */
-public class InputConfig extends ObjectGC implements IStringable, IInput {
+public class InputConfig extends ObjectGC implements IStringable, ITechInput {
 
    protected final ICanvasDrawable canvas;
 
@@ -51,7 +39,7 @@ public class InputConfig extends ObjectGC implements IStringable, IInput {
 
    private InputStateCanvasGui     is;
 
-   private OutputStateCanvasGui    sr;
+   private OutputStateCanvasGui    outputState;
 
    public InputConfig(GuiCtx gc, ICanvasDrawable canvas, InputStateCanvasGui isd, OutputStateCanvasGui srd) {
       super(gc);
@@ -60,28 +48,12 @@ public class InputConfig extends ObjectGC implements IStringable, IInput {
       setCanvasResultDrawable(srd);
    }
 
-   public void actionDone() {
-      actionDone(null, ITechInputFeedback.FLAG_01_ACTION_DONE);
-   }
-
-   public void actionDone(Object o, int type) {
-      getCanvasResultDrawable().actionDone(o, type);
-   }
-
-   public void debugSrActionDoneRepaint(String actionStr) {
-      getCanvasResultDrawable().debugSetActionDoneRepaint(actionStr);
-   }
-
    public ICanvasDrawable getCanvas() {
       return canvas;
    }
 
-   public OutputStateCanvasGui getCanvasResultDrawable() {
-      return sr;
-   }
-
    public OutputStateCanvasGui getCRD() {
-      return getCanvasResultDrawable();
+      return getOutputStateCanvasGui();
    }
 
    public int getDraggedDiffX() {
@@ -156,6 +128,10 @@ public class InputConfig extends ObjectGC implements IStringable, IInput {
     */
    public int getKeyNum() {
       return getInputStateDrawable().getKeyNum();
+   }
+
+   public OutputStateCanvasGui getOutputStateCanvasGui() {
+      return outputState;
    }
 
    /**
@@ -247,7 +223,7 @@ public class InputConfig extends ObjectGC implements IStringable, IInput {
    }
 
    public boolean isActionDone() {
-      return getCanvasResultDrawable().isActionDone();
+      return getOutputStateCanvasGui().isActionDone();
    }
 
    public boolean isActive(int key) {
@@ -318,9 +294,9 @@ public class InputConfig extends ObjectGC implements IStringable, IInput {
    }
 
    /**
-    * True if mod is {@link IInput#MOD_6_GESTURED}
+    * True if mod is {@link ITechInput#MOD_6_GESTURED}
     * <br>
-    * This mod is exclusive with {@link IInput#MOD_0_PRESSED}, 
+    * This mod is exclusive with {@link ITechInput#MOD_0_PRESSED}, 
     * <br>
     * This mode will occur when a worker thread generates Gesture event in the UI thread. Those gesture events will
     * trickle down the event consumer hierarchy like other events until some code decides to act upon the event.
@@ -516,11 +492,11 @@ public class InputConfig extends ObjectGC implements IStringable, IInput {
       return getInputStateDrawable().isUpActive();
    }
 
-   //#enddebug
-
    public boolean isUpP() {
       return getInputStateDrawable().isUpP();
    }
+
+   //#enddebug
 
    public boolean isWheeled() {
       return getInputStateDrawable().isWheeled();
@@ -536,27 +512,30 @@ public class InputConfig extends ObjectGC implements IStringable, IInput {
    }
 
    public void setActionDoneRepaintMessage(IDrawable msg, int timeout, int anchor) {
-      getCanvasResultDrawable().setActionDoneRepaintMessage(msg, timeout, anchor);
+      getOutputStateCanvasGui().setActionDoneRepaintMessage(msg, timeout, anchor);
    }
 
    public void setActionDoneRepaintMessage(String string, int timeout, int anchor) {
-      getCanvasResultDrawable().setActionDoneRepaintMessage(string, timeout, anchor);
+      getOutputStateCanvasGui().setActionDoneRepaintMessage(string, timeout, anchor);
    }
 
    public void setActionString(String string) {
-      getCanvasResultDrawable().setActionString(string);
+      getOutputStateCanvasGui().setActionString(string);
    }
 
    public void setCanvasResultDrawable(OutputStateCanvasGui sr) {
-      this.sr = sr;
+      this.outputState = sr;
    }
 
    public void setInputStateDrawable(InputStateCanvasGui is) {
       this.is = is;
    }
 
-   public void srActionDone() {
-      getCanvasResultDrawable().setActionDone();
+   /**
+    * Shortcut to {@link OutputStateCanvasGui#setActionDone()}
+    */
+   public void setActionDone() {
+      getOutputStateCanvasGui().setActionDone();
    }
 
    /**
@@ -567,12 +546,12 @@ public class InputConfig extends ObjectGC implements IStringable, IInput {
     * <br>
     * However when UP and DOWN are pressed together, they may generated 2 action done on the same loop
     */
-   public void srActionDoneRepaint() {
-      getCanvasResultDrawable().setActionDoneRepaint();
+   public void setActionDoneRepaint() {
+      getOutputStateCanvasGui().setActionDoneRepaint();
    }
 
    public void srActionDoneRepaint(boolean done, boolean repaint) {
-      getCanvasResultDrawable().setActionDoneRepaint(done, repaint);
+      getOutputStateCanvasGui().setActionDoneRepaint(done, repaint);
    }
 
    /**
@@ -584,7 +563,7 @@ public class InputConfig extends ObjectGC implements IStringable, IInput {
     * Impact the {@link Controller#screenResult()} method.
     * <br>
     * <br>
-    * When {@link IDrawable} does not have the flag {@link ITechDrawable#STATE_17_OPAQUE}, we force {@link IDrawable#draw(GraphicsX)} to draw
+    * When {@link IDrawable} does not have the flag {@link ITechDrawable#STATE_17_OPAQUE}, we force {@link IDrawable#draw(GraphicsXD)} to draw
     * <li>itself fully
     * <li>only style layers. 
     * <li>nothing
@@ -598,7 +577,7 @@ public class InputConfig extends ObjectGC implements IStringable, IInput {
     * @param drawable
     */
    public void srActionDoneRepaint(IDrawable drawable) {
-      getCanvasResultDrawable().setActionDoneRepaint(drawable);
+      getOutputStateCanvasGui().setActionDoneRepaint(drawable);
    }
 
    /**
@@ -607,7 +586,7 @@ public class InputConfig extends ObjectGC implements IStringable, IInput {
     * @param string
     */
    public void srActionDoneRepaintMessage(String string) {
-      getCanvasResultDrawable().setActionDoneRepaintMessage(string);
+      getOutputStateCanvasGui().setActionDoneRepaintMessage(string);
    }
 
    /**
@@ -625,7 +604,7 @@ public class InputConfig extends ObjectGC implements IStringable, IInput {
     * @param str
     */
    public void srActionDoneRepaintMessage(String string, int timeout) {
-      getCanvasResultDrawable().setActionDoneRepaintMessage(string, timeout);
+      getOutputStateCanvasGui().setActionDoneRepaintMessage(string, timeout);
    }
 
    /**
@@ -635,22 +614,22 @@ public class InputConfig extends ObjectGC implements IStringable, IInput {
     * @param is
     */
    public void srActionDoneRepaintSpecial(IDrawable d) {
-      getCanvasResultDrawable().setActionDoneRepaintSpecial(d);
+      getOutputStateCanvasGui().setActionDoneRepaintSpecial(d);
    }
 
    public void srActionRepaint(IDrawable drawable) {
-      getCanvasResultDrawable().setActionDoneRepaint(drawable);
+      getOutputStateCanvasGui().setActionDoneRepaint(drawable);
    }
 
    public void srMenuRepaint() {
-      getCanvasResultDrawable().srMenuRepaint();
+      getOutputStateCanvasGui().srMenuRepaint();
    }
 
    /**
     * Force a full flush of all cache
     */
    public void srRenewLayout() {
-      getCanvasResultDrawable().srRenewLayout();
+      getOutputStateCanvasGui().srRenewLayout();
    }
 
    public void toCheckPointer(Drawable drawable) {
@@ -674,11 +653,11 @@ public class InputConfig extends ObjectGC implements IStringable, IInput {
       toStringPrivate(dc);
    }
 
-   //#enddebug
-
    public String toString1Line() {
       return Dctx.toString1Line(this);
    }
+
+   //#enddebug
 
    public void toString1Line(Dctx dc) {
       dc.root1Line(this, "InputConfig");
@@ -696,6 +675,10 @@ public class InputConfig extends ObjectGC implements IStringable, IInput {
 
    private void toStringPrivate(Dctx dc) {
 
+   }
+
+   public void toStringSetActionDoneRepaint(String actionStr) {
+      getOutputStateCanvasGui().toStringSetActionDoneRepaint(actionStr);
    }
 
 }

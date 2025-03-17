@@ -3,10 +3,10 @@ package pasa.cbentley.framework.gui.src4.menu;
 import pasa.cbentley.byteobjects.src4.core.ByteObject;
 import pasa.cbentley.core.src4.logging.Dctx;
 import pasa.cbentley.framework.cmd.src4.engine.MCmd;
-import pasa.cbentley.framework.core.ui.src4.tech.IInput;
+import pasa.cbentley.framework.core.ui.src4.tech.ITechInput;
 import pasa.cbentley.framework.core.ui.src4.tech.ITechCodes;
 import pasa.cbentley.framework.datamodel.src4.table.ObjectTableModel;
-import pasa.cbentley.framework.drawx.src4.engine.GraphicsX;
+import pasa.cbentley.framework.gui.src4.canvas.GraphicsXD;
 import pasa.cbentley.framework.gui.src4.canvas.InputConfig;
 import pasa.cbentley.framework.gui.src4.core.Drawable;
 import pasa.cbentley.framework.gui.src4.core.StyleClass;
@@ -210,7 +210,7 @@ public class MenuBar extends Drawable {
 
    }
 
-   public void drawDrawable(GraphicsX g) {
+   public void drawDrawable(GraphicsXD g) {
       super.drawDrawableBg(g);
       tv.drawDrawable(g);
       //draw menu if needed
@@ -276,12 +276,12 @@ public class MenuBar extends Drawable {
     */
    public void manageKeyInput(ExecutionContextCanvasGui ec) {
       InputConfig ic = ec.getInputConfig();
-      if (ic.getInputStateDrawable().getMode() == IInput.MOD_1_RELEASED) {
+      if (ic.getInputStateDrawable().getMode() == ITechInput.MOD_1_RELEASED) {
          icRelease(ec);
       } else {
          if (ic.isCancel() && state != STATE_0NONE) {
             state = STATE_0NONE;
-            ic.srActionDoneRepaint();
+            ic.setActionDoneRepaint();
             return;
          }
          if (ic.isSoftLeftP()) {
@@ -309,7 +309,7 @@ public class MenuBar extends Drawable {
                      } else if (o instanceof MCmd) {
                         cc.executeInstanceMenu((MCmd) o);
                      }
-                     ic.srActionDoneRepaint();
+                     ic.setActionDoneRepaint();
                   }
                }
             }

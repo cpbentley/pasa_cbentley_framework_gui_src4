@@ -179,20 +179,19 @@ public interface IBOTableView extends IByteObject {
     */
    public static final int T_FLAGF_8_MERGE_MODEL_POLICY              = 1 << 7;
 
+   public static final int T_FLAGM_1_                                = 1 << 0;
+
    /**
-    * Allows selection of multiple cells.
-    * <br>
-    * <br>
-    * Built-check box first column appears or use a modifier key.
-    * <br>
-    * <br>
-    * Selecting toggles check box select status.
+    * When true, {@link TableView} allows the selection of multiple cells.
+    * <p>
+    * Mode is decided by {@link IBOTableView#T_OFFSET_16_MANY_SELECTION_MODE1}
+    * </p>
     */
    public static final int T_FLAGM_2_MULTIPLE_SELECTION              = 1 << 1;
 
-   public static final int T_FLAGM_3_MULTIPLE_SELECTION_CHECKBOX     = 1 << 2;
-
-   public static final int T_FLAGM_1_                                = 1 << 0;
+   /**
+    */
+   public static final int T_FLAGM_3_                                = 1 << 2;
 
    public static final int T_FLAGM_4_                                = 1 << 3;
 
@@ -279,6 +278,12 @@ public interface IBOTableView extends IByteObject {
     * 
     */
    public static final int T_FLAGX_6_SELECTION_ASAP                  = 1 << 5;
+
+   /**
+    * The Table will ignore all pointer event going through the ViewPort as long as this flag is set.
+    * <br>
+    */
+   public static final int T_FLAGX_7_VIEW_PORT_BLIND                 = 1 << 6;
 
    /**
     * Makes empty {@link Drawable} cells selectable. 
@@ -424,7 +429,7 @@ public interface IBOTableView extends IByteObject {
     * When it is set (true), model objects are filled column by columns. 
     * <br>
     */
-   public static final int T_OFFSET_09_FLAG_3_FILL_COL                = 4;
+   public static final int T_OFFSET_09_FLAG_3_FILL_COL               = 4;
 
    /**
     * Model filling mode : how does the model index relate to the visible index.
@@ -500,8 +505,9 @@ public interface IBOTableView extends IByteObject {
    public static final int T_OFFSET_15_MODEL_TECH1                   = T_BASE_OFFSET + 14;
 
    /**
-    * The Table will ignore all pointer event going through the ViewPort as long as this flag is set.
-    * <br>
+    * Mode for {@link IBOTableView#T_FLAGM_2_MULTIPLE_SELECTION}.
+    * <li>Check box on column 
+    * <li>Check box as overlay on cell ? 
     */
-   public static final int T_FLAGX_7_VIEW_PORT_BLIND                 = 1 << 6;
+   public static final int T_OFFSET_16_MANY_SELECTION_MODE1          = T_BASE_OFFSET + 14;
 }

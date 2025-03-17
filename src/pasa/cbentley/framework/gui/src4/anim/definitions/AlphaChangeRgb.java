@@ -9,6 +9,7 @@ import pasa.cbentley.framework.drawx.src4.engine.RgbImage;
 import pasa.cbentley.framework.gui.src4.anim.base.AnimAggregate;
 import pasa.cbentley.framework.gui.src4.anim.base.ImgAnimable;
 import pasa.cbentley.framework.gui.src4.anim.move.Move;
+import pasa.cbentley.framework.gui.src4.canvas.GraphicsXD;
 import pasa.cbentley.framework.gui.src4.ctx.GuiCtx;
 import pasa.cbentley.framework.gui.src4.interfaces.IAnimable;
 import pasa.cbentley.framework.gui.src4.interfaces.IDrawable;
@@ -169,7 +170,7 @@ public class AlphaChangeRgb extends ImgAnimable {
     * It may work on the Cache data or on a copy.
     * Animation may paint or may not if it is only worker
     */
-   public void paint(GraphicsX g) {
+   public void paint(GraphicsXD g) {
       //#debug
       toDLog().pAnim("Turn=" + turn + " nextAlpha=" + nextAlpha, this, AlphaChangeRgb.class, "paint", LVL_05_FINE, true);
       //must manage transparent pixels from the drawable

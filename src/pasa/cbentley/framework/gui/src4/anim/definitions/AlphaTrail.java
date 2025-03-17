@@ -4,11 +4,11 @@ import java.util.Vector;
 
 import pasa.cbentley.byteobjects.src4.objects.function.Function;
 import pasa.cbentley.core.src4.logging.Dctx;
-import pasa.cbentley.framework.drawx.src4.engine.GraphicsX;
 import pasa.cbentley.framework.drawx.src4.engine.RgbImage;
 import pasa.cbentley.framework.gui.src4.anim.Realisator;
 import pasa.cbentley.framework.gui.src4.anim.base.DrawableAnim;
 import pasa.cbentley.framework.gui.src4.anim.move.Move;
+import pasa.cbentley.framework.gui.src4.canvas.GraphicsXD;
 import pasa.cbentley.framework.gui.src4.core.Drawable;
 import pasa.cbentley.framework.gui.src4.ctx.GuiCtx;
 import pasa.cbentley.framework.gui.src4.interfaces.IAnimable;
@@ -79,23 +79,19 @@ public class AlphaTrail extends DrawableAnim {
       return Realisator.DEF_SLEEP;
    }
 
-   public void paint(GraphicsX g) {
+   public void paint(GraphicsXD g) {
       move.paint(g);
       for (int i = 0; i < this.af.size(); i++) {
          AlphaChangeRgb afa = (AlphaChangeRgb) this.af.elementAt(i);
          afa.paint(g);
       }
    }
-   
+
    //#mdebug
    public void toString(Dctx dc) {
       dc.root(this, "AlphaTrail");
       toStringPrivate(dc);
       super.toString(dc.sup());
-   }
-
-   private void toStringPrivate(Dctx dc) {
-      
    }
 
    public void toString1Line(Dctx dc) {
@@ -104,8 +100,10 @@ public class AlphaTrail extends DrawableAnim {
       super.toString1Line(dc.sup1Line());
    }
 
-   //#enddebug
-   
+   private void toStringPrivate(Dctx dc) {
 
+   }
+
+   //#enddebug
 
 }

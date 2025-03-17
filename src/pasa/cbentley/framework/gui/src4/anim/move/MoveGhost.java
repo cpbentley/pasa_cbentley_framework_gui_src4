@@ -7,6 +7,7 @@ import pasa.cbentley.core.src4.utils.BitUtils;
 import pasa.cbentley.framework.drawx.src4.engine.GraphicsX;
 import pasa.cbentley.framework.drawx.src4.string.CharOpt;
 import pasa.cbentley.framework.gui.src4.anim.base.DrawableAnim;
+import pasa.cbentley.framework.gui.src4.canvas.GraphicsXD;
 import pasa.cbentley.framework.gui.src4.ctx.GuiCtx;
 import pasa.cbentley.framework.gui.src4.interfaces.IDrawable;
 import pasa.cbentley.framework.gui.src4.utils.DrawableArrays;
@@ -105,7 +106,7 @@ public class MoveGhost extends DrawableAnim {
 
    }
 
-   protected void doDebugTime(GraphicsX g, int x, int y) {
+   protected void doDebugTime(GraphicsXD g, int x, int y) {
       if (hasFlagMove(ITechMoveFunction.MOVE_FLAG_3_DEBUG_TIME)) {
          long cur = System.currentTimeMillis();
          int diff = (int) (cur - time);
@@ -156,7 +157,7 @@ public class MoveGhost extends DrawableAnim {
     * 
     * @param g {@link GraphicsX}
     */
-   public void paint(GraphicsX g) {
+   public void paint(GraphicsXD g) {
       FunctionMove mf = ((FunctionMove) stepFunction);
       int x = mf.getX();
       int y = mf.getY();
@@ -171,7 +172,7 @@ public class MoveGhost extends DrawableAnim {
       doDebugTime(g, x, y);
    }
 
-   protected void paintTrail(GraphicsX g, int x, int y) {
+   protected void paintTrail(GraphicsXD g, int x, int y) {
       int dx = x;
       int dy = y;
       if (ghosts != null) {

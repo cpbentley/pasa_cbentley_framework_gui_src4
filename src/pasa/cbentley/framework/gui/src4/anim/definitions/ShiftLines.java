@@ -7,8 +7,8 @@ import pasa.cbentley.core.src4.helpers.StringBBuilder;
 import pasa.cbentley.core.src4.logging.Dctx;
 import pasa.cbentley.core.src4.utils.IntUtils;
 import pasa.cbentley.core.src4.utils.interfaces.IColors;
-import pasa.cbentley.framework.drawx.src4.engine.GraphicsX;
 import pasa.cbentley.framework.gui.src4.anim.base.ImgAnimable;
+import pasa.cbentley.framework.gui.src4.canvas.GraphicsXD;
 import pasa.cbentley.framework.gui.src4.core.Drawable;
 import pasa.cbentley.framework.gui.src4.ctx.GuiCtx;
 import pasa.cbentley.framework.gui.src4.interfaces.IDrawable;
@@ -283,7 +283,7 @@ public class ShiftLines extends ImgAnimable implements ITechShiftLine {
     * Paint function is inside.
     * 
     */
-   public void paint(GraphicsX g) {
+   public void paint(GraphicsXD g) {
       int x = d.getX();
       int y = d.getY();
       int iw = img.getWidth();

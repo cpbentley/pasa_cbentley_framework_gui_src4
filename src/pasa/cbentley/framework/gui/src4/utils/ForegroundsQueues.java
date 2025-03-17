@@ -8,6 +8,7 @@ import pasa.cbentley.core.src4.logging.Dctx;
 import pasa.cbentley.core.src4.logging.IStringable;
 import pasa.cbentley.framework.drawx.src4.engine.GraphicsX;
 import pasa.cbentley.framework.gui.src4.canvas.CanvasAppliInputGui;
+import pasa.cbentley.framework.gui.src4.canvas.GraphicsXD;
 import pasa.cbentley.framework.gui.src4.ctx.GuiCtx;
 import pasa.cbentley.framework.gui.src4.interfaces.IDrawable;
 
@@ -120,7 +121,7 @@ public class ForegroundsQueues implements IStringable {
     * Foreground are drawn top to left in the center
     * @param g
     */
-   public void paintForegrounds(GraphicsX g) {
+   public void paintForegrounds(GraphicsXD g) {
 
       paintRepaintTasksTop(g, foress[C.ANC_0_TOP_LEFT]);
       paintRepaintTasksTop(g, foress[C.ANC_1_TOP_CENTER]);
@@ -136,7 +137,7 @@ public class ForegroundsQueues implements IStringable {
 
    }
 
-   private void paintRepaintTasksBottom(GraphicsX g, RepaintTask[] rts) {
+   private void paintRepaintTasksBottom(GraphicsXD g, RepaintTask[] rts) {
       int y = canvas.getHeight();
       for (int i = 0; i < rts.length; i++) {
          if (rts[i] != null) {
@@ -148,7 +149,7 @@ public class ForegroundsQueues implements IStringable {
       }
    }
 
-   private void paintRepaintTasksCenter(GraphicsX g, RepaintTask[] rts) {
+   private void paintRepaintTasksCenter(GraphicsXD g, RepaintTask[] rts) {
       int y = canvas.getHeight() / 2;
       for (int i = 0; i < rts.length; i++) {
          if (rts[i] != null) {
@@ -162,7 +163,7 @@ public class ForegroundsQueues implements IStringable {
       }
    }
 
-   private void paintRepaintTasksTop(GraphicsX g, RepaintTask[] rts) {
+   private void paintRepaintTasksTop(GraphicsXD g, RepaintTask[] rts) {
       int y = 0;
       for (int i = 0; i < rts.length; i++) {
          if (rts[i] != null) {

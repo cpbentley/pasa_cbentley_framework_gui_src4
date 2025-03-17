@@ -1,6 +1,6 @@
 package pasa.cbentley.framework.gui.src4.core;
 
-import pasa.cbentley.framework.drawx.src4.engine.GraphicsX;
+import pasa.cbentley.framework.gui.src4.canvas.GraphicsXD;
 import pasa.cbentley.framework.gui.src4.canvas.ViewContext;
 import pasa.cbentley.framework.gui.src4.ctx.GuiCtx;
 import pasa.cbentley.framework.gui.src4.exec.ExecutionContextCanvasGui;
@@ -28,17 +28,22 @@ public class DummyDrawable extends Drawable {
       setViewContext(vc);
    }
 
-   public void initSize() {
-      setDw(vc.getWidth());
-      setDh(vc.getHeight());
+   public void addDrawable(IDrawable d) {
+      my = DrawableArrays.ensureCapacity(my, nextEmpty);
+      my[nextEmpty] = d;
    }
 
-   protected void drawDrawableContent(GraphicsX g, int x, int y, int w, int h) {
+   protected void drawDrawableContent(GraphicsXD g, int x, int y, int w, int h) {
       for (int i = 0; i < nextEmpty; i++) {
          if (my[i] != null) {
             my[i].draw(g);
          }
       }
+   }
+
+   public void initSize() {
+      setDw(vc.getWidth());
+      setDh(vc.getHeight());
    }
 
    /**
@@ -58,11 +63,6 @@ public class DummyDrawable extends Drawable {
             my[i].managePointerInput(ec);
          }
       }
-   }
-
-   public void addDrawable(IDrawable d) {
-      my = DrawableArrays.ensureCapacity(my, nextEmpty);
-      my[nextEmpty] = d;
    }
 
 }

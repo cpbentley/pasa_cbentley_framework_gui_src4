@@ -5,15 +5,16 @@ import pasa.cbentley.core.src4.interfaces.C;
 import pasa.cbentley.core.src4.logging.IStringable;
 import pasa.cbentley.core.src4.stator.IStatorable;
 import pasa.cbentley.framework.cmd.src4.ctx.CmdCtx;
-import pasa.cbentley.framework.cmd.src4.interfaces.ITechNav;
+import pasa.cbentley.framework.cmd.src4.interfaces.ITechNavCmd;
 import pasa.cbentley.framework.core.ui.src4.interfaces.IBentleyFwSerial;
-import pasa.cbentley.framework.core.ui.src4.tech.IInput;
+import pasa.cbentley.framework.core.ui.src4.tech.ITechInput;
 import pasa.cbentley.framework.core.ui.src4.utils.ViewState;
 import pasa.cbentley.framework.drawx.src4.engine.GraphicsX;
 import pasa.cbentley.framework.drawx.src4.engine.RgbImage;
 import pasa.cbentley.framework.gui.src4.anim.move.Move;
 import pasa.cbentley.framework.gui.src4.canvas.CanvasAppliInputGui;
 import pasa.cbentley.framework.gui.src4.canvas.FocusCtrl;
+import pasa.cbentley.framework.gui.src4.canvas.GraphicsXD;
 import pasa.cbentley.framework.gui.src4.canvas.TopologyDLayer;
 import pasa.cbentley.framework.gui.src4.canvas.ViewContext;
 import pasa.cbentley.framework.gui.src4.cmd.CmdInstanceGui;
@@ -101,7 +102,7 @@ import pasa.cbentley.layouter.src4.tech.ITechLayout;
  * <li> {@link ITechDrawable#STATE_03_HIDDEN} <font color=#00CF0F>True</font>  when created.
  * <li> {@link ITechDrawable#STATE_06_STYLED} <font color=#00CF0F>True</font>  when style is finalized.
  * <li> {@link ITechDrawable#STATE_05_LAYOUTED} <font color=#00CF0F>True</font>  when method {@link IDrawable#init(int, int)} has been called.
- * <li> {@link IDrawable#draw(GraphicsX)} is called.
+ * <li> {@link IDrawable#draw(GraphicsXD)} is called.
  * <li> {@link ITechDrawable#STATE_02_DRAWN}.  {@link ITechDrawable#STATE_03_HIDDEN} is removed.
  * <li> {@link ITechDrawable#STATE_11_ANIMATING} is <font color=#00CF0F>True</font>  if {@link ByteObject#ANIM_TIME_1_ENTRY} exists.
  * <li> {@link ITechDrawable#EVENT_03_KEY_FOCUS_GAIN} when Drawable {@link CmdCtx} is active.
@@ -168,7 +169,7 @@ public interface IDrawable extends IStringable, ITechDrawable, IStatorable, IBen
     * <br>
     * @param g {@link GraphicsX}
     */
-   public void draw(GraphicsX g);
+   public void draw(GraphicsXD g);
 
    /**
     * Simply draws on {@link GraphicsX} without control flow.
@@ -180,7 +181,7 @@ public interface IDrawable extends IStringable, ITechDrawable, IStatorable, IBen
     * <br>
     * @param g {@link GraphicsX}
     */
-   public void drawDrawable(GraphicsX g);
+   public void drawDrawable(GraphicsXD g);
 
    public CanvasAppliInputGui getCanvas();
 
@@ -245,10 +246,10 @@ public interface IDrawable extends IStringable, ITechDrawable, IStatorable, IBen
    /**
     * Returns the target {@link IDrawable} reachable by the given navEvent
     * 
-    * <li>{@link ITechNav#NAV_1_UP}
-    * <li>{@link ITechNav#NAV_2_DOWN}
-    * <li>{@link ITechNav#NAV_3_LEFT}
-    * <li>{@link ITechNav#NAV_4_RIGHT}
+    * <li>{@link ITechNavCmd#NAV_01_UP}
+    * <li>{@link ITechNavCmd#NAV_02_DOWN}
+    * <li>{@link ITechNavCmd#NAV_03_LEFT}
+    * <li>{@link ITechNavCmd#NAV_04_RIGHT}
     * <br>
     * <br>
     * 
@@ -551,7 +552,7 @@ public interface IDrawable extends IStringable, ITechDrawable, IStatorable, IBen
     */
    public void manageKeyInput(ExecutionContextCanvasGui ec);
 
-   public void manageNavigate(CmdInstanceGui cd, int navEvent);
+   public void navigateCmd(CmdInstanceGui cd, int navEvent);
 
    /**
     * All other events kinds are sent here.
@@ -563,7 +564,7 @@ public interface IDrawable extends IStringable, ITechDrawable, IStatorable, IBen
     * Asks the Controlled View, its context given the pointer configuration generates a command.
     * <br>
     * <br>
-    * For {@link IInput#MOD_3_MOVED}, sets {@link ITechDrawable#STYLE_07_FOCUSED_POINTER} on
+    * For {@link ITechInput#MOD_3_MOVED}, sets {@link ITechDrawable#STYLE_07_FOCUSED_POINTER} on
     * <br>
     * On Pointer Move supporting platforms, this method is called only when pointer is inside area of {@link IDrawable} 
     * <br>
@@ -646,8 +647,9 @@ public interface IDrawable extends IStringable, ITechDrawable, IStatorable, IBen
    public void setNavigate(int navEvent, IDrawable d, boolean doInverse);
 
    /**
-    * Sets the owner of this Drawable
-    * @param d
+    * Sets the owner of this {@link IDrawable}.
+    * 
+    * @param d {@link IDrawable} the parent for this {@link IDrawable}
     */
    public void setParent(IDrawable d);
 
@@ -777,7 +779,7 @@ public interface IDrawable extends IStringable, ITechDrawable, IStatorable, IBen
     * Animation control flow means
     * <li>Any {@link ByteObject#ANIM_TIME_1_ENTRY} animation is launched. 
     * <li>If animation requires it, Drawable stays hidden until the animation finishes,
-    * <li>Then a final repaint is called and {@link IDrawable#draw(GraphicsX)} do its thing.
+    * <li>Then a final repaint is called and {@link IDrawable#draw(GraphicsXD)} do its thing.
     * <li> Entry animation might just animate a FG layer while the Drawable is visible
     * <li> Hidden, when all Drawable pixel are animated into the screen.
     * </p>
@@ -786,12 +788,12 @@ public interface IDrawable extends IStringable, ITechDrawable, IStatorable, IBen
     * <b>Implementation Note</b> : <br>
     * <li> Sets {@link ITechDrawable#STATE_03_HIDDEN} to false. <br>
     * <li>Notify events {@link ITechDrawable#EVENT_01_NOTIFY_SHOW} and {@link ITechDrawable#EVENT_08_POINTER_FOCUS_GAIN}. <br>
-    * <li>Finally, calls {@link IDrawable#draw(GraphicsX)}.
+    * <li>Finally, calls {@link IDrawable#draw(GraphicsXD)}.
     * <br>
     * <br>
     * @param g
     */
-   public void show(GraphicsX g);
+   public void show(GraphicsXD g);
 
    /**
     * 

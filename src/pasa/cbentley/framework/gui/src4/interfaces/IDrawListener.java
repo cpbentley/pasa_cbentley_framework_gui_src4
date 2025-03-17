@@ -2,6 +2,7 @@ package pasa.cbentley.framework.gui.src4.interfaces;
 
 import pasa.cbentley.byteobjects.src4.core.ByteObject;
 import pasa.cbentley.framework.drawx.src4.engine.GraphicsX;
+import pasa.cbentley.framework.gui.src4.canvas.GraphicsXD;
 import pasa.cbentley.framework.gui.src4.core.Drawable;
 
 /**
@@ -21,7 +22,7 @@ public interface IDrawListener {
     * Ask the draw controller to draw the {@link Drawable}'s content in the given area. 
     * <br>
     * <br>
-    * Call {@link Drawable#draw(GraphicsX)}  ?
+    * Call {@link Drawable#draw(GraphicsXD)}  ?
     * <br>
     * <br>
     * @param g
@@ -31,7 +32,7 @@ public interface IDrawListener {
     * @param h height available for content
     * @param d reference to Drawable to be drawn. Used to know
     */
-   public void drawContentListen(GraphicsX g, int x, int y, int w, int h, Drawable d);
+   public void drawContentListen(GraphicsXD g, int x, int y, int w, int h, Drawable d);
 
    /**
     * Computes the width and height of Drawable based on the Sizers.

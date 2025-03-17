@@ -3,6 +3,7 @@ package pasa.cbentley.framework.gui.src4.interfaces;
 import pasa.cbentley.core.src4.interfaces.ITech;
 import pasa.cbentley.framework.coredraw.src4.interfaces.ITechGraphics;
 import pasa.cbentley.framework.drawx.src4.engine.GraphicsX;
+import pasa.cbentley.framework.gui.src4.canvas.GraphicsXD;
 import pasa.cbentley.framework.gui.src4.string.StringDrawable;
 
 public interface ITechCanvasDrawable extends ITech {
@@ -165,7 +166,7 @@ public interface ITechCanvasDrawable extends ITech {
    public static final int REPAINT_10_SPECIAL            = 1 << 9;
 
    /**
-    * When set, ignores states in the {@link IDrawable#draw(GraphicsX)} method.
+    * When set, ignores states in the {@link IDrawable#draw(GraphicsXD)} method.
     * <li> {@link ITechDrawable#STATE_03_HIDDEN}
     * <li> {@link ITechDrawable#STATE_02_DRAWN}
     * <li> {@link ITechDrawable#STATE_20_ANIMATED_FULL_HIDDEN}
@@ -181,7 +182,7 @@ public interface ITechCanvasDrawable extends ITech {
    public static final int REPAINT_12_NO_FLOW_WITH_CACHE = 1 << 11;
 
    /**
-    * Force the {@link IDrawable#draw(GraphicsX)} to paint raw pixels without ANY flow control or cache draws. 
+    * Force the {@link IDrawable#draw(GraphicsXD)} to paint raw pixels without ANY flow control or cache draws. 
     * <br>
     * <br>
     * Cannot be defined in {@link GraphicsX}, because that class is not aware of that business logic

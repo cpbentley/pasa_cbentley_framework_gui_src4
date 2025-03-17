@@ -12,22 +12,21 @@ import pasa.cbentley.core.src4.logging.Dctx;
 import pasa.cbentley.core.src4.structs.IntToStrings;
 import pasa.cbentley.core.src4.thread.IBRunnable;
 import pasa.cbentley.core.src4.thread.PulseThread;
-import pasa.cbentley.framework.cmd.src4.interfaces.ITechNav;
+import pasa.cbentley.framework.cmd.src4.interfaces.ITechNavCmd;
 import pasa.cbentley.framework.core.framework.src4.interfaces.IBOHost;
 import pasa.cbentley.framework.core.ui.src4.ctx.CoreUiCtx;
 import pasa.cbentley.framework.core.ui.src4.ctx.IEventsCoreUi;
 import pasa.cbentley.framework.core.ui.src4.tech.ITechCodes;
 import pasa.cbentley.framework.core.ui.src4.tech.ITechHostDataDrawUi;
-import pasa.cbentley.framework.core.ui.src4.tech.ITechHostUI;
 import pasa.cbentley.framework.coredraw.src4.interfaces.IMFont;
 import pasa.cbentley.framework.datamodel.src4.table.ObjectTableModel;
-import pasa.cbentley.framework.drawx.src4.engine.GraphicsX;
 import pasa.cbentley.framework.drawx.src4.factories.interfaces.IBOBox;
 import pasa.cbentley.framework.drawx.src4.string.Stringer;
 import pasa.cbentley.framework.drawx.src4.style.IBOStyle;
-import pasa.cbentley.framework.gui.src4.canvas.CanvasAppliInputGui;
-import pasa.cbentley.framework.gui.src4.canvas.InputConfig;
 import pasa.cbentley.framework.gui.src4.canvas.BusEventGui;
+import pasa.cbentley.framework.gui.src4.canvas.CanvasAppliInputGui;
+import pasa.cbentley.framework.gui.src4.canvas.GraphicsXD;
+import pasa.cbentley.framework.gui.src4.canvas.InputConfig;
 import pasa.cbentley.framework.gui.src4.canvas.RepaintHelperGui;
 import pasa.cbentley.framework.gui.src4.canvas.TopologyDLayer;
 import pasa.cbentley.framework.gui.src4.core.Drawable;
@@ -38,7 +37,6 @@ import pasa.cbentley.framework.gui.src4.ctx.IBOTypesGui;
 import pasa.cbentley.framework.gui.src4.exec.ExecutionContextCanvasGui;
 import pasa.cbentley.framework.gui.src4.exec.InputStateCanvasGui;
 import pasa.cbentley.framework.gui.src4.exec.OutputStateCanvasGui;
-import pasa.cbentley.framework.gui.src4.factories.interfaces.IBOStrAuxEdit;
 import pasa.cbentley.framework.gui.src4.factories.interfaces.IBOStrAuxData;
 import pasa.cbentley.framework.gui.src4.factories.interfaces.IBOStrAuxEdit;
 import pasa.cbentley.framework.gui.src4.interfaces.IDrawListener;
@@ -481,7 +479,7 @@ public class StringEditControl extends TableView implements IDrawListener, IBOSt
     * <br>
     * 
     */
-   public void drawContentListen(GraphicsX g, int x, int y, int w, int h, Drawable d) {
+   public void drawContentListen(GraphicsXD g, int x, int y, int w, int h, Drawable d) {
       if (d == drawableLetterChoices) {
          //draw content with selected letter in colored background
          ByteObject style = d.getStyle();
@@ -734,7 +732,7 @@ public class StringEditControl extends TableView implements IDrawListener, IBOSt
             if (ic.isCancel()) {
 
                editModule.caretAtDeleteChar();
-               ic.srActionDoneRepaint();
+               ic.setActionDoneRepaint();
             } else if (ic.isFireP()) {
                //accept?
             } else if (charProducer != null) {
@@ -851,7 +849,7 @@ public class StringEditControl extends TableView implements IDrawListener, IBOSt
       if (position == ITechStringDrawable.SEDIT_CONTROL_0_CANVAS) {
       } else if (position == ITechStringDrawable.SEDIT_CONTROL_1_TOP && controlledSD != null) {
          //create a Top Center Pozer
-         gc.getNavigator().navInsert(null, controlledSD, ITechNav.NAV_1_UP, this);
+         gc.getNavigator().navInsert(null, controlledSD, ITechNavCmd.NAV_01_UP, this);
 
       } else {
          //position it top of canvas as overlay??? depends on settings

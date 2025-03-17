@@ -138,7 +138,7 @@ public class DrawableUtilz {
     * @return
     */
    public static boolean isInside(ExecutionContextCanvasGui ec, IDrawable d) {
-      InputStateCanvasGui is = ec.getInputStateDrawable();
+      InputStateCanvasGui is = ec.getInputStateCanvasGui();
       return isInside(is, d);
    }
 
@@ -198,7 +198,7 @@ public class DrawableUtilz {
    }
 
    public static boolean isInside(ExecutionContextCanvasGui ec, int x, int y, int w, int h) {
-      InputStateCanvasGui is = ec.getInputStateDrawable();
+      InputStateCanvasGui is = ec.getInputStateCanvasGui();
       if (is.getX() >= x && is.getY() >= y) {
          if (is.getX() < x + w && is.getY() < y + h) {
             return true;
@@ -240,7 +240,7 @@ public class DrawableUtilz {
       if (d == null)
          return false;
       ByteObject style = d.getStyle();
-      InputStateCanvasGui is = ec.getInputStateDrawable();
+      InputStateCanvasGui is = ec.getInputStateCanvasGui();
       int x = is.getX();
       int y = is.getY();
       int dx = d.getX();
@@ -287,7 +287,7 @@ public class DrawableUtilz {
       if (d == null)
          return false;
       ByteObject style = d.getStyle();
-      InputStateCanvasGui is = ec.getInputStateDrawable();
+      InputStateCanvasGui is = ec.getInputStateCanvasGui();
       if (is.getX() < d.getX() + d.getStyleWLeftConsumed()) {
          return true;
       }

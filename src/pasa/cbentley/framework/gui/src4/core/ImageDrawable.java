@@ -8,6 +8,7 @@ import pasa.cbentley.framework.coredraw.src4.interfaces.IImage;
 import pasa.cbentley.framework.drawx.src4.engine.GraphicsX;
 import pasa.cbentley.framework.drawx.src4.engine.RgbImage;
 import pasa.cbentley.framework.drawx.src4.utils.AnchorUtils;
+import pasa.cbentley.framework.gui.src4.canvas.GraphicsXD;
 import pasa.cbentley.framework.gui.src4.ctx.GuiCtx;
 import pasa.cbentley.framework.gui.src4.ctx.IToStringFlagsDraw;
 import pasa.cbentley.framework.gui.src4.interfaces.ITechDrawable;
@@ -96,7 +97,7 @@ public class ImageDrawable extends ViewDrawable {
     * @param x coordinate for drawing image region
     * @param y coordinate for drawing image region
     */
-   private void drawImageRegion(GraphicsX g, int m, int n, int w, int h, int x, int y) {
+   private void drawImageRegion(GraphicsXD g, int m, int n, int w, int h, int x, int y) {
       g.drawRgbImage(img, m, n, w, h, IImage.TRANSFORM_0_NONE, x, y);
    }
 
@@ -111,14 +112,14 @@ public class ImageDrawable extends ViewDrawable {
     * <br>
     * 
     */
-   public void drawViewDrawableContent(GraphicsX g, int x, int y, ScrollConfig scx, ScrollConfig scy) {
+   public void drawViewDrawableContent(GraphicsXD g, int x, int y, ScrollConfig scx, ScrollConfig scy) {
       int w = getContentW();
       int h = getContentH();
 
       //#mdebug
       if (gc.toStringHasFlagDraw(IToStringFlagsDraw.FLAG_DRAW_05_IMAGE_DRAWABLE_BOUNDARY)) {
          g.setColor(255, 120, 20);
-         g.drawRect(getX()-1, getY()-1, getDrawnWidth()+1, getDrawnHeight()+1);
+         g.drawRect(getX() - 1, getY() - 1, getDrawnWidth() + 1, getDrawnHeight() + 1);
          g.setColor(255, 200, 200);
          g.drawRect(x, y, w, h);
       }
@@ -147,7 +148,7 @@ public class ImageDrawable extends ViewDrawable {
       //#mdebug
       if (gc.toStringHasFlagDraw(IToStringFlagsDraw.FLAG_DRAW_07_IMAGE_BOUNDARY)) {
          g.setColor(255, 120, 20);
-         g.drawRect(x-1, y-1, img.getWidth()+1, img.getHeight()+1);
+         g.drawRect(x - 1, y - 1, img.getWidth() + 1, img.getHeight() + 1);
          g.setColor(255, 200, 200);
          g.drawRect(x, y, w, h);
       }
@@ -215,20 +216,20 @@ public class ImageDrawable extends ViewDrawable {
       }
    }
 
-   protected void initViewPortSub(int width, int height) {
-      //#debug
-      toDLog().pFlow("", this, ImageDrawable.class, "initViewPortSub@200", LVL_05_FINE, true);
-   }
-
    public void initViewDrawable(LayouterEngineDrawable engine) {
       //#debug
       toDLog().pFlow("", this, ImageDrawable.class, "initViewDrawable@220", LVL_05_FINE, true);
-      
+
       //image drawable just draws itself
       int ph = img.getHeight();
       int pw = img.getWidth();
       layEngine.setPh(ph);
       layEngine.setPw(pw);
+   }
+
+   protected void initViewPortSub(int width, int height) {
+      //#debug
+      toDLog().pFlow("", this, ImageDrawable.class, "initViewPortSub@200", LVL_05_FINE, true);
    }
 
    public void setImage(RgbImage img) {
@@ -246,18 +247,16 @@ public class ImageDrawable extends ViewDrawable {
       dc.nlLvl(scale, "scale");
    }
 
-   private void toStringPrivate(Dctx dc) {
-      dc.appendVarWithSpace("xincr", xincr);
-      dc.appendVarWithSpace("yincr", yincr);
-   }
-
    public void toString1Line(Dctx dc) {
       dc.root1Line(this, ImageDrawable.class);
       toStringPrivate(dc);
       super.toString1Line(dc.sup1Line());
    }
 
-  
+   private void toStringPrivate(Dctx dc) {
+      dc.appendVarWithSpace("xincr", xincr);
+      dc.appendVarWithSpace("yincr", yincr);
+   }
 
    //#enddebug
 

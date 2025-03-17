@@ -6,6 +6,7 @@ import pasa.cbentley.framework.cmd.src4.engine.CmdProcessor;
 import pasa.cbentley.framework.cmd.src4.engine.MCmd;
 import pasa.cbentley.framework.cmd.src4.input.Commander;
 import pasa.cbentley.framework.cmd.src4.interfaces.ICmdControlled;
+import pasa.cbentley.framework.cmd.src4.nav.MCmdNav;
 import pasa.cbentley.framework.core.ui.src4.engine.CanvasHostAbstract;
 import pasa.cbentley.framework.core.ui.src4.interfaces.ICanvasAppli;
 import pasa.cbentley.framework.gui.src4.canvas.CanvasAppliInputGui;
@@ -13,6 +14,7 @@ import pasa.cbentley.framework.gui.src4.ctx.GuiCtx;
 import pasa.cbentley.framework.gui.src4.ctx.ObjectGC;
 import pasa.cbentley.framework.gui.src4.exec.ExecutionContextCanvasGui;
 import pasa.cbentley.framework.gui.src4.interfaces.IDrawable;
+import pasa.cbentley.framework.gui.src4.nav.MCmdNavGui;
 
 public class CmdControlledGui extends ObjectGC implements ICmdControlled {
 
@@ -51,6 +53,11 @@ public class CmdControlledGui extends ObjectGC implements ICmdControlled {
       }
 
       return null;
+   }
+
+
+   public MCmdNav createMCmdNav(int cmdId, int navParam, int labelId) {
+      return new MCmdNavGui(gc, cmdId, navParam, labelId);
    }
 
 }

@@ -3,20 +3,23 @@ package pasa.cbentley.framework.gui.src4.table;
 import pasa.cbentley.byteobjects.src4.core.ByteObject;
 import pasa.cbentley.byteobjects.src4.objects.litteral.LitteralStringOperator;
 import pasa.cbentley.core.src4.event.BusEvent;
+import pasa.cbentley.core.src4.event.IEventBus;
 import pasa.cbentley.core.src4.event.IEventConsumer;
 import pasa.cbentley.core.src4.interfaces.C;
+import pasa.cbentley.core.src4.interfaces.ITechNav;
 import pasa.cbentley.core.src4.logging.Dctx;
 import pasa.cbentley.core.src4.stator.StatorReader;
 import pasa.cbentley.core.src4.stator.StatorWriter;
 import pasa.cbentley.core.src4.utils.BitUtils;
 import pasa.cbentley.core.src4.utils.IntUtils;
-import pasa.cbentley.framework.cmd.src4.cmd.MCmdNav;
 import pasa.cbentley.framework.cmd.src4.ctx.CmdCtx;
+import pasa.cbentley.framework.cmd.src4.engine.CmdInstance;
 import pasa.cbentley.framework.cmd.src4.engine.MCmd;
+import pasa.cbentley.framework.cmd.src4.interfaces.ICmdExecutor;
 import pasa.cbentley.framework.cmd.src4.interfaces.ICmdListener;
 import pasa.cbentley.framework.cmd.src4.interfaces.ICmdsCmd;
-import pasa.cbentley.framework.cmd.src4.interfaces.ICmdExecutor;
-import pasa.cbentley.framework.cmd.src4.interfaces.ITechNav;
+import pasa.cbentley.framework.cmd.src4.nav.INavigational;
+import pasa.cbentley.framework.cmd.src4.nav.MCmdNav;
 import pasa.cbentley.framework.core.ui.src4.ctx.ToStringStaticCoreUi;
 import pasa.cbentley.framework.core.ui.src4.exec.ExecutionContext;
 import pasa.cbentley.framework.core.ui.src4.input.InputState;
@@ -28,6 +31,7 @@ import pasa.cbentley.framework.datamodel.src4.table.ObjectTableModel;
 import pasa.cbentley.framework.drawx.src4.ctx.IBOTypesDrawX;
 import pasa.cbentley.framework.drawx.src4.engine.GraphicsX;
 import pasa.cbentley.framework.drawx.src4.factories.FigureOperator;
+import pasa.cbentley.framework.gui.src4.canvas.GraphicsXD;
 import pasa.cbentley.framework.gui.src4.canvas.InputConfig;
 import pasa.cbentley.framework.gui.src4.cmd.CmdInstanceGui;
 import pasa.cbentley.framework.gui.src4.core.Drawable;
@@ -71,14 +75,15 @@ import pasa.cbentley.framework.input.src4.gesture.GestureDetector;
 import pasa.cbentley.layouter.src4.ctx.IBOTypesLayout;
 
 /**
- * Structure for displaying drawables in a table grid fashion. 
- * <br>
- * <br>
- * Services:
+ * Structuring {@link IDrawable} for displaying other {@link IDrawable}s in a table grid fashion. 
+ * 
+ * <p>
+ * <b>Services</b>:
  * <li>sizing
  * <li>positioning
  * <li>styling
  * <li>parenting
+ * </p>
  * <br>
  * <br>
  * Data elements are provided by a {@link ITableModel}, whose purpose is to wrap data {@link ITableModel} elements in {@link IDrawable}s.
@@ -293,7 +298,7 @@ import pasa.cbentley.layouter.src4.ctx.IBOTypesLayout;
  * @see ViewDrawable
  * @see IBOCellPolicy
  */
-public class TableView extends ViewDrawable implements IDrawableListener, IEventConsumer, IDrawListener, ITechCell, IBOTypesDrawX, IBOCellPolicy, IBOGenetics, IBOTableView, ICmdExecutor, ITechTable {
+public class TableView extends ViewDrawable implements IDrawableListener, INavigational, IEventConsumer, IDrawListener, ITechCell, IBOTypesDrawX, IBOCellPolicy, IBOGenetics, IBOTableView, ICmdExecutor, ITechTable {
 
    private static final int SETUP_WEAK              = Integer.MIN_VALUE;
 
@@ -383,7 +388,7 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
    /**
     * Model Mask Length
     */
-   private int              modelLen     = 0;
+   private int              modelLen                = 0;
 
    /**
     * TODO Model Mask is there because one View may decide to display a model's data in different ways.
@@ -393,14 +398,14 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
     * <br>
     * Not to be confused with making a record invisible, in which case, one can work at the model level.
     */
-   private int              modelOffset  = 0;
+   private int              modelOffset             = 0;
 
    /**
     * {@link CellModel} is initialized 
     */
    private CellModel        modelRow;
 
-   private int[]            pointed      = new int[2];
+   private int[]            pointed                 = new int[2];
 
    /**
     * {@link IBOTablePolicy} that cannot be null once constructor returns.
@@ -413,7 +418,7 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
     * <br>
     * Its value is decided during TableView initialization using {@link EventChannel#getNextProducerID(int)}
     */
-   private int              producerID   = -1;
+   private int              producerID              = -1;
 
    /**
     * Tells which cells are root span or slaved span or none <br>
@@ -438,7 +443,7 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
     * This value is added to the model size count in order to compute
     * consumed number of cells.
     */
-   protected int            spannedCount = 0;
+   protected int            spannedCount            = 0;
 
    /**
     * Root {@link StyleClass} to apply to all drawables.
@@ -931,6 +936,32 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
    }
 
    /**
+    * Be carefull when calling this from toString. workCellSizes might be null TODO
+    */
+   public int computeContentPh() {
+      //#mdebug
+      //might be called
+      if (modelRow.workCellSizes == null) {
+         return 0;
+      }
+      //#enddebug
+      int ph = IntUtils.sum(modelRow.workCellSizes);
+      ph += getSizeGridH() * (modelRow.numCells - 1);
+      return ph;
+   }
+
+   public int computeContentPw() {
+      //#mdebug
+      if (modelCol.workCellSizes == null) {
+         return 0;
+      }
+      //#enddebug
+      int pw = IntUtils.sum(modelCol.workCellSizes);
+      pw += getSizeGridV() * (modelCol.numCells - 1);
+      return pw;
+   }
+
+   /**
     * 
     */
    public void consumeEvent(BusEvent e) {
@@ -1000,11 +1031,11 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
     * <li> {@link IBOTableView#T_FLAGX_1_NO_SELECTION}
     * 
     */
-   private void doUpdateNavFlag() {
+   protected void doUpdateNavFlag() {
       boolean navH = false;
       boolean navV = false;
       boolean selectAble = false;
-      if (!hasTechX(T_FLAGX_1_NO_SELECTION)) {
+      if (!hasFlagX(T_FLAGX_1_NO_SELECTION)) {
          selectAble = true;
          if (modelCol.numCells > 1) {
             navH = true;
@@ -1087,7 +1118,7 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
     * @param rowAbs
     * @param style
     */
-   private void drawCell(GraphicsX g, int x, int y, int colAbs, int rowAbs, CellModel modelCol, CellModel modelRow) {
+   private void drawCell(GraphicsXD g, int x, int y, int colAbs, int rowAbs, CellModel modelCol, CellModel modelRow) {
       int cellX = x + modelCol.getOffsetCellAbs(colAbs);
       int cellY = y + modelRow.getOffsetCellAbs(rowAbs);
       int[] r = new int[2];
@@ -1107,7 +1138,7 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
     * <br>
     * 
     */
-   public void drawContentListen(GraphicsX g, int x, int y, int w, int h, Drawable d) {
+   public void drawContentListen(GraphicsXD g, int x, int y, int w, int h, Drawable d) {
       if (d == null) {
          return;
       }
@@ -1130,7 +1161,7 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
     * @param colAbs
     * @param rowAbs
     */
-   private void drawEmptyCell(GraphicsX g, int cellX, int cellY, int cellWidth, int cellHeight, int colAbs, int rowAbs) {
+   private void drawEmptyCell(GraphicsXD g, int cellX, int cellY, int cellWidth, int cellHeight, int colAbs, int rowAbs) {
       if (emptyBluePrint != null) {
          Drawable d = emptyBluePrint;
          // set style anyways because it is only a blueprint.
@@ -1155,11 +1186,11 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
     * </p>
     * 
     * 
-    * Calls the {@link IDrawable#draw(GraphicsX)} via the {@link IDrawable#show(GraphicsX)}.
+    * Calls the {@link IDrawable#draw(GraphicsXD)} via the {@link IDrawable#show(GraphicsX)}.
     * Style and Layout the Drawable.
     * When 
     * <li> First time drawn, animation entry is fired.
-    * <li> redrawn, only the {@link IDrawable#draw(GraphicsX)} method is called.
+    * <li> redrawn, only the {@link IDrawable#draw(GraphicsXD)} method is called.
     * 
     * <p>
     * When redrawn, optimization can be made. No more styling, no more layouting.
@@ -1173,7 +1204,7 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
     * @param colAbs
     * @param rowAbs
     */
-   protected void drawModelDrawable(GraphicsX g, int x, int y, int w, int h, int colAbs, int rowAbs) {
+   protected void drawModelDrawable(GraphicsXD g, int x, int y, int w, int h, int colAbs, int rowAbs) {
       //no recycler view like in Android or TableView like in Swift?
       //what if we have a million items in the model?
       IDrawable d = getModelDrawable(colAbs, rowAbs);
@@ -1207,7 +1238,7 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
    /**
     * Draws special index based cells.
     */
-   protected void drawSpecial(GraphicsX g) {
+   protected void drawSpecial(GraphicsXD g) {
       if (indexRepaints != null) {
          initDataDraw(g);
          int x = getContentX();
@@ -1222,7 +1253,7 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
       indexRepaints = null;
    }
 
-   protected void drawTitlesColInject(GraphicsX g, Drawable d) {
+   protected void drawTitlesColInject(GraphicsXD g, Drawable d) {
       // draw each row number using the style
       int firstColAbs = modelCol.firstCellAbs;
       int lastColAbs = modelCol.lastCellAbs;
@@ -1261,7 +1292,64 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
       }
    }
 
-   protected void drawTitlesRowInject(GraphicsX g, Drawable d) {
+   /**
+    * Match a temporary {@link Config} to {@link ScrollConfig} X and Y. Then
+    * draw that config at x,y on {@link GraphicsX}. <br>
+    * <br>
+    * Case when cell sizes are variable, depending on start increment and
+    * number of visible increments in the {@link Config}<br>
+    * <br>
+    * If the {@link ScrollConfig} are the root ones used by ViewPane, draw
+    * using the current {@link Config}.
+    * 
+    * @param g
+    * @param x
+    * @param y
+    * @param scX
+    * @param scY
+    */
+   //   void drawViewDrawableContentVar(GraphicsXD g, int x, int y, ScrollConfig scX, ScrollConfig scY) {
+   //      Config scroll = null;
+   //      if (scX != null) {
+   //         // convert situation to the Config using the
+   //         switch (scX.getTypeUnit()) {
+   //            case IViewPane.SCROLL_TYPE_0_PIXEL_UNIT:
+   //               //
+   //               x -= scX.getSIStart();
+   //               break;
+   //            case IViewPane.SCROLL_TYPE_1_LOGIC_UNIT:
+   //               break;
+   //            case IViewPane.SCROLL_TYPE_2_PAGE_UNIT:
+   //               break;
+   //            default:
+   //               throw new IllegalArgumentException();
+   //         }
+   //      }
+   //      if (scY != null) {
+   //         switch (scY.getTypeUnit()) {
+   //            case IViewPane.SCROLL_TYPE_0_PIXEL_UNIT:
+   //               y -= scY.getSIStart();
+   //               break;
+   //            case IViewPane.SCROLL_TYPE_1_LOGIC_UNIT:
+   //               break;
+   //            case IViewPane.SCROLL_TYPE_2_PAGE_UNIT:
+   //               break;
+   //            default:
+   //               throw new IllegalArgumentException();
+   //         }
+   //      }
+   //      if (scroll != null) {
+   //         def = scroll;
+   //      }
+   //      computeCoordinatesColumns(def);
+   //      computeCoordinatesRows(def);
+   //      // matches the configurations to the Table config
+   //      // System.out.println("TableView.drawViewDrawableContent " + x + "," +
+   //      // y);
+   //      drawViewDrawableContent(g, def, x, y);
+   //   }
+
+   protected void drawTitlesRowInject(GraphicsXD g, Drawable d) {
       // draw each row number using the style
       int firstRowAbs = modelRow.firstCellAbs;
       int lastRowAbs = modelRow.lastCellAbs;
@@ -1352,67 +1440,10 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
     * <br>
     * <br>
     */
-   public void drawViewDrawableContent(GraphicsX g, int x, int y, ScrollConfig scX, ScrollConfig scY) {
+   public void drawViewDrawableContent(GraphicsXD g, int x, int y, ScrollConfig scX, ScrollConfig scY) {
       initDataDraw(g);
       drawViewDrawableContentFixed(g, x, y, scX, scY);
    }
-
-   /**
-    * Match a temporary {@link Config} to {@link ScrollConfig} X and Y. Then
-    * draw that config at x,y on {@link GraphicsX}. <br>
-    * <br>
-    * Case when cell sizes are variable, depending on start increment and
-    * number of visible increments in the {@link Config}<br>
-    * <br>
-    * If the {@link ScrollConfig} are the root ones used by ViewPane, draw
-    * using the current {@link Config}.
-    * 
-    * @param g
-    * @param x
-    * @param y
-    * @param scX
-    * @param scY
-    */
-   //   void drawViewDrawableContentVar(GraphicsX g, int x, int y, ScrollConfig scX, ScrollConfig scY) {
-   //      Config scroll = null;
-   //      if (scX != null) {
-   //         // convert situation to the Config using the
-   //         switch (scX.getTypeUnit()) {
-   //            case IViewPane.SCROLL_TYPE_0_PIXEL_UNIT:
-   //               //
-   //               x -= scX.getSIStart();
-   //               break;
-   //            case IViewPane.SCROLL_TYPE_1_LOGIC_UNIT:
-   //               break;
-   //            case IViewPane.SCROLL_TYPE_2_PAGE_UNIT:
-   //               break;
-   //            default:
-   //               throw new IllegalArgumentException();
-   //         }
-   //      }
-   //      if (scY != null) {
-   //         switch (scY.getTypeUnit()) {
-   //            case IViewPane.SCROLL_TYPE_0_PIXEL_UNIT:
-   //               y -= scY.getSIStart();
-   //               break;
-   //            case IViewPane.SCROLL_TYPE_1_LOGIC_UNIT:
-   //               break;
-   //            case IViewPane.SCROLL_TYPE_2_PAGE_UNIT:
-   //               break;
-   //            default:
-   //               throw new IllegalArgumentException();
-   //         }
-   //      }
-   //      if (scroll != null) {
-   //         def = scroll;
-   //      }
-   //      computeCoordinatesColumns(def);
-   //      computeCoordinatesRows(def);
-   //      // matches the configurations to the Table config
-   //      // System.out.println("TableView.drawViewDrawableContent " + x + "," +
-   //      // y);
-   //      drawViewDrawableContent(g, def, x, y);
-   //   }
 
    /**
     * Match a temporary {@link Config} to {@link ScrollConfig} X and Y. Then draw that config at x,y on {@link GraphicsX}. 
@@ -1445,7 +1476,7 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
     * @param scX
     * @param scY
     */
-   void drawViewDrawableContentFixed(GraphicsX g, int x, int y, ScrollConfig scX, ScrollConfig scY) {
+   void drawViewDrawableContentFixed(GraphicsXD g, int x, int y, ScrollConfig scX, ScrollConfig scY) {
 
       CellModel modelCol = this.modelCol;
       CellModel modelRow = this.modelRow;
@@ -1483,7 +1514,7 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
     * @param x
     * @param y
     */
-   protected void drawViewDrawableContentProcessed(GraphicsX g, int x, int y, CellModel modelCol, CellModel modelRow) {
+   protected void drawViewDrawableContentProcessed(GraphicsXD g, int x, int y, CellModel modelCol, CellModel modelRow) {
       if (hasFlagView(FLAG_VSTATE_01_CLIP)) {
          g.clipSet(x, y, getContentW(), getContentH());
       }
@@ -1504,7 +1535,7 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
          }
       }
       // draw an additional overlay over the whole selected row
-      if (hasTechX(T_FLAGX_3_ROW_SELECTION) && !hasTechX(T_FLAGX_5_ROW_SELECTION_NO_OVERLAY) && !hasTechX(T_FLAGX_1_NO_SELECTION)) {
+      if (hasFlagX(T_FLAGX_3_ROW_SELECTION) && !hasFlagX(T_FLAGX_5_ROW_SELECTION_NO_OVERLAY) && !hasFlagX(T_FLAGX_1_NO_SELECTION)) {
          int dx = x + modelCol.getOffsetCellAbs(modelCol.firstCellAbs);
          int dy = y + modelRow.getOffsetCellAbs(modelRow.selectedCellAbs);
          int w = getContentW();
@@ -1590,7 +1621,7 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
     * @param j
     */
    private void forwardPointerSelectEventSub(ExecutionContextCanvasGui ec, IDrawable d, int i, int j) {
-      if (hasTechX(T_FLAGX_3_ROW_SELECTION)) {
+      if (hasFlagX(T_FLAGX_3_ROW_SELECTION)) {
          modelCol.setNewSelection(i);
          modelRow.setNewSelection(j);
          selectionSelectEvent(ec);
@@ -1770,14 +1801,6 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
          }
       }
       return d;
-   }
-
-   /**
-    * Can be null if no model genetics was set.
-    * @return
-    */
-   public ByteObject getModelGenetics() {
-      return modelGenetics;
    }
 
    private int getGeneticSize(boolean isRow) {
@@ -1972,8 +1995,21 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
       return getModelDrawableStyled(visualIndex);
    }
 
+   /**
+    * Can be null if no model genetics was set.
+    * @return
+    */
+   public ByteObject getModelGenetics() {
+      return modelGenetics;
+   }
+
    public CellModel getModelRow() {
       return modelRow;
+   }
+
+   public int getNavFlag() {
+      //by default
+      return ITechNav.FLAG_1_HORIZ | ITechNav.FLAG_2_VERTI | ITechNav.FLAG_3_SELECTABLE;
    }
 
    /**
@@ -2357,6 +2393,24 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
       return val;
    }
 
+   private int getSizeFromPolicy(ByteObject policy, boolean isRow) {
+      int size = policy.get4(CELLP_OFFSET_09_SIZE4);
+      if (modelGenetics != null) {
+         size = getGeneticSize(isRow);
+      } else {
+         //
+         if (policy.hasFlag(CELLP_OFFSET_04_FLAGZ, CELLP_FLAGZ_8_SIZER)) {
+            ByteObject sizer = policy.getSubFirst(IBOTypesLayout.FTYPE_3_SIZER);
+            if (isRow) {
+               size = gc.getLAC().getLayoutOperator().getPixelSizeH(sizer, this);
+            } else {
+               size = gc.getLAC().getLayoutOperator().getPixelSizeW(sizer, this);
+            }
+         }
+      }
+      return size;
+   }
+
    /**
     * Size of horizontal grid lines.
     * @return
@@ -2458,6 +2512,24 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
    }
 
    /**
+    * Checks flags from {@link IBOTableView#T_OFFSET_02_FLAGX}
+    * 
+    * <li>{@link IBOTableView#T_FLAGX_1_NO_SELECTION}
+    * <li>{@link IBOTableView#T_FLAGX_2_}
+    * <li>{@link IBOTableView#T_FLAGX_3_ROW_SELECTION}
+    * <li>{@link IBOTableView#T_FLAGX_4_ROW_SELECTION_STYLE_STATES}
+    * <li>{@link IBOTableView#T_FLAGX_5_ROW_SELECTION_NO_OVERLAY}
+    * <li>{@link IBOTableView#T_FLAGX_6_SELECTION_ASAP}
+    * <li>{@link IBOTableView#T_FLAGX_7_VIEW_PORT_BLIND}
+    * <li>{@link IBOTableView#T_FLAGX_8_SELECT_EMPTY_CELLS}
+    * @param flag
+    * @return
+    */
+   protected boolean hasFlagX(int flag) {
+      return boTable.hasFlag(T_OFFSET_02_FLAGX, flag);
+   }
+
+   /**
     * Check table helper flags
     * 
     * <li> {@link ITechTable#HELPER_FLAG_01_STRONG_ROWS}
@@ -2495,6 +2567,37 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
    private boolean hasSelectionBehavior() {
       return !hasTech(T_FLAGX_1_NO_SELECTION);
    }
+
+   //   public void initScrollingConfig2(ScrollConfig scX, ScrollConfig scY) {
+   //
+   //      if (scX != null) {
+   //         if (scX.getTypeUnit() == IViewPane.SCROLL_TYPE_1_LOGIC_UNIT) {
+   //            int sizeTotal = getContentW();
+   //            int siTotal = modelCol.getScrollTotal();
+   //            if (hasHelperFlag(HELPER_FLAG_08_ALL_COLS_SAME_SIZE)) {
+   //
+   //               scX.initConfigLogic(modelCol.workCellSizes[0], sizeTotal, siTotal, getSizeGridV());
+   //            } else {
+   //               scX.initConfigLogic(modelCol.workCellSizes, sizeTotal, siTotal, getSizeGridV());
+   //            }
+   //         } else {
+   //            DrawableUtilz.initConfigX(this, scX);
+   //         }
+   //      }
+   //      if (scY != null) {
+   //         if (scY.getTypeUnit() == IViewPane.SCROLL_TYPE_1_LOGIC_UNIT) {
+   //            int siTotal = modelRow.getScrollTotal();
+   //            if (hasHelperFlag(HELPER_FLAG_09_ALL_ROWS_SAME_SIZE)) {
+   //               scY.initConfigLogic(modelRow.workCellSizes[0], getContentH(), siTotal, getSizeGridH());
+   //            } else {
+   //               scY.initConfigLogic(modelRow.workCellSizes, getContentH(), siTotal, getSizeGridH());
+   //            }
+   //         } else {
+   //            DrawableUtilz.initConfigY(this, scY);
+   //         }
+   //      }
+   //      //DrawableUtilz.debugScrollConfigs("TableView#initScrollingConfig", scX, scY);
+   //   }
 
    /**
     * Checks flags from {@link IBOTableView#T_OFFSET_01_FLAG}
@@ -2537,7 +2640,7 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
     * 
     * <li>{@link IBOTableView#T_FLAGM_1_}
     * <li>{@link IBOTableView#T_FLAGM_2_MULTIPLE_SELECTION}
-    * <li>{@link IBOTableView#T_FLAGM_3_MULTIPLE_SELECTION_CHECKBOX}
+    * <li>{@link IBOTableView#T_FLAGM_3_}
     * <li>{@link IBOTableView#T_FLAGM_4_}
     * <li>{@link IBOTableView#T_FLAGM_5_CLOCK_FULL_H_LOOP}
     * <li>{@link IBOTableView#T_FLAGM_6_CLOCK_HORIZ}
@@ -2548,24 +2651,6 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
     */
    protected boolean hasTechM(int flag) {
       return boTable.hasFlag(T_OFFSET_11_FLAGM, flag);
-   }
-
-   /**
-    * Checks flags from {@link IBOTableView#T_OFFSET_02_FLAGX}
-    * 
-    * <li>{@link IBOTableView#T_FLAGX_1_NO_SELECTION}
-    * <li>{@link IBOTableView#T_FLAGX_2_}
-    * <li>{@link IBOTableView#T_FLAGX_3_ROW_SELECTION}
-    * <li>{@link IBOTableView#T_FLAGX_4_ROW_SELECTION_STYLE_STATES}
-    * <li>{@link IBOTableView#T_FLAGX_5_ROW_SELECTION_NO_OVERLAY}
-    * <li>{@link IBOTableView#T_FLAGX_6_SELECTION_ASAP}
-    * <li>{@link IBOTableView#T_FLAGX_7_VIEW_PORT_BLIND}
-    * <li>{@link IBOTableView#T_FLAGX_8_SELECT_EMPTY_CELLS}
-    * @param flag
-    * @return
-    */
-   protected boolean hasTechX(int flag) {
-      return boTable.hasFlag(T_OFFSET_02_FLAGX, flag);
    }
 
    /**
@@ -2586,37 +2671,6 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
       return boTable.hasFlag(T_OFFSET_03_FLAGY, flag);
    }
 
-   //   public void initScrollingConfig2(ScrollConfig scX, ScrollConfig scY) {
-   //
-   //      if (scX != null) {
-   //         if (scX.getTypeUnit() == IViewPane.SCROLL_TYPE_1_LOGIC_UNIT) {
-   //            int sizeTotal = getContentW();
-   //            int siTotal = modelCol.getScrollTotal();
-   //            if (hasHelperFlag(HELPER_FLAG_08_ALL_COLS_SAME_SIZE)) {
-   //
-   //               scX.initConfigLogic(modelCol.workCellSizes[0], sizeTotal, siTotal, getSizeGridV());
-   //            } else {
-   //               scX.initConfigLogic(modelCol.workCellSizes, sizeTotal, siTotal, getSizeGridV());
-   //            }
-   //         } else {
-   //            DrawableUtilz.initConfigX(this, scX);
-   //         }
-   //      }
-   //      if (scY != null) {
-   //         if (scY.getTypeUnit() == IViewPane.SCROLL_TYPE_1_LOGIC_UNIT) {
-   //            int siTotal = modelRow.getScrollTotal();
-   //            if (hasHelperFlag(HELPER_FLAG_09_ALL_ROWS_SAME_SIZE)) {
-   //               scY.initConfigLogic(modelRow.workCellSizes[0], getContentH(), siTotal, getSizeGridH());
-   //            } else {
-   //               scY.initConfigLogic(modelRow.workCellSizes, getContentH(), siTotal, getSizeGridH());
-   //            }
-   //         } else {
-   //            DrawableUtilz.initConfigY(this, scY);
-   //         }
-   //      }
-   //      //DrawableUtilz.debugScrollConfigs("TableView#initScrollingConfig", scX, scY);
-   //   }
-
    private void initConfigWorkSizes() {
       modelCol.initWorkSizes();
       modelRow.initWorkSizes();
@@ -2627,7 +2681,7 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
     * Implemented by subclasses.
     * @param g
     */
-   public void initDataDraw(GraphicsX g) {
+   public void initDataDraw(GraphicsXD g) {
 
    }
 
@@ -2687,6 +2741,99 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
       }
       return false;
    }
+
+   /**
+    * Method computes the current cell configuration {@link Config} and thus the preferred width and height.
+    * <br>
+    * <br>
+    * Called by {@link ViewDrawable#init(int, int)} to initialize the Table<br>
+    * <br>
+    * <br>
+    * When width is negative, the absolute value is the number of visible
+    * columns. Drawable size is computed based on that single constraint. It
+    * should only be called when all columns have the same width. <br>
+    * Same with negative height values. <br>
+    * <b>Examples</b> : <br>
+    * <li>values of -1,-1 shows only 1 cell surronded with scrollbars 
+    * <li>-2,100 shows 2 cells wide and a drawable height of 100 pixels
+    * 
+    * <br>
+    * Implicit height or width imply {@link IViewPane#PLANET_MODE_0_EAT} is overriden to {@link IViewPane#PLANET_MODE_1_EXPAND}
+    * 
+    * <br>
+    * When called by the {@link ViewPane}, 
+    * <br>
+    * <br>
+    * What is the meaning of Flow Column and Init width of 0 or negative?
+    * 
+    * @param width
+    * @param height
+    */
+   //   public void initViewDrawable(int width, int height) {
+   //      //System.out.println("$TableView#initViewDrawable w=" + width + " h=" + height);
+   //      checkNullities();
+   //      setHelperFlags();
+   //
+   //      try {
+   //         //first compute number of cells
+   //         setupNumColRows();
+   //
+   //         // once number of cells is known
+   //         //layout the space used by row numbers and column titles
+   //         setupTitlesRow();
+   //         setupTitlesCol();
+   //
+   //         // setupSizes();
+   //         setupPolicyType2();
+   //         // post: symbolized cell sizes are know.
+   //
+   //         // Config work size are taken from setupsize
+   //         //initConfigWorkSizes(u);
+   //         initConfigWorkSizes();
+   //
+   //         buildSpanning();
+   //         buildGridIndexModel();
+   //
+   //         // compute one time for variable size cells. symbolized/variable sizes compute
+   //         modelCol.computeSetupVariableCellSizes(getContentW());
+   //         modelRow.computeSetupVariableCellSizes(getContentH());
+   //         // once sizes are known
+   //         // computeVisibleRowsInit(u, getContentH());
+   //         // computeVisibleColsInit(u, getContentW());
+   //
+   //         // computeCellCoordinates(u);
+   //         //compute span
+   //         addSpanningToConfig();
+   //         updateNavFlag();
+   //
+   //         if (hasTechF(T_FLAGF_1_SELECT_KEPT_WITHOUT_FOCUS_KEY)) {
+   //            setSelectionState();
+   //         }
+   //      } catch (Exception e) {
+   //         //#debug
+   //         e.printStackTrace();
+   //         //#debug
+   //         throw new RuntimeException("In the TableView Compute Config method. Debug Stop");
+   //      }
+   //
+   //      // computes the preferred sizes based on the configuration
+   //      pw = IntUtils.sum(modelCol.workCellSizes) + MStyle.getStyleWConsumed(style);
+   //      pw += getSizeGridV() * (modelCol.numCells - 1);
+   //      ph = IntUtils.sum(modelRow.workCellSizes) + MStyle.getStyleHConsumed(style);
+   //      ph += getSizeGridH() * (modelRow.numCells - 1);
+   //      // at this stage if pw or ph is zero we have an empty table.
+   //      // the ViewDrawable will deal with it according to the tech params
+   //
+   //      //TODO expanded is done with FILL policy. do we really need this?
+   //      //      if (hasViewFlag(VIEW_GENE_31_EXPANDABLE_W)) {
+   //      //         if (pw < width) {
+   //      //            //redistribute width pixel to columns
+   //      //            pw = width;
+   //      //            setViewFlag(VIEWSTATE_18_EXPANDED_W, true);
+   //      //         }
+   //      //      }
+   //      //setDwDh(width, height);
+   //   }
 
    /**
     * Sibling of {@link TableView#initModelDrawableRow(int, int, int[])}
@@ -2857,99 +3004,6 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
    }
 
    /**
-    * Method computes the current cell configuration {@link Config} and thus the preferred width and height.
-    * <br>
-    * <br>
-    * Called by {@link ViewDrawable#init(int, int)} to initialize the Table<br>
-    * <br>
-    * <br>
-    * When width is negative, the absolute value is the number of visible
-    * columns. Drawable size is computed based on that single constraint. It
-    * should only be called when all columns have the same width. <br>
-    * Same with negative height values. <br>
-    * <b>Examples</b> : <br>
-    * <li>values of -1,-1 shows only 1 cell surronded with scrollbars 
-    * <li>-2,100 shows 2 cells wide and a drawable height of 100 pixels
-    * 
-    * <br>
-    * Implicit height or width imply {@link IViewPane#PLANET_MODE_0_EAT} is overriden to {@link IViewPane#PLANET_MODE_1_EXPAND}
-    * 
-    * <br>
-    * When called by the {@link ViewPane}, 
-    * <br>
-    * <br>
-    * What is the meaning of Flow Column and Init width of 0 or negative?
-    * 
-    * @param width
-    * @param height
-    */
-   //   public void initViewDrawable(int width, int height) {
-   //      //System.out.println("$TableView#initViewDrawable w=" + width + " h=" + height);
-   //      checkNullities();
-   //      setHelperFlags();
-   //
-   //      try {
-   //         //first compute number of cells
-   //         setupNumColRows();
-   //
-   //         // once number of cells is known
-   //         //layout the space used by row numbers and column titles
-   //         setupTitlesRow();
-   //         setupTitlesCol();
-   //
-   //         // setupSizes();
-   //         setupPolicyType2();
-   //         // post: symbolized cell sizes are know.
-   //
-   //         // Config work size are taken from setupsize
-   //         //initConfigWorkSizes(u);
-   //         initConfigWorkSizes();
-   //
-   //         buildSpanning();
-   //         buildGridIndexModel();
-   //
-   //         // compute one time for variable size cells. symbolized/variable sizes compute
-   //         modelCol.computeSetupVariableCellSizes(getContentW());
-   //         modelRow.computeSetupVariableCellSizes(getContentH());
-   //         // once sizes are known
-   //         // computeVisibleRowsInit(u, getContentH());
-   //         // computeVisibleColsInit(u, getContentW());
-   //
-   //         // computeCellCoordinates(u);
-   //         //compute span
-   //         addSpanningToConfig();
-   //         updateNavFlag();
-   //
-   //         if (hasTechF(T_FLAGF_1_SELECT_KEPT_WITHOUT_FOCUS_KEY)) {
-   //            setSelectionState();
-   //         }
-   //      } catch (Exception e) {
-   //         //#debug
-   //         e.printStackTrace();
-   //         //#debug
-   //         throw new RuntimeException("In the TableView Compute Config method. Debug Stop");
-   //      }
-   //
-   //      // computes the preferred sizes based on the configuration
-   //      pw = IntUtils.sum(modelCol.workCellSizes) + MStyle.getStyleWConsumed(style);
-   //      pw += getSizeGridV() * (modelCol.numCells - 1);
-   //      ph = IntUtils.sum(modelRow.workCellSizes) + MStyle.getStyleHConsumed(style);
-   //      ph += getSizeGridH() * (modelRow.numCells - 1);
-   //      // at this stage if pw or ph is zero we have an empty table.
-   //      // the ViewDrawable will deal with it according to the tech params
-   //
-   //      //TODO expanded is done with FILL policy. do we really need this?
-   //      //      if (hasViewFlag(VIEW_GENE_31_EXPANDABLE_W)) {
-   //      //         if (pw < width) {
-   //      //            //redistribute width pixel to columns
-   //      //            pw = width;
-   //      //            setViewFlag(VIEWSTATE_18_EXPANDED_W, true);
-   //      //         }
-   //      //      }
-   //      //setDwDh(width, height);
-   //   }
-
-   /**
     * Init the table policy.
     * <br>
     * <br>
@@ -3044,32 +3098,6 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
       layEngine.setPw(pw);
 
       layEngine.layoutInvalidateSize();
-   }
-
-   /**
-    * Be carefull when calling this from toString. workCellSizes might be null TODO
-    */
-   public int computeContentPh() {
-      //#mdebug
-      //might be called
-      if(modelRow.workCellSizes == null) {
-         return 0;
-      }
-      //#enddebug
-      int ph = IntUtils.sum(modelRow.workCellSizes);
-      ph += getSizeGridH() * (modelRow.numCells - 1);
-      return ph;
-   }
-
-   public int computeContentPw() {
-      //#mdebug
-      if(modelCol.workCellSizes == null) {
-         return 0;
-      }
-      //#enddebug
-      int pw = IntUtils.sum(modelCol.workCellSizes);
-      pw += getSizeGridV() * (modelCol.numCells - 1);
-      return pw;
    }
 
    /**
@@ -3228,6 +3256,13 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
       return modelCol.transitionType == Transition.TRANSITION_0_INSIDE_VIEWPORT && modelRow.transitionType == Transition.TRANSITION_0_INSIDE_VIEWPORT;
    }
 
+   /**
+    * Managed by  doUpdateNavFlag
+    */
+   public boolean isNavEventSupported(int navEvent) {
+      return super.isNavEventSupported(navEvent);
+   }
+
    public boolean isSelectedCell(int colAbs, int rowAbs) {
       return (getSelectedCol() == colAbs && getSelectedRow() == rowAbs);
    }
@@ -3249,16 +3284,6 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
     */
    public void manageKeyInput(ExecutionContextCanvasGui ec) {
       super.manageKeyInput(ec);
-   }
-
-   
-   public void manageNavigate(CmdInstanceGui cd, int navEvent) {
-      if (navEvent == ITechNav.NAV_1_UP) {
-         ExecutionContextCanvasGui ec = cd.getExecutionContextGui();
-         navigateUp(ec);
-      } else if (navEvent == ITechNav.NAV_5_SELECT) {
-
-      }
    }
 
    /**
@@ -3406,7 +3431,7 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
       if (pointed != null) {
          int i = pointed[0];
          int j = pointed[1];
-         if (hasTechX(T_FLAGX_3_ROW_SELECTION)) {
+         if (hasFlagX(T_FLAGX_3_ROW_SELECTION)) {
             if (modelRow.pointedIndexAbs != j) {
                setRowStyle(modelRow.pointedIndexAbs, ITechDrawable.STYLE_07_FOCUSED_POINTER, false);
             }
@@ -3419,7 +3444,7 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
 
          //if not selectable, still remove focus from old guy and give it to table
 
-         if (hasTechX(T_FLAGX_3_ROW_SELECTION)) {
+         if (hasFlagX(T_FLAGX_3_ROW_SELECTION)) {
             //set move style to the whole row
             setRowStyle(modelRow.pointedIndexAbs, ITechDrawable.STYLE_07_FOCUSED_POINTER, true);
          } else {
@@ -3528,6 +3553,31 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
       //toLog().printState("#TableView#matchModel after the match " + cm.toStringOneLine() + ((sc == null) ? "null " : sc.toString1Line()));
    }
 
+   public void navigateCmd(CmdInstance ci) {
+      int navEvent = ci.getParamInt1();
+      this.navigateCmd((CmdInstanceGui) ci, navEvent);
+   }
+
+   public void navigateCmd(CmdInstanceGui cd, int navEvent) {
+      ExecutionContextCanvasGui ec = cd.getExecutionContextGui();
+      
+      int selectedIndex = this.getSelectedIndex();
+      cd.setParamUndoInt(selectedIndex);
+      cd.setParamedUndo();
+      
+      if (navEvent == ITechNav.NAV_01_UP) {
+         navigateUp(ec);
+      } else if (navEvent == ITechNav.NAV_02_DOWN) {
+         navigateDown(cd);
+      } else if (navEvent == ITechNav.NAV_03_LEFT) {
+         navigateLeft(cd);
+      } else if (navEvent == ITechNav.NAV_04_RIGHT) {
+         navigateRight(cd);
+      } else if (navEvent == ITechNav.NAV_05_SELECT) {
+
+      }
+   }
+
    /**
     * Navigates the {@link TableView} using raw events.
     * 
@@ -3537,11 +3587,23 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
       // table has its own navigation
       ExecutionContextCanvasGui ec = cd.getExecutionContextGui();
       boolean success = navigateDownInternal(ec);
-      if(success) {
-         cd.setProcessed();;
+      if (success) {
+         cd.setProcessed();
       }
    }
-   
+
+   /**
+    * Navigates the {@link TableView} using raw events.
+    * 
+    * @param ec {@link ExecutionContextCanvasGui}
+    */
+   public void navigateDown(ExecutionContextCanvasGui ec) {
+      InputConfig ic = ec.getInputConfig();
+      if (ic.isPressed() || ic.isWheeled()) {
+         navigateDownInternal(ec);
+      }
+   }
+
    /**
     * Tries to navigate down. It may fail because
     * 
@@ -3556,30 +3618,17 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
       if (modelRow.hasHelperFlag(CELL_H_FLAG_10_OWN_NAVIGATION)) {
          int nextRow = getNextSelectableDown();
          if (nextRow != modelRow.selectedCellAbs) {
-           return selectionMove(ec, modelCol.selectedCellAbs, nextRow);
+            return selectionMove(ec, modelCol.selectedCellAbs, nextRow);
          }
       }
       return false;
    }
-      
-   /**
-    * Navigates the {@link TableView} using raw events.
-    * 
-    * @param ec {@link ExecutionContextCanvasGui}
-    */
-   public void navigateDown(ExecutionContextCanvasGui ec) {
-      InputConfig ic = ec.getInputConfig();
-      if (ic.isPressed() || ic.isWheeled()) {
-         navigateDownInternal(ec);
-      }
-   }
 
    public void navigateLeft(CmdInstanceGui cd) {
-      if (modelCol.hasHelperFlag(CELL_H_FLAG_10_OWN_NAVIGATION)) {
-         int nextCol = getNextSelectableLeft();
-         if (nextCol != modelCol.selectedCellAbs) {
-            selectionMove(cd.getExecutionContextGui(), nextCol, modelRow.selectedCellAbs);
-         }
+      ExecutionContextCanvasGui ec = cd.getExecutionContextGui();
+      boolean success = navigateLeftInternal(ec);
+      if (success) {
+         cd.setProcessed();
       }
    }
 
@@ -3599,12 +3648,21 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
       }
    }
 
-   public void navigateRight(CmdInstanceGui cd) {
+   protected boolean navigateLeftInternal(ExecutionContextCanvasGui ec) {
       if (modelCol.hasHelperFlag(CELL_H_FLAG_10_OWN_NAVIGATION)) {
-         int nextCol = getNextSelectableRight();
+         int nextCol = getNextSelectableLeft();
          if (nextCol != modelCol.selectedCellAbs) {
-            selectionMove(cd.getExecutionContextGui(), nextCol, modelRow.selectedCellAbs);
+            return selectionMove(ec, nextCol, modelRow.selectedCellAbs);
          }
+      }
+      return false;
+   }
+
+   public void navigateRight(CmdInstanceGui cd) {
+      ExecutionContextCanvasGui ec = cd.getExecutionContextGui();
+      boolean success = navigateRightInternal(ec);
+      if (success) {
+         cd.setProcessed();
       }
    }
 
@@ -3621,6 +3679,16 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
             }
          }
       }
+   }
+
+   protected boolean navigateRightInternal(ExecutionContextCanvasGui ec) {
+      if (modelCol.hasHelperFlag(CELL_H_FLAG_10_OWN_NAVIGATION)) {
+         int nextCol = getNextSelectableRight();
+         if (nextCol != modelCol.selectedCellAbs) {
+            return selectionMove(ec, nextCol, modelRow.selectedCellAbs);
+         }
+      }
+      return false;
    }
 
    /**
@@ -3644,12 +3712,11 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
    }
 
    public void navigateUp(CmdInstanceGui cd) {
-      if (modelRow.hasHelperFlag(CELL_H_FLAG_10_OWN_NAVIGATION)) {
-         int nextRow = getNextSelectableUp();
-         if (nextRow != modelRow.selectedCellAbs) {
-            ExecutionContextCanvasGui ec = (ExecutionContextCanvasGui) cd.getExecutionContext();
-            selectionMove(ec, modelCol.selectedCellAbs, nextRow);
-         }
+      // table has its own navigation
+      ExecutionContextCanvasGui ec = cd.getExecutionContextGui();
+      boolean success = navigateUpInternal(ec);
+      if (success) {
+         cd.setProcessed();
       }
    }
 
@@ -3661,13 +3728,18 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
    public void navigateUp(ExecutionContextCanvasGui ec) {
       InputConfig ic = ec.getInputConfig();
       if (ic.isPressed() || ic.isWheeled()) {
-         if (modelRow.hasHelperFlag(CELL_H_FLAG_10_OWN_NAVIGATION)) {
-            int nextRow = getNextSelectableUp();
-            if (nextRow != modelRow.selectedCellAbs) {
-               selectionMove(ec, modelCol.selectedCellAbs, nextRow);
-            }
+         navigateUpInternal(ec);
+      }
+   }
+
+   protected boolean navigateUpInternal(ExecutionContextCanvasGui ec) {
+      if (modelRow.hasHelperFlag(CELL_H_FLAG_10_OWN_NAVIGATION)) {
+         int nextRow = getNextSelectableUp();
+         if (nextRow != modelRow.selectedCellAbs) {
+            return selectionMove(ec, modelCol.selectedCellAbs, nextRow);
          }
       }
+      return false;
    }
 
    public void notifyEvent(IDrawable d, int event, Object o) {
@@ -3738,8 +3810,8 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
     * @param nd can be null.
     */
    protected void selectionChangeSelectedState(ExecutionContextCanvasGui ec, IDrawable od, IDrawable nd, boolean giveFocus) {
-      if (hasTechX(T_FLAGX_3_ROW_SELECTION)) {
-         if (hasTechX(T_FLAGX_4_ROW_SELECTION_STYLE_STATES)) {
+      if (hasFlagX(T_FLAGX_3_ROW_SELECTION)) {
+         if (hasFlagX(T_FLAGX_4_ROW_SELECTION_STYLE_STATES)) {
             setRowStyle(modelRow.oldSelectedCellAbs, ITechDrawable.STYLE_05_SELECTED, false);
          }
       } else {
@@ -3747,14 +3819,14 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
       }
 
       if (nd == null) {
-         if (hasTechX(T_FLAGX_8_SELECT_EMPTY_CELLS)) {
+         if (hasFlagX(T_FLAGX_8_SELECT_EMPTY_CELLS)) {
             nd = emptyBluePrint;
          } else {
             //no selection. get to next in line cell
          }
       }
-      if (hasTechX(T_FLAGX_3_ROW_SELECTION)) {
-         if (hasTechX(T_FLAGX_4_ROW_SELECTION_STYLE_STATES)) {
+      if (hasFlagX(T_FLAGX_3_ROW_SELECTION)) {
+         if (hasFlagX(T_FLAGX_4_ROW_SELECTION_STYLE_STATES)) {
             setRowStyle(modelRow.selectedCellAbs, ITechDrawable.STYLE_05_SELECTED, true);
          }
       } else {
@@ -3928,10 +4000,6 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
       return true;
    }
 
-   protected void sendSelectionChangeEvent(ExecutionContextCanvasGui ic) {
-      gc.getEventsBusGui().sendNewEvent(producerID, EVENT_ID_01_SELECTION_CHANGE, this);
-   }
-
    /**
     * Method called when selected cell is "selected" by means of the keyboard or the pointer. 
     * 
@@ -3944,18 +4012,17 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
    protected void selectionSelectEvent(ExecutionContextCanvasGui ec) {
       //#debug
       toDLog().pEvent("SelectedCell=[" + getSelectedCol() + "," + getSelectedRow() + "] =" + toStringSelectedDrawable(), this, TableView.class, "selectionSelectEvent");
-      BusEvent be = gc.getEventsBusGui().createEvent(producerID, EVENT_ID_00_SELECT, this);
+      IEventBus eventsBusGui = gc.getEventsBusGui();
+      BusEvent be = eventsBusGui.createEvent(producerID, EVENT_ID_00_SELECT, this);
       be.setParamO1(eventParamO);
       be.putOnBus();
    }
 
-   /**
-    * Sets the Object that will be in the {@link BusEvent} when a selection is made
-    * @param o
-    */
-   public void setEventParamObject(Object o) {
-      this.eventParamO = o;
+   protected void sendSelectionChangeEvent(ExecutionContextCanvasGui ic) {
+      IEventBus eventsBusGui = gc.getEventsBusGui();
+      eventsBusGui.sendNewEvent(producerID, EVENT_ID_01_SELECTION_CHANGE, this);
    }
+
    /**
     * Setting the model nullifies
     * @param model
@@ -3966,6 +4033,14 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
          mapperObjectDrawable.clearCache();
       }
       aInitModel();
+   }
+
+   /**
+    * Sets the Object that will be in the {@link BusEvent} when a selection is made
+    * @param o
+    */
+   public void setEventParamObject(Object o) {
+      this.eventParamO = o;
    }
 
    private void setFlowSingleSize(CellModel cm, int totalSize, int sepSize, int size) {
@@ -3996,12 +4071,12 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
       //            }
       //         }
       //      }
-      if (hasTechX(T_FLAGX_1_NO_SELECTION)) {
+      if (hasFlagX(T_FLAGX_1_NO_SELECTION)) {
          modelRow.setHelperFlag(CELL_H_FLAG_10_OWN_NAVIGATION, false);
          modelCol.setHelperFlag(CELL_H_FLAG_10_OWN_NAVIGATION, false);
       } else {
          modelRow.setHelperFlag(CELL_H_FLAG_10_OWN_NAVIGATION, true);
-         boolean isRowSelection = hasTechX(T_FLAGX_3_ROW_SELECTION);
+         boolean isRowSelection = hasFlagX(T_FLAGX_3_ROW_SELECTION);
          modelCol.setHelperFlag(CELL_H_FLAG_10_OWN_NAVIGATION, !isRowSelection);
       }
       // this.setViewFlag(ViewDrawable.VIEWSTATE_1_CONTENT_WIDTH_FOLLOWS_VIEWPORT,
@@ -4394,6 +4469,8 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
 
    }
 
+   //#mdebug
+
    private void setupPolicyType(boolean isRow, CellModel cm, int sepSize, int totalSize) {
       // check the cell type
       int typer = cm.policy.get1(CELLP_OFFSET_01_TYPE1);
@@ -4407,6 +4484,37 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
          default:
          case ITechCell.TYPE_1_FLOW:
             setupTypeFlow(isRow, cm, totalSize, sepSize);
+            break;
+      }
+   }
+
+   /**
+    * Finalize setup by computing implicit setup size to implict. <br>
+    * <br>
+    * setup size arrays and policies are created.
+    * 
+    * @param cellPolicies
+    * @param numTotalCells
+    * @param data
+    * @param totalSize
+    * @param sepSize
+    */
+   private void setupPolicyTypeImplicit(boolean isRow, CellModel cm, CellModel coModel, int sepSize, int totalSize) {
+      // check the cell type
+      int typer = cm.policy.get1(CELLP_OFFSET_01_TYPE1);
+      switch (typer) {
+         case ITechCell.TYPE_0_GENERIC:
+            setupImplicitCells(isRow, cm.policy, cm.setupSizes, coModel.setupSizes);
+            break;
+         case ITechCell.TYPE_2_RATIO:
+            break;
+         default:
+         case ITechCell.TYPE_1_FLOW:
+            int size = cm.policy.get4(CELLP_OFFSET_09_SIZE4);
+            if (size <= 0) {
+               setupImplicitFlow(isRow, cm, totalSize, sepSize, coModel.setupSizes);
+               // we must update the number of columns and row
+            }
             break;
       }
    }
@@ -4465,39 +4573,6 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
             break;
       }
    }
-
-   /**
-    * Finalize setup by computing implicit setup size to implict. <br>
-    * <br>
-    * setup size arrays and policies are created.
-    * 
-    * @param cellPolicies
-    * @param numTotalCells
-    * @param data
-    * @param totalSize
-    * @param sepSize
-    */
-   private void setupPolicyTypeImplicit(boolean isRow, CellModel cm, CellModel coModel, int sepSize, int totalSize) {
-      // check the cell type
-      int typer = cm.policy.get1(CELLP_OFFSET_01_TYPE1);
-      switch (typer) {
-         case ITechCell.TYPE_0_GENERIC:
-            setupImplicitCells(isRow, cm.policy, cm.setupSizes, coModel.setupSizes);
-            break;
-         case ITechCell.TYPE_2_RATIO:
-            break;
-         default:
-         case ITechCell.TYPE_1_FLOW:
-            int size = cm.policy.get4(CELLP_OFFSET_09_SIZE4);
-            if (size <= 0) {
-               setupImplicitFlow(isRow, cm, totalSize, sepSize, coModel.setupSizes);
-               // we must update the number of columns and row
-            }
-            break;
-      }
-   }
-
-   //#mdebug
 
    /**
     * <br>
@@ -4582,24 +4657,6 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
          setFlagView(ITechViewDrawable.FLAG_VSTATE_10_CONTENT_PW_VIEWPORT_DW, true);
          setFlagView(ITechViewDrawable.FLAG_VSTATE_12_CONTENT_W_DEPENDS_VIEWPORT, true);
       }
-   }
-
-   private int getSizeFromPolicy(ByteObject policy, boolean isRow) {
-      int size = policy.get4(CELLP_OFFSET_09_SIZE4);
-      if (modelGenetics != null) {
-         size = getGeneticSize(isRow);
-      } else {
-         //
-         if (policy.hasFlag(CELLP_OFFSET_04_FLAGZ, CELLP_FLAGZ_8_SIZER)) {
-            ByteObject sizer = policy.getSubFirst(IBOTypesLayout.FTYPE_3_SIZER);
-            if (isRow) {
-               size = gc.getLAC().getLayoutOperator().getPixelSizeH(sizer, this);
-            } else {
-               size = gc.getLAC().getLayoutOperator().getPixelSizeW(sizer, this);
-            }
-         }
-      }
-      return size;
    }
 
    private void setupTypeGeneric(boolean isRow, CellModel cm, int totalSize, int sepSize) {
@@ -4696,6 +4753,8 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
       cm.policies = new int[] { ITechCell.CELL_1_EXPLICIT_SET };
    }
 
+   //#enddebug
+
    protected void setViewPortFlag(boolean isRow) {
       if (isRow) {
          setFlagView(ITechViewDrawable.FLAG_VSTATE_13_CONTENT_H_DEPENDS_VIEWPORT, true);
@@ -4723,8 +4782,6 @@ public class TableView extends ViewDrawable implements IDrawableListener, IEvent
       }
 
    }
-
-   //#enddebug
 
    /**
     * Change the X,Y coordinate of Table and of all its cells/planetaries. 

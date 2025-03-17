@@ -2,6 +2,7 @@ package pasa.cbentley.framework.gui.src4.interfaces;
 
 import pasa.cbentley.core.src4.interfaces.ITech;
 import pasa.cbentley.framework.drawx.src4.engine.GraphicsX;
+import pasa.cbentley.framework.gui.src4.canvas.GraphicsXD;
 import pasa.cbentley.framework.gui.src4.core.ScrollBar;
 import pasa.cbentley.framework.gui.src4.core.ScrollConfig;
 import pasa.cbentley.framework.gui.src4.core.ViewDrawable;
@@ -29,7 +30,7 @@ public interface ITechViewDrawable extends ITech {
    public static final int FLAG_VSTATE_01_CLIP                       = 1 << 0;
 
    /**
-    * Force the {@link ViewPane#drawDrawable(GraphicsX)} to only paint the content. No Scrollbars, no Headers.
+    * Force the {@link ViewPane#drawDrawable(GraphicsXD)} to only paint the content. No Scrollbars, no Headers.
     * <br>
     * <br>
     * Only valid if {@link GraphicsX} paint flag FULL repaint is not set.

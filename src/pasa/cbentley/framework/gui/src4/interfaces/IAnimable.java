@@ -13,9 +13,11 @@ import pasa.cbentley.framework.gui.src4.anim.base.ImgAnimable;
 import pasa.cbentley.framework.gui.src4.anim.definitions.AlphaChangeRgb;
 import pasa.cbentley.framework.gui.src4.anim.move.Move;
 import pasa.cbentley.framework.gui.src4.canvas.CanvasAppliInputGui;
+import pasa.cbentley.framework.gui.src4.canvas.GraphicsXD;
 import pasa.cbentley.framework.gui.src4.canvas.ViewContext;
 import pasa.cbentley.framework.gui.src4.core.Drawable;
 import pasa.cbentley.framework.gui.src4.core.RgbDrawable;
+import pasa.cbentley.sound.src4.api.controls.IMIDIControl;
 
 /**
  * Animates an {@link IDrawable}. For animation an {@link RgbImage}, use the class {@link RgbDrawable}.
@@ -75,7 +77,7 @@ import pasa.cbentley.framework.gui.src4.core.RgbDrawable;
  * <br>
  * <br>
  * <br>
- * Animation uses {@link Drawable#draw(GraphicsX)} method and its control flow to draw each of its step.
+ * Animation uses {@link Drawable#draw(GraphicsXD)} method and its control flow to draw each of its step.
  * or it draws by itself (case of {@link ImgAnimable}.
  * {@link AlphaChangeRgb} and {@link Move} are examples of {@link ImgAnimable}. They work on Drawable's pixel data.
  * The move class may be direct if the drawing time of the drawable is fast and area is big. For small Drawable though, the move
@@ -138,7 +140,6 @@ import pasa.cbentley.framework.gui.src4.core.RgbDrawable;
  */
 public interface IAnimable extends IStringable, ITechAnimableDrawable {
 
-
    /**
     * When a moving {@link IDrawable} is repainted through the animation {@link ScreenResult},
     * the previous position must be erased in optimized repaint. Therefore, it gets the boundaries
@@ -154,14 +155,7 @@ public interface IAnimable extends IStringable, ITechAnimableDrawable {
     */
    public int[] getBounds();
 
-   /**
-    * Called in the Rendering Thread before adding to the animation queue.
-    * <br>
-    * <br>
-    * In Passive Mode, the Rendering Thread is the UI thread.
-    * In Active mode, the Rendering Thread is separate
-    */
-   public void lifeStartUIThread();
+   public ByteObject getDefinition();
 
    /**
     * The Drawable animated by this {@link IAnimable}.
@@ -177,6 +171,39 @@ public interface IAnimable extends IStringable, ITechAnimableDrawable {
     * @return
     */
    public IDrawable getDrawable();
+
+   /**
+    * Target of Drawable.
+    * <li> {@link ITechAnim#ANIM_TARGET_0_FULL}
+    * <li> {@link ITechAnim#ANIM_TARGET_1_DLAYER1}
+    * <li> {@link ITechAnim#ANIM_TARGET_2_DLAYER1}
+    * <li> {@link ITechAnim#ANIM_TARGET_9_CONTENT}
+    * 
+    * @return
+    */
+   public int getTarget();
+
+   /**
+    * 
+    * <li>{@link ITechAnim#ANIM_TIME_0_MAIN}
+    * <li>{@link ITechAnim#ANIM_TIME_1_ENTRY}
+    * <li>{@link ITechAnim#ANIM_TIME_2_EXIT}
+    * <br>
+    * <br>
+    * 
+    * @return
+    */
+   public int getTiming();
+
+   /**
+    * Draw type
+    * <li>{@link ITechAnim#ANIM_DRAW_0_OVERRIDE}
+    * <li>{@link ITechAnim#ANIM_DRAW_1_CACHE}
+    * <li>{@link ITechAnim#ANIM_DRAW_2_DRAWABLE}
+    * 
+    * @return
+    */
+   public int getType();
 
    /**
     * Genetics flag + state
@@ -218,6 +245,20 @@ public interface IAnimable extends IStringable, ITechAnimableDrawable {
    public void lifeStart();
 
    /**
+    * Called in the Rendering Thread before adding to the animation queue.
+    * <br>
+    * <br>
+    * In Passive Mode, the Rendering Thread is the UI thread.
+    * In Active mode, the Rendering Thread is separate
+    */
+   public void lifeStartUIThread();
+
+   /**
+    * Called ?
+    */
+   public void loadHeavyResources();
+
+   /**
     * Readies the animable for next turn.
     * <br>
     * <br>
@@ -230,27 +271,22 @@ public interface IAnimable extends IStringable, ITechAnimableDrawable {
    public int nextTurn();
 
    /**
-    * Called ?
-    */
-   public void loadHeavyResources();
-
-   /**
     * Paints the current frame of the animation in the Rendering thread.
     * <br>
     * How to avoid synchronization issue
     * <br>
-    * Called by {@link Drawable#draw(GraphicsX)} control flow when needed.
+    * Called by {@link Drawable#draw(GraphicsXD)} control flow when needed.
     * 
     * <b>Several possibilities</b> :
-    * <li> Target {@link IDrawable} draws itself using the {@link IDrawable#draw(GraphicsX)}.
-    * <li> Target {@link IDrawable} draws itself using the {@link IDrawable#drawDrawable(GraphicsX)}.
+    * <li> Target {@link IDrawable} draws itself using the {@link IDrawable#draw(GraphicsXD)}.
+    * <li> Target {@link IDrawable} draws itself using the {@link IDrawable#drawDrawable(GraphicsXD)}.
     * <li>Animation class does its own painting each turn
     * <br>
     * Included in anim genetics
     * <br>
     * @param g {@link GraphicsX}.
     */
-   public void paint(GraphicsX g);
+   public void paint(GraphicsXD g);
 
    /**
     * Finish the animation as soon as possible.
@@ -277,41 +313,6 @@ public interface IAnimable extends IStringable, ITechAnimableDrawable {
     * <li>It is used by animation with a repeat count or infinite loop. 
     */
    public void reset();
-
-   /**
-    * Target of Drawable.
-    * <li> {@link ITechAnim#ANIM_TARGET_0_FULL}
-    * <li> {@link ITechAnim#ANIM_TARGET_1_DLAYER1}
-    * <li> {@link ITechAnim#ANIM_TARGET_2_DLAYER1}
-    * <li> {@link ITechAnim#ANIM_TARGET_9_CONTENT}
-    * 
-    * @return
-    */
-   public int getTarget();
-
-   /**
-    * Draw type
-    * <li>{@link ITechAnim#ANIM_DRAW_0_OVERRIDE}
-    * <li>{@link ITechAnim#ANIM_DRAW_1_CACHE}
-    * <li>{@link ITechAnim#ANIM_DRAW_2_DRAWABLE}
-    * 
-    * @return
-    */
-   public int getType();
-
-   /**
-    * 
-    * <li>{@link ITechAnim#ANIM_TIME_0_MAIN}
-    * <li>{@link ITechAnim#ANIM_TIME_1_ENTRY}
-    * <li>{@link ITechAnim#ANIM_TIME_2_EXIT}
-    * <br>
-    * <br>
-    * 
-    * @return
-    */
-   public int getTiming();
-
-   public ByteObject getDefinition();
 
    /**
     * Sets flag

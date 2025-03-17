@@ -8,7 +8,7 @@ import pasa.cbentley.framework.cmd.src4.interfaces.ICmdsCmd;
 import pasa.cbentley.framework.cmd.src4.trigger.CmdTrigger;
 import pasa.cbentley.framework.core.ui.src4.event.GesturePointer;
 import pasa.cbentley.framework.core.ui.src4.input.InputState;
-import pasa.cbentley.framework.core.ui.src4.tech.IInput;
+import pasa.cbentley.framework.core.ui.src4.tech.ITechInput;
 import pasa.cbentley.framework.gui.src4.cmd.CmdInstanceGui;
 import pasa.cbentley.framework.gui.src4.core.Drawable;
 import pasa.cbentley.framework.gui.src4.ctx.GuiCtx;
@@ -153,7 +153,7 @@ public class ResizeDragCtrler implements IDrawableListener {
          int pointer = CmdTrigger.getUnitKey1(unit);
          int mod = CmdTrigger.getUnitMode(unit);
          //are we moving.. case of a continuous command
-         if (mod == IInput.MOD_3_MOVED) {
+         if (mod == ITechInput.MOD_3_MOVED) {
             //do we have access to input state here?
             //what if
             InputState is = cd.getInputConfig().getInputStateDrawable();

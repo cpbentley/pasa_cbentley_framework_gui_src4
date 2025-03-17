@@ -14,6 +14,7 @@ import pasa.cbentley.framework.drawx.src4.style.StyleCache;
 import pasa.cbentley.framework.drawx.src4.style.StyleOperator;
 import pasa.cbentley.framework.gui.src4.anim.move.Move;
 import pasa.cbentley.framework.gui.src4.anim.move.MoveGhost;
+import pasa.cbentley.framework.gui.src4.canvas.GraphicsXD;
 import pasa.cbentley.framework.gui.src4.canvas.InputConfig;
 import pasa.cbentley.framework.gui.src4.canvas.PointerGestureDrawable;
 import pasa.cbentley.framework.gui.src4.canvas.ViewContext;
@@ -566,7 +567,7 @@ public class ViewPane extends Drawable implements ITechViewPane, ITechDrawable, 
     * <br>
     * @param g
     */
-   public void drawContent(GraphicsX g, int cx, int cy, int cw, int ch) {
+   public void drawContent(GraphicsXD g, int cx, int cy, int cw, int ch) {
 
       //      if (isStyleAppliedToViewPort()) {
       //         //viewport style is applied to viewDrawable
@@ -587,7 +588,7 @@ public class ViewPane extends Drawable implements ITechViewPane, ITechDrawable, 
       drawContentInside(g, cx, cy, cw, ch);
    }
 
-   private void drawContentInside(GraphicsX g, int cx, int cy, int cw, int ch) {
+   private void drawContentInside(GraphicsXD g, int cx, int cy, int cw, int ch) {
       g.clipSet(cx, cy, cw, ch);
       ScrollConfig scx = getScrollConfigHorizontal();
       ScrollConfig scy = getScrollConfigVertical();
@@ -605,7 +606,7 @@ public class ViewPane extends Drawable implements ITechViewPane, ITechDrawable, 
     * <br>
     * <br>
     */
-   public void drawDrawable(GraphicsX g) {
+   public void drawDrawable(GraphicsXD g) {
 
       int cx = getViewPortXAbs();
       int cy = getViewPortYAbs();
@@ -688,7 +689,7 @@ public class ViewPane extends Drawable implements ITechViewPane, ITechDrawable, 
       //	 }
    }
 
-   private void drawHeaders(GraphicsX g) {
+   private void drawHeaders(GraphicsXD g) {
       //draw the headers
       if (headerTop != null) {
          headerTop.draw(g);
@@ -718,7 +719,7 @@ public class ViewPane extends Drawable implements ITechViewPane, ITechDrawable, 
 
    }
 
-   private void drawHoles(GraphicsX g, IDrawable[] ds) {
+   private void drawHoles(GraphicsXD g, IDrawable[] ds) {
       if (ds != null) {
          for (int i = 0; i < ds.length; i++) {
             if (ds[i] != null) {
@@ -729,7 +730,7 @@ public class ViewPane extends Drawable implements ITechViewPane, ITechDrawable, 
 
    }
 
-   private void drawScrollBars(GraphicsX g) {
+   private void drawScrollBars(GraphicsXD g) {
       //now the scrollbars
       if (vScrollBar != null && !isScrollBarVertImmaterial()) {
          vScrollBar.draw(g);
@@ -744,7 +745,7 @@ public class ViewPane extends Drawable implements ITechViewPane, ITechDrawable, 
       drawHoles(g, scrollBarHoles);
    }
 
-   protected void drawViewedDrawableContent(GraphicsX g, ScrollConfig scx, ScrollConfig scy, int cx, int cy) {
+   protected void drawViewedDrawableContent(GraphicsXD g, ScrollConfig scx, ScrollConfig scy, int cx, int cy) {
       viewedDrawable.drawViewDrawableContentCtrl(g, cx, cy, scx, scy);
    }
 

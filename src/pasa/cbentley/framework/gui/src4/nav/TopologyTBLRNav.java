@@ -1,65 +1,64 @@
 package pasa.cbentley.framework.gui.src4.nav;
 
 import pasa.cbentley.core.src4.interfaces.C;
-import pasa.cbentley.framework.gui.src4.canvas.InputConfig;
+import pasa.cbentley.core.src4.logging.Dctx;
+import pasa.cbentley.framework.cmd.src4.nav.INavigational;
 import pasa.cbentley.framework.gui.src4.core.Drawable;
 import pasa.cbentley.framework.gui.src4.ctx.GuiCtx;
+import pasa.cbentley.framework.gui.src4.ctx.ObjectGC;
 import pasa.cbentley.framework.gui.src4.exec.ExecutionContextCanvasGui;
 import pasa.cbentley.framework.gui.src4.interfaces.IDrawable;
-import pasa.cbentley.framework.gui.src4.interfaces.INavigational;
 import pasa.cbentley.framework.gui.src4.interfaces.ITechDrawable;
 import pasa.cbentley.framework.gui.src4.string.StringEditControl;
 import pasa.cbentley.framework.gui.src4.table.TableView;
 import pasa.cbentley.framework.gui.src4.utils.DrawableArrays;
 
 /**
- * Manage a loose TBLR relationships of {@link IDrawable} between themselves with a Drawable container.
+ * Class that manages the TBLR visual topology relationships between {@link IDrawable}s.
+ * 
+ * <p>
+ * <li>Used by devices (keyboard, gamepad) to move their focus
+ * <li>Used by Floating {@link Drawable}s such as {@link StringEditControl}.
+ * <li>When a Popup Drawable appears on a n+1 DLayer, it can be TBLR associated to a TableView cell.
+ * </p>
  * <br>
- * Used by Floating {@link Drawable}s such as {@link StringEditControl}.
- * <br>
- * Some container {@link IDrawable} like {@link TableView} have their own TBLR topology closed management.
- * <br>
+ * <p>
+ * Existing structural topoligies:
+ * <li>Some container {@link IDrawable} like {@link TableView} have their own TBLR structural topology  management.
  * However that management must check if current drawable cell does not have the topology override flag.
- * <br>
- * <br>
- * 
  * This class is used a generic that may override other topologies such as {@link TableView} one.
+ * </p>
  * <br>
- * 
- * When a Popup Drawable appears on a n+1 DLayer, it can be TBLR associated to a TableView cell.
- * <br>
+ * <p>
  * Popup may be set to be Bottom of Cell {@link Drawable}. It will be drawn as such on Screen. When a Down Nav event is recieved by CellDrawable
  * having KeyFocus, CellDrawable does not have Vertical navigation. Usually, TableView would take the event and give keyfocus to the TableCell below.
- * <br>
- * <br>
+ * </p>
  * 
  * @author Charles-Philip Bentley
  *
  */
-public class TopologyTBLRNav {
-
-   public static final int OP_0_OVER   = 0;
-
-   public static final int OP_1_INSERT = 1;
-
-   public static final int START_SIZE = 3;
+public class TopologyTBLRNav extends ObjectGC implements ITechNavCmdGui {
 
    /**
     * 
     */
-   private IDrawable[]     d1         = new IDrawable[START_SIZE];
+   private IDrawable[] d1;
 
-   private IDrawable[]     d2         = new IDrawable[START_SIZE];
+   private IDrawable[] d2;
 
-   protected final GuiCtx gc;
+   private int[]       pos;
 
-   private int[]           pos        = new int[START_SIZE];
-
-   private int             posNextEmpty;
+   private int         posNextEmpty;
 
    public TopologyTBLRNav(GuiCtx gc) {
-      this.gc = gc;
+      super(gc);
+      int startSize = 3;
+      d1 = new IDrawable[startSize];
+      d2 = new IDrawable[startSize];
+      pos = new int[startSize];
+
    }
+
    /**
     * Return the {@link Drawable} in the given position relationship with d {@link Drawable}.
     * <br>
@@ -98,9 +97,24 @@ public class TopologyTBLRNav {
       return null;
    }
 
-   public int getDrawableRelation(IDrawable dr1, IDrawable dr2) {
+
+   /**
+    * The relation of d1 {@link IDrawable} relative to d2 {@link IDrawable}.
+    * <p>
+    * <b>Position:</b> <br>
+    * <li> {@link C#POS_0_TOP}
+    * <li> {@link C#POS_1_BOT}
+    * <li> {@link C#POS_2_LEFT}
+    * <li> {@link C#POS_3_RIGHT}
+    * </p>
+    * 
+    * @param d1 d1 is on Top of D2
+    * @param d2
+    * @return -1 if no position relation was set between d1 and d2
+    */
+   public int getDrawableRelation(IDrawable d1, IDrawable d2) {
       for (int i = 0; i < posNextEmpty; i++) {
-         if (d1[i] == dr1 && d2[i] == dr2) {
+         if (this.d1[i] == d1 && this.d2[i] == d2) {
             return pos[i];
          }
       }
@@ -236,7 +250,7 @@ public class TopologyTBLRNav {
    }
 
    /**
-    * Relative positioning of nav1 relative to nav2
+    * Relative positioning of nav1 relative to nav2. 
     * <br>
     * <br>
     * Does not automatically register the inverse relationship.
@@ -247,29 +261,33 @@ public class TopologyTBLRNav {
     * nav1 visually positioned on top/bottom/left/right of nav2
     * <li>nav1 top of nav2
     * <li>nav1 left of nav2
-    * <br>
-    * <br>
-    * Position: <br>
+    * 
+    * 
+    * <p>
+    * <b>Position:</b> <br>
     * <li> {@link C#POS_0_TOP}
     * <li> {@link C#POS_1_BOT}
     * <li> {@link C#POS_2_LEFT}
     * <li> {@link C#POS_3_RIGHT}
+    * </p>
     * <br>
     * 
-    * <br>
-    * The old position is not lost. The topolgy is done over {@link TopologyTBLRNav#OP_0_OVER}. Which
+    * The old position is not lost. The topolgy is done over {@link ITechNavCmdGui#NAV_TOPO_OP_0_OVER}. Which
     * means that when this topo link is removed, the old link is be prime active again.
-    * <br>
-    * {@link INavigational}
-    * <br>
+    * 
+    * <p>
+    * {@link INavigationalGui}
+    * Irrespective whether {@link IDrawable} are {@link INavigational}.
+    * </p>
+    * 
     * @param nav1
     * @param position
     * @param nav2
     * 
-    * @see INavigational
+    * @see INavigationalGui
     */
    public void positionToplogy(IDrawable nav1, int position, IDrawable nav2) {
-      positionToplogy(nav1, position, nav2, OP_0_OVER);
+      positionToplogy(nav1, position, nav2, ITechNavCmdGui.NAV_TOPO_OP_0_OVER);
    }
 
    /**
@@ -288,7 +306,8 @@ public class TopologyTBLRNav {
          nav1.setStateNav(ITechDrawable.NAV_02_TOPO_DOWN, true);
          nav2.setStateNav(ITechDrawable.NAV_01_TOPO_UP, true);
       }
-      int firstNull = -1;
+
+      int index = -1;
       for (int i = 0; i < d1.length; i++) {
          if (d1[i] == nav1 && pos[i] == position) {
             //
@@ -297,16 +316,16 @@ public class TopologyTBLRNav {
             return;
          }
          if (d1[i] == null) {
-            firstNull = i;
+            index = i;
          }
       }
       //
-      if (firstNull == -1) {
-         firstNull = getFirstNull();
+      if (index == -1) {
+         index = getFirstNull();
       }
-      d1[firstNull] = nav1;
-      pos[firstNull] = position;
-      d2[firstNull] = nav2;
+      d1[index] = nav1;
+      pos[index] = position;
+      d2[index] = nav2;
 
    }
 
@@ -325,4 +344,23 @@ public class TopologyTBLRNav {
          }
       }
    }
+
+   //#mdebug
+   public void toString(Dctx dc) {
+      dc.root(this, TopologyTBLRNav.class, toStringGetLine(336));
+      toStringPrivate(dc);
+      super.toString(dc.sup());
+   }
+
+   public void toString1Line(Dctx dc) {
+      dc.root1Line(this, TopologyTBLRNav.class, toStringGetLine(336));
+      toStringPrivate(dc);
+      super.toString1Line(dc.sup1Line());
+   }
+
+   private void toStringPrivate(Dctx dc) {
+
+   }
+   //#enddebug
+
 }

@@ -12,11 +12,22 @@ import pasa.cbentley.framework.gui.src4.ctx.IToStringFlagsGui;
  */
 public interface IConfigGui extends IConfigBO {
 
-   
    /**
     * {@link IToStringFlagsGui}
     * 
     * @return
     */
    public int toStringGetFlagsGui();
+
+   /**
+    * Number of milli seconds the caret should stay visible
+    * @return
+    */
+   public int getCaretBlinkMillisOn();
+
+   /**
+    * Number of milli seconds the caret should stay invisible
+    * @return
+    */
+   public int getCaretBlinkMillisOff();
 }

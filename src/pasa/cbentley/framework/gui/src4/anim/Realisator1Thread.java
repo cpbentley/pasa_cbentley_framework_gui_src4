@@ -384,7 +384,7 @@ public class Realisator1Thread extends Realisator implements ITechAnimableDrawab
             animationsNeedRepaint[i] = anim;
             screenResultAnimation.setActionDoneRepaint(anim.getDrawable());
             //#debug
-            screenResultAnimation.debugSetActionDoneRepaint(anim.toString1Line());
+            screenResultAnimation.toStringSetActionDoneRepaint(anim.toString1Line());
          }
       } else {
          //make sure it is there
@@ -393,7 +393,7 @@ public class Realisator1Thread extends Realisator implements ITechAnimableDrawab
          //register animable drawable to be repainted
          screenResultAnimation.setActionDoneRepaint(anim.getDrawable());
          //#debug
-         screenResultAnimation.debugSetActionDoneRepaint(anim.toString1Line());
+         screenResultAnimation.toStringSetActionDoneRepaint(anim.toString1Line());
       }
    }
 

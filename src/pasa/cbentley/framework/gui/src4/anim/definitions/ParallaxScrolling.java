@@ -2,8 +2,8 @@ package pasa.cbentley.framework.gui.src4.anim.definitions;
 
 import pasa.cbentley.byteobjects.src4.core.ByteObject;
 import pasa.cbentley.core.src4.logging.Dctx;
-import pasa.cbentley.framework.drawx.src4.engine.GraphicsX;
 import pasa.cbentley.framework.gui.src4.anim.base.DrawableAnim;
+import pasa.cbentley.framework.gui.src4.canvas.GraphicsXD;
 import pasa.cbentley.framework.gui.src4.ctx.GuiCtx;
 import pasa.cbentley.framework.gui.src4.interfaces.IDrawable;
 
@@ -37,7 +37,7 @@ public class ParallaxScrolling extends DrawableAnim {
    public void nextTurnSub() {
    }
 
-   public void paint(GraphicsX g) {
+   public void paint(GraphicsXD g) {
 
    }
 

@@ -58,7 +58,7 @@ public class CmdProcessorGui extends CmdProcessor implements ICmdsGui, ITechInpu
     */
    public CmdNode getModalCmdNode() {
       if (modalCtx == null) {
-         modalCtx = cc.getCmdNodeRoot().createChildCtx("Modal");
+         modalCtx = cc.getCmdNodeRoot().createChildNode("Modal");
          CmdTrigger ctFire = cc.getFacTrig().createKeyP(ITechCodes.KEY_FIRE);
          modalCtx.addCmdLink(ctFire, ICmdsCmd.CMD_04_OK);
          CmdTrigger ctEscape = cc.getFacTrig().createKeyP(ITechCodes.KEY_ESCAPE);

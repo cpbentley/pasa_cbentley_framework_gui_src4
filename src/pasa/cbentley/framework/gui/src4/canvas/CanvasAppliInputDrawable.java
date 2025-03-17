@@ -78,11 +78,11 @@ public abstract class CanvasAppliInputDrawable extends CanvasAppliInput implemen
    /**
     * Sub class 
     */
-   public void draw(GraphicsX g) {
+   public void draw(GraphicsXD g) {
 
    }
 
-   public void drawDrawable(GraphicsX g) {
+   public void drawDrawable(GraphicsXD g) {
       // TODO Auto-generated method stub
 
    }
@@ -271,7 +271,6 @@ public abstract class CanvasAppliInputDrawable extends CanvasAppliInput implemen
       //#debug
       toDLog().pDraw("Clip " + "[" + g.getClipX() + "," + g.getClipY() + " " + g.getClipWidth() + "," + g.getClipHeight() + "]", null, CanvasAppliInput.class, "render");
 
-      OutputStateCanvasGui renderCause = (OutputStateCanvasGui) sr;
       //clean clip sequence since this is a new paint job
       super.paintStart();
       //create new GraphicsXDrawable context
@@ -287,8 +286,7 @@ public abstract class CanvasAppliInputDrawable extends CanvasAppliInput implemen
          //when paint mode is not screen, we have to draw
          destGraphicsX.reset(g);
       }
-      destGraphicsX.screenResultCause = renderCause;
-      destGraphicsX.isd = (InputStateCanvasGui) is;
+      destGraphicsX.setExecutionContextCanvasGui((ExecutionContextCanvasGui) ec);
 
       draw(destGraphicsX);
    }
@@ -381,7 +379,7 @@ public abstract class CanvasAppliInputDrawable extends CanvasAppliInput implemen
 
    }
 
-   public void show(GraphicsX g) {
+   public void show(GraphicsXD g) {
       // TODO Auto-generated method stub
 
    }

@@ -4,12 +4,12 @@ import pasa.cbentley.byteobjects.src4.core.ByteObject;
 import pasa.cbentley.core.src4.interfaces.C;
 import pasa.cbentley.core.src4.logging.Dctx;
 import pasa.cbentley.framework.drawx.src4.ctx.IBOTypesDrawX;
-import pasa.cbentley.framework.drawx.src4.engine.GraphicsX;
 import pasa.cbentley.framework.drawx.src4.engine.RgbImage;
 import pasa.cbentley.framework.drawx.src4.factories.interfaces.IBOFigure;
 import pasa.cbentley.framework.drawx.src4.tech.ITechFigure;
 import pasa.cbentley.framework.gui.src4.anim.IBOAnim;
 import pasa.cbentley.framework.gui.src4.anim.ITechAnim;
+import pasa.cbentley.framework.gui.src4.canvas.GraphicsXD;
 import pasa.cbentley.framework.gui.src4.ctx.GuiCtx;
 import pasa.cbentley.framework.gui.src4.ctx.IBOTypesGui;
 import pasa.cbentley.framework.gui.src4.ctx.IToStringFlagsDraw;
@@ -100,7 +100,7 @@ public class FigDrawable extends Drawable implements ITechFigure {
       setFigure(fig);
    }
 
-   public void drawAt(GraphicsX g, int x, int y) {
+   public void drawAt(GraphicsXD g, int x, int y) {
       setXY(x, y);
       draw(g);
    }
@@ -108,7 +108,7 @@ public class FigDrawable extends Drawable implements ITechFigure {
    /**
     * Figure is a DrwParam.
     */
-   public void drawDrawable(GraphicsX g) {
+   public void drawDrawable(GraphicsXD g) {
       //#mdebug
       if (gc.toStringHasFlagDraw(IToStringFlagsDraw.FLAG_DRAW_02_FIG_DRAWABLE_BOUNDARY)) {
          g.setColor(255, 20, 20);
@@ -126,7 +126,7 @@ public class FigDrawable extends Drawable implements ITechFigure {
       }
    }
 
-   public void drawDrawableContent(GraphicsX g, int x, int y, int w, int h) {
+   public void drawDrawableContent(GraphicsXD g, int x, int y, int w, int h) {
       ByteObject figure = getFigure();
       g.drawFigure(figure, x, y, w, h);
    }
@@ -164,7 +164,7 @@ public class FigDrawable extends Drawable implements ITechFigure {
 
    public void managePointerInput(ExecutionContextCanvasGui ec) {
       //#debug
-      toDLog().pEvent1("x=" + ec.getInputStateDrawable().getX() + " y=" + ec.getInputStateDrawable().getY(), null, FigDrawable.class, "managePointerInput");
+      toDLog().pEvent1("x=" + ec.getInputStateCanvasGui().getX() + " y=" + ec.getInputStateCanvasGui().getY(), null, FigDrawable.class, "managePointerInput");
    }
 
    /**

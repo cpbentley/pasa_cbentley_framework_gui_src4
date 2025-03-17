@@ -6,13 +6,13 @@ import pasa.cbentley.core.src4.logging.Dctx;
 import pasa.cbentley.core.src4.stator.StatorReader;
 import pasa.cbentley.core.src4.stator.StatorWriter;
 import pasa.cbentley.core.src4.utils.BitUtils;
-import pasa.cbentley.core.src4.utils.IntUtils;
 import pasa.cbentley.framework.cmd.src4.engine.CmdInstance;
 import pasa.cbentley.framework.core.ui.src4.tech.ITechGestures;
 import pasa.cbentley.framework.drawx.src4.engine.GraphicsX;
 import pasa.cbentley.framework.drawx.src4.engine.RgbImage;
 import pasa.cbentley.framework.drawx.src4.string.StringMetrics;
 import pasa.cbentley.framework.gui.src4.anim.move.Move;
+import pasa.cbentley.framework.gui.src4.canvas.GraphicsXD;
 import pasa.cbentley.framework.gui.src4.canvas.InputConfig;
 import pasa.cbentley.framework.gui.src4.canvas.PointerGestureDrawable;
 import pasa.cbentley.framework.gui.src4.canvas.ViewContext;
@@ -22,7 +22,6 @@ import pasa.cbentley.framework.gui.src4.ctx.IToStringFlagsGui;
 import pasa.cbentley.framework.gui.src4.ctx.ToStringStaticGui;
 import pasa.cbentley.framework.gui.src4.exec.ExecutionContextCanvasGui;
 import pasa.cbentley.framework.gui.src4.factories.interfaces.IBOViewPane;
-import pasa.cbentley.framework.gui.src4.interfaces.IBODrawable;
 import pasa.cbentley.framework.gui.src4.interfaces.IDrawable;
 import pasa.cbentley.framework.gui.src4.interfaces.ITechCanvasDrawable;
 import pasa.cbentley.framework.gui.src4.interfaces.ITechDrawable;
@@ -293,7 +292,7 @@ public class ViewDrawable extends Drawable implements ITechViewDrawable, ITechVi
    }
 
    /**
-    * Called by {@link Drawable#draw(GraphicsX)}. 
+    * Called by {@link Drawable#draw(GraphicsXD)}. 
     * <br>
     * <br>
     * If component has a ViewPane, it delegates drawing flow control. Otherwise, it calls {@link ViewDrawable#drawViewDrawableContent(GraphicsX, int, int, ScrollConfig, ScrollConfig)}
@@ -301,7 +300,7 @@ public class ViewDrawable extends Drawable implements ITechViewDrawable, ITechVi
     * <br>
     * <br>
     */
-   public final void drawDrawable(GraphicsX g) {
+   public final void drawDrawable(GraphicsXD g) {
       if (viewPane != null) {
          //draw the view pane that will call the drawDrawable method 
          //no flow control for the ViewPane
@@ -331,7 +330,7 @@ public class ViewDrawable extends Drawable implements ITechViewDrawable, ITechVi
     * For the {@link ViewDrawable}, content is ViewPane and everything. Only Style layers are not content
     * <br>
     */
-   public void drawDrawableContent(GraphicsX g) {
+   public void drawDrawableContent(GraphicsXD g) {
       drawDrawable(g);
       //drawViewDrawableContent(g, getContentX(), getContentY(), getSChorizontal(), getSCvertical());
    }
@@ -355,7 +354,7 @@ public class ViewDrawable extends Drawable implements ITechViewDrawable, ITechVi
     * @param scx may be null
     * @param scy may be null
     */
-   public void drawViewDrawable(GraphicsX g, int x, int y, ScrollConfig scx, ScrollConfig scy) {
+   public void drawViewDrawable(GraphicsXD g, int x, int y, ScrollConfig scx, ScrollConfig scy) {
 
    }
 
@@ -397,11 +396,11 @@ public class ViewDrawable extends Drawable implements ITechViewDrawable, ITechVi
     * @param scx {@link ScrollConfig} for horizontal scrolling
     * @param scy {@link ScrollConfig} for vertical scrolling
     */
-   public void drawViewDrawableContent(GraphicsX g, int x, int y, ScrollConfig scx, ScrollConfig scy) {
+   public void drawViewDrawableContent(GraphicsXD g, int x, int y, ScrollConfig scx, ScrollConfig scy) {
       //to be subclassed
    }
 
-   public void drawViewDrawableContentCtrl(GraphicsX g, int x, int y, ScrollConfig scx, ScrollConfig scy) {
+   public void drawViewDrawableContentCtrl(GraphicsXD g, int x, int y, ScrollConfig scx, ScrollConfig scy) {
       //System.out.println("#ViewDrawable#drawViewDrawableContentCtrl " + toStringOneLine());
       if (hasState(ITechDrawable.STATE_22_ANIMATED_CONTENT_HIDDEN) && da != null) {
          //System.out.println("#ViewDrawable#drawViewDrawableContentCtrl Anim Content Hidden " + Thread.currentThread().toString());
@@ -417,7 +416,7 @@ public class ViewDrawable extends Drawable implements ITechViewDrawable, ITechVi
     * @param scX
     * @param scY
     */
-   public void drawViewDrawableDeco(GraphicsX g, int x, int y, ScrollConfig scX, ScrollConfig scY) {
+   public void drawViewDrawableDeco(GraphicsXD g, int x, int y, ScrollConfig scX, ScrollConfig scY) {
 
    }
 
@@ -435,7 +434,7 @@ public class ViewDrawable extends Drawable implements ITechViewDrawable, ITechVi
     * @param scx
     * @param scy
     */
-   //   protected void drawDrawableStyledViewPort(GraphicsX g, int x, int y, ScrollConfig scx, ScrollConfig scy) {
+   //   protected void drawDrawableStyledViewPort(GraphicsXD g, int x, int y, ScrollConfig scx, ScrollConfig scy) {
    //      //System.out.println("drawDrawableStyledViewPort x=" + x + " y=" + y);
    //      int contentX = x + MStyle.getStyleLeftWConsumed(style);
    //      int contentY = y + MStyle.getStyleTopHConsumed(style);
@@ -458,14 +457,14 @@ public class ViewDrawable extends Drawable implements ITechViewDrawable, ITechVi
     * @param x shifted content root x coordinate
     * @param y shifted content root y coordinate
     */
-   //   public void drawViewDrawableContent(GraphicsX g, int x, int y) {
+   //   public void drawViewDrawableContent(GraphicsXD g, int x, int y) {
    //      drawViewDrawableContent(g, x, y, null, null);
    //   }
 
    /**
     * 
     */
-   public void eraseDrawableContent(GraphicsX g) {
+   public void eraseDrawableContent(GraphicsXD g) {
       if (viewPane != null) {
          g.fillRect(getContentX(), getContentY(), getContentW(), getContentH());
       } else {
@@ -481,7 +480,7 @@ public class ViewDrawable extends Drawable implements ITechViewDrawable, ITechVi
     * @param scx
     * @param scy
     */
-   //   public void drawViewDrawableStyle(GraphicsX g, int x, int y, ScrollConfig scx, ScrollConfig scy) {
+   //   public void drawViewDrawableStyle(GraphicsXD g, int x, int y, ScrollConfig scx, ScrollConfig scy) {
    //      int styleValue = viewPane.getTech().get1(IViewPane.VP_OFFSET_7STYLE_MODE1);
    //      if (viewPane != null) {
    //         switch (styleValue) {
@@ -865,7 +864,7 @@ public class ViewDrawable extends Drawable implements ITechViewDrawable, ITechVi
          ih = scy.getPixelVisibleSize();
       }
       RgbImage ri = gc.getDC().getCache().create(iw, ih);
-      GraphicsX g = ri.getGraphicsX();
+      GraphicsXD g = (GraphicsXD) ri.getGraphicsX();
       //we needed not erase of special stuff. full
       g.setPaintCtxFlag(ITechCanvasDrawable.REPAINT_01_FULL, true);
       boolean hasClip = hasFlagView(FLAG_VSTATE_01_CLIP);
@@ -1468,7 +1467,7 @@ public class ViewDrawable extends Drawable implements ITechViewDrawable, ITechVi
     */
    public void managePointerGesture(ExecutionContextCanvasGui ec) {
       //System.out.println("#ViewDrawable#managePointerGesture " + pg.toStringOneLine());
-      GestureDetector pg = ec.getInputStateDrawable().getOrCreateGesture(this);
+      GestureDetector pg = ec.getInputStateCanvasGui().getOrCreateGesture(this);
       InputConfig ic = ec.getInputConfig();
       //how to stop the gesture? when a new press event occurs
       if (ic.isGestured()) {
@@ -1599,7 +1598,7 @@ public class ViewDrawable extends Drawable implements ITechViewDrawable, ITechVi
       } else {
          //case when no viewpane satellites have been acted upon. So if no drawable was set any new states
          //the only remaining case is the content of the viewdrawable. so go up to Drawable states.
-         if (!ic.getCanvasResultDrawable().isDrawableStatesSet()) {
+         if (!ic.getOutputStateCanvasGui().isDrawableStatesSet()) {
             super.managePointerStateStyle(ec);
          }
       }
